@@ -4,7 +4,10 @@ import { notFound } from "next/navigation";
 import type { Plan } from "@/lib/api";
 import { COUNTRIES, getCountry, countriesByRegion } from "@/i18n/countries";
 import { buildCountryJsonLd } from "@/lib/jsonld";
-import { LandingPlans } from "@/components/LandingPlans";
+import { CategoryGroupedGrid } from "@/components/CategoryGroupedGrid";
+import { Footer } from "@/components/Footer";
+import { langOfCountry, tr } from "@/i18n/languages";
+import { CATEGORY_CODES, categoryLabel, categorySlug } from "@/i18n/categories";
 
 export const dynamic = "force-dynamic";
 
@@ -19,9 +22,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const c = getCountry(country);
   if (!c) return { title: "Not found" };
 
-  // hreflang: cada país aponta para a sua URL pelo seu BCP 47 único.
-  // x-default aponta para a home.
-  const languages: Record<string, string> = { "x-default": "/" };
+  const languages: Record<string, string> = { "x-default": "/", en: "/" };
   for (const other of COUNTRIES) {
     languages[other.htmlLang] = `/${other.code}`;
   }
@@ -48,12 +49,12 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   };
 }
 
-async function getSeguidoresPlans(): Promise<Plan[]> {
+async function getPlans(): Promise<Plan[]> {
   const base = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
   try {
     const res = await fetch(`${base}/v1/plans`, { cache: "no-store" });
     const json = await res.json();
-    return (json.data as Plan[]).filter((p) => p.category === "seguidores");
+    return (json.data as Plan[]) ?? [];
   } catch {
     return [];
   }
@@ -64,27 +65,27 @@ export default async function CountryPage({ params }: { params: Promise<Params> 
   const c = getCountry(country);
   if (!c) notFound();
 
-  const plans = await getSeguidoresPlans();
-  const jsonld = buildCountryJsonLd(c, plans, siteUrl());
+  const plans = await getPlans();
+  const lang = langOfCountry(c.code);
+  const t = tr(lang);
 
-  // Outros mercados (mesma região primeiro, depois a outra).
+  // JSON-LD agora cobre todas as categorias (não só seguidores).
+  const seguidoresPlans = plans.filter((p) => p.category === "seguidores");
+  const jsonld = buildCountryJsonLd(c, seguidoresPlans, siteUrl());
+
   const sameRegion = countriesByRegion(c.region).filter((o) => o.code !== c.code);
   const otherRegion = countriesByRegion(c.region === "americas" ? "sepa" : "americas");
 
   return (
     <>
       {jsonld.map((doc, i) => (
-        <script
-          key={i}
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(doc) }}
-        />
+        <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(doc) }} />
       ))}
 
       <article lang={c.htmlLang}>
         <nav aria-label="Breadcrumb" className="container" style={{ paddingTop: "0.5rem", fontSize: "0.85rem", color: "var(--muted)" }}>
           <ol style={{ listStyle: "none", display: "flex", gap: "0.5rem", padding: 0 }}>
-            <li><Link href="/">Home</Link></li>
+            <li><Link href="/">{t.category.breadcrumb}</Link></li>
             <li aria-hidden>›</li>
             <li aria-current="page">{c.flag} {c.name}</li>
           </ol>
@@ -93,17 +94,25 @@ export default async function CountryPage({ params }: { params: Promise<Params> 
         <header className="hero container">
           <h1>{c.flag} {c.h1}</h1>
           <p>{c.intro}</p>
-          <p style={{ marginTop: "0.75rem", fontSize: "0.85rem" }}>
-            <Link href={`/v2/${c.code}`} style={{ color: "var(--accent)" }}>
-              Ver versão com calculadora →
-            </Link>
-          </p>
         </header>
 
         <main className="container" style={{ paddingBottom: "4rem" }}>
-          <section aria-labelledby="plans-heading">
-            <LandingPlans plans={plans} labels={c.labels} />
-          </section>
+          {/* Atalhos diretos para cada página de categoria — sinaliza o
+              menu de serviços e dá link interno para SEO. */}
+          <nav aria-label={t.home.pickService} style={{ marginBottom: "2rem", display: "flex", gap: "0.5rem", flexWrap: "wrap", justifyContent: "center" }}>
+            {CATEGORY_CODES.map((code) => (
+              <Link
+                key={code}
+                href={`/${c.code}/${categorySlug(code, lang)}`}
+                className="btn btn-outline"
+                style={{ padding: "0.5rem 1rem", fontSize: "0.9rem" }}
+              >
+                {categoryLabel(code, lang)}
+              </Link>
+            ))}
+          </nav>
+
+          <CategoryGroupedGrid plans={plans} lang={lang} countryCode={c.code} />
 
           <p style={{ textAlign: "center", marginTop: "2.5rem" }}>
             <Link href="/" className="btn btn-outline">
@@ -116,7 +125,7 @@ export default async function CountryPage({ params }: { params: Promise<Params> 
               {c.labels.otherMarkets}
             </h2>
             <h3 style={{ fontSize: "0.85rem", color: "var(--muted)", margin: "0.5rem 0" }}>
-              {c.region === "americas" ? "Américas / Americas" : "Europa / SEPA"}
+              {c.region === "americas" ? "Americas" : "Europe / SEPA"}
             </h3>
             <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
               {sameRegion.map((o) => (
@@ -126,7 +135,7 @@ export default async function CountryPage({ params }: { params: Promise<Params> 
               ))}
             </div>
             <h3 style={{ fontSize: "0.85rem", color: "var(--muted)", margin: "1rem 0 0.5rem" }}>
-              {c.region === "americas" ? "Europa / SEPA" : "Américas / Americas"}
+              {c.region === "americas" ? "Europe / SEPA" : "Americas"}
             </h3>
             <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
               {otherRegion.map((o) => (
@@ -138,6 +147,8 @@ export default async function CountryPage({ params }: { params: Promise<Params> 
           </section>
         </main>
       </article>
+
+      <Footer lang={lang} />
     </>
   );
 }

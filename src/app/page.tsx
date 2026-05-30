@@ -1,57 +1,100 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import type { Category, Plan } from "@/lib/api";
+import type { Metadata } from "next";
 import Link from "next/link";
-import { fetchCategories, fetchPlans } from "@/lib/api";
-import { PlansSection } from "@/components/PlansSection";
-import { countriesByRegion } from "@/i18n/countries";
+import type { Plan } from "@/lib/api";
+import { COUNTRIES, countriesByRegion } from "@/i18n/countries";
+import { CategoryGroupedGrid } from "@/components/CategoryGroupedGrid";
+import { Footer } from "@/components/Footer";
+import { tr } from "@/i18n/languages";
 
-export default function HomePage() {
-  const [plans, setPlans] = useState<Plan[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+// Home global. Inglês "international" — atende quem chega sem cookie de
+// idioma/país detectado. Conteúdo focado em "global followers" + lista de
+// mercados para CTR para subsites por país.
+//
+// `/` é a entrada canônica para `en` na hreflang.
 
-  useEffect(() => {
-    Promise.all([fetchPlans(), fetchCategories()])
-      .then(([p, c]) => {
-        setPlans(p);
-        setCategories(c);
-      })
-      .catch((e) => setError(e instanceof Error ? e.message : "API indisponível"))
-      .finally(() => setLoading(false));
-  }, []);
+export const dynamic = "force-dynamic";
+
+function siteUrl() {
+  return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+}
+
+export const metadata: Metadata = {
+  title: "Buy Instagram & TikTok followers worldwide | Viralefy",
+  description:
+    "Real followers, engagement and views for Instagram and TikTok. Fast delivery, 30-day refill guarantee, support in your language. Pay in USD, EUR, BRL or crypto.",
+  alternates: (() => {
+    const languages: Record<string, string> = { "x-default": "/", en: "/" };
+    for (const c of COUNTRIES) languages[c.htmlLang] = `/${c.code}`;
+    return { canonical: "/", languages };
+  })(),
+  openGraph: {
+    title: "Buy Instagram & TikTok followers worldwide | Viralefy",
+    description:
+      "Real followers, engagement and views for Instagram and TikTok. Fast delivery, 30-day refill guarantee, support in your language.",
+    locale: "en_US",
+    type: "website",
+    url: siteUrl(),
+  },
+  twitter: { card: "summary_large_image" },
+};
+
+async function getPlans(): Promise<Plan[]> {
+  const base = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
+  try {
+    const res = await fetch(`${base}/v1/plans`, { cache: "no-store" });
+    const json = await res.json();
+    return (json.data as Plan[]) ?? [];
+  } catch {
+    return [];
+  }
+}
+
+export default async function HomePage() {
+  const plans = await getPlans();
+  const t = tr("en");
+  const url = siteUrl();
+
+  // JSON-LD para a home global. Organization + WebSite + ItemList dos planos.
+  const jsonld = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: "Viralefy",
+      url,
+      logo: `${url}/logo.png`,
+      sameAs: [],
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: "Viralefy",
+      url,
+      potentialAction: {
+        "@type": "SearchAction",
+        target: `${url}/{country}`,
+        "query-input": "required name=country",
+      },
+    },
+  ];
 
   return (
     <>
+      {jsonld.map((doc, i) => (
+        <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(doc) }} />
+      ))}
+
       <section className="hero container">
-        <h1>Impulsione seu Instagram</h1>
-        <p>
-          Seguidores, engajamento e visualizações com entrega rápida. Escolha um
-          serviço, pague na moeda que preferir — inclusive cripto.
-        </p>
+        <h1>{t.home.heroTitle}</h1>
+        <p>{t.home.heroSubtitle}</p>
       </section>
 
       <main className="container" style={{ paddingBottom: "4rem" }}>
-        {error && (
-          <div className="alert alert-error">
-            Não foi possível carregar os serviços: {error}. Verifique se a API
-            está rodando em localhost:8080.
-          </div>
-        )}
-        {loading ? (
-          <p style={{ color: "var(--muted)", textAlign: "center" }}>Carregando…</p>
-        ) : (
-          <PlansSection plans={plans} categories={categories} />
-        )}
+        <CategoryGroupedGrid plans={plans} lang="en" countryCode="" />
 
         <section style={{ marginTop: "3.5rem", borderTop: "1px solid var(--border)", paddingTop: "2rem" }}>
-          <h2 style={{ fontSize: "1.2rem", marginBottom: "1rem", textAlign: "center" }}>
-            Mercados e idiomas
-          </h2>
+          <h2 style={{ fontSize: "1.2rem", marginBottom: "1rem", textAlign: "center" }}>{t.home.pickMarket}</h2>
           <h3 style={{ fontSize: "0.9rem", color: "var(--muted)", marginBottom: "0.5rem", textAlign: "center" }}>
-            Américas
+            Americas
           </h3>
           <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", justifyContent: "center", marginBottom: "1.25rem" }}>
             {countriesByRegion("americas").map((c) => (
@@ -66,7 +109,7 @@ export default function HomePage() {
             ))}
           </div>
           <h3 style={{ fontSize: "0.9rem", color: "var(--muted)", marginBottom: "0.5rem", textAlign: "center" }}>
-            Europa / SEPA
+            Europe / SEPA
           </h3>
           <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", justifyContent: "center" }}>
             {countriesByRegion("sepa").map((c) => (
@@ -83,17 +126,7 @@ export default function HomePage() {
         </section>
       </main>
 
-      <footer
-        className="container"
-        style={{
-          padding: "2rem 0",
-          borderTop: "1px solid var(--border)",
-          color: "var(--muted)",
-          fontSize: "0.875rem",
-        }}
-      >
-        © {new Date().getFullYear()} Viralefy. Uso responsável das redes sociais.
-      </footer>
+      <Footer lang="en" />
     </>
   );
 }

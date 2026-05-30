@@ -1,15 +1,13 @@
 import type { MetadataRoute } from "next";
-import { COUNTRIES } from "@/i18n/countries";
+import { allSiteUrls } from "@/lib/site-urls";
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-  const countries = COUNTRIES.map((c) => ({
-    url: `${base}/${c.code}`,
-    changeFrequency: "weekly" as const,
-    priority: 0.8,
+// Sitemap canônico. Single-source-of-truth: `lib/site-urls.ts`.
+// O mesmo arquivo alimenta o endpoint IndexNow.
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const list = await allSiteUrls();
+  return list.map((u) => ({
+    url: u.url,
+    changeFrequency: u.changeFrequency,
+    priority: u.priority,
   }));
-  return [
-    { url: base, changeFrequency: "weekly", priority: 1 },
-    ...countries,
-  ];
 }
