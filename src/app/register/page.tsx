@@ -21,7 +21,6 @@ export default function RegisterPage() {
       const session = await userRegister({
         name: String(fd.get("name")),
         email: String(fd.get("email")),
-        instagram: String(fd.get("instagram")),
         password: String(fd.get("password")),
       });
       login(session);
@@ -46,10 +45,6 @@ export default function RegisterPage() {
           <div>
             <label className="label" htmlFor="email">E-mail</label>
             <input className="input" id="email" name="email" type="email" required />
-          </div>
-          <div>
-            <label className="label" htmlFor="instagram">@ Instagram</label>
-            <input className="input" id="instagram" name="instagram" placeholder="seuperfil" required />
           </div>
           <div>
             <label className="label" htmlFor="password">Senha (mín. 8 caracteres)</label>

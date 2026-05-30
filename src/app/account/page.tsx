@@ -46,6 +46,21 @@ export default function AccountPage() {
         </Link>
       </div>
 
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "0.75rem", marginBottom: "2rem" }}>
+        <Link href="/account/profiles" className="card" style={{ textDecoration: "none", color: "var(--text)" }}>
+          <strong style={{ display: "block", marginBottom: "0.25rem" }}>👤 Perfis</strong>
+          <span style={{ color: "var(--muted)", fontSize: "0.85rem" }}>Cadastre seus perfis IG/TikTok</span>
+        </Link>
+        <Link href="/account/credits" className="card" style={{ textDecoration: "none", color: "var(--text)" }}>
+          <strong style={{ display: "block", marginBottom: "0.25rem" }}>💳 Créditos</strong>
+          <span style={{ color: "var(--muted)", fontSize: "0.85rem" }}>Saldo + recarga + ledger</span>
+        </Link>
+        <Link href="/tickets" className="card" style={{ textDecoration: "none", color: "var(--text)" }}>
+          <strong style={{ display: "block", marginBottom: "0.25rem" }}>🎫 Suporte</strong>
+          <span style={{ color: "var(--muted)", fontSize: "0.85rem" }}>Tickets de atendimento</span>
+        </Link>
+      </div>
+
       <h2 style={{ marginBottom: "1rem", fontSize: "1.2rem" }}>Histórico de compras</h2>
 
       {error && <div className="alert alert-error">{error}</div>}

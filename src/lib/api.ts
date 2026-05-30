@@ -1,10 +1,15 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
 
+export type Platform = "instagram" | "tiktok";
+export type TargetType = "profile" | "publication";
+
 export type Plan = {
   id: string;
   name: string;
   description: string;
   category: string;
+  platform: Platform;
+  target_type: TargetType;
   followers_qty: number;
   price_cents: number;
   currency: string;
@@ -33,8 +38,11 @@ export type CheckoutPayload = {
   plan_id: string;
   email: string;
   name: string;
-  instagram: string;
   display_currency: string;
+  profile_id?: string;
+  new_profile?: { platform: Platform; handle: string; display_name?: string };
+  publication_url?: string;
+  payment_method?: "gateway" | "credits";
 };
 
 export type CheckoutResult = {
@@ -50,9 +58,12 @@ export type CheckoutResult = {
   account_created: boolean;
   email: string;
   email_sent: boolean;
-  gateway_provider: string;
+  gateway_provider?: string;
   payment_url?: string;
   payment_extra?: Record<string, string>;
+  payment_method: "gateway" | "credits";
+  credits_used_cents?: number;
+  credit_balance_cents?: number;
 };
 
 export type User = {
@@ -103,10 +114,10 @@ export const fetchPlans = () => request<Plan[]>("/v1/plans");
 export const fetchCategories = () => request<Category[]>("/v1/categories");
 export const fetchCurrencies = () => request<Currency[]>("/v1/currencies");
 
-export const checkout = (payload: CheckoutPayload) =>
-  request<CheckoutResult>("/v1/checkout", { method: "POST", body: JSON.stringify(payload) });
+export const checkout = (payload: CheckoutPayload, token?: string) =>
+  request<CheckoutResult>("/v1/checkout", { method: "POST", body: JSON.stringify(payload) }, token);
 
-export const userRegister = (body: { email: string; name: string; instagram: string; password: string }) =>
+export const userRegister = (body: { email: string; name: string; password: string }) =>
   request<Session>("/v1/auth/user/register", { method: "POST", body: JSON.stringify(body) });
 
 export const userLogin = (email: string, password: string) =>
@@ -165,3 +176,91 @@ export const replyTicket = (token: string, id: string, body: string) =>
     { method: "POST", body: JSON.stringify({ body }) },
     token
   );
+
+// ----- Profiles ----- //
+
+export type Profile = {
+  id: string;
+  user_id: string;
+  platform: Platform;
+  handle: string;
+  display_name: string;
+  verified: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export const fetchMyProfiles = (token: string) =>
+  request<Profile[]>("/v1/me/profiles", undefined, token);
+
+export const addProfile = (
+  token: string,
+  body: { platform: Platform; handle: string; display_name?: string }
+) =>
+  request<Profile>("/v1/me/profiles", { method: "POST", body: JSON.stringify(body) }, token);
+
+export const deleteProfile = (token: string, id: string) =>
+  request<void>(`/v1/me/profiles/${id}`, { method: "DELETE" }, token);
+
+// ----- Créditos + ledger ----- //
+
+export type CreditAccount = {
+  user_id: string;
+  balance_cents: number;
+  currency: string;
+  updated_at: string;
+};
+
+export type CreditTxType = "recharge" | "spend" | "refund" | "adjustment";
+
+export type CreditTransaction = {
+  id: string;
+  user_id: string;
+  type: CreditTxType;
+  amount_cents: number; // signed
+  balance_after_cents: number;
+  currency: string;
+  order_id?: string | null;
+  invoice_id?: string | null;
+  description: string;
+  metadata: Record<string, string>;
+  created_at: string;
+};
+
+export const fetchCredits = (token: string) =>
+  request<CreditAccount>("/v1/me/credits", undefined, token);
+
+export const fetchTransactions = (token: string) =>
+  request<CreditTransaction[]>("/v1/me/transactions", undefined, token);
+
+// ----- Invoices (recargas) ----- //
+
+export type InvoiceStatus = "pending" | "paid" | "failed" | "cancelled";
+
+export type Invoice = {
+  id: string;
+  user_id: string;
+  amount_cents: number;
+  currency: string;
+  display_currency: string;
+  display_amount: string;
+  settlement_currency: string;
+  settlement_amount: string;
+  status: InvoiceStatus;
+  gateway_id?: string | null;
+  external_ref?: string | null;
+  payment_url?: string | null;
+  payment_extra: Record<string, string>;
+  created_at: string;
+  updated_at: string;
+  paid_at?: string | null;
+};
+
+export const fetchMyInvoices = (token: string) =>
+  request<Invoice[]>("/v1/me/invoices", undefined, token);
+
+export const requestRecharge = (
+  token: string,
+  body: { amount_cents: number; display_currency?: string }
+) =>
+  request<Invoice>("/v1/me/recharge", { method: "POST", body: JSON.stringify(body) }, token);
