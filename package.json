@@ -7,7 +7,13 @@
     "build": "next build",
     "start": "next start -p 3000",
     "lint": "next lint",
-    "indexnow": "node scripts/indexnow.mjs"
+    "indexnow": "node scripts/indexnow.mjs",
+    "test": "node --import ./tests/ts-loader.mjs --test tests/unit/*.test.mjs",
+    "test:smoke": "bash tests/smoke/run.sh",
+    "test:pentest": "bash tests/pentest/probes.sh",
+    "test:emulated:browse": "node tests/emulated/browse-flow.mjs",
+    "test:emulated:checkout": "node tests/emulated/checkout-flow.mjs",
+    "test:all": "npm test && npm run test:smoke && npm run test:pentest && npm run test:emulated:browse"
   },
   "dependencies": {
     "next": "^15.3.0",

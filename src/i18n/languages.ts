@@ -5,7 +5,11 @@
 export type LangCode =
   | "pt" | "en" | "es" | "es_AR" | "fr" | "de" | "it" | "nl"
   | "pl" | "sv" | "da" | "no" | "fi" | "is" | "et" | "lv" | "lt"
-  | "cs" | "sk" | "hu" | "ro" | "bg" | "el" | "hr" | "sl" | "ca";
+  | "cs" | "sk" | "hu" | "ro" | "bg" | "el" | "hr" | "sl" | "ca"
+  // Ásia, África, Oceania, Europa-fora-SEPA
+  | "ja" | "ko" | "ar" | "hi" | "id" | "vi" | "th" | "tr" | "uk"
+  | "tl" | "ms" | "sr" | "sq" | "bs" | "fa" | "he" | "bn" | "ur"
+  | "sw" | "am";
 
 // Mapa país → idioma. Para países sem entrada cai no inglês.
 const COUNTRY_LANG: Record<string, LangCode> = {
@@ -582,6 +586,29 @@ export const PACKS: Record<LangCode, Pack> = {
   hr: { ...en },
   sl: { ...en },
   ca: { ...es, home: { ...es.home, heroTitle: "Fes créixer el teu Instagram i TikTok" } },
+  // ---------- Ásia ----------
+  ja: { ...en, home: { ...en.home, heroTitle: "Instagram と TikTok を成長させる", heroSubtitle: "本物のフォロワー、エンゲージメント、ビューを高速配信。USD、EUR、暗号通貨で支払い可能。" } },
+  ko: { ...en, home: { ...en.home, heroTitle: "Instagram과 TikTok 성장시키기", heroSubtitle: "진짜 팔로워, 좋아요, 조회수를 빠르게 배송. USD, EUR 또는 암호화폐로 결제." } },
+  ar: { ...en, home: { ...en.home, heroTitle: "نمِّ حساب Instagram و TikTok", heroSubtitle: "متابعين حقيقيون، تفاعل ومشاهدات بتسليم سريع. ادفع بالدولار الأمريكي أو اليورو أو العملات المشفرة." } },
+  hi: { ...en, home: { ...en.home, heroTitle: "अपना Instagram और TikTok बढ़ाएं", heroSubtitle: "असली फॉलोअर्स, एंगेजमेंट और व्यूज़ — तेज़ डिलीवरी। USD, EUR या क्रिप्टो से भुगतान करें।" } },
+  id: { ...en, home: { ...en.home, heroTitle: "Kembangkan Instagram dan TikTok Anda", heroSubtitle: "Pengikut asli, engagement, dan tayangan dengan pengiriman cepat. Bayar dalam USD, EUR, atau kripto." } },
+  vi: { ...en, home: { ...en.home, heroTitle: "Phát triển Instagram và TikTok của bạn", heroSubtitle: "Người theo dõi thật, tương tác và lượt xem giao nhanh. Thanh toán bằng USD, EUR hoặc tiền điện tử." } },
+  th: { ...en, home: { ...en.home, heroTitle: "เติบโตบน Instagram และ TikTok", heroSubtitle: "ผู้ติดตามจริง การมีส่วนร่วม และการดูที่ส่งมอบเร็ว ชำระด้วย USD, EUR หรือคริปโต" } },
+  tr: { ...en, home: { ...en.home, heroTitle: "Instagram ve TikTok'unu büyüt", heroSubtitle: "Gerçek takipçi, etkileşim ve görüntüleme hızlı teslimat ile. USD, EUR veya kripto ile öde." } },
+  // ---------- Europa-fora-SEPA ----------
+  uk: { ...en, home: { ...en.home, heroTitle: "Розвивайте Instagram і TikTok", heroSubtitle: "Справжні підписники, активність і перегляди зі швидкою доставкою. Оплата в USD, EUR або криптовалюті." } },
+  sr: { ...en, home: { ...en.home, heroTitle: "Развијте Instagram и TikTok" } },
+  sq: { ...en, home: { ...en.home, heroTitle: "Rritni Instagram dhe TikTok" } },
+  bs: { ...en, home: { ...en.home, heroTitle: "Razvijte Instagram i TikTok" } },
+  // ---------- Outros ----------
+  tl: { ...en, home: { ...en.home, heroTitle: "Palaguin ang iyong Instagram at TikTok" } },
+  ms: { ...en, home: { ...en.home, heroTitle: "Kembangkan Instagram dan TikTok anda" } },
+  fa: { ...en, home: { ...en.home, heroTitle: "Instagram و TikTok خود را رشد دهید" } },
+  he: { ...en, home: { ...en.home, heroTitle: "הצמיחו את Instagram ו-TikTok שלכם" } },
+  bn: { ...en, home: { ...en.home, heroTitle: "আপনার Instagram এবং TikTok বাড়ান" } },
+  ur: { ...en, home: { ...en.home, heroTitle: "اپنا Instagram اور TikTok بڑھائیں" } },
+  sw: { ...en, home: { ...en.home, heroTitle: "Kuza Instagram na TikTok yako" } },
+  am: { ...en, home: { ...en.home, heroTitle: "Instagram እና TikTok ያሳድጉ" } },
 };
 
 export function tr(lang: LangCode): Pack {

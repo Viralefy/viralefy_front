@@ -25,7 +25,9 @@ export function useApp(): AppState {
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [currencies, setCurrencies] = useState<Currency[]>([]);
-  const [code, setCode] = useState<string>("BRL");
+  // Padrão global: USD. Antes era BRL (acidente histórico do MVP brasileiro).
+  // Visitante novo cai em USD a menos que sobrescreva pelo seletor.
+  const [code, setCode] = useState<string>("USD");
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
@@ -35,9 +37,14 @@ export function Providers({ children }: { children: React.ReactNode }) {
     fetchCurrencies()
       .then((list) => {
         setCurrencies(list);
-        // Se a moeda salva não existe mais, cai na primeira disponível.
-        if (list.length && !list.some((c) => c.code === (saved ?? code))) {
-          setCode(list[0].code);
+        // Se a moeda salva (ou USD default) não existe mais, cai na primeira
+        // disponível, com preferência por USD → EUR → primeira da lista.
+        const want = saved ?? code;
+        if (list.length && !list.some((c) => c.code === want)) {
+          const fallback = list.find((c) => c.code === "USD")
+            ?? list.find((c) => c.code === "EUR")
+            ?? list[0];
+          setCode(fallback.code);
         }
       })
       .catch(() => setCurrencies([]));
@@ -59,7 +66,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     setUser(null);
   }
 
-  const currency = currencies.find((c) => c.code === code) ?? null;
+  const currency = currencies.find((c) => c.code === code) ?? currencies.find((c) => c.code === "USD") ?? null;
 
   return (
     <AppContext.Provider value={{ currencies, currency, setCurrencyCode, user, login, logout }}>

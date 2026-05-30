@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import type { Plan } from "@/lib/api";
-import { COUNTRIES, countriesByRegion } from "@/i18n/countries";
+import { COUNTRIES, countriesByRegion, type Region } from "@/i18n/countries";
 import { CategoryGroupedGrid } from "@/components/CategoryGroupedGrid";
 import { Footer } from "@/components/Footer";
 import { tr } from "@/i18n/languages";
@@ -92,37 +92,39 @@ export default async function HomePage() {
         <CategoryGroupedGrid plans={plans} lang="en" countryCode="" />
 
         <section style={{ marginTop: "3.5rem", borderTop: "1px solid var(--border)", paddingTop: "2rem" }}>
-          <h2 style={{ fontSize: "1.2rem", marginBottom: "1rem", textAlign: "center" }}>{t.home.pickMarket}</h2>
-          <h3 style={{ fontSize: "0.9rem", color: "var(--muted)", marginBottom: "0.5rem", textAlign: "center" }}>
-            Americas
-          </h3>
-          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", justifyContent: "center", marginBottom: "1.25rem" }}>
-            {countriesByRegion("americas").map((c) => (
-              <Link
-                key={c.code}
-                href={`/${c.code}`}
-                hrefLang={c.htmlLang}
-                style={{ fontSize: "0.9rem", padding: "0.35rem 0.6rem", border: "1px solid var(--border)", borderRadius: "0.4rem", textDecoration: "none" }}
-              >
-                {c.flag} {c.name}
-              </Link>
-            ))}
-          </div>
-          <h3 style={{ fontSize: "0.9rem", color: "var(--muted)", marginBottom: "0.5rem", textAlign: "center" }}>
-            Europe / SEPA
-          </h3>
-          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", justifyContent: "center" }}>
-            {countriesByRegion("sepa").map((c) => (
-              <Link
-                key={c.code}
-                href={`/${c.code}`}
-                hrefLang={c.htmlLang}
-                style={{ fontSize: "0.9rem", padding: "0.35rem 0.6rem", border: "1px solid var(--border)", borderRadius: "0.4rem", textDecoration: "none" }}
-              >
-                {c.flag} {c.name}
-              </Link>
-            ))}
-          </div>
+          <h2 style={{ fontSize: "1.2rem", marginBottom: "1rem", textAlign: "center" }}>
+            {t.home.pickMarket} <span style={{ color: "var(--muted)", fontSize: "0.85rem", fontWeight: 400 }}>({COUNTRIES.length})</span>
+          </h2>
+          {([
+            ["americas", "Americas"],
+            ["sepa", "Europe / SEPA"],
+            ["asia", "Asia"],
+            ["africa", "Africa"],
+            ["oceania", "Oceania"],
+            ["europe_other", "Europe (other)"],
+          ] as Array<[Region, string]>).map(([region, label]) => {
+            const list = countriesByRegion(region);
+            if (list.length === 0) return null;
+            return (
+              <div key={region} style={{ marginBottom: "1.5rem" }}>
+                <h3 style={{ fontSize: "0.9rem", color: "var(--muted)", marginBottom: "0.5rem", textAlign: "center" }}>
+                  {label} <span style={{ opacity: 0.6 }}>({list.length})</span>
+                </h3>
+                <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap", justifyContent: "center" }}>
+                  {list.map((c) => (
+                    <Link
+                      key={c.code}
+                      href={`/${c.code}`}
+                      hrefLang={c.htmlLang}
+                      style={{ fontSize: "0.85rem", padding: "0.3rem 0.55rem", border: "1px solid var(--border)", borderRadius: "0.4rem", textDecoration: "none" }}
+                    >
+                      {c.flag} {c.name}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </section>
       </main>
 
