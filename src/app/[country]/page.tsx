@@ -93,6 +93,11 @@ export default async function CountryPage({ params }: { params: Promise<Params> 
         <header className="hero container">
           <h1>{c.flag} {c.h1}</h1>
           <p>{c.intro}</p>
+          <p style={{ marginTop: "0.75rem", fontSize: "0.85rem" }}>
+            <Link href={`/v2/${c.code}`} style={{ color: "var(--accent)" }}>
+              Ver versão com calculadora →
+            </Link>
+          </p>
         </header>
 
         <main className="container" style={{ paddingBottom: "4rem" }}>

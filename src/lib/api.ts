@@ -114,3 +114,54 @@ export const userLogin = (email: string, password: string) =>
 
 export const fetchMyOrders = (token: string) =>
   request<Order[]>("/v1/me/orders", undefined, token);
+
+// ----- Tickets (helpdesk) ----- //
+
+export type TicketStatus = "open" | "pending" | "resolved" | "closed";
+export type TicketPriority = "low" | "normal" | "high" | "urgent";
+
+export type Ticket = {
+  id: string;
+  user_id: string;
+  subject: string;
+  status: TicketStatus;
+  priority: TicketPriority;
+  order_id?: string | null;
+  assigned_admin_id?: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type TicketMessage = {
+  id: string;
+  ticket_id: string;
+  author_type: "user" | "admin";
+  author_id: string;
+  author_name: string;
+  body: string;
+  created_at: string;
+};
+
+export type TicketDetail = {
+  ticket: Ticket;
+  messages: TicketMessage[];
+};
+
+export const fetchMyTickets = (token: string) =>
+  request<Ticket[]>("/v1/me/tickets", undefined, token);
+
+export const fetchMyTicket = (token: string, id: string) =>
+  request<TicketDetail>(`/v1/me/tickets/${id}`, undefined, token);
+
+export const createTicket = (
+  token: string,
+  body: { subject: string; body: string; order_id?: string | null }
+) =>
+  request<Ticket>("/v1/me/tickets", { method: "POST", body: JSON.stringify(body) }, token);
+
+export const replyTicket = (token: string, id: string, body: string) =>
+  request<void>(
+    `/v1/me/tickets/${id}/messages`,
+    { method: "POST", body: JSON.stringify({ body }) },
+    token
+  );

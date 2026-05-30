@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useApp } from "./Providers";
@@ -21,8 +22,15 @@ export function Header() {
         flexWrap: "wrap",
       }}
     >
-      <Link href="/" style={{ color: "var(--text)", textDecoration: "none" }}>
-        <strong style={{ fontSize: "1.4rem" }}>Viralefy</strong>
+      <Link href="/" aria-label="Viralefy" style={{ display: "inline-flex" }}>
+        <Image
+          src="/logo.png"
+          alt="Viralefy"
+          width={2471}
+          height={704}
+          priority
+          style={{ height: 36, width: "auto" }}
+        />
       </Link>
 
       <nav style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}>
@@ -42,6 +50,9 @@ export function Header() {
 
         {user ? (
           <>
+            <Link href="/tickets" className="btn btn-outline" style={{ padding: "0.5rem 1rem" }}>
+              Suporte
+            </Link>
             <Link href="/account" className="btn btn-outline" style={{ padding: "0.5rem 1rem" }}>
               Minha conta
             </Link>
