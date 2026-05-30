@@ -55,6 +55,11 @@ export type Pack = {
     support: string;
     logout: string;
     currency: string;
+    markets: string;
+    searchPlaceholder: string;
+    searchNoResults: string;
+    regionAmericas: string;
+    regionSepa: string;
   };
   footer: {
     tagline: string;
@@ -123,6 +128,11 @@ const en: Pack = {
     support: "Support",
     logout: "Sign out",
     currency: "Currency",
+    markets: "Markets",
+    searchPlaceholder: "Search services and markets…",
+    searchNoResults: "No matches.",
+    regionAmericas: "Americas",
+    regionSepa: "Europe / SEPA",
   },
   footer: {
     tagline: "Responsible social media growth.",
@@ -191,6 +201,11 @@ const pt: Pack = {
     support: "Suporte",
     logout: "Sair",
     currency: "Moeda",
+    markets: "Mercados",
+    searchPlaceholder: "Buscar serviços e mercados…",
+    searchNoResults: "Nenhum resultado.",
+    regionAmericas: "Américas",
+    regionSepa: "Europa / SEPA",
   },
   footer: {
     tagline: "Crescimento responsável em redes sociais.",
@@ -259,6 +274,11 @@ const es: Pack = {
     support: "Soporte",
     logout: "Salir",
     currency: "Moneda",
+    markets: "Mercados",
+    searchPlaceholder: "Buscar servicios y mercados…",
+    searchNoResults: "Sin resultados.",
+    regionAmericas: "Américas",
+    regionSepa: "Europa / SEPA",
   },
   footer: {
     tagline: "Crecimiento responsable en redes sociales.",
@@ -327,6 +347,11 @@ const fr: Pack = {
     support: "Support",
     logout: "Déconnexion",
     currency: "Devise",
+    markets: "Marchés",
+    searchPlaceholder: "Rechercher services et marchés…",
+    searchNoResults: "Aucun résultat.",
+    regionAmericas: "Amériques",
+    regionSepa: "Europe / SEPA",
   },
   footer: {
     tagline: "Croissance responsable des réseaux sociaux.",
@@ -395,6 +420,11 @@ const de: Pack = {
     support: "Support",
     logout: "Abmelden",
     currency: "Währung",
+    markets: "Märkte",
+    searchPlaceholder: "Services und Märkte suchen…",
+    searchNoResults: "Keine Treffer.",
+    regionAmericas: "Amerika",
+    regionSepa: "Europa / SEPA",
   },
   footer: {
     tagline: "Verantwortungsvolles Social-Media-Wachstum.",
@@ -463,6 +493,11 @@ const it: Pack = {
     support: "Supporto",
     logout: "Esci",
     currency: "Valuta",
+    markets: "Mercati",
+    searchPlaceholder: "Cerca servizi e mercati…",
+    searchNoResults: "Nessun risultato.",
+    regionAmericas: "Americhe",
+    regionSepa: "Europa / SEPA",
   },
   footer: {
     tagline: "Crescita responsabile sui social.",

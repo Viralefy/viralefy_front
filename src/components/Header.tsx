@@ -6,6 +6,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useApp } from "./Providers";
 import { langOfCountry, tr } from "@/i18n/languages";
 import { getCountry } from "@/i18n/countries";
+import { MegaMenuMarkets } from "./MegaMenuMarkets";
+import { SearchBar } from "./SearchBar";
 
 // Header derive o idioma do path: o primeiro segmento é o país, o lang
 // vem do mapa em `languages.ts`. Caso o path não bata (login, register,
@@ -30,29 +32,32 @@ export function Header() {
       style={{
         display: "flex",
         alignItems: "center",
-        justifyContent: "space-between",
-        gap: "1rem",
-        paddingTop: "1.25rem",
-        paddingBottom: "1.25rem",
+        gap: "0.75rem",
+        paddingTop: "1rem",
+        paddingBottom: "1rem",
         flexWrap: "wrap",
       }}
     >
-      <Link href="/" aria-label="Viralefy" style={{ display: "inline-flex" }}>
+      <Link href="/" aria-label="Viralefy" style={{ display: "inline-flex", flexShrink: 0 }}>
         <Image
           src="/logo.png"
           alt="Viralefy"
           width={2471}
           height={704}
           priority
-          style={{ height: 36, width: "auto" }}
+          style={{ height: 32, width: "auto" }}
         />
       </Link>
 
-      <nav style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}>
+      <MegaMenuMarkets lang={lang} />
+
+      <SearchBar lang={lang} />
+
+      <nav style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap", marginLeft: "auto" }}>
         <select
           aria-label={t.header.currency}
           className="input"
-          style={{ width: "auto", padding: "0.5rem 0.75rem" }}
+          style={{ width: "auto", padding: "0.5rem 0.75rem", fontSize: "0.85rem" }}
           value={currency?.code ?? "BRL"}
           onChange={(e) => setCurrencyCode(e.target.value)}
         >
@@ -65,16 +70,16 @@ export function Header() {
 
         {user ? (
           <>
-            <Link href="/tickets" className="btn btn-outline" style={{ padding: "0.5rem 1rem" }}>
+            <Link href="/tickets" className="btn btn-outline" style={{ padding: "0.5rem 0.85rem", fontSize: "0.85rem" }}>
               {t.header.support}
             </Link>
-            <Link href="/account" className="btn btn-outline" style={{ padding: "0.5rem 1rem" }}>
+            <Link href="/account" className="btn btn-outline" style={{ padding: "0.5rem 0.85rem", fontSize: "0.85rem" }}>
               {t.header.account}
             </Link>
             <button
               type="button"
               className="btn btn-outline"
-              style={{ padding: "0.5rem 1rem" }}
+              style={{ padding: "0.5rem 0.85rem", fontSize: "0.85rem" }}
               onClick={() => {
                 logout();
                 router.push("/");
@@ -85,10 +90,10 @@ export function Header() {
           </>
         ) : (
           <>
-            <Link href="/login" className="btn btn-outline" style={{ padding: "0.5rem 1rem" }}>
+            <Link href="/login" className="btn btn-outline" style={{ padding: "0.5rem 0.85rem", fontSize: "0.85rem" }}>
               {t.header.login}
             </Link>
-            <Link href="/register" className="btn btn-primary" style={{ padding: "0.5rem 1rem" }}>
+            <Link href="/register" className="btn btn-primary" style={{ padding: "0.5rem 0.85rem", fontSize: "0.85rem" }}>
               {t.header.register}
             </Link>
           </>
