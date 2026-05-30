@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Providers } from "@/components/Providers";
+import { Header } from "@/components/Header";
 
 export const metadata: Metadata = {
-  title: "Viralefy — Seguidores para Instagram",
-  description: "Compre seguidores reais com entrega rápida e suporte dedicado.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  title: "Viralefy — Serviços para Instagram",
+  description: "Seguidores, engajamento e visualizações com entrega rápida. Pague em BRL, USD, EUR ou cripto.",
 };
 
 export default function RootLayout({
@@ -13,7 +16,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
-      <body>{children}</body>
+      <body>
+        <Providers>
+          <Header />
+          {children}
+        </Providers>
+      </body>
     </html>
   );
 }

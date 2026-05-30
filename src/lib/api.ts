@@ -4,11 +4,29 @@ export type Plan = {
   id: string;
   name: string;
   description: string;
+  category: string;
   followers_qty: number;
   price_cents: number;
   currency: string;
   active: boolean;
   sort_order: number;
+  prices: Record<string, string>; // preço manual por moeda
+};
+
+export type Category = {
+  code: string;
+  label: string;
+  sort_order: number;
+};
+
+export type Currency = {
+  code: string;
+  name: string;
+  symbol: string;
+  rate: number;
+  decimals: number;
+  kind: string;
+  settlement_code: string;
 };
 
 export type CheckoutPayload = {
@@ -16,46 +34,83 @@ export type CheckoutPayload = {
   email: string;
   name: string;
   instagram: string;
-  password: string;
+  display_currency: string;
 };
 
 export type CheckoutResult = {
-  user_id: string;
   order_id: string;
   status: string;
-  amount: number;
-  currency: string;
+  plan_name: string;
+  display_currency: string;
+  display_symbol: string;
+  display_amount: string;
+  settlement_currency: string;
+  settlement_symbol: string;
+  settlement_amount: string;
+  account_created: boolean;
+  email: string;
+  email_sent: boolean;
+  gateway_provider: string;
+  payment_url?: string;
+  payment_extra?: Record<string, string>;
 };
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
+export type User = {
+  id: string;
+  email: string;
+  name: string;
+  instagram: string;
+};
+
+export type Session = {
+  token: string;
+  expires_at: string;
+  user: User;
+};
+
+export type Order = {
+  id: string;
+  plan_id: string;
+  plan_name: string;
+  plan_category: string;
+  status: string;
+  amount_cents: number;
+  currency: string;
+  display_currency: string;
+  display_amount: string;
+  settlement_currency: string;
+  settlement_amount: string;
+  created_at: string;
+};
+
+async function request<T>(path: string, init?: RequestInit, token?: string): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, {
     ...init,
     headers: {
       "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...init?.headers,
     },
   });
-  const json = await res.json();
+  const json = await res.json().catch(() => ({}));
   if (!res.ok) {
-    const msg = json?.error?.message ?? "Erro na requisição";
-    throw new Error(msg);
+    throw new Error(json?.error?.message ?? "Erro na requisição");
   }
   return json.data as T;
 }
 
-export async function fetchPlans(): Promise<Plan[]> {
-  return request<Plan[]>("/v1/plans");
-}
+export const fetchPlans = () => request<Plan[]>("/v1/plans");
+export const fetchCategories = () => request<Category[]>("/v1/categories");
+export const fetchCurrencies = () => request<Currency[]>("/v1/currencies");
 
-export async function checkout(payload: CheckoutPayload): Promise<CheckoutResult> {
-  return request<CheckoutResult>("/v1/checkout", {
-    method: "POST",
-    body: JSON.stringify(payload),
-  });
-}
+export const checkout = (payload: CheckoutPayload) =>
+  request<CheckoutResult>("/v1/checkout", { method: "POST", body: JSON.stringify(payload) });
 
-export function formatPrice(cents: number, currency = "BRL"): string {
-  return new Intl.NumberFormat("pt-BR", { style: "currency", currency }).format(
-    cents / 100
-  );
-}
+export const userRegister = (body: { email: string; name: string; instagram: string; password: string }) =>
+  request<Session>("/v1/auth/user/register", { method: "POST", body: JSON.stringify(body) });
+
+export const userLogin = (email: string, password: string) =>
+  request<Session>("/v1/auth/user/login", { method: "POST", body: JSON.stringify({ email, password }) });
+
+export const fetchMyOrders = (token: string) =>
+  request<Order[]>("/v1/me/orders", undefined, token);
