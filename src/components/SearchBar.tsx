@@ -249,7 +249,7 @@ export function SearchBar({ lang }: { lang: LangCode }) {
                   alignItems: "center",
                   gap: "0.7rem",
                   padding: "0.55rem 0.75rem",
-                  background: i === active ? "rgba(168,85,247,0.12)" : "transparent",
+                  background: i === active ? "var(--accent-dim)" : "transparent",
                   border: "none",
                   borderBottom: "1px solid var(--border)",
                   cursor: "pointer",

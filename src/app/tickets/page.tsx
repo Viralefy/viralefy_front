@@ -8,10 +8,10 @@ import { fetchMyTickets } from "@/lib/api";
 import { getToken } from "@/lib/auth";
 
 const STATUS: Record<string, { label: string; color: string }> = {
-  open: { label: "Aberto", color: "#a855f7" },
-  pending: { label: "Aguardando você", color: "#f59e0b" },
-  resolved: { label: "Resolvido", color: "#22c55e" },
-  closed: { label: "Fechado", color: "#6b7280" },
+  open: { label: "Aberto", color: "var(--accent)" },
+  pending: { label: "Aguardando você", color: "var(--warning)" },
+  resolved: { label: "Resolvido", color: "var(--success)" },
+  closed: { label: "Fechado", color: "var(--muted-strong)" },
 };
 
 export default function TicketsListPage() {

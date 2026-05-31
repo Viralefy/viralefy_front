@@ -109,7 +109,7 @@ export default function TicketThreadPage() {
               className="card"
               style={{
                 borderColor: isUser ? "var(--border)" : "var(--accent)",
-                background: isUser ? "var(--surface)" : "rgba(168,85,247,0.08)",
+                background: isUser ? "var(--surface)" : "var(--accent-dim)",
               }}
             >
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.8rem", color: "var(--muted)", marginBottom: "0.5rem" }}>
@@ -125,7 +125,7 @@ export default function TicketThreadPage() {
       </div>
 
       {closed ? (
-        <div className="alert" style={{ background: "rgba(107,114,128,0.15)", border: "1px solid #6b7280", color: "#cbd5e1" }}>
+        <div className="alert" style={{ background: "rgba(122,139,150,0.12)", border: "1px solid var(--border-strong)", color: "var(--muted-strong)" }}>
           Este ticket foi fechado. Abra um novo se precisar de ajuda.
         </div>
       ) : (

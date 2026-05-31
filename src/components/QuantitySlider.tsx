@@ -50,7 +50,7 @@ export function QuantitySlider({
         className="card"
         style={{
           background:
-            "linear-gradient(135deg, rgba(124,58,237,0.15) 0%, rgba(236,72,153,0.10) 50%, rgba(245,158,11,0.08) 100%)",
+            "var(--gradient-subtle)",
           border: "1px solid var(--accent)",
           marginBottom: "2rem",
         }}
@@ -109,7 +109,7 @@ export function QuantitySlider({
       <div className="card" style={{ padding: 0, overflow: "hidden" }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
-            <tr style={{ background: "rgba(168,85,247,0.08)", borderBottom: "1px solid var(--border)" }}>
+            <tr style={{ background: "var(--accent-dim)", borderBottom: "1px solid var(--border)" }}>
               <th style={{ padding: "0.75rem 1rem", textAlign: "left", fontSize: "0.85rem", color: "var(--muted)" }}>
                 {t.category.table.plan}
               </th>

@@ -19,7 +19,7 @@ export function BuyPlanCta({ plan, lang }: { plan: Plan; lang: LangCode }) {
       className="card"
       style={{
         textAlign: "center",
-        background: "linear-gradient(135deg, rgba(124,58,237,0.12) 0%, rgba(236,72,153,0.08) 100%)",
+        background: "var(--gradient-subtle)",
         border: "1px solid var(--accent)",
       }}
     >
