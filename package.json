@@ -14,7 +14,10 @@
     "test:emulated:browse": "node tests/emulated/browse-flow.mjs",
     "test:emulated:checkout": "node tests/emulated/checkout-flow.mjs",
     "test:emulated:i18n": "node tests/emulated/i18n-flow.mjs",
-    "test:all": "npm test && npm run test:smoke && npm run test:pentest && npm run test:emulated:browse && npm run test:emulated:i18n"
+    "test:emulated:contracts": "node tests/emulated/api-contracts.mjs",
+    "test:emulated:a11y": "node tests/emulated/accessibility.mjs",
+    "test:coverage": "node --import ./tests/ts-loader.mjs --experimental-test-coverage --test tests/unit/*.test.mjs",
+    "test:all": "npm test && npm run test:smoke && npm run test:pentest && npm run test:emulated:browse && npm run test:emulated:i18n && npm run test:emulated:contracts && npm run test:emulated:a11y"
   },
   "dependencies": {
     "next": "^15.3.0",

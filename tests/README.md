@@ -196,6 +196,81 @@ Exits 0 only if every check is PASS or INFO. Exits 1 on any FAIL.
 X-Frame-Options, missing `/robots.txt`, missing `/.well-known/security.txt`,
 no `INDEXNOW_SECRET` enforcement on `/api/indexnow` in prod.
 
+## Expansion: unit / smoke / pentest / emulated additions
+
+The suite was expanded with deeper data-integrity, edge-case, JSON-LD
+cross-reference, sitemap-XML, accessibility, API contract, SEO meta,
+HSTS strength, TLS protocol, cookie attribute, method tampering,
+header injection, /.env / GraphQL / WP-style probes. The new files:
+
+```
+tests/unit/
+├── countries-integrity.test.mjs   (BCP47, ISO4217, emoji flag, description bounds, region sort)
+├── languages-integrity.test.mjs   (every PACK has every nested key; tr/langOfCountry roundtrip)
+├── search-edge.test.mjs           (empty/1-char/no-match/case-insensitive/diacritic/multi-token AND)
+├── jsonld-deep.test.mjs           (uses REAL src/lib/jsonld.ts via loader; @id refs resolve)
+├── plan-slugs.test.mjs            (URL-safe; ASCII-only en; fallback to en; slug roundtrip)
+├── site-urls-integrity.test.mjs   (origin prefix; lang partition; LEGAL count = 6*|PACKS|)
+├── legal-coverage.test.mjs        (LEGAL_SLUGS coverage; ru carries Cyrillic; ar falls back)
+├── theme-integration.test.mjs     (toggleTheme cycling, SSR safety, invalid value fallback)
+└── sitemap-xml.test.mjs           (XML prolog, sitemapindex, ≥40 <sitemap>, lastmod format)
+
+tests/emulated/
+├── api-contracts.mjs              (GET /v1/plans|categories|currencies shape; POST checkout validation;
+│                                   auth gates on /v1/me/orders; /health)
+└── accessibility.mjs              (img alt, button label, single h1, heading order, html lang)
+```
+
+`tests/smoke/run.sh` gained:
+- SEO meta checks (title length 20–90, meta description 50–200, canonical) on 6 pages
+- JSON-LD presence on /, /br/seguidores, /br/seguidores/1000-seguidores
+- Performance smoke (GET / and /br/seguidores < 5s)
+- Sitemap index `<sitemap>` count ≥ 40 / per-lang `<url>` count ≥ 1000
+- Currency hint (`USD`), `data-theme` attribute, `twemoji`, `GTM-K7GQ4H32` markers
+- 404 on bogus route, Cyrillic on `/ru`, no PT-BR leakage on `/us`
+
+`tests/pentest/probes.sh` gained:
+- HSTS strength (max-age + includeSubDomains + preload)
+- Certificate validity (≥ 30 days remaining via openssl)
+- TLS protocol negotiation (TLSv1.0/1.1 rejected)
+- Cookie attributes (HttpOnly + Secure + SameSite)
+- Open-redirect deeper sweep (`url=`, `redirect=`, `next=`, `/redirect?to=`)
+- Path traversal deeper sweep (`%2F`, `%2e%2e`, `/.git/config`, `/etc/passwd`)
+- Method tampering (TRACE/OPTIONS/PROPFIND/MKCOL on `/`)
+- Header injection canary (CRLF in UA)
+- Reflected XSS canary (`/?q=<script>`)
+- API auth bypass attempts on `/v1/admin/plans` (no token / Bearer null / Bearer traversal)
+- API order tampering on `/v1/me/orders` (no auth / empty Bearer)
+- Server-header version leak (Caddy/nginx version)
+- `/.env` exposure check
+- GraphQL canary (`GET`/`POST /graphql` expected 404)
+- WordPress probes (`/wp-admin`, `/wp-login.php`, `/xmlrpc.php`)
+
+### Running subsets
+
+```bash
+# Unit subsets
+node --import ./tests/ts-loader.mjs --test tests/unit/countries-integrity.test.mjs
+node --import ./tests/ts-loader.mjs --test tests/unit/languages-integrity.test.mjs
+node --import ./tests/ts-loader.mjs --test tests/unit/jsonld-deep.test.mjs
+
+# Single suite via npm
+npm test                          # all unit tests (~255 assertions)
+npm run test:coverage             # unit tests with V8 coverage report
+npm run test:smoke                # production smoke (curl)
+npm run test:pentest              # security probes (curl + openssl)
+npm run test:emulated:browse      # fetch() browse flow
+npm run test:emulated:checkout    # creates ONE pending order
+npm run test:emulated:i18n        # per-language pages
+npm run test:emulated:contracts   # API HTTP contracts (NEW)
+npm run test:emulated:a11y        # accessibility smoke (NEW)
+npm run test:all                  # the full suite
+```
+
+Expected counts after the expansion: ~255 unit tests pass hermetically.
+The new emulated:contracts and emulated:a11y suites add ~25 PASS/INFO
+rows each against production.
+
 ## Notes / trade-offs
 
 - The unit suite imports real `.ts` files via a tiny module-customization

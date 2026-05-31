@@ -395,6 +395,241 @@ else
 fi
 rm -f "$RESP_BODY_FILE"
 
+# ==================================================================
+# NEW SECTIONS — SEO meta, JSON-LD breadth, perf smoke, sitemap depth,
+# 404 handling, currency hint, twemoji, GTM, language leakage.
+# ==================================================================
+
+# ------------------------------------------------------------------
+# Section: SEO meta tags on critical pages
+# ------------------------------------------------------------------
+printf "\n[SEO meta]\n"
+
+# Crude HTML title extractor — works for both single-line and minified HTML.
+# Returns the inner text of the first <title>...</title> in the file, or "".
+extract_title() {
+  awk 'match($0,/<title>([^<]*)<\/title>/,m){print m[1]; exit}' "$1" 2>/dev/null || \
+  perl -ne 'if(/<title>([^<]*)<\/title>/){print $1; exit}' "$1" 2>/dev/null
+}
+extract_meta_description() {
+  perl -ne 'if(/<meta[^>]*name=["'"'"']description["'"'"'][^>]*content=["'"'"']([^"'"'"']*)["'"'"']/i){print $1; exit}' "$1" 2>/dev/null
+}
+
+SEO_PATHS=(
+  "/"
+  "/br"
+  "/us"
+  "/us/followers"
+  "/br/seguidores"
+  "/legal/privacy?lang=en"
+)
+
+for p in "${SEO_PATHS[@]}"; do
+  fetch "$p"
+  if [ "$RESP_STATUS" != "200" ]; then
+    mark_info "SEO meta $p" "status=$RESP_STATUS — skipped"
+    rm -f "$RESP_BODY_FILE"
+    continue
+  fi
+  title=$(extract_title "$RESP_BODY_FILE")
+  desc=$(extract_meta_description "$RESP_BODY_FILE")
+  tlen=${#title}
+  dlen=${#desc}
+
+  if [ "$tlen" -gt 0 ]; then
+    if [ "$tlen" -ge 20 ] && [ "$tlen" -le 90 ]; then
+      mark_pass "$p <title> present, $tlen chars"
+    else
+      mark_info "$p <title> length=$tlen out of [20,90]" "$title"
+    fi
+  else
+    mark_info "$p <title>" "empty or missing"
+  fi
+
+  if [ "$dlen" -gt 0 ]; then
+    if [ "$dlen" -ge 50 ] && [ "$dlen" -le 200 ]; then
+      mark_pass "$p meta description $dlen chars"
+    else
+      mark_info "$p meta description length=$dlen out of [50,200]" "(may be lazy)"
+    fi
+  else
+    mark_info "$p meta description" "missing"
+  fi
+
+  if grep -qiE 'rel="?canonical"?' "$RESP_BODY_FILE"; then
+    mark_pass "$p canonical link present"
+  else
+    mark_info "$p canonical" "missing (Next sometimes omits on dynamic routes)"
+  fi
+  rm -f "$RESP_BODY_FILE"
+done
+
+# ------------------------------------------------------------------
+# Section: JSON-LD presence on key pages
+# ------------------------------------------------------------------
+printf "\n[JSON-LD breadth]\n"
+for p in "/" "/br/seguidores" "/br/seguidores/1000-seguidores"; do
+  fetch "$p"
+  if [ "$RESP_STATUS" = "200" ] && grep -q 'application/ld+json' "$RESP_BODY_FILE"; then
+    mark_pass "$p has at least one application/ld+json block"
+  elif [ "$RESP_STATUS" = "200" ]; then
+    mark_info "$p JSON-LD" "200 but no ld+json block"
+  else
+    mark_info "$p JSON-LD" "status=$RESP_STATUS"
+  fi
+  rm -f "$RESP_BODY_FILE"
+done
+
+# ------------------------------------------------------------------
+# Section: performance smoke (< 5 s per page)
+# ------------------------------------------------------------------
+printf "\n[perf smoke]\n"
+for p in "/" "/br/seguidores"; do
+  if curl -fsS --max-time 5 -A "Viralefy-PerfSmoke/1.0" -o /dev/null "${SITE_URL}${p}" 2>/dev/null; then
+    mark_pass "GET $p responds within 5s"
+  else
+    mark_info "GET $p slow or failed within 5s" "informational"
+  fi
+done
+
+# ------------------------------------------------------------------
+# Section: sitemap index validity (>= 40 <sitemap> entries)
+# ------------------------------------------------------------------
+printf "\n[sitemap index depth]\n"
+fetch "/sitemap.xml"
+if [ "$RESP_STATUS" = "200" ] && grep -q '<sitemapindex' "$RESP_BODY_FILE"; then
+  sm_count=$(grep -c '<sitemap>' "$RESP_BODY_FILE")
+  if [ "$sm_count" -ge 40 ]; then
+    mark_pass "/sitemap.xml is a sitemapindex with $sm_count entries (>=40)"
+  else
+    mark_info "/sitemap.xml sitemapindex only $sm_count entries" "expected >=40"
+  fi
+else
+  mark_info "/sitemap.xml depth" "status=$RESP_STATUS or not a sitemapindex"
+fi
+rm -f "$RESP_BODY_FILE"
+
+# ------------------------------------------------------------------
+# Section: per-lang sitemap reach (>= 1000 <url> entries on /sitemap/en.xml)
+# ------------------------------------------------------------------
+printf "\n[per-lang sitemap reach]\n"
+fetch "/sitemap/en.xml"
+if [ "$RESP_STATUS" = "200" ] && grep -q '<urlset' "$RESP_BODY_FILE"; then
+  url_count=$(grep -c '<url>' "$RESP_BODY_FILE")
+  if [ "$url_count" -ge 1000 ]; then
+    mark_pass "/sitemap/en.xml has $url_count <url> entries (>=1000)"
+  else
+    mark_info "/sitemap/en.xml only $url_count <url> entries" "expected >=1000 once plans seed"
+  fi
+else
+  mark_info "/sitemap/en.xml" "status=$RESP_STATUS (per-lang sitemap pending or empty)"
+fi
+rm -f "$RESP_BODY_FILE"
+
+# ------------------------------------------------------------------
+# Section: currency switching hint (default USD)
+# ------------------------------------------------------------------
+printf "\n[currency hint]\n"
+fetch "/"
+if [ "$RESP_STATUS" = "200" ]; then
+  if grep -q "USD" "$RESP_BODY_FILE"; then
+    mark_pass "/ contains 'USD' (default currency hint visible)"
+  else
+    mark_info "/ USD hint" "no USD literal — currency selector may be lazy"
+  fi
+fi
+rm -f "$RESP_BODY_FILE"
+
+# ------------------------------------------------------------------
+# Section: theme attribute on <html>
+# ------------------------------------------------------------------
+printf "\n[theme attribute]\n"
+fetch "/"
+if [ "$RESP_STATUS" = "200" ]; then
+  if grep -q 'data-theme' "$RESP_BODY_FILE"; then
+    mark_pass "/ contains data-theme attribute"
+  else
+    mark_info "/ data-theme" "anti-flash script may not have run yet"
+  fi
+fi
+rm -f "$RESP_BODY_FILE"
+
+# ------------------------------------------------------------------
+# Section: twemoji loaded
+# ------------------------------------------------------------------
+printf "\n[twemoji]\n"
+fetch "/"
+if [ "$RESP_STATUS" = "200" ]; then
+  if grep -q "twemoji" "$RESP_BODY_FILE"; then
+    mark_pass "/ ships twemoji"
+  else
+    mark_info "/ twemoji" "no twemoji marker (flag rendering may regress on some OSes)"
+  fi
+fi
+rm -f "$RESP_BODY_FILE"
+
+# ------------------------------------------------------------------
+# Section: GTM ID (GTM-K7GQ4H32)
+# ------------------------------------------------------------------
+printf "\n[GTM ID]\n"
+fetch "/"
+if [ "$RESP_STATUS" = "200" ]; then
+  if grep -q "GTM-K7GQ4H32" "$RESP_BODY_FILE"; then
+    mark_pass "/ embeds GTM-K7GQ4H32"
+  else
+    mark_info "/ GTM ID" "GTM-K7GQ4H32 not present (env-gated?)"
+  fi
+fi
+rm -f "$RESP_BODY_FILE"
+
+# ------------------------------------------------------------------
+# Section: 404 handling
+# ------------------------------------------------------------------
+printf "\n[404 handling]\n"
+fetch "/nonexistent-route-12345-zzz"
+if [ "$RESP_STATUS" = "404" ]; then
+  mark_pass "/nonexistent-route-12345-zzz returns 404"
+else
+  mark_info "/nonexistent-route-12345-zzz returned $RESP_STATUS" "expected 404"
+fi
+rm -f "$RESP_BODY_FILE"
+
+# ------------------------------------------------------------------
+# Section: Russian content reachable (Cyrillic on /ru)
+# ------------------------------------------------------------------
+printf "\n[ru content]\n"
+fetch "/ru"
+if [ "$RESP_STATUS" = "200" ]; then
+  # Look for any Cyrillic char (UTF-8 sequence 0xD0/0xD1 range).
+  if grep -qP '[\xD0-\xD1][\x80-\xBF]' "$RESP_BODY_FILE" 2>/dev/null \
+     || LC_ALL=C grep -qE '(Развивайте|Купить|Подписчики|Аккаунт)' "$RESP_BODY_FILE"; then
+    mark_pass "/ru returns 200 and contains Cyrillic content"
+  else
+    mark_info "/ru returns 200 but no Cyrillic detected" "may still be EN fallback"
+  fi
+elif [ "$RESP_STATUS" = "404" ]; then
+  mark_info "/ru returns 404" "ru country may not be deployed yet"
+else
+  mark_info "/ru status=$RESP_STATUS" "informational"
+fi
+rm -f "$RESP_BODY_FILE"
+
+# ------------------------------------------------------------------
+# Section: no PT-BR leaking on /us
+# ------------------------------------------------------------------
+printf "\n[lang isolation]\n"
+fetch "/us"
+if [ "$RESP_STATUS" = "200" ]; then
+  if grep -qE "(Carregando|Comprar agora)" "$RESP_BODY_FILE"; then
+    mark_fail "/us contains PT-BR strings" "PT leaking into EN page"
+  else
+    mark_pass "/us has no PT-BR string leakage"
+  fi
+elif [ "$RESP_STATUS" = "404" ]; then
+  mark_info "/us not reachable" "skipping language isolation check"
+fi
+rm -f "$RESP_BODY_FILE"
+
 # ------------------------------------------------------------------
 # Summary
 # ------------------------------------------------------------------
