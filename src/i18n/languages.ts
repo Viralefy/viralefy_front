@@ -135,7 +135,7 @@ export type Pack = {
 const en: Pack = {
   home: {
     heroTitle: "Grow your Instagram & TikTok",
-    heroSubtitle: "Real followers, engagement and views with fast delivery. Pay in USD, EUR, BRL or crypto.",
+    heroSubtitle: "Real followers, engagement and views with fast delivery. Pay in USDT, USD, EUR or crypto.",
     plansByService: "Services",
     pickMarket: "Markets & languages",
     pickService: "Pick a service",

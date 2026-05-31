@@ -100,13 +100,15 @@ export default async function CategoryPage({ params }: { params: Promise<Params>
   const unitLabel = categoryUnit(cat, lang);
 
   // Offers para AggregateOffer (e cada plano vira ProductGroup ofertado).
+  // Schema.org exige priceCurrency em ISO 4217; usamos USD (não USDT, que
+  // não é fiat). USD é o canônico interno (plan.prices["USD"]).
   const offers = sortedPlans.map((p) => {
-    const brl = p.prices?.["BRL"] ?? (p.price_cents / 100).toFixed(2);
+    const usd = p.prices?.["USD"] ?? (p.price_cents / 100).toFixed(2);
     return {
       "@type": "Offer",
       name: p.name,
-      price: brl,
-      priceCurrency: "BRL",
+      price: usd,
+      priceCurrency: "USD",
       url: `${pageUrl}/${p.followers_qty}-${catSlug}`,
       availability: "https://schema.org/InStock",
       eligibleRegion: { "@type": "Country", name: c.name },
@@ -137,7 +139,7 @@ export default async function CategoryPage({ params }: { params: Promise<Params>
       offers: offers.length
         ? {
             "@type": "AggregateOffer",
-            priceCurrency: "BRL",
+            priceCurrency: "USD",
             lowPrice: low,
             highPrice: high,
             offerCount: offers.length,

@@ -6,7 +6,8 @@
 // detecção geo.
 //
 // Critério: BR cai em BRL (mercado nativo); zona euro e nórdicos viram EUR;
-// LATAM/Anglo/Ásia/Rússia caem em USD. Default fallback = USD.
+// LATAM/Anglo/Ásia/Rússia caem em USD. Default fallback = USDT (storefront
+// usa USDT como moeda canônica de display; antes caía em USD).
 
 const COUNTRY_CURRENCY: Record<string, string> = {
   // ---- BRL (Brasil) ----
@@ -47,11 +48,11 @@ const COUNTRY_CURRENCY: Record<string, string> = {
 /**
  * Retorna a moeda de exibição padrão para um código de país.
  * - Aceita qualquer case (`BR`, `br`, `Br`).
- * - País não mapeado cai em USD.
+ * - País não mapeado cai em USDT (default global da storefront).
  */
 export function currencyForCountry(code: string | null | undefined): string {
-  if (!code) return "USD";
-  return COUNTRY_CURRENCY[code.toLowerCase()] ?? "USD";
+  if (!code) return "USDT";
+  return COUNTRY_CURRENCY[code.toLowerCase()] ?? "USDT";
 }
 
 /**

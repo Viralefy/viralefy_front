@@ -22,7 +22,7 @@ function siteUrl() {
 export const metadata: Metadata = {
   title: "Buy Instagram & TikTok followers worldwide | Viralefy",
   description:
-    "Real followers, engagement and views for Instagram and TikTok. Fast delivery, 30-day refill guarantee, support in your language. Pay in USD, EUR, BRL or crypto.",
+    "Real followers, engagement and views for Instagram and TikTok. Fast delivery, 30-day refill guarantee, support in your language. Pay in USDT, USD, EUR, BRL or crypto.",
   alternates: (() => {
     const languages: Record<string, string> = { "x-default": "/", en: "/" };
     for (const c of COUNTRIES) languages[c.htmlLang] = `/${c.code}`;

@@ -25,10 +25,12 @@ export function useApp(): AppState {
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [currencies, setCurrencies] = useState<Currency[]>([]);
-  // Padrão global: USD. Antes era BRL (acidente histórico do MVP brasileiro).
-  // Visitante novo cai em USD a menos que sobrescreva pelo seletor — ou que
-  // o `/api/geo` resolva pra outra moeda compatível.
-  const [code, setCode] = useState<string>("USD");
+  // Padrão global: USDT. É a moeda de liquidação canônica e fica 1:1 com
+  // USD pra visitantes globais (símbolo "$"). Antes era USD; antes ainda
+  // era BRL (acidente histórico do MVP brasileiro). Visitante novo cai em
+  // USDT até `/api/geo` decidir outra (BR→BRL, EU→EUR, etc.) ou o seletor
+  // sobrescrever.
+  const [code, setCode] = useState<string>("USDT");
   const [user, setUser] = useState<User | null>(null);
   // Marca que o usuário escolheu a moeda manualmente (ou já tinha cookie). Se
   // verdadeiro, ignoramos qualquer resposta de `/api/geo` que chegar atrasada.
@@ -70,7 +72,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
         // disponível, com preferência por USD → EUR → primeira da lista.
         const want = saved ?? code;
         if (list.length && !list.some((c) => c.code === want)) {
-          const fallback = list.find((c) => c.code === "USD")
+          const fallback = list.find((c) => c.code === "USDT")
+            ?? list.find((c) => c.code === "USD")
             ?? list.find((c) => c.code === "EUR")
             ?? list[0];
           setCode(fallback.code);
@@ -100,7 +103,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
     setUser(null);
   }
 
-  const currency = currencies.find((c) => c.code === code) ?? currencies.find((c) => c.code === "USD") ?? null;
+  const currency =
+    currencies.find((c) => c.code === code)
+    ?? currencies.find((c) => c.code === "USDT")
+    ?? currencies.find((c) => c.code === "USD")
+    ?? null;
 
   return (
     <AppContext.Provider value={{ currencies, currency, setCurrencyCode, user, login, logout }}>

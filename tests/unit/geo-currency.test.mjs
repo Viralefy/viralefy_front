@@ -49,11 +49,13 @@ test("Russia/Belarus/Kazakhstan/Kyrgyzstan map to USD", () => {
   }
 });
 
-test("Unknown / empty / null defaults to USD", () => {
-  assert.equal(currencyForCountry("ZZ"), "USD");
-  assert.equal(currencyForCountry(""), "USD");
-  assert.equal(currencyForCountry(null), "USD");
-  assert.equal(currencyForCountry(undefined), "USD");
+test("Unknown / empty / null defaults to USDT (storefront global default)", () => {
+  // USDT é a moeda padrão da storefront. Antes caía em USD, mas o branding
+  // de produto é "USDT por padrão" — visitantes sem geo detectada veem USDT.
+  assert.equal(currencyForCountry("ZZ"), "USDT");
+  assert.equal(currencyForCountry(""), "USDT");
+  assert.equal(currencyForCountry(null), "USDT");
+  assert.equal(currencyForCountry(undefined), "USDT");
 });
 
 test("countryFromAcceptLanguage parses pt-BR", () => {
