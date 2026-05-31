@@ -10,7 +10,6 @@
 
 import { ImageResponse } from "next/og";
 import { getCountry } from "@/i18n/countries";
-import { langOfCountry } from "@/i18n/languages";
 import {
   categoryFromSlug,
   categoryLabel,
@@ -56,6 +55,23 @@ function qtyFromSlug(slug: string): number | null {
   return m ? parseInt(m[1], 10) : null;
 }
 
+// Resolve um country code ISO 3166 para o nome em inglês. Usamos sempre o
+// nome inglês na imagem OG porque o renderer do `next/og` (satori) trava
+// em ligaduras Árabes complexas ("lookupType: 5 - substFormat: 3 is not
+// yet supported"): países como Marrocos, Arábia Saudita e Emirados Árabes
+// faziam o /og/{code} responder 502 com corpo vazio.
+//
+// O `og:title` da página continua usando o nome localizado — só a imagem
+// usa inglês, que é o que aparece no preview de redes sociais.
+function englishCountryName(code: string, fallback: string): string {
+  try {
+    const dn = new Intl.DisplayNames("en", { type: "region" });
+    return dn.of(code.toUpperCase()) ?? fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 export async function GET(
   _req: Request,
   ctx: { params: Promise<{ slug?: string[] }> },
@@ -71,10 +87,14 @@ export async function GET(
 
   // Defaults seguros pra qualquer combinação inválida — devolvemos uma
   // imagem genérica em vez de 404 (Twitter/Facebook insistem em retentar).
-  const lang = country ? langOfCountry(country.code) : "en";
+  // Renderizamos sempre em inglês: nome do país via Intl.DisplayNames (en),
+  // label da categoria via `en` no CATEGORY_LABEL. Vê comentário em
+  // `englishCountryName` pro motivo.
   const flag = country?.flag ?? "🌎";
-  const countryName = country?.name ?? "the world";
-  const catLabel = cat ? categoryLabel(cat, lang) : "social growth";
+  const countryName = country
+    ? englishCountryName(country.code, country.name)
+    : "the world";
+  const catLabel = cat ? categoryLabel(cat, "en") : "social growth";
 
   let title: string;
   let priceLabel: string | null = null;

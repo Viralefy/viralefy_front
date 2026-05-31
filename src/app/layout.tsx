@@ -45,6 +45,10 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
+    // @viralefy é o handle do X/Twitter da marca; ajuste se o handle
+    // oficial mudar (o validador da X exige este campo para o card grande).
+    site: "@viralefy",
+    creator: "@viralefy",
   },
 };
 
