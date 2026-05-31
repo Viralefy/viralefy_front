@@ -136,7 +136,9 @@ export default async function CategoryPage({ params }: { params: Promise<Params>
       description: copy.metaDescription(c.name),
       provider: { "@type": "Organization", name: "Viralefy", url },
       areaServed: { "@type": "Country", name: c.name },
-      inLanguage: c.htmlLang,
+      // `inLanguage` não é válido em Service — Schema.org restringe a
+      // propriedade a CreativeWork. O <article lang={c.htmlLang}> da página
+      // e o BreadcrumbList já carregam o sinal de idioma.
       offers: offers.length
         ? {
             "@type": "AggregateOffer",

@@ -126,7 +126,9 @@ export function buildCountryJsonLd(country: Country, plans: Plan[], siteUrl: str
     serviceType: "Social media growth",
     provider: { "@id": `${siteUrl}/#organization` },
     areaServed: { "@type": "Country", name: country.name },
-    inLanguage: country.htmlLang,
+    // `inLanguage` não é válido em Service (só em CreativeWork e subtipos).
+    // O idioma desta página já é declarado pelo WebPage acima — o Google
+    // junta os dois nós via @id e atribui o idioma ao serviço por inferência.
     offers: offers.length > 0 ? {
       "@type": "AggregateOffer",
       priceCurrency: firstOfferCurrency,
