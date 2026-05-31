@@ -23,6 +23,7 @@ export const CATEGORY_LABEL: Record<CategoryCode, Partial<Record<LangCode, strin
     fi: "Seuraajat", is: "Fylgjendur", et: "Jälgijad", lv: "Sekotāji", lt: "Sekėjai",
     cs: "Sledující", sk: "Sledovatelia", hu: "Követők", ro: "Urmăritori",
     bg: "Последователи", el: "Ακόλουθοι", hr: "Pratitelji", sl: "Sledilci", ca: "Seguidors",
+    ru: "Подписчики",
   },
   engajamento: {
     en: "Likes & Engagement", pt: "Curtidas e engajamento",
@@ -33,6 +34,7 @@ export const CATEGORY_LABEL: Record<CategoryCode, Partial<Record<LangCode, strin
     fi: "Tykkäykset", is: "Líkar", et: "Meeldimised", lv: "Patīk", lt: "Patiktukai",
     cs: "Lajky", sk: "Lajky", hu: "Lájkok", ro: "Aprecieri",
     bg: "Харесвания", el: "Likes", hr: "Lajkovi", sl: "Všečki", ca: "M'agrada",
+    ru: "Лайки и активность",
   },
   visualizacoes: {
     en: "Views", pt: "Visualizações", es: "Visualizaciones", es_AR: "Visualizaciones",
@@ -41,6 +43,7 @@ export const CATEGORY_LABEL: Record<CategoryCode, Partial<Record<LangCode, strin
     fi: "Katselut", is: "Áhorf", et: "Vaatamised", lv: "Skatījumi", lt: "Peržiūros",
     cs: "Zhlédnutí", sk: "Zhliadnutia", hu: "Megtekintések", ro: "Vizualizări",
     bg: "Гледания", el: "Προβολές", hr: "Pregledi", sl: "Ogledi", ca: "Visualitzacions",
+    ru: "Просмотры",
   },
   servicos: {
     en: "Premium services", pt: "Serviços premium", es: "Servicios premium",
@@ -52,6 +55,7 @@ export const CATEGORY_LABEL: Record<CategoryCode, Partial<Record<LangCode, strin
     cs: "Prémiové služby", sk: "Prémiové služby", hu: "Prémium szolgáltatások",
     ro: "Servicii premium", bg: "Премиум услуги", el: "Premium υπηρεσίες",
     hr: "Premium usluge", sl: "Premium storitve", ca: "Serveis premium",
+    ru: "Премиум услуги",
   },
 };
 
@@ -64,6 +68,7 @@ export const CATEGORY_SLUG: Record<CategoryCode, Partial<Record<LangCode, string
     fi: "seuraajat", is: "fylgjendur", et: "jalgijad", lv: "sekotaji", lt: "sekejai",
     cs: "sledujici", sk: "sledovatelia", hu: "kovetok", ro: "urmaritori",
     bg: "posledovateli", el: "akoloutoi", hr: "pratitelji", sl: "sledilci", ca: "seguidors",
+    ru: "podpisciki",
   },
   engajamento: {
     en: "likes", pt: "curtidas", es: "likes", es_AR: "likes",
@@ -72,6 +77,7 @@ export const CATEGORY_SLUG: Record<CategoryCode, Partial<Record<LangCode, string
     fi: "tykkaykset", is: "likar", et: "meeldimised", lv: "patik", lt: "patiktukai",
     cs: "lajky", sk: "lajky", hu: "lajkok", ro: "aprecieri",
     bg: "haresvaniya", el: "likes", hr: "lajkovi", sl: "vsecki", ca: "magrada",
+    ru: "lajki",
   },
   visualizacoes: {
     en: "views", pt: "visualizacoes", es: "visualizaciones", es_AR: "visualizaciones",
@@ -80,6 +86,7 @@ export const CATEGORY_SLUG: Record<CategoryCode, Partial<Record<LangCode, string
     fi: "katselut", is: "ahorf", et: "vaatamised", lv: "skatijumi", lt: "perziuros",
     cs: "zhlednuti", sk: "zhliadnutia", hu: "megtekintesek", ro: "vizualizari",
     bg: "gledaniya", el: "provoles", hr: "pregledi", sl: "ogledi", ca: "visualitzacions",
+    ru: "prosmotry",
   },
   servicos: {
     en: "services", pt: "servicos", es: "servicios", es_AR: "servicios",
@@ -88,6 +95,7 @@ export const CATEGORY_SLUG: Record<CategoryCode, Partial<Record<LangCode, string
     fi: "palvelut", is: "thjonusta", et: "teenused", lv: "pakalpojumi", lt: "paslaugos",
     cs: "sluzby", sk: "sluzby", hu: "szolgaltatasok", ro: "servicii",
     bg: "uslugi", el: "ipiresies", hr: "usluge", sl: "storitve", ca: "serveis",
+    ru: "uslugi",
   },
 };
 
