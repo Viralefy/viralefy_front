@@ -75,7 +75,7 @@ export function CategoryGroupedGrid({
                   {g.code !== "servicos" && (
                     <p style={{ fontSize: "0.9rem" }}>
                       <strong>{plan.followers_qty.toLocaleString()}</strong>{" "}
-                      {g.code === "seguidores" ? t.category.table.qty.toLowerCase() : label.toLowerCase()}
+                      {g.code.startsWith("seguidores") ? t.category.table.qty.toLowerCase() : label.toLowerCase()}
                     </p>
                   )}
                   <button

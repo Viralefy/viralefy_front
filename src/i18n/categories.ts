@@ -8,42 +8,92 @@
 
 import type { LangCode } from "./languages";
 
-export type CategoryCode = "seguidores" | "engajamento" | "visualizacoes" | "servicos";
+export type CategoryCode =
+  | "seguidores_instagram"
+  | "seguidores_tiktok"
+  | "engajamento_instagram"
+  | "engajamento_tiktok"
+  | "visualizacoes_instagram"
+  | "visualizacoes_tiktok"
+  | "servicos";
 
 export const CATEGORY_CODES: CategoryCode[] = [
-  "seguidores", "engajamento", "visualizacoes", "servicos",
+  "seguidores_instagram",
+  "seguidores_tiktok",
+  "engajamento_instagram",
+  "engajamento_tiktok",
+  "visualizacoes_instagram",
+  "visualizacoes_tiktok",
+  "servicos",
 ];
 
 // Label curto (usado em chips / tabs)
 export const CATEGORY_LABEL: Record<CategoryCode, Partial<Record<LangCode, string>>> = {
-  seguidores: {
-    en: "Followers", pt: "Seguidores", es: "Seguidores", es_AR: "Seguidores",
-    fr: "Abonnés", de: "Follower", it: "Follower", nl: "Volgers",
-    pl: "Obserwujący", sv: "Följare", da: "Følgere", no: "Følgere",
-    fi: "Seuraajat", is: "Fylgjendur", et: "Jälgijad", lv: "Sekotāji", lt: "Sekėjai",
-    cs: "Sledující", sk: "Sledovatelia", hu: "Követők", ro: "Urmăritori",
-    bg: "Последователи", el: "Ακόλουθοι", hr: "Pratitelji", sl: "Sledilci", ca: "Seguidors",
-    ru: "Подписчики",
+  seguidores_instagram: {
+    en: "Instagram followers", pt: "Seguidores Instagram",
+    es: "Seguidores Instagram", fr: "Abonnés Instagram",
+    de: "Instagram Follower", it: "Follower Instagram",
+    nl: "Instagram volgers", ru: "Подписчики Instagram",
+    ja: "Instagramフォロワー", ko: "Instagram 팔로워",
+    ar: "متابعو Instagram", hi: "Instagram फॉलोअर्स",
+    id: "Pengikut Instagram", vi: "Người theo dõi Instagram",
+    th: "ผู้ติดตาม Instagram", tr: "Instagram takipçi",
+    uk: "Підписники Instagram",
   },
-  engajamento: {
-    en: "Likes & Engagement", pt: "Curtidas e engajamento",
-    es: "Likes y engagement", es_AR: "Likes y engagement",
-    fr: "Likes et engagement", de: "Likes & Engagement",
-    it: "Like e engagement", nl: "Likes & engagement",
-    pl: "Polubienia", sv: "Gilla-markeringar", da: "Likes", no: "Likes",
-    fi: "Tykkäykset", is: "Líkar", et: "Meeldimised", lv: "Patīk", lt: "Patiktukai",
-    cs: "Lajky", sk: "Lajky", hu: "Lájkok", ro: "Aprecieri",
-    bg: "Харесвания", el: "Likes", hr: "Lajkovi", sl: "Všečki", ca: "M'agrada",
-    ru: "Лайки и активность",
+  seguidores_tiktok: {
+    en: "TikTok followers", pt: "Seguidores TikTok",
+    es: "Seguidores TikTok", fr: "Abonnés TikTok",
+    de: "TikTok Follower", it: "Follower TikTok",
+    nl: "TikTok volgers", ru: "Подписчики TikTok",
+    ja: "TikTokフォロワー", ko: "TikTok 팔로워",
+    ar: "متابعو TikTok", hi: "TikTok फॉलोअर्स",
+    id: "Pengikut TikTok", vi: "Người theo dõi TikTok",
+    th: "ผู้ติดตาม TikTok", tr: "TikTok takipçi",
+    uk: "Підписники TikTok",
   },
-  visualizacoes: {
-    en: "Views", pt: "Visualizações", es: "Visualizaciones", es_AR: "Visualizaciones",
-    fr: "Vues", de: "Aufrufe", it: "Visualizzazioni", nl: "Weergaven",
-    pl: "Wyświetlenia", sv: "Visningar", da: "Visninger", no: "Visninger",
-    fi: "Katselut", is: "Áhorf", et: "Vaatamised", lv: "Skatījumi", lt: "Peržiūros",
-    cs: "Zhlédnutí", sk: "Zhliadnutia", hu: "Megtekintések", ro: "Vizualizări",
-    bg: "Гледания", el: "Προβολές", hr: "Pregledi", sl: "Ogledi", ca: "Visualitzacions",
-    ru: "Просмотры",
+  engajamento_instagram: {
+    en: "Instagram engagement", pt: "Engajamento Instagram",
+    es: "Engagement Instagram", fr: "Engagement Instagram",
+    de: "Instagram Engagement", it: "Engagement Instagram",
+    nl: "Instagram engagement", ru: "Активность Instagram",
+    ja: "Instagramエンゲージメント", ko: "Instagram 참여",
+    ar: "تفاعل Instagram", hi: "Instagram एंगेजमेंट",
+    id: "Engagement Instagram", vi: "Tương tác Instagram",
+    th: "การมีส่วนร่วม Instagram", tr: "Instagram etkileşim",
+    uk: "Активність Instagram",
+  },
+  engajamento_tiktok: {
+    en: "TikTok engagement", pt: "Engajamento TikTok",
+    es: "Engagement TikTok", fr: "Engagement TikTok",
+    de: "TikTok Engagement", it: "Engagement TikTok",
+    nl: "TikTok engagement", ru: "Активность TikTok",
+    ja: "TikTokエンゲージメント", ko: "TikTok 참여",
+    ar: "تفاعل TikTok", hi: "TikTok एंगेजमेंट",
+    id: "Engagement TikTok", vi: "Tương tác TikTok",
+    th: "การมีส่วนร่วม TikTok", tr: "TikTok etkileşim",
+    uk: "Активність TikTok",
+  },
+  visualizacoes_instagram: {
+    en: "Instagram views", pt: "Visualizações Instagram",
+    es: "Visualizaciones Instagram", fr: "Vues Instagram",
+    de: "Instagram Aufrufe", it: "Visualizzazioni Instagram",
+    nl: "Instagram weergaven", ru: "Просмотры Instagram",
+    ja: "Instagram再生数", ko: "Instagram 조회수",
+    ar: "مشاهدات Instagram", hi: "Instagram व्यूज़",
+    id: "Tayangan Instagram", vi: "Lượt xem Instagram",
+    th: "ยอดดู Instagram", tr: "Instagram görüntüleme",
+    uk: "Перегляди Instagram",
+  },
+  visualizacoes_tiktok: {
+    en: "TikTok views", pt: "Visualizações TikTok",
+    es: "Visualizaciones TikTok", fr: "Vues TikTok",
+    de: "TikTok Aufrufe", it: "Visualizzazioni TikTok",
+    nl: "TikTok weergaven", ru: "Просмотры TikTok",
+    ja: "TikTok再生数", ko: "TikTok 조회수",
+    ar: "مشاهدات TikTok", hi: "TikTok व्यूज़",
+    id: "Tayangan TikTok", vi: "Lượt xem TikTok",
+    th: "ยอดดู TikTok", tr: "TikTok görüntüleme",
+    uk: "Перегляди TikTok",
   },
   servicos: {
     en: "Premium services", pt: "Serviços premium", es: "Servicios premium",
@@ -61,32 +111,41 @@ export const CATEGORY_LABEL: Record<CategoryCode, Partial<Record<LangCode, strin
 
 // Slug SEO da categoria por idioma. Cai no inglês (= "followers") se faltar.
 export const CATEGORY_SLUG: Record<CategoryCode, Partial<Record<LangCode, string>>> = {
-  seguidores: {
-    en: "followers", pt: "seguidores", es: "seguidores", es_AR: "seguidores",
-    fr: "abonnes", de: "follower", it: "follower", nl: "volgers",
-    pl: "obserwujacy", sv: "foljare", da: "folgere", no: "folgere",
-    fi: "seuraajat", is: "fylgjendur", et: "jalgijad", lv: "sekotaji", lt: "sekejai",
-    cs: "sledujici", sk: "sledovatelia", hu: "kovetok", ro: "urmaritori",
-    bg: "posledovateli", el: "akoloutoi", hr: "pratitelji", sl: "sledilci", ca: "seguidors",
-    ru: "podpisciki",
+  seguidores_instagram: {
+    en: "instagram-followers", pt: "seguidores-instagram",
+    es: "seguidores-instagram", fr: "abonnes-instagram",
+    de: "instagram-follower", it: "follower-instagram",
+    nl: "instagram-volgers", ru: "podpisciki-instagram",
   },
-  engajamento: {
-    en: "likes", pt: "curtidas", es: "likes", es_AR: "likes",
-    fr: "likes", de: "likes", it: "like", nl: "likes",
-    pl: "polubienia", sv: "gillamarkeringar", da: "likes", no: "likes",
-    fi: "tykkaykset", is: "likar", et: "meeldimised", lv: "patik", lt: "patiktukai",
-    cs: "lajky", sk: "lajky", hu: "lajkok", ro: "aprecieri",
-    bg: "haresvaniya", el: "likes", hr: "lajkovi", sl: "vsecki", ca: "magrada",
-    ru: "lajki",
+  seguidores_tiktok: {
+    en: "tiktok-followers", pt: "seguidores-tiktok",
+    es: "seguidores-tiktok", fr: "abonnes-tiktok",
+    de: "tiktok-follower", it: "follower-tiktok",
+    nl: "tiktok-volgers", ru: "podpisciki-tiktok",
   },
-  visualizacoes: {
-    en: "views", pt: "visualizacoes", es: "visualizaciones", es_AR: "visualizaciones",
-    fr: "vues", de: "aufrufe", it: "visualizzazioni", nl: "weergaven",
-    pl: "wyswietlenia", sv: "visningar", da: "visninger", no: "visninger",
-    fi: "katselut", is: "ahorf", et: "vaatamised", lv: "skatijumi", lt: "perziuros",
-    cs: "zhlednuti", sk: "zhliadnutia", hu: "megtekintesek", ro: "vizualizari",
-    bg: "gledaniya", el: "provoles", hr: "pregledi", sl: "ogledi", ca: "visualitzacions",
-    ru: "prosmotry",
+  engajamento_instagram: {
+    en: "instagram-likes", pt: "curtidas-instagram",
+    es: "likes-instagram", fr: "likes-instagram",
+    de: "instagram-likes", it: "like-instagram",
+    nl: "instagram-likes", ru: "lajki-instagram",
+  },
+  engajamento_tiktok: {
+    en: "tiktok-likes", pt: "curtidas-tiktok",
+    es: "likes-tiktok", fr: "likes-tiktok",
+    de: "tiktok-likes", it: "like-tiktok",
+    nl: "tiktok-likes", ru: "lajki-tiktok",
+  },
+  visualizacoes_instagram: {
+    en: "instagram-views", pt: "visualizacoes-instagram",
+    es: "visualizaciones-instagram", fr: "vues-instagram",
+    de: "instagram-aufrufe", it: "visualizzazioni-instagram",
+    nl: "instagram-weergaven", ru: "prosmotry-instagram",
+  },
+  visualizacoes_tiktok: {
+    en: "tiktok-views", pt: "visualizacoes-tiktok",
+    es: "visualizaciones-tiktok", fr: "vues-tiktok",
+    de: "tiktok-aufrufe", it: "visualizzazioni-tiktok",
+    nl: "tiktok-weergaven", ru: "prosmotry-tiktok",
   },
   servicos: {
     en: "services", pt: "servicos", es: "servicios", es_AR: "servicios",
@@ -1035,18 +1094,35 @@ const COPY_SERV_RU: LongCopy = {
 };
 
 // Tabela final — categoria × idioma → cópia. Fallback: en.
+// As 6 categorias por plataforma reaproveitam o mesmo LongCopy do tipo de
+// produto (a cópia já menciona Instagram e TikTok juntos), evitando duplicação.
 export const COPY: Record<CategoryCode, Partial<Record<LangCode, LongCopy>>> = {
-  seguidores: {
+  seguidores_instagram: {
     en: COPY_SEGUIDORES_EN, pt: COPY_SEGUIDORES_PT, es: COPY_SEGUIDORES_ES, es_AR: COPY_SEGUIDORES_ES,
     fr: COPY_SEGUIDORES_FR, de: COPY_SEGUIDORES_DE, it: COPY_SEGUIDORES_IT, nl: COPY_SEGUIDORES_NL,
     ru: COPY_SEGUIDORES_RU,
   },
-  engajamento: {
+  seguidores_tiktok: {
+    en: COPY_SEGUIDORES_EN, pt: COPY_SEGUIDORES_PT, es: COPY_SEGUIDORES_ES, es_AR: COPY_SEGUIDORES_ES,
+    fr: COPY_SEGUIDORES_FR, de: COPY_SEGUIDORES_DE, it: COPY_SEGUIDORES_IT, nl: COPY_SEGUIDORES_NL,
+    ru: COPY_SEGUIDORES_RU,
+  },
+  engajamento_instagram: {
     en: COPY_ENG_EN, pt: COPY_ENG_PT, es: COPY_ENG_ES, es_AR: COPY_ENG_ES,
     fr: COPY_ENG_FR, de: COPY_ENG_DE, it: COPY_ENG_IT, nl: COPY_ENG_NL,
     ru: COPY_ENG_RU,
   },
-  visualizacoes: {
+  engajamento_tiktok: {
+    en: COPY_ENG_EN, pt: COPY_ENG_PT, es: COPY_ENG_ES, es_AR: COPY_ENG_ES,
+    fr: COPY_ENG_FR, de: COPY_ENG_DE, it: COPY_ENG_IT, nl: COPY_ENG_NL,
+    ru: COPY_ENG_RU,
+  },
+  visualizacoes_instagram: {
+    en: COPY_VIEWS_EN, pt: COPY_VIEWS_PT, es: COPY_VIEWS_ES, es_AR: COPY_VIEWS_ES,
+    fr: COPY_VIEWS_FR, de: COPY_VIEWS_DE, it: COPY_VIEWS_IT, nl: COPY_VIEWS_NL,
+    ru: COPY_VIEWS_RU,
+  },
+  visualizacoes_tiktok: {
     en: COPY_VIEWS_EN, pt: COPY_VIEWS_PT, es: COPY_VIEWS_ES, es_AR: COPY_VIEWS_ES,
     fr: COPY_VIEWS_FR, de: COPY_VIEWS_DE, it: COPY_VIEWS_IT, nl: COPY_VIEWS_NL,
     ru: COPY_VIEWS_RU,

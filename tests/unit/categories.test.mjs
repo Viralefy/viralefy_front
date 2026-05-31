@@ -16,74 +16,86 @@ import {
   copyFor,
 } from "../../src/i18n/categories.ts";
 
-test("CATEGORY_CODES exposes the four canonical codes", () => {
+test("CATEGORY_CODES exposes the seven canonical platform-split codes", () => {
   assert.deepEqual(CATEGORY_CODES, [
-    "seguidores",
-    "engajamento",
-    "visualizacoes",
+    "seguidores_instagram",
+    "seguidores_tiktok",
+    "engajamento_instagram",
+    "engajamento_tiktok",
+    "visualizacoes_instagram",
+    "visualizacoes_tiktok",
     "servicos",
   ]);
 });
 
-test("categoryFromSlug resolves Portuguese slug", () => {
-  assert.equal(categoryFromSlug("seguidores"), "seguidores");
+test("categoryFromSlug resolves Portuguese Instagram followers slug", () => {
+  assert.equal(categoryFromSlug("seguidores-instagram"), "seguidores_instagram");
 });
 
-test("categoryFromSlug resolves English slug", () => {
-  assert.equal(categoryFromSlug("followers"), "seguidores");
+test("categoryFromSlug resolves English Instagram followers slug", () => {
+  assert.equal(categoryFromSlug("instagram-followers"), "seguidores_instagram");
 });
 
-test("categoryFromSlug resolves French slug", () => {
-  assert.equal(categoryFromSlug("abonnes"), "seguidores");
+test("categoryFromSlug resolves French Instagram followers slug", () => {
+  assert.equal(categoryFromSlug("abonnes-instagram"), "seguidores_instagram");
+});
+
+test("categoryFromSlug resolves TikTok followers slug", () => {
+  assert.equal(categoryFromSlug("tiktok-followers"), "seguidores_tiktok");
 });
 
 test("categoryFromSlug is case-insensitive", () => {
-  assert.equal(categoryFromSlug("FoLLowErs"), "seguidores");
+  assert.equal(categoryFromSlug("Instagram-FoLLowErs"), "seguidores_instagram");
 });
 
 test("categoryFromSlug returns undefined for unknown slug", () => {
   assert.equal(categoryFromSlug("nonexistent"), undefined);
 });
 
-test("categoryFromSlug maps 'likes' to engajamento", () => {
-  assert.equal(categoryFromSlug("likes"), "engajamento");
+test("categoryFromSlug maps 'instagram-likes' to engajamento_instagram", () => {
+  assert.equal(categoryFromSlug("instagram-likes"), "engajamento_instagram");
+});
+
+test("categoryFromSlug maps 'tiktok-likes' to engajamento_tiktok", () => {
+  assert.equal(categoryFromSlug("tiktok-likes"), "engajamento_tiktok");
 });
 
 test("categoryFromSlug maps 'services' to servicos", () => {
   assert.equal(categoryFromSlug("services"), "servicos");
 });
 
-test("categorySlug returns the PT slug", () => {
-  assert.equal(categorySlug("seguidores", "pt"), "seguidores");
+test("categorySlug returns the PT Instagram followers slug", () => {
+  assert.equal(categorySlug("seguidores_instagram", "pt"), "seguidores-instagram");
 });
 
-test("categorySlug returns the EN slug", () => {
-  assert.equal(categorySlug("seguidores", "en"), "followers");
+test("categorySlug returns the EN Instagram followers slug", () => {
+  assert.equal(categorySlug("seguidores_instagram", "en"), "instagram-followers");
 });
 
 test("categorySlug falls back to EN for languages without an explicit slug", () => {
-  // ja (Japanese) has no explicit slug in CATEGORY_SLUG for seguidores.
-  assert.equal(categorySlug("seguidores", "ja"), "followers");
+  // ja (Japanese) has no explicit slug in CATEGORY_SLUG for seguidores_instagram.
+  assert.equal(categorySlug("seguidores_instagram", "ja"), "instagram-followers");
 });
 
-test("categorySlug returns FR slug for engajamento", () => {
-  assert.equal(categorySlug("engajamento", "fr"), "likes");
+test("categorySlug returns FR slug for engajamento_instagram", () => {
+  assert.equal(categorySlug("engajamento_instagram", "fr"), "likes-instagram");
 });
 
 test("categoryLabel returns German label", () => {
-  assert.equal(categoryLabel("seguidores", "de"), "Follower");
+  assert.equal(categoryLabel("seguidores_instagram", "de"), "Instagram Follower");
 });
 
 test("categoryLabel returns French label", () => {
-  assert.equal(categoryLabel("seguidores", "fr"), "Abonnés");
+  assert.equal(categoryLabel("seguidores_instagram", "fr"), "Abonnés Instagram");
 });
 
 test("categoryLabel falls back to EN when missing", () => {
-  assert.equal(categoryLabel("seguidores", "ja"), "Followers");
+  // pl (Polish) has no rich label for seguidores_instagram — falls back to EN.
+  assert.equal(categoryLabel("seguidores_instagram", "pl"), "Instagram followers");
 });
 
 test("copyFor returns LongCopy with callable paragraphs", () => {
-  const copy = copyFor("seguidores", "en");
+  const copy = copyFor("seguidores_instagram", "en");
   assert.ok(typeof copy.h1 === "function");
   assert.ok(typeof copy.paragraphs === "function");
   const ps = copy.paragraphs("United States");
@@ -96,13 +108,13 @@ test("copyFor returns LongCopy with callable paragraphs", () => {
 });
 
 test("copyFor falls back to English when language is unknown", () => {
-  const enCopy = copyFor("seguidores", "en");
-  const jaCopy = copyFor("seguidores", "ja");
+  const enCopy = copyFor("seguidores_instagram", "en");
+  const jaCopy = copyFor("seguidores_instagram", "ja");
   assert.equal(jaCopy.h1("Japan"), enCopy.h1("Japan"));
 });
 
 test("copyFor h1 interpolates country name", () => {
-  const copy = copyFor("seguidores", "pt");
+  const copy = copyFor("seguidores_instagram", "pt");
   const h1 = copy.h1("Brasil");
   assert.ok(h1.includes("Brasil"), `expected h1 to mention Brasil, got: ${h1}`);
 });
@@ -118,4 +130,11 @@ test("copyFor returns bullets and faq for every category", () => {
       assert.ok(f.q && f.a, `incomplete faq item in ${code}`);
     }
   }
+});
+
+test("Instagram and TikTok variants share the same copy", () => {
+  // Platform-split codes intentionally reuse the same LongCopy bundle.
+  const igFollowers = copyFor("seguidores_instagram", "en");
+  const ttFollowers = copyFor("seguidores_tiktok", "en");
+  assert.equal(igFollowers, ttFollowers);
 });

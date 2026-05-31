@@ -47,48 +47,38 @@ test("tr('ru').header.markets returns 'Рынки'", () => {
   assert.equal(tr("ru").header.markets, "Рынки");
 });
 
-test("categoryLabel('seguidores', 'ru') is 'Подписчики' if ru added, English fallback otherwise", () => {
-  const label = categoryLabel("seguidores", "ru");
-  // Either localized to Подписчики, or fell back to English "Followers".
-  // Both are acceptable for now; we just lock the value so a regression
-  // is visible. Once ru is added, change this to a hard equal check.
-  const okValues = ["Подписчики", "Followers"];
-  assert.ok(okValues.includes(label), `unexpected ru label: ${label}`);
+test("categoryLabel('seguidores_instagram', 'ru') carries Cyrillic now ru is wired", () => {
+  const label = categoryLabel("seguidores_instagram", "ru");
+  // ru label is now shipped — must contain Cyrillic ("Подписчики Instagram").
+  assert.ok(CYRILLIC_RE.test(label), `expected Cyrillic in ru label, got: ${label}`);
 });
 
-test("categorySlug('seguidores', 'ru') returns a non-empty ASCII slug", () => {
-  const slug = categorySlug("seguidores", "ru");
+test("categorySlug('seguidores_instagram', 'ru') returns a non-empty ASCII slug", () => {
+  const slug = categorySlug("seguidores_instagram", "ru");
   assert.ok(typeof slug === "string" && slug.length > 0);
   // The slug must be safe for a URL — printable ASCII only, no spaces.
   assert.ok(/^[a-z0-9-]+$/.test(slug), `slug not URL-safe: ${slug}`);
 });
 
-test("categoryFromSlug('podpisciki') resolves to 'seguidores' once ru slugs are added (pending)", () => {
-  // ru transliterated slugs aren't wired yet — categoryFromSlug returns
-  // undefined for "podpisciki" right now. Lock the contract: either resolved
-  // to seguidores, or undefined (pending). Will tighten once ru is added.
-  const r = categoryFromSlug("podpisciki");
-  assert.ok(r === "seguidores" || r === undefined, `unexpected: ${r}`);
+test("categoryFromSlug('podpisciki-instagram') resolves to 'seguidores_instagram'", () => {
+  // ru transliterated slugs are now wired for the platform-split codes.
+  const r = categoryFromSlug("podpisciki-instagram");
+  assert.equal(r, "seguidores_instagram");
 });
 
-test("copyFor('seguidores', 'ru') returns at least 5 paragraphs totalling many characters", () => {
-  const copy = copyFor("seguidores", "ru");
+test("copyFor('seguidores_instagram', 'ru') returns at least 5 paragraphs totalling many characters", () => {
+  const copy = copyFor("seguidores_instagram", "ru");
   const ps = copy.paragraphs("Россия");
   assert.ok(Array.isArray(ps));
   assert.ok(ps.length >= 5, `expected >=5 paragraphs, got ${ps.length}`);
   const total = ps.join(" ").length;
-  // The fallback copy is English, so we cannot assert Cyrillic on every
-  // paragraph yet. We assert mass (>= 1500 chars total) so SEO depth is
-  // preserved while ru is pending. Once the ru copy ships, the
-  // sumCyrillic >= 400 assertion below becomes the real test.
+  // ru copy now ships, so we expect Cyrillic content.
   assert.ok(total >= 1500, `total copy too short: ${total}`);
   const sumCyrillic = ps.reduce((acc, p) => acc + countCyrillic(p), 0);
-  // Pending: when ru copy is added, sumCyrillic >= 400 is required.
-  // Until then we just record the observation as a soft check.
-  assert.ok(sumCyrillic >= 0); // tautology, kept for future tightening
+  assert.ok(sumCyrillic >= 400, `expected substantial Cyrillic in ru copy, got ${sumCyrillic} chars`);
 });
 
-test("All 4 categories have a copyFor('ru') return value (fallback or native)", () => {
+test("All 7 categories have a copyFor('ru') return value (fallback or native)", () => {
   for (const code of CATEGORY_CODES) {
     const copy = copyFor(code, "ru");
     assert.ok(copy, `missing copyFor(${code}, ru)`);

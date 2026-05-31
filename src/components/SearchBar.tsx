@@ -36,9 +36,13 @@ type Hit = {
 // Keywords adicionais por categoria — vocabulário do usuário que talvez não
 // esteja nos labels (ex: "seguidor singular", "curtidas vs likes", nomes
 // de serviços específicos pra categoria 'servicos').
-const EXTRA_KEYWORDS: Record<CategoryCode, string> = {
-  seguidores: "follower seguidor follower seguir abonnes obserwujacy seuraajat sledilci instagram tiktok",
-  engajamento: "like curtir polubienia interaccion comentario comment commentaire reazione",
+// Keywords adicionais por bucket lógico. Mapeamos para cada CategoryCode
+// via heurística de prefixo (seguidores_*, engajamento_*, visualizacoes_*),
+// e adicionamos termos de plataforma quando aplicável.
+const KEYWORDS_BY_BUCKET = {
+  seguidores: "follower seguidor seguir abonnes obserwujacy seuraajat sledilci",
+  engajamento: "like curtir polubienia interaccion comentario comment commentaire reazione " +
+    "share compartilhamento save salvamento partilhar guardar shares saves",
   visualizacoes: "view watch reels story stories reel video views vistas aufruf vues visualizzazioni",
   servicos: "servico service services premium gestao management gestion gerenciamento " +
     "recuperacao recovery recuperar recuperacion recuperer recover wiederherstellen rebooting " +
@@ -49,6 +53,14 @@ const EXTRA_KEYWORDS: Record<CategoryCode, string> = {
     "verificacao verification badge azul blue check verifie verifica " +
     "consultoria consulting consulenza beratung consultation",
 };
+
+function extraKeywords(cat: CategoryCode): string {
+  if (cat === "servicos") return KEYWORDS_BY_BUCKET.servicos;
+  // Prefixo do bucket + plataforma (instagram/tiktok) extraída do sufixo
+  const [bucket, platform] = cat.split("_") as [keyof typeof KEYWORDS_BY_BUCKET, string];
+  const base = KEYWORDS_BY_BUCKET[bucket] ?? "";
+  return platform ? `${base} ${platform}` : base;
+}
 
 function buildIndex(): Hit[] {
   const items: Hit[] = [];
@@ -73,7 +85,7 @@ function buildIndex(): Hit[] {
           c.htmlLang,
           allLangsLabel,
           label,
-          EXTRA_KEYWORDS[cat],
+          extraKeywords(cat),
         ]
           .join(" ")
           .toLowerCase()

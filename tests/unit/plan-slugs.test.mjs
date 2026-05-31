@@ -40,16 +40,16 @@ test("every (CategoryCode x LangCode) slug is URL-safe", () => {
   }
 });
 
-test("categoryFromSlug('podpisciki') === 'seguidores'", () => {
-  assert.equal(categoryFromSlug("podpisciki"), "seguidores");
+test("categoryFromSlug('podpisciki-instagram') === 'seguidores_instagram'", () => {
+  assert.equal(categoryFromSlug("podpisciki-instagram"), "seguidores_instagram");
 });
 
-test("categoryFromSlug('lajki') === 'engajamento'", () => {
-  assert.equal(categoryFromSlug("lajki"), "engajamento");
+test("categoryFromSlug('lajki-tiktok') === 'engajamento_tiktok'", () => {
+  assert.equal(categoryFromSlug("lajki-tiktok"), "engajamento_tiktok");
 });
 
-test("categoryFromSlug('prosmotry') === 'visualizacoes'", () => {
-  assert.equal(categoryFromSlug("prosmotry"), "visualizacoes");
+test("categoryFromSlug('prosmotry-instagram') === 'visualizacoes_instagram'", () => {
+  assert.equal(categoryFromSlug("prosmotry-instagram"), "visualizacoes_instagram");
 });
 
 test("categoryFromSlug('uslugi') === 'servicos'", () => {
@@ -64,16 +64,15 @@ test("categoryFromSlug returns undefined for nonsense", () => {
 
 test("categoryLabel falls back to en when a lang has no entry", () => {
   // Pick a code/lang combination known to not have a custom label.
-  // We pick the LangCode "ja" (Japanese) for engajamento — falls back to en.
-  // (CATEGORY_LABEL.engajamento has no "ja" key.)
-  const label = categoryLabel("engajamento", "ja");
-  assert.equal(label, CATEGORY_LABEL.engajamento.en);
+  // Polish ("pl") has no rich label for engajamento_instagram — falls back to en.
+  const label = categoryLabel("engajamento_instagram", "pl");
+  assert.equal(label, CATEGORY_LABEL.engajamento_instagram.en);
 });
 
 test("categorySlug falls back to en when a lang has no entry", () => {
-  // Likewise for slug.
-  const slug = categorySlug("engajamento", "ja");
-  assert.equal(slug, CATEGORY_SLUG.engajamento.en);
+  // Likewise for slug — Japanese has no engajamento_instagram slug.
+  const slug = categorySlug("engajamento_instagram", "ja");
+  assert.equal(slug, CATEGORY_SLUG.engajamento_instagram.en);
 });
 
 test("COPY map has at least en/pt/es/ru entries for every category", () => {
@@ -88,7 +87,7 @@ test("COPY map has at least en/pt/es/ru entries for every category", () => {
 });
 
 test("categoryFromSlug is case-insensitive on input", () => {
-  assert.equal(categoryFromSlug("Podpisciki"), "seguidores");
+  assert.equal(categoryFromSlug("Podpisciki-Instagram"), "seguidores_instagram");
   assert.equal(categoryFromSlug("USLUGI"), "servicos");
 });
 
@@ -116,10 +115,18 @@ test("CATEGORY_LABEL has at least en/pt/es/ru entries for every category", () =>
   }
 });
 
-test("CATEGORY_CODES has exactly 4 entries (seguidores/engajamento/visualizacoes/servicos)", () => {
-  assert.equal(CATEGORY_CODES.length, 4);
+test("CATEGORY_CODES has exactly 7 entries (platform-split + servicos)", () => {
+  assert.equal(CATEGORY_CODES.length, 7);
   assert.deepEqual(
     [...CATEGORY_CODES].sort(),
-    ["engajamento", "seguidores", "servicos", "visualizacoes"]
+    [
+      "engajamento_instagram",
+      "engajamento_tiktok",
+      "seguidores_instagram",
+      "seguidores_tiktok",
+      "servicos",
+      "visualizacoes_instagram",
+      "visualizacoes_tiktok",
+    ]
   );
 });
