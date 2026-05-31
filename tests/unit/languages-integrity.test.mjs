@@ -37,6 +37,8 @@ const REQ_PLAN = [
   "delivery", "deliveryDesc", "safe", "safeDesc", "refill", "refillDesc",
   "support", "supportDesc", "detailsTitle", "whyTitle", "relatedTitle",
 ];
+const REQ_TRUST = ["refill", "password", "delivery", "guarantee"];
+const REQ_LIVE = ["ordersToday", "lastHour"];
 
 test("PACKS registry has all expected top-level keys", () => {
   for (const lang of ALL_LANGS) {
@@ -47,6 +49,28 @@ test("PACKS registry has all expected top-level keys", () => {
     assert.ok(p.cta, `lang ${lang} missing cta`);
     assert.ok(p.category, `lang ${lang} missing category`);
     assert.ok(p.plan, `lang ${lang} missing plan`);
+    assert.ok(p.trust, `lang ${lang} missing trust`);
+    assert.ok(p.live, `lang ${lang} missing live`);
+  }
+});
+
+test("every Pack.trust has refill/password/delivery/guarantee (string)", () => {
+  for (const lang of ALL_LANGS) {
+    for (const k of REQ_TRUST) {
+      const v = PACKS[lang].trust[k];
+      assert.equal(typeof v, "string", `lang ${lang} trust.${k}`);
+      assert.ok(v.length > 0, `lang ${lang} trust.${k} empty`);
+    }
+  }
+});
+
+test("every Pack.live has ordersToday/lastHour (string)", () => {
+  for (const lang of ALL_LANGS) {
+    for (const k of REQ_LIVE) {
+      const v = PACKS[lang].live[k];
+      assert.equal(typeof v, "string", `lang ${lang} live.${k}`);
+      assert.ok(v.length > 0, `lang ${lang} live.${k} empty`);
+    }
   }
 });
 

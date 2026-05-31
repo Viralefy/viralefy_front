@@ -117,6 +117,18 @@ export type Pack = {
     whyTitle: string;         // "Por que esse pacote?"
     relatedTitle: string;     // "Outros pacotes da mesma categoria"
   };
+  // Selos curtos de confiança usados no hero/checkout (TrustSignals).
+  trust: {
+    refill: string;     // "30-day refill guarantee"
+    password: string;   // "No password required"
+    delivery: string;   // "Delivery starts in 30 minutes"
+    guarantee: string;  // "30-day guarantee" — versão badge
+  };
+  // Widget de contador "ao vivo" (LiveCounter).
+  live: {
+    ordersToday: string; // "orders today"
+    lastHour: string;    // "in the last hour"
+  };
 };
 
 // ---------- Pacote base (en-US) ----------
@@ -189,6 +201,16 @@ const en: Pack = {
     detailsTitle: "What's in this package",
     whyTitle: "Why this package?",
     relatedTitle: "Other packages in this category",
+  },
+  trust: {
+    refill: "30-day refill guarantee",
+    password: "No password required",
+    delivery: "Delivery starts in 30 minutes",
+    guarantee: "30-day guarantee",
+  },
+  live: {
+    ordersToday: "orders today",
+    lastHour: "in the last hour",
   },
 };
 
@@ -263,6 +285,16 @@ const pt: Pack = {
     whyTitle: "Por que esse pacote?",
     relatedTitle: "Outros pacotes da mesma categoria",
   },
+  trust: {
+    refill: "Reposição garantida por 30 dias",
+    password: "Sem precisar de senha",
+    delivery: "Entrega começa em 30 minutos",
+    guarantee: "Garantia de 30 dias",
+  },
+  live: {
+    ordersToday: "pedidos hoje",
+    lastHour: "na última hora",
+  },
 };
 
 // ---------- Español (es) ----------
@@ -335,6 +367,16 @@ const es: Pack = {
     detailsTitle: "Qué incluye este paquete",
     whyTitle: "¿Por qué este paquete?",
     relatedTitle: "Otros paquetes de la misma categoría",
+  },
+  trust: {
+    refill: "Reposición garantizada 30 días",
+    password: "Sin contraseña",
+    delivery: "La entrega comienza en 30 minutos",
+    guarantee: "Garantía de 30 días",
+  },
+  live: {
+    ordersToday: "pedidos hoy",
+    lastHour: "en la última hora",
   },
 };
 
@@ -409,6 +451,16 @@ const fr: Pack = {
     whyTitle: "Pourquoi ce pack ?",
     relatedTitle: "Autres packs de la même catégorie",
   },
+  trust: {
+    refill: "Garantie de recharge 30 jours",
+    password: "Aucun mot de passe requis",
+    delivery: "Livraison sous 30 minutes",
+    guarantee: "Garantie 30 jours",
+  },
+  live: {
+    ordersToday: "commandes aujourd'hui",
+    lastHour: "dans la dernière heure",
+  },
 };
 
 // ---------- Deutsch (de) ----------
@@ -481,6 +533,16 @@ const de: Pack = {
     detailsTitle: "Inhalt des Pakets",
     whyTitle: "Warum dieses Paket?",
     relatedTitle: "Andere Pakete der gleichen Kategorie",
+  },
+  trust: {
+    refill: "30 Tage Auffüll-Garantie",
+    password: "Kein Passwort nötig",
+    delivery: "Lieferung startet in 30 Minuten",
+    guarantee: "30-Tage-Garantie",
+  },
+  live: {
+    ordersToday: "Bestellungen heute",
+    lastHour: "in der letzten Stunde",
   },
 };
 
@@ -555,6 +617,16 @@ const it: Pack = {
     whyTitle: "Perché questo pacchetto?",
     relatedTitle: "Altri pacchetti nella stessa categoria",
   },
+  trust: {
+    refill: "Garanzia di ricarica 30 giorni",
+    password: "Nessuna password richiesta",
+    delivery: "Consegna in 30 minuti",
+    guarantee: "Garanzia 30 giorni",
+  },
+  live: {
+    ordersToday: "ordini oggi",
+    lastHour: "nell'ultima ora",
+  },
 };
 
 // es_AR (voseo argentino) — pequena variação sobre `es`.
@@ -571,7 +643,20 @@ export const PACKS: Record<LangCode, Pack> = {
   pt, en, es, es_AR, fr, de, it,
   // SEPA / outros idiomas — fallback temporário para en.
   // Sobrescritas curtas mantêm o label crítico do header/footer no idioma certo.
-  nl: { ...en, home: { ...en.home, heroTitle: "Laat je Instagram en TikTok groeien" } },
+  nl: {
+    ...en,
+    home: { ...en.home, heroTitle: "Laat je Instagram en TikTok groeien" },
+    trust: {
+      refill: "30 dagen aanvulgarantie",
+      password: "Geen wachtwoord nodig",
+      delivery: "Levering start in 30 minuten",
+      guarantee: "30 dagen garantie",
+    },
+    live: {
+      ordersToday: "bestellingen vandaag",
+      lastHour: "in het laatste uur",
+    },
+  },
   pl: { ...en, home: { ...en.home, heroTitle: "Rozwijaj Instagram i TikTok" } },
   sv: { ...en, home: { ...en.home, heroTitle: "Få ditt Instagram och TikTok att växa" } },
   da: { ...en, home: { ...en.home, heroTitle: "Lad dit Instagram og TikTok vokse" } },
@@ -683,6 +768,16 @@ export const PACKS: Record<LangCode, Pack> = {
       detailsTitle: "Содержимое пакета",
       whyTitle: "Почему этот пакет?",
       relatedTitle: "Другие пакеты этой категории",
+    },
+    trust: {
+      refill: "Гарантия восполнения 30 дней",
+      password: "Без пароля",
+      delivery: "Доставка начинается за 30 минут",
+      guarantee: "Гарантия 30 дней",
+    },
+    live: {
+      ordersToday: "заказов сегодня",
+      lastHour: "за последний час",
     },
   },
 };

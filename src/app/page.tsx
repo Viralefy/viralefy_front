@@ -4,6 +4,7 @@ import type { Plan } from "@/lib/api";
 import { COUNTRIES, countriesByRegion, type Region } from "@/i18n/countries";
 import { CategoryGroupedGrid } from "@/components/CategoryGroupedGrid";
 import { Footer } from "@/components/Footer";
+import { TrustSignals } from "@/components/TrustSignals";
 import { tr } from "@/i18n/languages";
 
 // Home global. Inglês "international" — atende quem chega sem cookie de
@@ -34,8 +35,9 @@ export const metadata: Metadata = {
     locale: "en_US",
     type: "website",
     url: siteUrl(),
+    images: [{ url: "/og/global", width: 1200, height: 630 }],
   },
-  twitter: { card: "summary_large_image" },
+  twitter: { card: "summary_large_image", images: ["/og/global"] },
 };
 
 async function getPlans(): Promise<Plan[]> {
@@ -86,6 +88,7 @@ export default async function HomePage() {
       <section className="hero container">
         <h1>{t.home.heroTitle}</h1>
         <p>{t.home.heroSubtitle}</p>
+        <TrustSignals lang="en" />
       </section>
 
       <main className="container" style={{ paddingBottom: "4rem" }}>

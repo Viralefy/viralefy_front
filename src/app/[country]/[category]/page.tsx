@@ -14,6 +14,8 @@ import {
 import { CategoryCardGrid } from "@/components/CategoryCardGrid";
 import { QuantitySlider } from "@/components/QuantitySlider";
 import { Footer } from "@/components/Footer";
+import { TrustSignals } from "@/components/TrustSignals";
+import { LiveCounter } from "@/components/LiveCounter";
 
 // Página de categoria por país. Slug aceita o nome local (`/br/seguidores`,
 // `/us/followers`, `/de/follower`). A página entrega:
@@ -48,6 +50,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   }
 
   const canonical = `/${c.code}/${categorySlug(cat, lang)}`;
+  const ogUrl = `/og/${c.code}/${categorySlug(cat, lang)}`;
   return {
     title: copy.metaTitle(c.name),
     description: copy.metaDescription(c.name),
@@ -58,7 +61,9 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
       url: `${siteUrl()}${canonical}`,
       locale: c.htmlLang.replace("-", "_"),
       type: "website",
+      images: [{ url: ogUrl, width: 1200, height: 630 }],
     },
+    twitter: { card: "summary_large_image", images: [ogUrl] },
   };
 }
 
@@ -168,6 +173,7 @@ export default async function CategoryPage({ params }: { params: Promise<Params>
         <header className="hero container">
           <h1>{copy.h1(c.name)}</h1>
           <p>{copy.paragraphs(c.name)[0]}</p>
+          <TrustSignals lang={lang} />
         </header>
 
         <main className="container" style={{ paddingBottom: "4rem" }}>
@@ -249,6 +255,7 @@ export default async function CategoryPage({ params }: { params: Promise<Params>
       </article>
 
       <Footer lang={lang} />
+      <LiveCounter lang={lang} />
     </>
   );
 }

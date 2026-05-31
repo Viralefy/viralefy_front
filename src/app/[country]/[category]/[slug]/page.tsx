@@ -12,6 +12,7 @@ import {
 } from "@/i18n/categories";
 import { Footer } from "@/components/Footer";
 import { BuyPlanCta } from "@/components/BuyPlanCta";
+import { LiveCounter } from "@/components/LiveCounter";
 
 // Página dedicada a um plano específico (`/br/seguidores/1000-seguidores`).
 // Slug do plano = `<qty>-<category-slug-local>`. SEO próprio: title/H1 com
@@ -84,11 +85,20 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   }
   const canonical = `/${c.code}/${catSlug}/${qty}-${catSlug}`;
 
+  const ogUrl = `/og/${c.code}/${catSlug}/${qty}-${catSlug}`;
   return {
     title,
     description,
     alternates: { canonical, languages },
-    openGraph: { title, description, url: `${siteUrl()}${canonical}`, locale: c.htmlLang.replace("-", "_"), type: "website" },
+    openGraph: {
+      title,
+      description,
+      url: `${siteUrl()}${canonical}`,
+      locale: c.htmlLang.replace("-", "_"),
+      type: "website",
+      images: [{ url: ogUrl, width: 1200, height: 630 }],
+    },
+    twitter: { card: "summary_large_image", images: [ogUrl] },
   };
 }
 
@@ -278,6 +288,7 @@ export default async function PlanPage({ params }: { params: Promise<Params> }) 
       </article>
 
       <Footer lang={lang} />
+      <LiveCounter lang={lang} />
     </>
   );
 }

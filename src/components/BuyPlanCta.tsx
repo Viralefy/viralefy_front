@@ -5,6 +5,7 @@ import type { Plan } from "@/lib/api";
 import { priceFor } from "@/lib/format";
 import { useApp } from "./Providers";
 import { CheckoutModal } from "./CheckoutModal";
+import { TrustSignals } from "./TrustSignals";
 import { tr, type LangCode } from "@/i18n/languages";
 
 // Bloco isolado de CTA na página do plano. Mantemos `client` aqui pra deixar
@@ -33,7 +34,8 @@ export function BuyPlanCta({ plan, lang }: { plan: Plan; lang: LangCode }) {
       >
         {t.cta.buyNow}
       </button>
-      {open && <CheckoutModal plan={plan} onClose={() => setOpen(false)} />}
+      <TrustSignals lang={lang} variant="compact" />
+      {open && <CheckoutModal plan={plan} lang={lang} onClose={() => setOpen(false)} />}
     </div>
   );
 }

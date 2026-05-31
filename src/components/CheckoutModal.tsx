@@ -7,8 +7,18 @@ import { checkout, fetchCredits, fetchMyProfiles } from "@/lib/api";
 import { priceFor } from "@/lib/format";
 import { getToken } from "@/lib/auth";
 import { useApp } from "./Providers";
+import { TrustSignals } from "./TrustSignals";
+import type { LangCode } from "@/i18n/languages";
 
-export function CheckoutModal({ plan, onClose }: { plan: Plan; onClose: () => void }) {
+export function CheckoutModal({
+  plan,
+  lang = "en",
+  onClose,
+}: {
+  plan: Plan;
+  lang?: LangCode;
+  onClose: () => void;
+}) {
   const { currency, user } = useApp();
   const isProfile = plan.target_type === "profile";
   const platformLabel = plan.platform === "tiktok" ? "TikTok" : "Instagram";
@@ -102,9 +112,10 @@ export function CheckoutModal({ plan, onClose }: { plan: Plan; onClose: () => vo
             <p style={{ color: "var(--muted)", fontSize: "0.85rem", marginBottom: "0.25rem" }}>
               {platformIcon} {platformLabel} · {isProfile ? "delivered to the profile" : "delivered to the post"}
             </p>
-            <p style={{ marginBottom: "1.25rem" }}>
+            <p style={{ marginBottom: "0.5rem" }}>
               <strong>{plan.name}</strong> — {priceFor(plan, currency)}
             </p>
+            <TrustSignals lang={lang} variant="compact" />
 
             <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               {error && <div className="alert alert-error">{error}</div>}

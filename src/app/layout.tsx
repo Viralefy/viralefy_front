@@ -3,6 +3,7 @@ import Script from "next/script";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
 import { Header } from "@/components/Header";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 // Layout raiz. `<html lang>` é "en" (root é home global em inglês); páginas
 // de país sobrescrevem o lang no `<article lang>` interno.
@@ -122,7 +123,17 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         <Providers>
           <Header />
           {children}
+          {/* WhatsApp flutuante — só renderiza se NEXT_PUBLIC_WHATSAPP_NUMBER
+              estiver setado E o idioma do país atual for pt/es/es_AR. */}
+          <WhatsAppButton />
         </Providers>
+        {/*
+          TODO: backend cron will pick this up — adds a column
+          `notified_abandoned_at` to orders table and runs hourly to e-mail
+          carrinhos abandonados (criamos `order` mas o pagamento não foi
+          confirmado em N horas). Nada a fazer do lado front aqui — esta nota
+          fica como lembrete para o time backend.
+        */}
       </body>
     </html>
   );

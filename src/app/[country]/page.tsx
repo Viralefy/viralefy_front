@@ -6,6 +6,8 @@ import { COUNTRIES, getCountry, countriesByRegion } from "@/i18n/countries";
 import { buildCountryJsonLd } from "@/lib/jsonld";
 import { CategoryGroupedGrid } from "@/components/CategoryGroupedGrid";
 import { Footer } from "@/components/Footer";
+import { TrustSignals } from "@/components/TrustSignals";
+import { LiveCounter } from "@/components/LiveCounter";
 import { langOfCountry, tr } from "@/i18n/languages";
 import { CATEGORY_CODES, categoryLabel, categorySlug } from "@/i18n/categories";
 
@@ -40,11 +42,13 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
       locale: c.htmlLang.replace("-", "_"),
       type: "website",
       url: `${siteUrl()}/${c.code}`,
+      images: [{ url: `/og/${c.code}`, width: 1200, height: 630 }],
     },
     twitter: {
       card: "summary_large_image",
       title: c.title,
       description: c.description,
+      images: [`/og/${c.code}`],
     },
   };
 }
@@ -94,6 +98,7 @@ export default async function CountryPage({ params }: { params: Promise<Params> 
         <header className="hero container">
           <h1>{c.flag} {c.h1}</h1>
           <p>{c.intro}</p>
+          <TrustSignals lang={lang} />
         </header>
 
         <main className="container" style={{ paddingBottom: "4rem" }}>
@@ -149,6 +154,7 @@ export default async function CountryPage({ params }: { params: Promise<Params> 
       </article>
 
       <Footer lang={lang} />
+      <LiveCounter lang={lang} />
     </>
   );
 }
