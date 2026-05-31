@@ -42,7 +42,8 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${d.title} | Viralefy`,
+    // absolute pra não duplicar o "| Viralefy" via template do root layout.
+    title: { absolute: `${d.title} | Viralefy` },
     description: `${d.title} — Viralefy`,
     alternates: { canonical: `/legal/${doc}?lang=en`, languages },
   };

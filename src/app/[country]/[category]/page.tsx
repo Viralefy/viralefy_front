@@ -53,7 +53,8 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const canonical = `/${c.code}/${categorySlug(cat, lang)}`;
   const ogUrl = `/og/${c.code}/${categorySlug(cat, lang)}`;
   return {
-    title: copy.metaTitle(c.name),
+    // metaTitle já vem com "| Viralefy" — absolute pra não duplicar.
+    title: { absolute: copy.metaTitle(c.name) },
     description: copy.metaDescription(c.name),
     alternates: { canonical, languages },
     openGraph: {

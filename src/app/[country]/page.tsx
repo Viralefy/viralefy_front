@@ -30,7 +30,9 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   }
 
   return {
-    title: c.title,
+    // c.title já vem com sufixo "| Viralefy" — usamos absolute para o
+    // template do root layout não duplicar.
+    title: { absolute: c.title },
     description: c.description,
     alternates: {
       canonical: `/${c.code}`,

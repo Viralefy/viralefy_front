@@ -19,7 +19,14 @@ import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
-  title: "Viralefy — Instagram & TikTok growth",
+  // Title como template: pages que retornarem `title: "Login"` viram
+  // "Login | Viralefy" na <title>. Pages que retornarem o título completo
+  // (Service pages com SEO próprio) usam `title: { absolute: "…" }` para
+  // não levar o sufixo " | Viralefy" duplicado.
+  title: {
+    template: "%s | Viralefy",
+    default: "Viralefy — Instagram & TikTok growth",
+  },
   description:
     "Real followers, engagement and views for Instagram and TikTok worldwide. Fast delivery, refill guarantee, support in your language.",
   applicationName: "Viralefy",

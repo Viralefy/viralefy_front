@@ -87,7 +87,8 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
   const ogUrl = `/og/${c.code}/${catSlug}/${qty}-${catSlug}`;
   return {
-    title,
+    // titleByLang já termina em "| Viralefy" — absolute pra não duplicar.
+    title: { absolute: title },
     description,
     alternates: { canonical, languages },
     openGraph: {

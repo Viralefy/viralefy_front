@@ -103,7 +103,17 @@ export function Header() {
     <header className="site-header">
       <div className="site-header__row container">
         <Link href="/" aria-label="Viralefy" className="site-header__logo" style={{ display: "inline-flex", flexShrink: 0 }}>
-          <Image src="/logo.png" alt="Viralefy" width={2471} height={704} priority />
+          {/* sizes="200px" pra Next.js servir variante pequena (~200w em
+              vez do 3840w default). Antes o PSI flagava 24KB de logo
+              transferido pra render de 160x46. */}
+          <Image
+            src="/logo.png"
+            alt="Viralefy"
+            width={2471}
+            height={704}
+            sizes="200px"
+            priority
+          />
         </Link>
 
         {/* Markets — visível só em desktop */}

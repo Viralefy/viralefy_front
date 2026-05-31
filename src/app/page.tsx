@@ -20,7 +20,9 @@ function siteUrl() {
 }
 
 export const metadata: Metadata = {
-  title: "Buy Instagram & TikTok followers worldwide | Viralefy",
+  // absolute = bypass do template "%s | Viralefy" do root layout, já que
+  // esse título já termina em "| Viralefy" pra cuidar do SEO da home.
+  title: { absolute: "Buy Instagram & TikTok followers worldwide | Viralefy" },
   description:
     "Real followers, engagement and views for Instagram and TikTok. Fast delivery, 30-day refill guarantee, support in your language. Pay in USDT, USD, EUR, BRL or crypto.",
   alternates: (() => {

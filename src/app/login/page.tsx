@@ -47,7 +47,12 @@ export default function LoginPage() {
           </button>
         </form>
         <p style={{ color: "var(--muted)", marginTop: "1.25rem", fontSize: "0.9rem" }}>
-          Don&apos;t have an account? <Link href="/register">Create account</Link>
+          {/* underline pra atender WCAG 1.4.1 — link em parágrafo muted
+              estava distinguido apenas pela cor. */}
+          Don&apos;t have an account?{" "}
+          <Link href="/register" style={{ textDecoration: "underline" }}>
+            Create account
+          </Link>
         </p>
       </div>
     </main>

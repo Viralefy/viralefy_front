@@ -143,6 +143,14 @@ a {
   text-decoration: none;
 }
 
+/* Link em parágrafo de texto corrido sempre sublinhado — WCAG 1.4.1: cor
+   sozinha não pode ser o único sinal de "isso é um link" quando o link
+   está em meio a texto. Em nav/header/footer/cards o link é
+   estruturalmente óbvio, então mantém sem underline. */
+p > a {
+  text-decoration: underline;
+}
+
 a:hover {
   color: var(--accent-hover);
   text-shadow: 0 0 8px rgba(0, 254, 214, 0.4);
