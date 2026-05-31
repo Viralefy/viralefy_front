@@ -48,6 +48,8 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     },
     twitter: {
       card: "summary_large_image",
+      site: "@viralefy",
+      creator: "@viralefy",
       title: c.title,
       description: c.description,
       images: [`/og/${c.code}`],
