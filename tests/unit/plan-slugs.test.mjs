@@ -44,8 +44,15 @@ test("categoryFromSlug('podpisciki-instagram') === 'seguidores_instagram'", () =
   assert.equal(categoryFromSlug("podpisciki-instagram"), "seguidores_instagram");
 });
 
-test("categoryFromSlug('lajki-tiktok') === 'engajamento_tiktok'", () => {
-  assert.equal(categoryFromSlug("lajki-tiktok"), "engajamento_tiktok");
+test("categoryFromSlug('lajki-tiktok') === 'curtidas_tiktok'", () => {
+  assert.equal(categoryFromSlug("lajki-tiktok"), "curtidas_tiktok");
+});
+
+test("categoryFromSlug resolves comments/shares slugs to the new codes", () => {
+  assert.equal(categoryFromSlug("instagram-comments"), "comentarios_instagram");
+  assert.equal(categoryFromSlug("comentarios-instagram"), "comentarios_instagram");
+  assert.equal(categoryFromSlug("tiktok-shares"), "compartilhamentos_tiktok");
+  assert.equal(categoryFromSlug("partages-instagram"), "compartilhamentos_instagram");
 });
 
 test("categoryFromSlug('prosmotry-instagram') === 'visualizacoes_instagram'", () => {
@@ -63,16 +70,15 @@ test("categoryFromSlug returns undefined for nonsense", () => {
 });
 
 test("categoryLabel falls back to en when a lang has no entry", () => {
-  // Pick a code/lang combination known to not have a custom label.
-  // Polish ("pl") has no rich label for engajamento_instagram — falls back to en.
-  const label = categoryLabel("engajamento_instagram", "pl");
-  assert.equal(label, CATEGORY_LABEL.engajamento_instagram.en);
+  // Polish ("pl") has no rich label for curtidas_instagram — falls back to en.
+  const label = categoryLabel("curtidas_instagram", "pl");
+  assert.equal(label, CATEGORY_LABEL.curtidas_instagram.en);
 });
 
 test("categorySlug falls back to en when a lang has no entry", () => {
-  // Likewise for slug — Japanese has no engajamento_instagram slug.
-  const slug = categorySlug("engajamento_instagram", "ja");
-  assert.equal(slug, CATEGORY_SLUG.engajamento_instagram.en);
+  // Japanese has no curtidas_instagram slug — falls back to the en slug.
+  const slug = categorySlug("curtidas_instagram", "ja");
+  assert.equal(slug, CATEGORY_SLUG.curtidas_instagram.en);
 });
 
 test("COPY map has at least en/pt/es/ru entries for every category", () => {
@@ -115,13 +121,20 @@ test("CATEGORY_LABEL has at least en/pt/es/ru entries for every category", () =>
   }
 });
 
-test("CATEGORY_CODES has exactly 7 entries (platform-split + servicos)", () => {
-  assert.equal(CATEGORY_CODES.length, 7);
+test("CATEGORY_CODES has exactly 11 entries (engagement split by primitive)", () => {
+  // Engagement foi separado em 3 primitivas (curtidas, comentarios,
+  // compartilhamentos) × 2 plataformas = 6 codes. Mais 2 seguidores, 2 views
+  // e servicos = 11.
+  assert.equal(CATEGORY_CODES.length, 11);
   assert.deepEqual(
     [...CATEGORY_CODES].sort(),
     [
-      "engajamento_instagram",
-      "engajamento_tiktok",
+      "comentarios_instagram",
+      "comentarios_tiktok",
+      "compartilhamentos_instagram",
+      "compartilhamentos_tiktok",
+      "curtidas_instagram",
+      "curtidas_tiktok",
       "seguidores_instagram",
       "seguidores_tiktok",
       "servicos",

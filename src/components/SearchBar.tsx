@@ -33,16 +33,16 @@ type Hit = {
   keywords: string;
 };
 
-// Keywords adicionais por categoria — vocabulário do usuário que talvez não
-// esteja nos labels (ex: "seguidor singular", "curtidas vs likes", nomes
-// de serviços específicos pra categoria 'servicos').
-// Keywords adicionais por bucket lógico. Mapeamos para cada CategoryCode
-// via heurística de prefixo (seguidores_*, engajamento_*, visualizacoes_*),
-// e adicionamos termos de plataforma quando aplicável.
+// Keywords adicionais por bucket lógico (prefixo do CategoryCode até o
+// underline). Mapeamos para cada CategoryCode via heurística do prefixo, e
+// adicionamos termos de plataforma quando aplicável.
 const KEYWORDS_BY_BUCKET = {
-  seguidores: "follower seguidor seguir abonnes obserwujacy seuraajat sledilci",
-  engajamento: "like curtir polubienia interaccion comentario comment commentaire reazione " +
-    "share compartilhamento save salvamento partilhar guardar shares saves",
+  seguidores: "follower seguidor seguir abonnes obserwujacy seuraajat sledilci podpisciki",
+  curtidas: "like curtir likes curtidas reazione me-gusta lajki haikara polubienia",
+  comentarios: "comment comentario comentarios commentaire kommentar commento reactie kommentarii yorum",
+  compartilhamentos:
+    "share compartilhamento save salvamento partilhar guardar shares saves " +
+    "partage partages condivisione condivisioni reposto repost teilen",
   visualizacoes: "view watch reels story stories reel video views vistas aufruf vues visualizzazioni",
   servicos: "servico service services premium gestao management gestion gerenciamento " +
     "recuperacao recovery recuperar recuperacion recuperer recover wiederherstellen rebooting " +

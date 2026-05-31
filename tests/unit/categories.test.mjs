@@ -16,12 +16,19 @@ import {
   copyFor,
 } from "../../src/i18n/categories.ts";
 
-test("CATEGORY_CODES exposes the seven canonical platform-split codes", () => {
+test("CATEGORY_CODES exposes the 11 canonical platform+primitive-split codes", () => {
+  // Engagement separado em 3 primitivas (curtidas / comentarios /
+  // compartilhamentos) × 2 plataformas. Saves do IG ficam embutidos em
+  // compartilhamentos_instagram.
   assert.deepEqual(CATEGORY_CODES, [
     "seguidores_instagram",
     "seguidores_tiktok",
-    "engajamento_instagram",
-    "engajamento_tiktok",
+    "curtidas_instagram",
+    "curtidas_tiktok",
+    "comentarios_instagram",
+    "comentarios_tiktok",
+    "compartilhamentos_instagram",
+    "compartilhamentos_tiktok",
     "visualizacoes_instagram",
     "visualizacoes_tiktok",
     "servicos",
@@ -52,12 +59,19 @@ test("categoryFromSlug returns undefined for unknown slug", () => {
   assert.equal(categoryFromSlug("nonexistent"), undefined);
 });
 
-test("categoryFromSlug maps 'instagram-likes' to engajamento_instagram", () => {
-  assert.equal(categoryFromSlug("instagram-likes"), "engajamento_instagram");
+test("categoryFromSlug maps 'instagram-likes' to curtidas_instagram", () => {
+  assert.equal(categoryFromSlug("instagram-likes"), "curtidas_instagram");
 });
 
-test("categoryFromSlug maps 'tiktok-likes' to engajamento_tiktok", () => {
-  assert.equal(categoryFromSlug("tiktok-likes"), "engajamento_tiktok");
+test("categoryFromSlug maps 'tiktok-likes' to curtidas_tiktok", () => {
+  assert.equal(categoryFromSlug("tiktok-likes"), "curtidas_tiktok");
+});
+
+test("categoryFromSlug maps comments/shares slugs to the right codes", () => {
+  assert.equal(categoryFromSlug("instagram-comments"), "comentarios_instagram");
+  assert.equal(categoryFromSlug("comentarios-tiktok"), "comentarios_tiktok");
+  assert.equal(categoryFromSlug("instagram-shares"), "compartilhamentos_instagram");
+  assert.equal(categoryFromSlug("partages-tiktok"), "compartilhamentos_tiktok");
 });
 
 test("categoryFromSlug maps 'services' to servicos", () => {
@@ -77,8 +91,8 @@ test("categorySlug falls back to EN for languages without an explicit slug", () 
   assert.equal(categorySlug("seguidores_instagram", "ja"), "instagram-followers");
 });
 
-test("categorySlug returns FR slug for engajamento_instagram", () => {
-  assert.equal(categorySlug("engajamento_instagram", "fr"), "likes-instagram");
+test("categorySlug returns FR slug for curtidas_instagram", () => {
+  assert.equal(categorySlug("curtidas_instagram", "fr"), "likes-instagram");
 });
 
 test("categoryLabel returns German label", () => {

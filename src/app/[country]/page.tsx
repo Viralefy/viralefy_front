@@ -73,9 +73,11 @@ export default async function CountryPage({ params }: { params: Promise<Params> 
   const lang = langOfCountry(c.code);
   const t = tr(lang);
 
-  // JSON-LD agora cobre todas as categorias (não só seguidores).
-  const seguidoresPlans = plans.filter((p) => p.category === "seguidores");
-  const jsonld = buildCountryJsonLd(c, seguidoresPlans, siteUrl());
+  // JSON-LD pega a categoria primária do país (seguidores IG) — é o
+  // produto-âncora pro Service/AggregateOffer. Antes filtrava por "seguidores"
+  // que não existia mais (split em seguidores_instagram/_tiktok).
+  const anchorPlans = plans.filter((p) => p.category === "seguidores_instagram");
+  const jsonld = buildCountryJsonLd(c, anchorPlans, siteUrl());
 
   const sameRegion = countriesByRegion(c.region).filter((o) => o.code !== c.code);
   const otherRegion = countriesByRegion(c.region === "americas" ? "sepa" : "americas");

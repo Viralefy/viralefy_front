@@ -8,11 +8,19 @@
 
 import type { LangCode } from "./languages";
 
+// Categorias separadas por primitiva de engagement (likes / comments / shares)
+// e por plataforma (instagram / tiktok). Saves do IG caem em
+// `compartilhamentos_instagram` — shares e saves são a mesma família de
+// "espalhamento" pra fins de SEO e UX.
 export type CategoryCode =
   | "seguidores_instagram"
   | "seguidores_tiktok"
-  | "engajamento_instagram"
-  | "engajamento_tiktok"
+  | "curtidas_instagram"
+  | "curtidas_tiktok"
+  | "comentarios_instagram"
+  | "comentarios_tiktok"
+  | "compartilhamentos_instagram"
+  | "compartilhamentos_tiktok"
   | "visualizacoes_instagram"
   | "visualizacoes_tiktok"
   | "servicos";
@@ -20,8 +28,12 @@ export type CategoryCode =
 export const CATEGORY_CODES: CategoryCode[] = [
   "seguidores_instagram",
   "seguidores_tiktok",
-  "engajamento_instagram",
-  "engajamento_tiktok",
+  "curtidas_instagram",
+  "curtidas_tiktok",
+  "comentarios_instagram",
+  "comentarios_tiktok",
+  "compartilhamentos_instagram",
+  "compartilhamentos_tiktok",
   "visualizacoes_instagram",
   "visualizacoes_tiktok",
   "servicos",
@@ -51,27 +63,71 @@ export const CATEGORY_LABEL: Record<CategoryCode, Partial<Record<LangCode, strin
     th: "ผู้ติดตาม TikTok", tr: "TikTok takipçi",
     uk: "Підписники TikTok",
   },
-  engajamento_instagram: {
-    en: "Instagram engagement", pt: "Engajamento Instagram",
-    es: "Engagement Instagram", fr: "Engagement Instagram",
-    de: "Instagram Engagement", it: "Engagement Instagram",
-    nl: "Instagram engagement", ru: "Активность Instagram",
-    ja: "Instagramエンゲージメント", ko: "Instagram 참여",
-    ar: "تفاعل Instagram", hi: "Instagram एंगेजमेंट",
-    id: "Engagement Instagram", vi: "Tương tác Instagram",
-    th: "การมีส่วนร่วม Instagram", tr: "Instagram etkileşim",
-    uk: "Активність Instagram",
+  curtidas_instagram: {
+    en: "Instagram likes", pt: "Curtidas Instagram",
+    es: "Likes Instagram", fr: "Likes Instagram",
+    de: "Instagram Likes", it: "Like Instagram",
+    nl: "Instagram likes", ru: "Лайки Instagram",
+    ja: "Instagramいいね", ko: "Instagram 좋아요",
+    ar: "إعجابات Instagram", hi: "Instagram लाइक्स",
+    id: "Suka Instagram", vi: "Lượt thích Instagram",
+    th: "ไลก์ Instagram", tr: "Instagram beğeni",
+    uk: "Лайки Instagram",
   },
-  engajamento_tiktok: {
-    en: "TikTok engagement", pt: "Engajamento TikTok",
-    es: "Engagement TikTok", fr: "Engagement TikTok",
-    de: "TikTok Engagement", it: "Engagement TikTok",
-    nl: "TikTok engagement", ru: "Активность TikTok",
-    ja: "TikTokエンゲージメント", ko: "TikTok 참여",
-    ar: "تفاعل TikTok", hi: "TikTok एंगेजमेंट",
-    id: "Engagement TikTok", vi: "Tương tác TikTok",
-    th: "การมีส่วนร่วม TikTok", tr: "TikTok etkileşim",
-    uk: "Активність TikTok",
+  curtidas_tiktok: {
+    en: "TikTok likes", pt: "Curtidas TikTok",
+    es: "Likes TikTok", fr: "Likes TikTok",
+    de: "TikTok Likes", it: "Like TikTok",
+    nl: "TikTok likes", ru: "Лайки TikTok",
+    ja: "TikTokいいね", ko: "TikTok 좋아요",
+    ar: "إعجابات TikTok", hi: "TikTok लाइक्स",
+    id: "Suka TikTok", vi: "Lượt thích TikTok",
+    th: "ไลก์ TikTok", tr: "TikTok beğeni",
+    uk: "Лайки TikTok",
+  },
+  comentarios_instagram: {
+    en: "Instagram comments", pt: "Comentários Instagram",
+    es: "Comentarios Instagram", fr: "Commentaires Instagram",
+    de: "Instagram Kommentare", it: "Commenti Instagram",
+    nl: "Instagram reacties", ru: "Комментарии Instagram",
+    ja: "Instagramコメント", ko: "Instagram 댓글",
+    ar: "تعليقات Instagram", hi: "Instagram कमेंट्स",
+    id: "Komentar Instagram", vi: "Bình luận Instagram",
+    th: "คอมเมนต์ Instagram", tr: "Instagram yorum",
+    uk: "Коментарі Instagram",
+  },
+  comentarios_tiktok: {
+    en: "TikTok comments", pt: "Comentários TikTok",
+    es: "Comentarios TikTok", fr: "Commentaires TikTok",
+    de: "TikTok Kommentare", it: "Commenti TikTok",
+    nl: "TikTok reacties", ru: "Комментарии TikTok",
+    ja: "TikTokコメント", ko: "TikTok 댓글",
+    ar: "تعليقات TikTok", hi: "TikTok कमेंट्स",
+    id: "Komentar TikTok", vi: "Bình luận TikTok",
+    th: "คอมเมนต์ TikTok", tr: "TikTok yorum",
+    uk: "Коментарі TikTok",
+  },
+  compartilhamentos_instagram: {
+    en: "Instagram shares", pt: "Compartilhamentos Instagram",
+    es: "Compartidos Instagram", fr: "Partages Instagram",
+    de: "Instagram Shares", it: "Condivisioni Instagram",
+    nl: "Instagram delen", ru: "Репосты Instagram",
+    ja: "Instagramシェア", ko: "Instagram 공유",
+    ar: "مشاركات Instagram", hi: "Instagram शेयर्स",
+    id: "Bagikan Instagram", vi: "Chia sẻ Instagram",
+    th: "แชร์ Instagram", tr: "Instagram paylaşım",
+    uk: "Поширення Instagram",
+  },
+  compartilhamentos_tiktok: {
+    en: "TikTok shares", pt: "Compartilhamentos TikTok",
+    es: "Compartidos TikTok", fr: "Partages TikTok",
+    de: "TikTok Shares", it: "Condivisioni TikTok",
+    nl: "TikTok delen", ru: "Репосты TikTok",
+    ja: "TikTokシェア", ko: "TikTok 공유",
+    ar: "مشاركات TikTok", hi: "TikTok शेयर्स",
+    id: "Bagikan TikTok", vi: "Chia sẻ TikTok",
+    th: "แชร์ TikTok", tr: "TikTok paylaşım",
+    uk: "Поширення TikTok",
   },
   visualizacoes_instagram: {
     en: "Instagram views", pt: "Visualizações Instagram",
@@ -123,17 +179,41 @@ export const CATEGORY_SLUG: Record<CategoryCode, Partial<Record<LangCode, string
     de: "tiktok-follower", it: "follower-tiktok",
     nl: "tiktok-volgers", ru: "podpisciki-tiktok",
   },
-  engajamento_instagram: {
+  curtidas_instagram: {
     en: "instagram-likes", pt: "curtidas-instagram",
     es: "likes-instagram", fr: "likes-instagram",
     de: "instagram-likes", it: "like-instagram",
     nl: "instagram-likes", ru: "lajki-instagram",
   },
-  engajamento_tiktok: {
+  curtidas_tiktok: {
     en: "tiktok-likes", pt: "curtidas-tiktok",
     es: "likes-tiktok", fr: "likes-tiktok",
     de: "tiktok-likes", it: "like-tiktok",
     nl: "tiktok-likes", ru: "lajki-tiktok",
+  },
+  comentarios_instagram: {
+    en: "instagram-comments", pt: "comentarios-instagram",
+    es: "comentarios-instagram", fr: "commentaires-instagram",
+    de: "instagram-kommentare", it: "commenti-instagram",
+    nl: "instagram-reacties", ru: "kommentarii-instagram",
+  },
+  comentarios_tiktok: {
+    en: "tiktok-comments", pt: "comentarios-tiktok",
+    es: "comentarios-tiktok", fr: "commentaires-tiktok",
+    de: "tiktok-kommentare", it: "commenti-tiktok",
+    nl: "tiktok-reacties", ru: "kommentarii-tiktok",
+  },
+  compartilhamentos_instagram: {
+    en: "instagram-shares", pt: "compartilhamentos-instagram",
+    es: "compartidos-instagram", fr: "partages-instagram",
+    de: "instagram-shares", it: "condivisioni-instagram",
+    nl: "instagram-delen", ru: "reposty-instagram",
+  },
+  compartilhamentos_tiktok: {
+    en: "tiktok-shares", pt: "compartilhamentos-tiktok",
+    es: "compartidos-tiktok", fr: "partages-tiktok",
+    de: "tiktok-shares", it: "condivisioni-tiktok",
+    nl: "tiktok-delen", ru: "reposty-tiktok",
   },
   visualizacoes_instagram: {
     en: "instagram-views", pt: "visualizacoes-instagram",
@@ -177,6 +257,75 @@ export function categorySlug(code: CategoryCode, lang: LangCode): string {
 
 export function categoryLabel(code: CategoryCode, lang: LangCode): string {
   return CATEGORY_LABEL[code][lang] ?? CATEGORY_LABEL[code].en ?? code;
+}
+
+// Unit label SEM nome da plataforma — é só a primitiva ("followers", "likes",
+// "comments", "shares", "views"). Usada para frases como "1,000 followers" ou
+// "1,000 likes" no card de plano, onde a plataforma já está no nome do plano
+// e adicioná-la de novo no sufixo fica redundante.
+//
+// `serviceUnit` é fallback para `servicos` (raramente usado — a UI esconde
+// esse sufixo para serviços).
+type Primitive = "followers" | "likes" | "comments" | "shares" | "views" | "service";
+
+function primitiveOf(code: CategoryCode): Primitive {
+  if (code === "servicos") return "service";
+  if (code.startsWith("seguidores")) return "followers";
+  if (code.startsWith("curtidas")) return "likes";
+  if (code.startsWith("comentarios")) return "comments";
+  if (code.startsWith("compartilhamentos")) return "shares";
+  return "views";
+}
+
+const UNIT_BY_PRIMITIVE: Record<Primitive, Partial<Record<LangCode, string>>> = {
+  followers: {
+    en: "followers", pt: "seguidores", es: "seguidores", es_AR: "seguidores",
+    fr: "abonnés", de: "Follower", it: "follower", nl: "volgers",
+    ru: "подписчиков", ja: "フォロワー", ko: "팔로워", ar: "متابع",
+    hi: "फॉलोअर्स", id: "pengikut", vi: "người theo dõi", th: "ผู้ติดตาม",
+    tr: "takipçi", uk: "підписників",
+  },
+  likes: {
+    en: "likes", pt: "curtidas", es: "likes", es_AR: "likes",
+    fr: "likes", de: "Likes", it: "like", nl: "likes",
+    ru: "лайков", ja: "いいね", ko: "좋아요", ar: "إعجاب",
+    hi: "लाइक्स", id: "suka", vi: "lượt thích", th: "ไลก์",
+    tr: "beğeni", uk: "лайків",
+  },
+  comments: {
+    en: "comments", pt: "comentários", es: "comentarios", es_AR: "comentarios",
+    fr: "commentaires", de: "Kommentare", it: "commenti", nl: "reacties",
+    ru: "комментариев", ja: "コメント", ko: "댓글", ar: "تعليق",
+    hi: "कमेंट्स", id: "komentar", vi: "bình luận", th: "คอมเมนต์",
+    tr: "yorum", uk: "коментарів",
+  },
+  shares: {
+    en: "shares", pt: "compartilhamentos", es: "compartidos", es_AR: "compartidos",
+    fr: "partages", de: "Shares", it: "condivisioni", nl: "delen",
+    ru: "репостов", ja: "シェア", ko: "공유", ar: "مشاركة",
+    hi: "शेयर्स", id: "bagikan", vi: "chia sẻ", th: "แชร์",
+    tr: "paylaşım", uk: "поширень",
+  },
+  views: {
+    en: "views", pt: "visualizações", es: "visualizaciones", es_AR: "visualizaciones",
+    fr: "vues", de: "Aufrufe", it: "visualizzazioni", nl: "weergaven",
+    ru: "просмотров", ja: "再生", ko: "조회수", ar: "مشاهدة",
+    hi: "व्यूज़", id: "tayangan", vi: "lượt xem", th: "ยอดดู",
+    tr: "görüntüleme", uk: "переглядів",
+  },
+  service: {
+    en: "service", pt: "serviço", es: "servicio", es_AR: "servicio",
+    fr: "service", de: "Service", it: "servizio", nl: "dienst",
+    ru: "услуга",
+  },
+};
+
+// Unit label curto, sem plataforma — vira o sufixo na frase
+// "1,000 <unit>" no card de plano. Cai no `en` quando o idioma não tem
+// tradução dedicada.
+export function categoryUnit(code: CategoryCode, lang: LangCode): string {
+  const prim = primitiveOf(code);
+  return UNIT_BY_PRIMITIVE[prim][lang] ?? UNIT_BY_PRIMITIVE[prim].en ?? prim;
 }
 
 // ---------- Cópia longa (500+ palavras) por categoria e idioma ----------
@@ -1107,12 +1256,36 @@ export const COPY: Record<CategoryCode, Partial<Record<LangCode, LongCopy>>> = {
     fr: COPY_SEGUIDORES_FR, de: COPY_SEGUIDORES_DE, it: COPY_SEGUIDORES_IT, nl: COPY_SEGUIDORES_NL,
     ru: COPY_SEGUIDORES_RU,
   },
-  engajamento_instagram: {
+  // Likes / Comments / Shares dividem o mesmo bloco de cópia base
+  // (engagement). O CategoryGroupedGrid e a [category]/page.tsx tiram o nome
+  // da primitiva do label local (CATEGORY_LABEL), então a página fica
+  // semanticamente correta mesmo reaproveitando o COPY genérico.
+  curtidas_instagram: {
     en: COPY_ENG_EN, pt: COPY_ENG_PT, es: COPY_ENG_ES, es_AR: COPY_ENG_ES,
     fr: COPY_ENG_FR, de: COPY_ENG_DE, it: COPY_ENG_IT, nl: COPY_ENG_NL,
     ru: COPY_ENG_RU,
   },
-  engajamento_tiktok: {
+  curtidas_tiktok: {
+    en: COPY_ENG_EN, pt: COPY_ENG_PT, es: COPY_ENG_ES, es_AR: COPY_ENG_ES,
+    fr: COPY_ENG_FR, de: COPY_ENG_DE, it: COPY_ENG_IT, nl: COPY_ENG_NL,
+    ru: COPY_ENG_RU,
+  },
+  comentarios_instagram: {
+    en: COPY_ENG_EN, pt: COPY_ENG_PT, es: COPY_ENG_ES, es_AR: COPY_ENG_ES,
+    fr: COPY_ENG_FR, de: COPY_ENG_DE, it: COPY_ENG_IT, nl: COPY_ENG_NL,
+    ru: COPY_ENG_RU,
+  },
+  comentarios_tiktok: {
+    en: COPY_ENG_EN, pt: COPY_ENG_PT, es: COPY_ENG_ES, es_AR: COPY_ENG_ES,
+    fr: COPY_ENG_FR, de: COPY_ENG_DE, it: COPY_ENG_IT, nl: COPY_ENG_NL,
+    ru: COPY_ENG_RU,
+  },
+  compartilhamentos_instagram: {
+    en: COPY_ENG_EN, pt: COPY_ENG_PT, es: COPY_ENG_ES, es_AR: COPY_ENG_ES,
+    fr: COPY_ENG_FR, de: COPY_ENG_DE, it: COPY_ENG_IT, nl: COPY_ENG_NL,
+    ru: COPY_ENG_RU,
+  },
+  compartilhamentos_tiktok: {
     en: COPY_ENG_EN, pt: COPY_ENG_PT, es: COPY_ENG_ES, es_AR: COPY_ENG_ES,
     fr: COPY_ENG_FR, de: COPY_ENG_DE, it: COPY_ENG_IT, nl: COPY_ENG_NL,
     ru: COPY_ENG_RU,

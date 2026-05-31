@@ -19,11 +19,19 @@ import {
 } from "../../src/i18n/categories.ts";
 import { langOfCountry } from "../../src/i18n/languages.ts";
 
+// Bucket de keywords espelhando SearchBar.tsx (após split de engagement em
+// curtidas / comentarios / compartilhamentos). Indexamos diretamente por
+// CategoryCode + servicos. As entradas sem match (categorias de plataforma)
+// caem para "" via `??`, igualando o comportamento de prod.
 const EXTRA_KEYWORDS = {
   seguidores:
     "follower seguidor follower seguir abonnes obserwujacy seuraajat sledilci instagram tiktok",
-  engajamento:
-    "like curtir polubienia interaccion comentario comment commentaire reazione",
+  curtidas:
+    "like curtir likes curtidas reazione me-gusta lajki polubienia",
+  comentarios:
+    "comment comentario comentarios commentaire kommentar commento reactie",
+  compartilhamentos:
+    "share compartilhamento save salvamento partilhar guardar shares saves partage condivisione",
   visualizacoes:
     "view watch reels story stories reel video views vistas aufruf vues visualizzazioni",
   servicos:

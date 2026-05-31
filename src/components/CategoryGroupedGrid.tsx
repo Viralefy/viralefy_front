@@ -6,13 +6,13 @@ import type { Plan } from "@/lib/api";
 import { priceFor } from "@/lib/format";
 import { useApp } from "./Providers";
 import { CheckoutModal } from "./CheckoutModal";
-import { CATEGORY_CODES, categoryLabel, categorySlug, type CategoryCode } from "@/i18n/categories";
+import { CATEGORY_CODES, categoryLabel, categorySlug, categoryUnit } from "@/i18n/categories";
 import { tr, type LangCode } from "@/i18n/languages";
 
 // Grid usado em /<country> e em / (global). Agrupa os planos por categoria
-// na ordem canônica (seguidores → engajamento → visualizações → serviços) e
-// dentro de cada grupo ordena por followers_qty ASC. Cada grupo tem um header
-// e um link "ver detalhes" que leva à página SEO de categoria.
+// na ordem canônica (seguidores → likes → comments → shares → views →
+// serviços) e dentro de cada grupo ordena por followers_qty ASC. Cada grupo
+// tem um header e um link "ver detalhes" que leva à página SEO de categoria.
 //
 // `countryCode` define o prefixo dos links — `/${countryCode}/${slug}`. Quando
 // for a home global o prefixo é `""` e os links vão pra raiz com âncora.
@@ -75,7 +75,7 @@ export function CategoryGroupedGrid({
                   {g.code !== "servicos" && (
                     <p style={{ fontSize: "0.9rem" }}>
                       <strong>{plan.followers_qty.toLocaleString()}</strong>{" "}
-                      {g.code.startsWith("seguidores") ? t.category.table.qty.toLowerCase() : label.toLowerCase()}
+                      {categoryUnit(g.code, lang)}
                     </p>
                   )}
                   <button

@@ -9,6 +9,7 @@ import {
   categoryFromSlug,
   categoryLabel,
   categorySlug,
+  categoryUnit,
   copyFor,
 } from "@/i18n/categories";
 import { CategoryCardGrid } from "@/components/CategoryCardGrid";
@@ -94,7 +95,9 @@ export default async function CategoryPage({ params }: { params: Promise<Params>
   const catSlug = categorySlug(cat, lang);
   const url = siteUrl();
   const pageUrl = `${url}/${c.code}/${catSlug}`;
-  const unitLabel = catLabel.toLowerCase();
+  // Unit label sem plataforma — "followers", "likes", "comments", "shares",
+  // "views". Mantém o card legível sem duplicar "instagram" / "tiktok".
+  const unitLabel = categoryUnit(cat, lang);
 
   // Offers para AggregateOffer (e cada plano vira ProductGroup ofertado).
   const offers = sortedPlans.map((p) => {

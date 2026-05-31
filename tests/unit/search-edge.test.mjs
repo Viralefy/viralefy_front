@@ -22,8 +22,12 @@ import { langOfCountry } from "../../src/i18n/languages.ts";
 const EXTRA_KEYWORDS = {
   seguidores:
     "follower seguidor follower seguir abonnes obserwujacy seuraajat sledilci instagram tiktok",
-  engajamento:
-    "like curtir polubienia interaccion comentario comment commentaire reazione",
+  curtidas:
+    "like curtir likes curtidas reazione lajki polubienia",
+  comentarios:
+    "comment comentario comentarios commentaire kommentar commento reactie",
+  compartilhamentos:
+    "share compartilhamento save salvamento partilhar shares saves partage condivisione",
   visualizacoes:
     "view watch reels story stories reel video views vistas aufruf vues visualizzazioni",
   servicos:
