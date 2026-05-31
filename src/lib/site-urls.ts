@@ -1,14 +1,12 @@
-// Gera a lista canônica de URLs do site. Usada por:
-//   - app/sitemap.ts (sitemap.xml)
-//   - app/api/indexnow (submissão IndexNow)
-//   - script CLI scripts/indexnow.mjs
+// Gera a lista canônica de URLs do site, agora particionada por idioma.
 //
-// A lista cobre:
-//   /                                    (home global EN)
-//   /{country}                           (67 subsites)
-//   /{country}/{category-slug}           (67 × 4 = 268)
-//   /{country}/{category}/{qty}-{slug}   (variável, ~67 × 7 = ~469)
-//   /legal/{slug}?lang={langs}           (6 docs × 8 idiomas = 48)
+// O sitemap.xml virou um *índice* que aponta para /sitemap-<lang>.xml. Cada
+// per-lang sitemap é gerado por route handler que filtra `allSiteUrls()`
+// pelo idioma do país. Páginas legais entram em todos os idiomas pois cada
+// uma tem uma URL `?lang=<code>` distinta.
+//
+// Idiomas no índice = todos os langs presentes em PACKS + "legal" virtual
+// para as URLs cross-language.
 
 import { COUNTRIES } from "@/i18n/countries";
 import { CATEGORY_CODES, categorySlug } from "@/i18n/categories";
@@ -16,7 +14,13 @@ import { LEGAL_SLUGS } from "@/i18n/legal";
 import { PACKS, langOfCountry, type LangCode } from "@/i18n/languages";
 import type { Plan } from "./api";
 
-type SiteUrl = { url: string; changeFrequency: "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never"; priority: number };
+export type SiteUrl = {
+  url: string;
+  changeFrequency: "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
+  priority: number;
+  lang: LangCode | "legal";   // lang determina em qual per-lang sitemap a URL cai
+  lastModified?: string;       // ISO date — quando conhecido
+};
 
 function siteUrl(): string {
   return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
@@ -38,37 +42,57 @@ export async function allSiteUrls(): Promise<SiteUrl[]> {
   const plans = await fetchPlans();
   const out: SiteUrl[] = [];
 
-  // Home global
-  out.push({ url: base, changeFrequency: "weekly", priority: 1.0 });
+  // Home global = entrada do bloco `en`.
+  out.push({ url: base, changeFrequency: "weekly", priority: 1.0, lang: "en" });
 
-  // Cada país
   for (const c of COUNTRIES) {
-    out.push({ url: `${base}/${c.code}`, changeFrequency: "weekly", priority: 0.9 });
     const lang = langOfCountry(c.code);
+    out.push({ url: `${base}/${c.code}`, changeFrequency: "weekly", priority: 0.9, lang });
 
-    // Cada categoria (do país)
     for (const cat of CATEGORY_CODES) {
       const slug = categorySlug(cat, lang);
-      out.push({ url: `${base}/${c.code}/${slug}`, changeFrequency: "weekly", priority: 0.8 });
+      out.push({ url: `${base}/${c.code}/${slug}`, changeFrequency: "weekly", priority: 0.8, lang });
 
-      // Cada plano dessa categoria
       const catPlans = plans.filter((p) => p.category === cat);
       for (const p of catPlans) {
         out.push({
           url: `${base}/${c.code}/${slug}/${p.followers_qty}-${slug}`,
           changeFrequency: "weekly",
           priority: 0.7,
+          lang,
         });
       }
     }
   }
 
-  // Páginas legais — uma URL por idioma com pacote.
+  // Legais — uma URL por idioma. Caem no bucket "legal" pra não inflar nenhum lang.
   for (const slug of LEGAL_SLUGS) {
     for (const code of Object.keys(PACKS) as LangCode[]) {
-      out.push({ url: `${base}/legal/${slug}?lang=${code}`, changeFrequency: "monthly", priority: 0.3 });
+      out.push({
+        url: `${base}/legal/${slug}?lang=${code}`,
+        changeFrequency: "monthly",
+        priority: 0.3,
+        lang: "legal",
+      });
     }
   }
 
   return out;
 }
+
+export function urlsForLang(all: SiteUrl[], lang: LangCode | "legal"): SiteUrl[] {
+  return all.filter((u) => u.lang === lang);
+}
+
+// Lista de buckets — usada pelo índice e pelos route handlers.
+// Cada bucket gera um per-lang sitemap. "legal" é o cross-language para
+// as variantes ?lang= das páginas jurídicas.
+export const SITEMAP_BUCKETS: Array<LangCode | "legal"> = [
+  "en", "pt", "es", "es_AR", "fr", "de", "it", "nl",
+  "ja", "ko", "ar", "hi", "id", "vi", "th", "tr",
+  "ru", "uk",
+  "pl", "sv", "da", "no", "fi", "is", "et", "lv", "lt",
+  "cs", "sk", "hu", "ro", "bg", "el", "hr", "sl", "ca",
+  "tl", "ms", "sr", "sq", "bs", "fa", "he", "bn", "ur", "sw", "am",
+  "legal",
+];

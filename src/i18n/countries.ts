@@ -354,6 +354,13 @@ const L = {
     backToStore: "ሁሉንም አገልግሎቶች ይመልከቱ",
     otherMarkets: "ሌሎች ገበያዎች",
   },
+  ru: <Labels>{
+    plansHeading: "Пакеты подписчиков",
+    ctaBuy: "Купить сейчас",
+    followers: "подписчики",
+    backToStore: "Все услуги",
+    otherMarkets: "Другие рынки",
+  },
 };
 
 // -------- Catálogo de países -------- //
@@ -1394,6 +1401,43 @@ export const COUNTRIES: Country[] = [
     description: "Türkiye'de gerçek Instagram ve TikTok takipçileri satın alın. Hızlı teslimat ve USD, EUR veya kripto ile ödeme.",
     intro: "Türkiye'de gerçek takipçilerle Instagram hesabınızı büyütün. Hızlı, güvenli teslimat ve özel destek.",
     labels: L.tr,
+  },
+
+  // ============ MERCADOS RUSSÓFONOS ============
+  // IG/TikTok têm restrições parciais em RU/BY (via VPN ainda funciona),
+  // mas KZ/KG estão totalmente abertos. Mantemos os 4 pra dar cobertura SEO
+  // ao bloco russófono completo.
+  {
+    code: "ru", name: "Россия", htmlLang: "ru-RU", region: "europe_other", currencyHint: "RUB", flag: "🇷🇺",
+    h1: "Купить подписчиков Instagram и TikTok в России",
+    title: "Купить подписчиков Instagram и TikTok в России | Viralefy",
+    description: "Покупайте настоящих подписчиков Instagram и TikTok в России. Быстрая доставка, оплата в USD, EUR или криптовалюте.",
+    intro: "Развивайте Instagram и TikTok в России с настоящими подписчиками. Быстрая, безопасная доставка и поддержка на русском.",
+    labels: L.ru,
+  },
+  {
+    code: "by", name: "Беларусь", htmlLang: "ru-BY", region: "europe_other", currencyHint: "BYN", flag: "🇧🇾",
+    h1: "Купить подписчиков Instagram и TikTok в Беларуси",
+    title: "Купить подписчиков Instagram и TikTok в Беларуси | Viralefy",
+    description: "Покупайте настоящих подписчиков Instagram и TikTok в Беларуси. Оплата в USD, EUR или криптовалюте.",
+    intro: "Развивайте Instagram и TikTok в Беларуси с настоящими подписчиками и поддержкой на русском.",
+    labels: L.ru,
+  },
+  {
+    code: "kz", name: "Қазақстан", htmlLang: "ru-KZ", region: "asia", currencyHint: "KZT", flag: "🇰🇿",
+    h1: "Купить подписчиков Instagram и TikTok в Казахстане",
+    title: "Купить подписчиков Instagram и TikTok в Казахстане | Viralefy",
+    description: "Покупайте настоящих подписчиков Instagram и TikTok в Казахстане. Оплата в USD, EUR или криптовалюте.",
+    intro: "Развивайте Instagram и TikTok в Казахстане с настоящими подписчиками и поддержкой на русском.",
+    labels: L.ru,
+  },
+  {
+    code: "kg", name: "Кыргызстан", htmlLang: "ru-KG", region: "asia", currencyHint: "KGS", flag: "🇰🇬",
+    h1: "Купить подписчиков Instagram и TikTok в Кыргызстане",
+    title: "Купить подписчиков Instagram и TikTok в Кыргызстане | Viralefy",
+    description: "Покупайте настоящих подписчиков Instagram и TikTok в Кыргызстане. Оплата в USD, EUR или криптовалюте.",
+    intro: "Развивайте Instagram и TikTok в Кыргызстане с настоящими подписчиками и поддержкой на русском.",
+    labels: L.ru,
   },
 ];
 

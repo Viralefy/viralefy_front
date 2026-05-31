@@ -1,7 +1,48 @@
 import type { NextConfig } from "next";
 
+// Headers de segurança — recomendações OWASP + relaxa o que GTM/Twemoji/SVG
+// CDN precisam:
+//   - Twemoji SVG: cdn.jsdelivr.net (img-src)
+//   - GTM JS: googletagmanager.com (script-src) + dataLayer (frame-src ns.html)
+//   - Próprio: 'self' pra script/style/conexão de API
+const SECURITY_HEADERS = [
+  {
+    key: "Content-Security-Policy",
+    value: [
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://cdn.jsdelivr.net",
+      "style-src 'self' 'unsafe-inline'",
+      "img-src 'self' data: blob: https://cdn.jsdelivr.net https://www.googletagmanager.com https://*.google-analytics.com https://*.google.com",
+      "font-src 'self' data:",
+      "connect-src 'self' https://api.viralefy.com https://www.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com",
+      "frame-src https://www.googletagmanager.com",
+      "frame-ancestors 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+      "object-src 'none'",
+      "upgrade-insecure-requests",
+    ].join("; "),
+  },
+  { key: "X-Frame-Options", value: "DENY" },
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  {
+    key: "Permissions-Policy",
+    value: "camera=(), microphone=(), geolocation=(), interest-cohort=()",
+  },
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+  // X-Powered-By já é desabilitado via `poweredByHeader: false` abaixo.
+];
+
 const nextConfig: NextConfig = {
-  // Redireciona URLs antigas /<locale>/<slug> para os novos subsites /<código-país>.
+  poweredByHeader: false,
+
+  async headers() {
+    return [
+      { source: "/:path*", headers: SECURITY_HEADERS },
+    ];
+  },
+
   async redirects() {
     return [
       { source: "/pt/seguidores-brasileiros", destination: "/br", permanent: true },

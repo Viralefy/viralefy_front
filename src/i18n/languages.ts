@@ -9,12 +9,16 @@ export type LangCode =
   // Ásia, África, Oceania, Europa-fora-SEPA
   | "ja" | "ko" | "ar" | "hi" | "id" | "vi" | "th" | "tr" | "uk"
   | "tl" | "ms" | "sr" | "sq" | "bs" | "fa" | "he" | "bn" | "ur"
-  | "sw" | "am";
+  | "sw" | "am"
+  // Russo (Rússia, Bielorrússia, Cazaquistão, Quirguistão e diáspora)
+  | "ru";
 
 // Mapa país → idioma. Para países sem entrada cai no inglês.
 const COUNTRY_LANG: Record<string, LangCode> = {
   // pt
   br: "pt", pt: "pt",
+  // ru
+  ru: "ru", by: "ru", kz: "ru", kg: "ru",
   // en (americas + sepa + caribbean + global default)
   us: "en", ca: "en", gb: "en", ie: "en", mt: "en", gi: "en",
   jm: "en", tt: "en", bs: "en", bb: "en", bz: "en", gy: "en",
@@ -609,6 +613,78 @@ export const PACKS: Record<LangCode, Pack> = {
   ur: { ...en, home: { ...en.home, heroTitle: "اپنا Instagram اور TikTok بڑھائیں" } },
   sw: { ...en, home: { ...en.home, heroTitle: "Kuza Instagram na TikTok yako" } },
   am: { ...en, home: { ...en.home, heroTitle: "Instagram እና TikTok ያሳድጉ" } },
+  // ---------- Russo (rico) ----------
+  ru: {
+    home: {
+      heroTitle: "Развивайте Instagram и TikTok",
+      heroSubtitle: "Настоящие подписчики, активность и просмотры с быстрой доставкой. Оплата в USD, EUR или криптовалюте.",
+      plansByService: "Услуги",
+      pickMarket: "Рынки и языки",
+      pickService: "Выбрать услугу",
+      viewService: "Подробнее",
+    },
+    header: {
+      login: "Войти",
+      register: "Создать аккаунт",
+      account: "Мой аккаунт",
+      support: "Поддержка",
+      logout: "Выйти",
+      currency: "Валюта",
+      markets: "Рынки",
+      searchPlaceholder: "Поиск услуг и рынков…",
+      searchNoResults: "Ничего не найдено.",
+      regionAmericas: "Америка",
+      regionSepa: "Европа / SEPA",
+    },
+    footer: {
+      tagline: "Ответственный рост в социальных сетях.",
+      sections: { legal: "Правовое", site: "Сайт", markets: "Рынки" },
+      links: {
+        privacy: "Политика конфиденциальности",
+        terms: "Условия использования",
+        cookies: "Политика cookies",
+        refund: "Политика возврата",
+        contact: "Поддержка",
+        about: "О Viralefy",
+      },
+      copyright: "Все права защищены.",
+      disclaimer: "Viralefy не аффилирована с Instagram, TikTok или Meta Platforms.",
+    },
+    cta: {
+      buy: "Купить",
+      buyNow: "Купить сейчас",
+      seeAll: "Все пакеты",
+      seeRange: "Версия со слайдером",
+      seeCards: "Версия с карточками",
+      backToHome: "На главную",
+      backToCategory: "К категории",
+    },
+    category: {
+      intro: "Выберите пакет",
+      chooseQty: "Сколько?",
+      suggested: "Рекомендуемый пакет",
+      total: "Итого",
+      perUnit: "за единицу",
+      compareAll: "Сравнить все пакеты",
+      table: { plan: "Пакет", qty: "Количество", price: "Цена" },
+      faq: "Часто задаваемые вопросы",
+      breadcrumb: "Главная",
+      in: "в",
+    },
+    plan: {
+      delivery: "Быстрая доставка",
+      deliveryDesc: "Большинство заказов начинаются в течение 30 минут после подтверждения оплаты.",
+      safe: "Без пароля",
+      safeDesc: "Мы никогда не запрашиваем пароль вашей учётной записи. Достаточно публичного @ или ссылки на пост.",
+      refill: "Гарантия восполнения",
+      refillDesc: "Отписки в течение 30 дней восполняются бесплатно.",
+      support: "Живая поддержка",
+      supportDesc: "Реальные люди отвечают на тикеты на вашем языке.",
+      detailsTitle: "Содержимое пакета",
+      whyTitle: "Почему этот пакет?",
+      relatedTitle: "Другие пакеты этой категории",
+    },
+  },
 };
 
 export function tr(lang: LangCode): Pack {

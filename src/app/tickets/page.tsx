@@ -8,10 +8,10 @@ import { fetchMyTickets } from "@/lib/api";
 import { getToken } from "@/lib/auth";
 
 const STATUS: Record<string, { label: string; color: string }> = {
-  open: { label: "Aberto", color: "var(--accent)" },
-  pending: { label: "Aguardando você", color: "var(--warning)" },
-  resolved: { label: "Resolvido", color: "var(--success)" },
-  closed: { label: "Fechado", color: "var(--muted-strong)" },
+  open: { label: "Open", color: "var(--accent)" },
+  pending: { label: "Awaiting you", color: "var(--warning)" },
+  resolved: { label: "Resolved", color: "var(--success)" },
+  closed: { label: "Closed", color: "var(--muted-strong)" },
 };
 
 export default function TicketsListPage() {
@@ -28,7 +28,7 @@ export default function TicketsListPage() {
     }
     fetchMyTickets(token)
       .then(setTickets)
-      .catch((e) => setError(e instanceof Error ? e.message : "Erro"))
+      .catch((e) => setError(e instanceof Error ? e.message : "Error"))
       .finally(() => setLoading(false));
   }, [router]);
 
@@ -36,20 +36,20 @@ export default function TicketsListPage() {
     <main className="container" style={{ paddingTop: "2rem", paddingBottom: "4rem" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", flexWrap: "wrap", gap: "1rem" }}>
         <div>
-          <h1>Suporte</h1>
-          <p style={{ color: "var(--muted)" }}>Seus tickets de atendimento.</p>
+          <h1>Support</h1>
+          <p style={{ color: "var(--muted)" }}>Your support tickets.</p>
         </div>
-        <Link href="/tickets/new" className="btn btn-primary">Novo ticket</Link>
+        <Link href="/tickets/new" className="btn btn-primary">New ticket</Link>
       </div>
 
       {error && <div className="alert alert-error">{error}</div>}
 
       {loading ? (
-        <p style={{ color: "var(--muted)" }}>Carregando…</p>
+        <p style={{ color: "var(--muted)" }}>Loading…</p>
       ) : tickets.length === 0 ? (
         <div className="card">
           <p style={{ color: "var(--muted)" }}>
-            Você ainda não abriu nenhum ticket. <Link href="/tickets/new">Abrir um agora</Link>.
+            You haven&apos;t opened any tickets yet. <Link href="/tickets/new">Open one now</Link>.
           </p>
         </div>
       ) : (
@@ -66,7 +66,7 @@ export default function TicketsListPage() {
                 <div style={{ minWidth: 0 }}>
                   <strong style={{ display: "block", color: "var(--text)" }}>{t.subject}</strong>
                   <div style={{ color: "var(--muted)", fontSize: "0.85rem" }}>
-                    #{t.id.slice(0, 8)} · atualizado {new Date(t.updated_at).toLocaleString("pt-BR")}
+                    #{t.id.slice(0, 8)} · updated {new Date(t.updated_at).toLocaleString()}
                   </div>
                 </div>
                 <span

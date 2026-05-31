@@ -8,10 +8,10 @@ import { fetchMyTicket, replyTicket } from "@/lib/api";
 import { getToken } from "@/lib/auth";
 
 const STATUS_LABEL: Record<string, string> = {
-  open: "Aberto",
-  pending: "Aguardando você",
-  resolved: "Resolvido",
-  closed: "Fechado",
+  open: "Open",
+  pending: "Awaiting you",
+  resolved: "Resolved",
+  closed: "Closed",
 };
 
 export default function TicketThreadPage() {
@@ -33,7 +33,7 @@ export default function TicketThreadPage() {
       const d = await fetchMyTicket(token, id);
       setDetail(d);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Erro ao carregar ticket");
+      setError(e instanceof Error ? e.message : "Failed to load ticket");
     } finally {
       setLoading(false);
     }
@@ -57,7 +57,7 @@ export default function TicketThreadPage() {
       (e.target as HTMLFormElement).reset();
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao responder");
+      setError(err instanceof Error ? err.message : "Failed to send reply");
     } finally {
       setSending(false);
     }
@@ -66,7 +66,7 @@ export default function TicketThreadPage() {
   if (loading) {
     return (
       <main className="container" style={{ paddingTop: "2rem" }}>
-        <p style={{ color: "var(--muted)" }}>Carregando…</p>
+        <p style={{ color: "var(--muted)" }}>Loading…</p>
       </main>
     );
   }
@@ -74,8 +74,8 @@ export default function TicketThreadPage() {
   if (error || !detail) {
     return (
       <main className="container" style={{ paddingTop: "2rem" }}>
-        <div className="alert alert-error">{error ?? "Ticket não encontrado."}</div>
-        <p><Link href="/tickets">← Voltar</Link></p>
+        <div className="alert alert-error">{error ?? "Ticket not found."}</div>
+        <p><Link href="/tickets">← Back</Link></p>
       </main>
     );
   }
@@ -85,7 +85,7 @@ export default function TicketThreadPage() {
   return (
     <main className="container" style={{ maxWidth: 760, paddingTop: "2rem", paddingBottom: "4rem" }}>
       <p style={{ marginBottom: "1rem", fontSize: "0.9rem" }}>
-        <Link href="/tickets">← Meus tickets</Link>
+        <Link href="/tickets">← My tickets</Link>
       </p>
 
       <div className="card" style={{ marginBottom: "1.5rem" }}>
@@ -96,7 +96,7 @@ export default function TicketThreadPage() {
           </span>
         </div>
         <div style={{ color: "var(--muted)", fontSize: "0.85rem" }}>
-          #{detail.ticket.id.slice(0, 8)} · aberto em {new Date(detail.ticket.created_at).toLocaleString("pt-BR")}
+          #{detail.ticket.id.slice(0, 8)} · opened {new Date(detail.ticket.created_at).toLocaleString()}
         </div>
       </div>
 
@@ -114,9 +114,9 @@ export default function TicketThreadPage() {
             >
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.8rem", color: "var(--muted)", marginBottom: "0.5rem" }}>
                 <strong style={{ color: isUser ? "var(--text)" : "var(--accent)" }}>
-                  {isUser ? "Você" : `${m.author_name || "Suporte"} (suporte)`}
+                  {isUser ? "You" : `${m.author_name || "Support"} (support)`}
                 </strong>
-                <span>{new Date(m.created_at).toLocaleString("pt-BR")}</span>
+                <span>{new Date(m.created_at).toLocaleString()}</span>
               </div>
               <div style={{ whiteSpace: "pre-wrap", lineHeight: 1.55 }}>{m.body}</div>
             </div>
@@ -126,14 +126,14 @@ export default function TicketThreadPage() {
 
       {closed ? (
         <div className="alert" style={{ background: "rgba(122,139,150,0.12)", border: "1px solid var(--border-strong)", color: "var(--muted-strong)" }}>
-          Este ticket foi fechado. Abra um novo se precisar de ajuda.
+          This ticket has been closed. Open a new one if you need help.
         </div>
       ) : (
         <form onSubmit={onReply} className="card">
-          <label className="label" htmlFor="body">Responder</label>
-          <textarea className="input" id="body" name="body" rows={4} required placeholder="Escreva sua mensagem…" />
+          <label className="label" htmlFor="body">Reply</label>
+          <textarea className="input" id="body" name="body" rows={4} required placeholder="Write your message…" />
           <button type="submit" className="btn btn-primary" style={{ marginTop: "0.75rem" }} disabled={sending}>
-            {sending ? "Enviando…" : "Enviar resposta"}
+            {sending ? "Sending…" : "Send reply"}
           </button>
         </form>
       )}

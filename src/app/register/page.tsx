@@ -26,7 +26,7 @@ export default function RegisterPage() {
       login(session);
       router.push("/account");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Falha ao criar conta");
+      setError(err instanceof Error ? err.message : "Failed to create account");
     } finally {
       setLoading(false);
     }
@@ -35,27 +35,27 @@ export default function RegisterPage() {
   return (
     <main className="container" style={{ maxWidth: 420, paddingTop: "3rem" }}>
       <div className="card">
-        <h1 style={{ marginBottom: "1.25rem" }}>Criar conta</h1>
+        <h1 style={{ marginBottom: "1.25rem" }}>Create account</h1>
         <form onSubmit={onSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
           {error && <div className="alert alert-error">{error}</div>}
           <div>
-            <label className="label" htmlFor="name">Nome completo</label>
+            <label className="label" htmlFor="name">Full name</label>
             <input className="input" id="name" name="name" required />
           </div>
           <div>
-            <label className="label" htmlFor="email">E-mail</label>
+            <label className="label" htmlFor="email">Email</label>
             <input className="input" id="email" name="email" type="email" required />
           </div>
           <div>
-            <label className="label" htmlFor="password">Senha (mín. 8 caracteres)</label>
+            <label className="label" htmlFor="password">Password (min. 8 characters)</label>
             <input className="input" id="password" name="password" type="password" minLength={8} required />
           </div>
           <button type="submit" className="btn btn-primary" disabled={loading}>
-            {loading ? "Criando…" : "Criar conta"}
+            {loading ? "Creating…" : "Create account"}
           </button>
         </form>
         <p style={{ color: "var(--muted)", marginTop: "1.25rem", fontSize: "0.9rem" }}>
-          Já tem conta? <Link href="/login">Entrar</Link>
+          Already have an account? <Link href="/login">Sign in</Link>
         </p>
       </div>
     </main>

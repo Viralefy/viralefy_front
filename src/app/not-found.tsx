@@ -2,7 +2,7 @@ import Link from "next/link";
 import { COUNTRIES, countriesByRegion } from "@/i18n/countries";
 
 export const metadata = {
-  title: "Página não encontrada | Viralefy",
+  title: "Page not found | Viralefy",
   robots: { index: false, follow: true },
 };
 
@@ -30,10 +30,10 @@ export default function NotFound() {
           404
         </p>
         <h1 style={{ fontSize: "clamp(1.4rem, 3vw, 2rem)", marginBottom: "0.75rem" }}>
-          Essa página não existe — mas o seu próximo seguidor existe.
+          This page doesn&apos;t exist — but your next follower does.
         </h1>
         <p style={{ color: "var(--muted)", maxWidth: 560, margin: "0 auto" }}>
-          O conteúdo que você procurava saiu do ar ou nunca esteve aqui. Continue por onde a maioria dos clientes começa:
+          The content you were looking for is gone or never existed. Continue where most customers start:
         </p>
       </section>
 
@@ -47,22 +47,22 @@ export default function NotFound() {
         }}
       >
         <Link href="/" className="btn btn-primary">
-          Ver todos os serviços
+          Browse all services
         </Link>
         <Link href="/account" className="btn btn-outline">
-          Minha conta
+          My account
         </Link>
         <Link href="/login" className="btn btn-outline">
-          Entrar
+          Sign in
         </Link>
         <Link href="/register" className="btn btn-outline">
-          Criar conta
+          Create account
         </Link>
       </div>
 
       <section aria-labelledby="popular-markets">
         <h2 id="popular-markets" style={{ fontSize: "1.05rem", marginBottom: "0.75rem", textAlign: "center" }}>
-          Mercados populares
+          Popular markets
         </h2>
         <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", justifyContent: "center", marginBottom: "2.5rem" }}>
           {featured.map((c) => (
@@ -89,11 +89,11 @@ export default function NotFound() {
             marginBottom: "1rem",
           }}
         >
-          Ver todos os mercados
+          View all markets
         </summary>
         <div style={{ marginTop: "1rem" }}>
           <h3 style={{ fontSize: "0.85rem", color: "var(--muted)", textAlign: "center", marginBottom: "0.5rem" }}>
-            Américas
+            Americas
           </h3>
           <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", justifyContent: "center", marginBottom: "1.5rem" }}>
             {countriesByRegion("americas").map((c) => (
@@ -114,7 +114,7 @@ export default function NotFound() {
             ))}
           </div>
           <h3 style={{ fontSize: "0.85rem", color: "var(--muted)", textAlign: "center", marginBottom: "0.5rem" }}>
-            Europa / SEPA
+            Europe / SEPA
           </h3>
           <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", justifyContent: "center" }}>
             {countriesByRegion("sepa").map((c) => (

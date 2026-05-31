@@ -28,7 +28,7 @@ export default function ProfilesPage() {
     try {
       setProfiles(await fetchMyProfiles(token));
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Erro");
+      setError(e instanceof Error ? e.message : "Error");
     } finally {
       setLoading(false);
     }
@@ -55,21 +55,21 @@ export default function ProfilesPage() {
       (e.target as HTMLFormElement).reset();
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao adicionar perfil");
+      setError(err instanceof Error ? err.message : "Failed to add profile");
     } finally {
       setAdding(false);
     }
   }
 
   async function onDelete(id: string, name: string) {
-    if (!confirm(`Remover o perfil "${name}"?`)) return;
+    if (!confirm(`Remove the profile "${name}"?`)) return;
     const token = getToken();
     if (!token) return;
     try {
       await deleteProfile(token, id);
       load();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Erro");
+      setError(e instanceof Error ? e.message : "Error");
     }
   }
 
@@ -78,21 +78,21 @@ export default function ProfilesPage() {
   return (
     <main className="container" style={{ paddingTop: "2rem", paddingBottom: "4rem", maxWidth: 720 }}>
       <p style={{ marginBottom: "1rem", fontSize: "0.9rem" }}>
-        <Link href="/account">← Minha conta</Link>
+        <Link href="/account">← My account</Link>
       </p>
 
-      <h1 style={{ marginBottom: "0.5rem" }}>Perfis</h1>
+      <h1 style={{ marginBottom: "0.5rem" }}>Profiles</h1>
       <p style={{ color: "var(--muted)", marginBottom: "1.5rem" }}>
-        Cadastre os perfis que vão receber os serviços. Você escolhe qual perfil usar na hora da compra.
+        Register the profiles that will receive the services. You pick which profile to use when you buy.
       </p>
 
       {error && <div className="alert alert-error">{error}</div>}
 
       <form onSubmit={onAdd} className="card" style={{ marginBottom: "2rem" }}>
-        <h2 style={{ fontSize: "1.05rem", marginBottom: "0.75rem" }}>Adicionar perfil</h2>
+        <h2 style={{ fontSize: "1.05rem", marginBottom: "0.75rem" }}>Add profile</h2>
         <div className="form-row" style={{ display: "grid", gridTemplateColumns: "auto 1fr 1fr", gap: "0.75rem" }}>
           <div>
-            <label className="label" htmlFor="platform">Plataforma</label>
+            <label className="label" htmlFor="platform">Platform</label>
             <select className="input" name="platform" id="platform" defaultValue="instagram">
               {PLATFORMS.map((p) => (
                 <option key={p.code} value={p.code}>{p.icon} {p.label}</option>
@@ -100,24 +100,24 @@ export default function ProfilesPage() {
             </select>
           </div>
           <div>
-            <label className="label" htmlFor="handle">@ usuário</label>
-            <input className="input" name="handle" id="handle" placeholder="seuperfil" required />
+            <label className="label" htmlFor="handle">@ handle</label>
+            <input className="input" name="handle" id="handle" placeholder="yourhandle" required />
           </div>
           <div>
-            <label className="label" htmlFor="display_name">Apelido (opcional)</label>
-            <input className="input" name="display_name" id="display_name" placeholder="Pessoal, Marca…" />
+            <label className="label" htmlFor="display_name">Nickname (optional)</label>
+            <input className="input" name="display_name" id="display_name" placeholder="Personal, Brand…" />
           </div>
         </div>
         <button type="submit" className="btn btn-primary" style={{ marginTop: "0.75rem" }} disabled={adding}>
-          {adding ? "Salvando…" : "Adicionar perfil"}
+          {adding ? "Saving…" : "Add profile"}
         </button>
       </form>
 
       {loading ? (
-        <p style={{ color: "var(--muted)" }}>Carregando…</p>
+        <p style={{ color: "var(--muted)" }}>Loading…</p>
       ) : profiles.length === 0 ? (
         <div className="card">
-          <p style={{ color: "var(--muted)" }}>Nenhum perfil cadastrado ainda.</p>
+          <p style={{ color: "var(--muted)" }}>No profiles registered yet.</p>
         </div>
       ) : (
         PLATFORMS.map((pl) => {
@@ -141,7 +141,7 @@ export default function ProfilesPage() {
                         <span style={{ color: "var(--muted)", fontSize: "0.85rem" }}> — {p.display_name}</span>
                       )}
                       {p.verified && (
-                        <span style={{ marginLeft: "0.5rem", fontSize: "0.75rem", color: "var(--success)" }}>✓ validado</span>
+                        <span style={{ marginLeft: "0.5rem", fontSize: "0.75rem", color: "var(--success)" }}>✓ verified</span>
                       )}
                     </div>
                     <button
@@ -150,7 +150,7 @@ export default function ProfilesPage() {
                       style={{ padding: "0.4rem 0.8rem", fontSize: "0.85rem" }}
                       onClick={() => onDelete(p.id, p.handle)}
                     >
-                      Remover
+                      Remove
                     </button>
                   </div>
                 ))}

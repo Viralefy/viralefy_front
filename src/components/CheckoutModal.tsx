@@ -76,7 +76,7 @@ export function CheckoutModal({ plan, onClose }: { plan: Plan; onClose: () => vo
       const res = await checkout(payload, token);
       setResult(res);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro no checkout");
+      setError(err instanceof Error ? err.message : "Checkout error");
     } finally {
       setLoading(false);
     }
@@ -98,9 +98,9 @@ export function CheckoutModal({ plan, onClose }: { plan: Plan; onClose: () => vo
           <CheckoutSuccess result={result} onClose={onClose} />
         ) : (
           <>
-            <h2 style={{ marginBottom: "0.25rem" }}>Finalizar compra</h2>
+            <h2 style={{ marginBottom: "0.25rem" }}>Complete purchase</h2>
             <p style={{ color: "var(--muted)", fontSize: "0.85rem", marginBottom: "0.25rem" }}>
-              {platformIcon} {platformLabel} · {isProfile ? "envia para o perfil" : "envia para a publicação"}
+              {platformIcon} {platformLabel} · {isProfile ? "delivered to the profile" : "delivered to the post"}
             </p>
             <p style={{ marginBottom: "1.25rem" }}>
               <strong>{plan.name}</strong> — {priceFor(plan, currency)}
@@ -112,15 +112,15 @@ export function CheckoutModal({ plan, onClose }: { plan: Plan; onClose: () => vo
               {!user && (
                 <>
                   <div>
-                    <label className="label" htmlFor="name">Nome completo</label>
+                    <label className="label" htmlFor="name">Full name</label>
                     <input className="input" id="name" name="name" required />
                   </div>
                   <div>
-                    <label className="label" htmlFor="email">E-mail</label>
+                    <label className="label" htmlFor="email">Email</label>
                     <input className="input" id="email" name="email" type="email" required />
                   </div>
                   <p style={{ color: "var(--muted)", fontSize: "0.8rem", margin: 0 }}>
-                    Vamos criar sua conta e enviar a senha por e-mail.
+                    We&apos;ll create your account and send the password by email.
                   </p>
                 </>
               )}
@@ -152,11 +152,11 @@ export function CheckoutModal({ plan, onClose }: { plan: Plan; onClose: () => vo
               )}
 
               <button type="submit" className="btn btn-primary" disabled={loading}>
-                {loading ? "Processando…" : payMethod === "credits" ? "Pagar com créditos" : "Confirmar pedido"}
+                {loading ? "Processing…" : payMethod === "credits" ? "Pay with credits" : "Confirm order"}
               </button>
             </form>
             <button type="button" className="btn btn-outline" style={{ marginTop: "1rem", width: "100%" }} onClick={onClose}>
-              Cancelar
+              Cancel
             </button>
           </>
         )}
@@ -182,14 +182,14 @@ function ProfileSection({
   if (!user) {
     return (
       <div>
-        <label className="label" htmlFor="handle">{platformIcon} @ no {platformLabel}</label>
-        <input className="input" id="handle" name="handle" placeholder="seuperfil" required />
+        <label className="label" htmlFor="handle">{platformIcon} @ on {platformLabel}</label>
+        <input className="input" id="handle" name="handle" placeholder="yourhandle" required />
       </div>
     );
   }
   return (
     <div>
-      <label className="label">{platformIcon} Perfil de {platformLabel}</label>
+      <label className="label">{platformIcon} {platformLabel} profile</label>
       {profiles && profiles.length > 0 && !useNewProfile ? (
         <>
           <select className="input" value={selectedProfileId} onChange={(e) => setSelectedProfileId(e.target.value)}>
@@ -200,18 +200,18 @@ function ProfileSection({
             ))}
           </select>
           <button type="button" className="btn btn-ghost" style={{ marginTop: "0.5rem", fontSize: "0.85rem", padding: "0.25rem 0" }} onClick={() => setUseNewProfile(true)}>
-            + Adicionar outro perfil
+            + Add another profile
           </button>
         </>
       ) : (
         <>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
-            <input className="input" name="handle" placeholder="@ usuário" required />
-            <input className="input" name="display_name" placeholder="Apelido (opcional)" />
+            <input className="input" name="handle" placeholder="@ handle" required />
+            <input className="input" name="display_name" placeholder="Nickname (optional)" />
           </div>
           {profiles && profiles.length > 0 && (
             <button type="button" className="btn btn-ghost" style={{ marginTop: "0.5rem", fontSize: "0.85rem", padding: "0.25rem 0" }} onClick={() => setUseNewProfile(false)}>
-              ← Usar perfil existente
+              ← Use existing profile
             </button>
           )}
         </>
@@ -223,14 +223,14 @@ function ProfileSection({
 function PublicationSection({ platform, platformLabel, platformIcon }: { platform: Platform; platformLabel: string; platformIcon: string }) {
   const placeholder =
     platform === "tiktok"
-      ? "https://www.tiktok.com/@usuario/video/123…"
-      : "https://www.instagram.com/p/ABC123/ ou /reel/…";
+      ? "https://www.tiktok.com/@user/video/123…"
+      : "https://www.instagram.com/p/ABC123/ or /reel/…";
   return (
     <div>
-      <label className="label" htmlFor="publication_url">{platformIcon} URL da publicação ({platformLabel})</label>
+      <label className="label" htmlFor="publication_url">{platformIcon} Post URL ({platformLabel})</label>
       <input className="input" id="publication_url" name="publication_url" placeholder={placeholder} required />
       <p style={{ color: "var(--muted)", fontSize: "0.78rem", marginTop: "0.3rem" }}>
-        Cole o link do post/vídeo onde o serviço será aplicado.
+        Paste the link to the post/video where the service will be applied.
       </p>
     </div>
   );
@@ -247,25 +247,25 @@ function PaymentMethodSection({
 }) {
   return (
     <div>
-      <label className="label">Pagar com</label>
+      <label className="label">Pay with</label>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
         <button type="button" className={payMethod === "gateway" ? "btn btn-primary" : "btn btn-outline"} onClick={() => setPayMethod("gateway")}>
-          💳 Pagamento externo
+          💳 External payment
         </button>
         <button
           type="button"
           className={payMethod === "credits" ? "btn btn-primary" : "btn btn-outline"}
           onClick={() => enough && setPayMethod("credits")}
           disabled={!enough}
-          title={enough ? "" : "Saldo insuficiente"}
+          title={enough ? "" : "Insufficient balance"}
         >
-          💎 Créditos
+          💎 Credits
         </button>
       </div>
       <p style={{ color: enough ? "var(--muted)" : "var(--danger)", fontSize: "0.78rem", marginTop: "0.4rem" }}>
-        Saldo: R$ {(credit.balance_cents / 100).toFixed(2)}
-        {!enough && ` — faltam R$ ${((priceCents - credit.balance_cents) / 100).toFixed(2)}. `}
-        {!enough && <Link href="/account/credits" style={{ color: "var(--accent)" }}>Recarregar</Link>}
+        Balance: R$ {(credit.balance_cents / 100).toFixed(2)}
+        {!enough && ` — short by R$ ${((priceCents - credit.balance_cents) / 100).toFixed(2)}. `}
+        {!enough && <Link href="/account/credits" style={{ color: "var(--accent)" }}>Top up</Link>}
       </p>
     </div>
   );
@@ -274,21 +274,21 @@ function PaymentMethodSection({
 function CheckoutSuccess({ result, onClose }: { result: CheckoutResult; onClose: () => void }) {
   return (
     <>
-      <h2 style={{ marginBottom: "0.75rem" }}>Pedido criado! 🎉</h2>
+      <h2 style={{ marginBottom: "0.75rem" }}>Order created! 🎉</h2>
       <div className="alert alert-success" style={{ marginBottom: "1rem" }}>
-        Pedido <strong>#{result.order_id.slice(0, 8)}</strong> do plano <strong>{result.plan_name}</strong>.
+        Order <strong>#{result.order_id.slice(0, 8)}</strong> for plan <strong>{result.plan_name}</strong>.
       </div>
       <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "0.5rem", marginBottom: "1rem" }}>
-        <li>Valor: <strong>{result.display_symbol} {result.display_amount}</strong></li>
+        <li>Amount: <strong>{result.display_symbol} {result.display_amount}</strong></li>
         {result.payment_method === "credits" ? (
           <>
-            <li style={{ color: "var(--success)" }}>✓ Pago com créditos</li>
+            <li style={{ color: "var(--success)" }}>✓ Paid with credits</li>
             <li style={{ color: "var(--muted)", fontSize: "0.85rem" }}>
-              Saldo restante: R$ {((result.credit_balance_cents ?? 0) / 100).toFixed(2)}
+              Remaining balance: R$ {((result.credit_balance_cents ?? 0) / 100).toFixed(2)}
             </li>
           </>
         ) : (
-          <li>Cobrança em: <strong>{result.settlement_amount} {result.settlement_currency}</strong></li>
+          <li>Charged in: <strong>{result.settlement_amount} {result.settlement_currency}</strong></li>
         )}
       </ul>
 
@@ -296,18 +296,18 @@ function CheckoutSuccess({ result, onClose }: { result: CheckoutResult; onClose:
 
       {result.account_created ? (
         <p style={{ color: "var(--muted)", fontSize: "0.85rem", marginBottom: "1rem" }}>
-          Conta criada para <strong>{result.email}</strong>. {result.email_sent ? "Enviamos a senha e as instruções por e-mail." : "Falha no envio — abra um ticket."}
+          Account created for <strong>{result.email}</strong>. {result.email_sent ? "We've emailed your password and instructions." : "Email failed to send — open a ticket."}
         </p>
       ) : (
         <p style={{ color: "var(--muted)", fontSize: "0.85rem", marginBottom: "1rem" }}>
-          {result.email_sent ? `Confirmação enviada para ${result.email}.` : ""}
+          {result.email_sent ? `Confirmation sent to ${result.email}.` : ""}
         </p>
       )}
       <Link href="/account" className="btn btn-primary" style={{ width: "100%" }}>
-        Ver meus pedidos
+        View my orders
       </Link>
       <button type="button" className="btn btn-outline" style={{ marginTop: "0.5rem", width: "100%" }} onClick={onClose}>
-        Fechar
+        Close
       </button>
     </>
   );
@@ -324,14 +324,14 @@ function PaymentInstructions({ result }: { result: CheckoutResult }) {
   if (brCode || qrImage) {
     return (
       <div style={{ borderTop: "1px solid var(--border)", paddingTop: "1rem", marginBottom: "1rem" }}>
-        <h3 style={{ fontSize: "1rem", marginBottom: "0.5rem" }}>Pague via PIX</h3>
+        <h3 style={{ fontSize: "1rem", marginBottom: "0.5rem" }}>Pay with Pix</h3>
         {qrImage && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={qrImage} alt="QR Code PIX" style={{ display: "block", maxWidth: 220, margin: "0 auto 0.75rem", borderRadius: "0.5rem" }} />
+          <img src={qrImage} alt="Pix QR code" style={{ display: "block", maxWidth: 220, margin: "0 auto 0.75rem", borderRadius: "0.5rem" }} />
         )}
         {brCode && (
           <>
-            <label className="label">Código copia-e-cola</label>
+            <label className="label">Copy-and-paste code</label>
             <textarea readOnly className="input" rows={3} style={{ fontFamily: "monospace", fontSize: "0.8rem" }} value={brCode} />
             <button
               type="button"
@@ -339,7 +339,7 @@ function PaymentInstructions({ result }: { result: CheckoutResult }) {
               style={{ marginTop: "0.5rem", width: "100%" }}
               onClick={() => navigator.clipboard.writeText(brCode).catch(() => undefined)}
             >
-              Copiar código
+              Copy code
             </button>
           </>
         )}
@@ -350,14 +350,14 @@ function PaymentInstructions({ result }: { result: CheckoutResult }) {
     return (
       <div style={{ borderTop: "1px solid var(--border)", paddingTop: "1rem", marginBottom: "1rem" }}>
         <h3 style={{ fontSize: "1rem", marginBottom: "0.5rem" }}>
-          Pague {result.settlement_amount} {result.settlement_currency}
-          {network && <span style={{ color: "var(--muted)", fontWeight: "normal" }}> (rede {network})</span>}
+          Pay {result.settlement_amount} {result.settlement_currency}
+          {network && <span style={{ color: "var(--muted)", fontWeight: "normal" }}> ({network} network)</span>}
         </h3>
-        <label className="label">Carteira</label>
+        <label className="label">Wallet</label>
         <textarea readOnly className="input" rows={2} style={{ fontFamily: "monospace", fontSize: "0.8rem" }} value={address} />
         {result.payment_url && (
           <a href={result.payment_url} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ marginTop: "0.5rem", width: "100%" }}>
-            Abrir página de pagamento
+            Open payment page
           </a>
         )}
       </div>
@@ -366,15 +366,15 @@ function PaymentInstructions({ result }: { result: CheckoutResult }) {
   if (result.payment_url) {
     return (
       <a href={result.payment_url} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ marginBottom: "1rem", width: "100%" }}>
-        Ir para a página de pagamento
+        Go to payment page
       </a>
     );
   }
   if (pixKey) {
     return (
       <div style={{ borderTop: "1px solid var(--border)", paddingTop: "1rem", marginBottom: "1rem" }}>
-        <h3 style={{ fontSize: "1rem", marginBottom: "0.5rem" }}>Pague via PIX</h3>
-        <label className="label">Chave PIX</label>
+        <h3 style={{ fontSize: "1rem", marginBottom: "0.5rem" }}>Pay with Pix</h3>
+        <label className="label">Pix key</label>
         <input readOnly className="input" value={pixKey} />
       </div>
     );

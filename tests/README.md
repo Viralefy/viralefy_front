@@ -14,16 +14,22 @@ tests/
 │   ├── categories.test.mjs
 │   ├── countries.test.mjs
 │   ├── format.test.mjs
+│   ├── hreflang.test.mjs        (NEW — hreflang map invariants)
 │   ├── indexnow.test.mjs
+│   ├── jsonld.schema.test.mjs   (NEW — stricter JSON-LD shape)
 │   ├── jsonld.test.mjs
 │   ├── languages.test.mjs
 │   ├── legal-render.test.mjs
-│   └── search-corpus.test.mjs
+│   ├── ru.test.mjs              (NEW — Russian translation pack)
+│   ├── search-corpus.test.mjs
+│   ├── sitemap-split.test.mjs   (NEW — sitemap URL generator)
+│   └── theme.test.mjs           (NEW — theme switcher; PENDING)
 ├── smoke/run.sh          (curl every public URL, check shape + headers)
 ├── pentest/probes.sh     (non-destructive security probes)
 └── emulated/
     ├── browse-flow.mjs   (fetch-driven user browse path)
-    └── checkout-flow.mjs (creates one pending order against /v1/checkout)
+    ├── checkout-flow.mjs (creates one pending order against /v1/checkout)
+    └── i18n-flow.mjs     (NEW — per-language pages, English fallback verifier)
 ```
 
 ## How to run
@@ -74,6 +80,11 @@ to strip types — no extra packages needed.
 | `legal-render.test.mjs`    | markdown-lite renderer: h2 counting, bullet merging, unique keys         |
 | `indexnow.test.mjs`        | `envIndexNow` + `keyLocation` use site URL + key from env                |
 | `search-corpus.test.mjs`   | re-implements `buildIndex`/`search` from SearchBar (client component) and asserts size, query matching, multi-token AND, EXTRA_KEYWORDS hook for "recuperação" |
+| `ru.test.mjs`              | Russian translation pack: `tr("ru")` shape + Cyrillic content, `categoryLabel/Slug` ru behavior (or English fallback), `copyFor` for all 4 categories, `legalDoc("ru","privacy")` |
+| `theme.test.mjs`           | Theme switcher persistence helpers in `src/lib/theme.ts` — PENDING if module not yet present; will auto-activate once shipped |
+| `hreflang.test.mjs`        | hreflang language-map invariants: unique htmlLang per country, x-default + en presence, BCP47 sanity, minimum cardinality |
+| `jsonld.schema.test.mjs`   | Stricter cross-block JSON-LD validation: `@context` on every block, `provider`/`itemListElement` shape, `lowPrice <= highPrice` numerically |
+| `sitemap-split.test.mjs`   | `allSiteUrls()` cardinality, origin prefix, dedup, per-language partitioning; sitemap-split feature pending |
 
 Why some helpers are re-implemented: `SearchBar.tsx` is a `"use client"`
 React component whose `buildIndex` and `search` are module-private. We
@@ -103,6 +114,19 @@ shape:
 9. `/sitemap.xml` is well-formed XML and lists at least 200 URLs
 10. The IndexNow keyfile `adcfcb...txt` is served at the site root
 11. `/robots.txt` is served (informational)
+12. **(NEW)** Sitemap index / per-language sitemap (`/sitemap-en.xml`,
+    `/sitemap/en.xml`) — INFO if split not deployed
+13. **(NEW)** `/robots.txt` mentions `Sitemap:` and has at least one
+    `Disallow:` directive
+14. **(NEW)** `/` contains `data-theme` (theme switcher hint) — INFO
+    if pending
+15. **(NEW)** `/` carries a twemoji / emoji rendering hint
+16. **(NEW)** Russian-speaking country routes (`/ru`, `/kz`, `/by`,
+    `/kg`) — 200 if catalog includes them, 404 INFO otherwise
+17. **(NEW)** Plan name "Account recovery" / "Recuperação de conta"
+    appears on `/br/servicos` (verifies DB plan translation)
+18. **(NEW)** Strict hreflang on `/br`: count ≥ 30 and `x-default`
+    present
 
 PASS/FAIL/INFO summary is printed and the script exits non-zero only
 on FAIL (INFO is observational).
@@ -124,6 +148,15 @@ brute-force, no DoS. Each probe is one or a small number of requests.
 10. `/robots.txt` and `/.well-known/security.txt` presence (INFO)
 11. TLS handshake on the site host (subject/issuer/dates printed as INFO)
 12. Response headers: HSTS, X-Frame-Options/CSP frame-ancestors, CSP, X-Content-Type-Options, Referrer-Policy
+13. **(NEW)** Stricter headers: X-Powered-By **absence** (Next.js exposes
+    it by default), Server-header version leak check, Permissions-Policy,
+    Cross-Origin-Opener/Resource-Policy
+14. **(NEW)** GET `/api/indexnow` should be 405 (method not allowed) or
+    auth-gated — INFO if 2xx (info disclosure risk)
+15. **(NEW)** Hreflang sanity on `/br`: link-rel-alternate count ≥ 60,
+    `x-default` present
+16. **(NEW)** CSP strict re-check: PASS only if `frame-ancestors`
+    directive is present in CSP
 
 Exits 0 only if every check is PASS or INFO. Exits 1 on any FAIL.
 
@@ -141,6 +174,14 @@ Exits 0 only if every check is PASS or INFO. Exits 1 on any FAIL.
   pay — it just verifies the order-creation pipeline returns a
   `CheckoutResult` with an `order_id`. The pending order will be
   swept by the API's normal expiry logic.
+
+`i18n-flow.mjs` (NEW)
+: Hits `/br`, `/us`, `/jp`, `/ru`, `/kz`, `/fr`, `/de` and a deep
+  `/br/seguidores` route, asserting that the response either carries
+  localized content (Cyrillic for ru/kz, CJK for jp, French/German
+  markers) **or** falls back to English. 404 on the ru-family is
+  treated as informational while the countries catalog is being
+  expanded.
 
 ## Failure interpretation
 

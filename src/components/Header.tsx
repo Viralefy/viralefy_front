@@ -9,6 +9,7 @@ import { langOfCountry, tr } from "@/i18n/languages";
 import { getCountry } from "@/i18n/countries";
 import { MegaMenuMarkets } from "./MegaMenuMarkets";
 import { SearchBar } from "./SearchBar";
+import { ThemeToggle } from "./ThemeToggle";
 
 // Header sticky com blur. Layout responsivo:
 //   Desktop (>= 760px):  Logo · Markets · Search · Currency · Auth (single row)
@@ -115,8 +116,9 @@ export function Header() {
           <SearchBar lang={lang} />
         </div>
 
-        {/* Currency + auth — só desktop */}
+        {/* Theme toggle + Currency + auth — só desktop */}
         <nav className="site-header__nav site-header__hide-mobile">
+          <ThemeToggle />
           {CurrencySelect}
           {AuthButtons}
         </nav>
@@ -133,12 +135,15 @@ export function Header() {
         </button>
       </div>
 
-      {/* Drawer mobile — abre abaixo da row 1, com Markets + Currency + Auth */}
+      {/* Drawer mobile — abre abaixo da row 1, com Markets + Theme + Currency + Auth */}
       <div className={`site-header__drawer container ${drawerOpen ? "open" : ""}`}>
         <MegaMenuMarkets lang={lang} />
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", marginTop: "0.3rem" }}>
-          <label className="label" style={{ marginBottom: 0 }}>{t.header.currency}</label>
-          {CurrencySelect}
+        <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginTop: "0.4rem" }}>
+          <ThemeToggle />
+          <div style={{ flex: 1 }}>
+            <label className="label" style={{ marginBottom: 0 }}>{t.header.currency}</label>
+            {CurrencySelect}
+          </div>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", marginTop: "0.6rem" }}>
           {AuthButtons}

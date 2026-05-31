@@ -9,10 +9,10 @@ import { getToken } from "@/lib/auth";
 import { useApp } from "@/components/Providers";
 
 const statusLabel: Record<string, string> = {
-  pending: "Pendente",
-  paid: "Pago",
-  failed: "Falhou",
-  cancelled: "Cancelado",
+  pending: "Pending",
+  paid: "Paid",
+  failed: "Failed",
+  cancelled: "Cancelled",
 };
 
 export default function AccountPage() {
@@ -30,7 +30,7 @@ export default function AccountPage() {
     }
     fetchMyOrders(token)
       .then(setOrders)
-      .catch((e) => setError(e instanceof Error ? e.message : "Erro ao carregar pedidos"))
+      .catch((e) => setError(e instanceof Error ? e.message : "Failed to load orders"))
       .finally(() => setLoading(false));
   }, [router]);
 
@@ -38,39 +38,39 @@ export default function AccountPage() {
     <main className="container" style={{ paddingTop: "2rem", paddingBottom: "4rem" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", flexWrap: "wrap", gap: "1rem" }}>
         <div>
-          <h1>Minha conta</h1>
+          <h1>My account</h1>
           {user && <p style={{ color: "var(--muted)" }}>{user.name} · {user.email}</p>}
         </div>
         <Link href="/" className="btn btn-outline" style={{ padding: "0.5rem 1rem" }}>
-          Comprar mais
+          Buy more
         </Link>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "0.75rem", marginBottom: "2rem" }}>
         <Link href="/account/profiles" className="card" style={{ textDecoration: "none", color: "var(--text)" }}>
-          <strong style={{ display: "block", marginBottom: "0.25rem" }}>👤 Perfis</strong>
-          <span style={{ color: "var(--muted)", fontSize: "0.85rem" }}>Cadastre seus perfis IG/TikTok</span>
+          <strong style={{ display: "block", marginBottom: "0.25rem" }}>👤 Profiles</strong>
+          <span style={{ color: "var(--muted)", fontSize: "0.85rem" }}>Register your IG/TikTok profiles</span>
         </Link>
         <Link href="/account/credits" className="card" style={{ textDecoration: "none", color: "var(--text)" }}>
-          <strong style={{ display: "block", marginBottom: "0.25rem" }}>💳 Créditos</strong>
-          <span style={{ color: "var(--muted)", fontSize: "0.85rem" }}>Saldo + recarga + ledger</span>
+          <strong style={{ display: "block", marginBottom: "0.25rem" }}>💳 Credits</strong>
+          <span style={{ color: "var(--muted)", fontSize: "0.85rem" }}>Balance + top-up + ledger</span>
         </Link>
         <Link href="/tickets" className="card" style={{ textDecoration: "none", color: "var(--text)" }}>
-          <strong style={{ display: "block", marginBottom: "0.25rem" }}>🎫 Suporte</strong>
-          <span style={{ color: "var(--muted)", fontSize: "0.85rem" }}>Tickets de atendimento</span>
+          <strong style={{ display: "block", marginBottom: "0.25rem" }}>🎫 Support</strong>
+          <span style={{ color: "var(--muted)", fontSize: "0.85rem" }}>Support tickets</span>
         </Link>
       </div>
 
-      <h2 style={{ marginBottom: "1rem", fontSize: "1.2rem" }}>Histórico de compras</h2>
+      <h2 style={{ marginBottom: "1rem", fontSize: "1.2rem" }}>Purchase history</h2>
 
       {error && <div className="alert alert-error">{error}</div>}
 
       {loading ? (
-        <p style={{ color: "var(--muted)" }}>Carregando…</p>
+        <p style={{ color: "var(--muted)" }}>Loading…</p>
       ) : orders.length === 0 ? (
         <div className="card">
           <p style={{ color: "var(--muted)" }}>
-            Você ainda não fez nenhuma compra. <Link href="/">Ver serviços</Link>.
+            You haven&apos;t made any purchases yet. <Link href="/">Browse services</Link>.
           </p>
         </div>
       ) : (
@@ -82,9 +82,9 @@ export default function AccountPage() {
               style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem", flexWrap: "wrap" }}
             >
               <div>
-                <strong>{o.plan_name || "Plano"}</strong>
+                <strong>{o.plan_name || "Plan"}</strong>
                 <div style={{ color: "var(--muted)", fontSize: "0.85rem" }}>
-                  #{o.id.slice(0, 8)} · {new Date(o.created_at).toLocaleString("pt-BR")}
+                  #{o.id.slice(0, 8)} · {new Date(o.created_at).toLocaleString()}
                 </div>
               </div>
               <div style={{ textAlign: "right" }}>

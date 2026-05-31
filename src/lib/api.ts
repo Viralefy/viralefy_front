@@ -105,7 +105,7 @@ async function request<T>(path: string, init?: RequestInit, token?: string): Pro
   });
   const json = await res.json().catch(() => ({}));
   if (!res.ok) {
-    throw new Error(json?.error?.message ?? "Erro na requisição");
+    throw new Error(json?.error?.message ?? "Request failed");
   }
   return json.data as T;
 }

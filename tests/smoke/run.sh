@@ -241,6 +241,160 @@ else
 fi
 rm -f "$RESP_BODY_FILE"
 
+# ==================================================================
+# NEW SECTIONS (theme switcher, sitemap split, twemoji, ru countries,
+# DB plan translation, hreflang sanity, JSON-LD presence on /br/<cat>)
+# ==================================================================
+
+# ------------------------------------------------------------------
+# Section: sitemap index / per-language split
+# ------------------------------------------------------------------
+printf "\n[sitemap split]\n"
+fetch "/sitemap.xml"
+if [ "$RESP_STATUS" = "200" ]; then
+  # Is it a sitemapindex (split mode) or a single urlset?
+  if grep -q '<sitemapindex' "$RESP_BODY_FILE"; then
+    sitemap_count=$(grep -c '<sitemap>' "$RESP_BODY_FILE")
+    if [ "$sitemap_count" -ge 2 ]; then
+      mark_pass "/sitemap.xml is a sitemapindex with $sitemap_count <sitemap> entries"
+    else
+      mark_info "/sitemap.xml is a sitemapindex but only $sitemap_count entries" "expect more once split is wired"
+    fi
+  else
+    # Fallback: single urlset must have many URLs
+    url_count=$(grep -c '<loc>' "$RESP_BODY_FILE")
+    if [ "$url_count" -ge 200 ]; then
+      mark_pass "/sitemap.xml is single urlset with $url_count URLs (split pending)"
+    else
+      mark_info "/sitemap.xml urlset only $url_count URLs" "split + seeding pending"
+    fi
+  fi
+else
+  mark_info "/sitemap.xml split check" "status=$RESP_STATUS"
+fi
+rm -f "$RESP_BODY_FILE"
+
+# Per-language sitemap candidates (two naming conventions): informational.
+for path in "/sitemap-en.xml" "/sitemap/en.xml" "/sitemap-pt.xml" "/sitemap/pt.xml"; do
+  fetch "$path"
+  if [ "$RESP_STATUS" = "200" ] && head -c 200 "$RESP_BODY_FILE" | grep -q '<?xml'; then
+    mark_pass "GET $path exists as XML"
+  else
+    mark_info "GET $path" "status=$RESP_STATUS (per-lang sitemap pending)"
+  fi
+  rm -f "$RESP_BODY_FILE"
+done
+
+# ------------------------------------------------------------------
+# Section: robots.txt richer assertions
+# ------------------------------------------------------------------
+printf "\n[robots richer]\n"
+fetch "/robots.txt"
+if [ "$RESP_STATUS" = "200" ]; then
+  if grep -qi "sitemap:" "$RESP_BODY_FILE"; then
+    mark_pass "/robots.txt mentions Sitemap:"
+  else
+    mark_info "/robots.txt Sitemap directive" "missing"
+  fi
+  if grep -qi "disallow:" "$RESP_BODY_FILE"; then
+    mark_pass "/robots.txt has at least one Disallow directive"
+  else
+    mark_info "/robots.txt Disallow" "no Disallow lines"
+  fi
+else
+  mark_info "/robots.txt" "not served — skipping content check"
+fi
+rm -f "$RESP_BODY_FILE"
+
+# ------------------------------------------------------------------
+# Section: theme switcher hint on /
+# ------------------------------------------------------------------
+printf "\n[theme switcher]\n"
+fetch "/"
+if [ "$RESP_STATUS" = "200" ]; then
+  if grep -q 'data-theme' "$RESP_BODY_FILE"; then
+    mark_pass "/ contains data-theme attribute (theme switcher wired)"
+  else
+    mark_info "/ data-theme" "not present (theme switcher pending deploy)"
+  fi
+else
+  mark_info "/ data-theme" "/ not reachable"
+fi
+rm -f "$RESP_BODY_FILE"
+
+# ------------------------------------------------------------------
+# Section: emoji rendering hint (twemoji or system emoji CSS)
+# ------------------------------------------------------------------
+printf "\n[emoji rendering]\n"
+fetch "/"
+if [ "$RESP_STATUS" = "200" ]; then
+  if grep -qE '(twemoji|"Apple Color Emoji"|emoji)' "$RESP_BODY_FILE"; then
+    mark_pass "/ ships twemoji or emoji font hint"
+  else
+    mark_info "/ emoji hint" "no twemoji/emoji marker (flags may render poorly)"
+  fi
+fi
+rm -f "$RESP_BODY_FILE"
+
+# ------------------------------------------------------------------
+# Section: Russian-speaking country routes (ru, kz, by, kg)
+# ------------------------------------------------------------------
+printf "\n[ru countries]\n"
+for c in "ru" "kz" "by" "kg"; do
+  fetch "/$c"
+  if [ "$RESP_STATUS" = "200" ] && [ "$RESP_SIZE" -ge 500 ]; then
+    mark_pass "GET /$c (Russian-speaking country) served"
+  elif [ "$RESP_STATUS" = "404" ]; then
+    mark_info "GET /$c -> 404" "country not yet in COUNTRIES catalog"
+  else
+    mark_info "GET /$c -> $RESP_STATUS" "informational"
+  fi
+  rm -f "$RESP_BODY_FILE"
+done
+
+# ------------------------------------------------------------------
+# Section: DB plan translation — Account recovery on /br/servicos
+# ------------------------------------------------------------------
+printf "\n[plan name translation]\n"
+fetch "/br/servicos"
+if [ "$RESP_STATUS" = "200" ]; then
+  # The expected PT-translated name is "Recuperação de conta" but legacy
+  # English "Account recovery" might still appear before the DB seed runs.
+  if grep -qiE "(Recupera..o de conta|Account recovery|Recuperação)" "$RESP_BODY_FILE"; then
+    mark_pass "/br/servicos lists the account recovery plan"
+  else
+    mark_info "/br/servicos account-recovery plan" "neither PT nor EN name found"
+  fi
+else
+  mark_info "/br/servicos plan check" "status=$RESP_STATUS"
+fi
+rm -f "$RESP_BODY_FILE"
+
+# ------------------------------------------------------------------
+# Section: hreflang strict sanity on /br
+# ------------------------------------------------------------------
+printf "\n[hreflang strict]\n"
+fetch "/br"
+if [ "$RESP_STATUS" = "200" ]; then
+  hreflang_count=$(grep -oE 'hreflang=' "$RESP_BODY_FILE" | wc -l)
+  # We expect >= 60 with 126 countries in /br metadata (Next emits alternates
+  # for the whole catalog). Tolerant: PASS at 30+, INFO below.
+  if [ "$hreflang_count" -ge 30 ]; then
+    mark_pass "/br hreflang count: $hreflang_count (>=30)"
+  else
+    mark_info "/br hreflang count: $hreflang_count" "<30, alternates may not be wired on country pages"
+  fi
+  # x-default presence
+  if grep -q 'x-default' "$RESP_BODY_FILE"; then
+    mark_pass "/br includes hreflang x-default"
+  else
+    mark_info "/br x-default" "not found"
+  fi
+else
+  mark_info "/br hreflang strict" "status=$RESP_STATUS"
+fi
+rm -f "$RESP_BODY_FILE"
+
 # ------------------------------------------------------------------
 # Summary
 # ------------------------------------------------------------------

@@ -30,7 +30,7 @@ export default function NewTicketPage() {
       });
       router.push(`/tickets/${t.id}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao criar ticket");
+      setError(err instanceof Error ? err.message : "Failed to create ticket");
     } finally {
       setLoading(false);
     }
@@ -39,37 +39,37 @@ export default function NewTicketPage() {
   return (
     <main className="container" style={{ maxWidth: 640, paddingTop: "2rem", paddingBottom: "4rem" }}>
       <p style={{ marginBottom: "1rem", fontSize: "0.9rem" }}>
-        <Link href="/tickets">← Meus tickets</Link>
+        <Link href="/tickets">← My tickets</Link>
       </p>
       <div className="card">
-        <h1 style={{ marginBottom: "0.5rem" }}>Abrir ticket</h1>
+        <h1 style={{ marginBottom: "0.5rem" }}>Open ticket</h1>
         <p style={{ color: "var(--muted)", marginBottom: "1.5rem", fontSize: "0.9rem" }}>
-          Descreva sua dúvida ou problema. Nossa equipe responde por aqui e também envia um e-mail.
+          Describe your question or issue. Our team replies here and also sends an email.
         </p>
 
         <form onSubmit={onSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
           {error && <div className="alert alert-error">{error}</div>}
           <div>
-            <label className="label" htmlFor="subject">Assunto</label>
-            <input className="input" id="subject" name="subject" placeholder="Ex.: Pedido #ABC123 não chegou" required maxLength={120} />
+            <label className="label" htmlFor="subject">Subject</label>
+            <input className="input" id="subject" name="subject" placeholder="E.g.: Order #ABC123 didn't arrive" required maxLength={120} />
           </div>
           <div>
-            <label className="label" htmlFor="body">Mensagem</label>
+            <label className="label" htmlFor="body">Message</label>
             <textarea
               className="input"
               id="body"
               name="body"
               rows={6}
               required
-              placeholder="Conte com detalhes o que aconteceu. Quanto mais contexto, mais rápido resolvemos."
+              placeholder="Describe what happened in detail. The more context, the faster we can resolve it."
             />
           </div>
           <div>
-            <label className="label" htmlFor="order_id">ID do pedido (opcional)</label>
-            <input className="input" id="order_id" name="order_id" placeholder="Cole o ID se for relacionado a um pedido específico" />
+            <label className="label" htmlFor="order_id">Order ID (optional)</label>
+            <input className="input" id="order_id" name="order_id" placeholder="Paste the ID if related to a specific order" />
           </div>
           <button type="submit" className="btn btn-primary" disabled={loading}>
-            {loading ? "Enviando…" : "Enviar"}
+            {loading ? "Sending…" : "Send"}
           </button>
         </form>
       </div>

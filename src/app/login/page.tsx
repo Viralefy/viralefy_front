@@ -22,7 +22,7 @@ export default function LoginPage() {
       login(session);
       router.push("/account");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Falha no login");
+      setError(err instanceof Error ? err.message : "Login failed");
     } finally {
       setLoading(false);
     }
@@ -31,23 +31,23 @@ export default function LoginPage() {
   return (
     <main className="container" style={{ maxWidth: 420, paddingTop: "3rem" }}>
       <div className="card">
-        <h1 style={{ marginBottom: "1.25rem" }}>Entrar</h1>
+        <h1 style={{ marginBottom: "1.25rem" }}>Sign in</h1>
         <form onSubmit={onSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
           {error && <div className="alert alert-error">{error}</div>}
           <div>
-            <label className="label" htmlFor="email">E-mail</label>
+            <label className="label" htmlFor="email">Email</label>
             <input className="input" id="email" name="email" type="email" required />
           </div>
           <div>
-            <label className="label" htmlFor="password">Senha</label>
+            <label className="label" htmlFor="password">Password</label>
             <input className="input" id="password" name="password" type="password" required />
           </div>
           <button type="submit" className="btn btn-primary" disabled={loading}>
-            {loading ? "Entrando…" : "Entrar"}
+            {loading ? "Signing in…" : "Sign in"}
           </button>
         </form>
         <p style={{ color: "var(--muted)", marginTop: "1.25rem", fontSize: "0.9rem" }}>
-          Não tem conta? <Link href="/register">Criar conta</Link>
+          Don&apos;t have an account? <Link href="/register">Create account</Link>
         </p>
       </div>
     </main>

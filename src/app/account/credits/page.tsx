@@ -11,10 +11,10 @@ import { useApp } from "@/components/Providers";
 const PRESETS = [50, 100, 200, 500, 1000, 2000]; // em reais
 
 const TX_LABEL: Record<string, string> = {
-  recharge: "Recarga",
-  spend: "Pedido",
-  refund: "Estorno",
-  adjustment: "Ajuste",
+  recharge: "Top-up",
+  spend: "Order",
+  refund: "Refund",
+  adjustment: "Adjustment",
 };
 
 function formatBRL(cents: number): string {
@@ -42,7 +42,7 @@ export default function CreditsPage() {
       setAcct(a);
       setTxs(t);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Erro");
+      setError(e instanceof Error ? e.message : "Error");
     }
   }
 
@@ -65,7 +65,7 @@ export default function CreditsPage() {
       setRechargeExtra(inv.payment_extra ?? {});
       load();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Erro ao gerar recarga");
+      setError(e instanceof Error ? e.message : "Failed to create top-up");
     } finally {
       setSubmitting(false);
     }
@@ -74,19 +74,19 @@ export default function CreditsPage() {
   return (
     <main className="container" style={{ paddingTop: "2rem", paddingBottom: "4rem", maxWidth: 760 }}>
       <p style={{ marginBottom: "1rem", fontSize: "0.9rem" }}>
-        <Link href="/account">← Minha conta</Link>
+        <Link href="/account">← My account</Link>
       </p>
 
-      <h1 style={{ marginBottom: "0.5rem" }}>Créditos</h1>
+      <h1 style={{ marginBottom: "0.5rem" }}>Credits</h1>
       <p style={{ color: "var(--muted)", marginBottom: "1.5rem" }}>
-        Recarregue e use saldo no checkout — sem precisar passar por cobrança a cada compra.
+        Top up and use your balance at checkout — no need to go through payment on every purchase.
       </p>
 
       {error && <div className="alert alert-error">{error}</div>}
 
       <div className="card" style={{ marginBottom: "1.5rem", textAlign: "center" }}>
         <p style={{ color: "var(--muted)", fontSize: "0.85rem", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: "0.5rem" }}>
-          Saldo disponível
+          Available balance
         </p>
         <p className="plan-price" style={{ fontSize: "2.5rem", margin: 0 }}>
           {acct ? formatBRL(acct.balance_cents) : "—"}
@@ -94,7 +94,7 @@ export default function CreditsPage() {
       </div>
 
       <div className="card" style={{ marginBottom: "1.5rem" }}>
-        <h2 style={{ fontSize: "1.05rem", marginBottom: "0.75rem" }}>Recarregar</h2>
+        <h2 style={{ fontSize: "1.05rem", marginBottom: "0.75rem" }}>Top up</h2>
         <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginBottom: "0.75rem" }}>
           {PRESETS.map((v) => (
             <button
@@ -113,59 +113,59 @@ export default function CreditsPage() {
 
         {rechargeExtra && (rechargeExtra["br_code"] || rechargeExtra["address"] || rechargeUrl || rechargeExtra["pix_key"]) && (
           <div style={{ marginTop: "1rem", padding: "1rem", borderTop: "1px solid var(--border)" }}>
-            <h3 style={{ fontSize: "0.95rem", marginBottom: "0.5rem" }}>Pague para creditar o saldo</h3>
+            <h3 style={{ fontSize: "0.95rem", marginBottom: "0.5rem" }}>Pay to credit your balance</h3>
             {rechargeExtra["br_code"] && (
               <>
-                <label className="label">Código PIX (copia-e-cola)</label>
+                <label className="label">Pix code (copy and paste)</label>
                 <textarea readOnly className="input" rows={3} style={{ fontFamily: "monospace", fontSize: "0.8rem" }} value={rechargeExtra["br_code"]} />
               </>
             )}
             {rechargeExtra["address"] && (
               <>
-                <label className="label">Carteira ({rechargeExtra["network"]})</label>
+                <label className="label">Wallet ({rechargeExtra["network"]})</label>
                 <textarea readOnly className="input" rows={2} style={{ fontFamily: "monospace", fontSize: "0.8rem" }} value={rechargeExtra["address"]} />
               </>
             )}
             {rechargeExtra["pix_key"] && (
               <>
-                <label className="label">Chave PIX</label>
+                <label className="label">Pix key</label>
                 <input readOnly className="input" value={rechargeExtra["pix_key"]} />
               </>
             )}
             {rechargeUrl && (
               <a href={rechargeUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ marginTop: "0.5rem", display: "inline-block" }}>
-                Abrir página de pagamento →
+                Open payment page →
               </a>
             )}
             <p style={{ color: "var(--muted)", fontSize: "0.8rem", marginTop: "0.75rem" }}>
-              Após o pagamento, o saldo é creditado automaticamente. Se demorar, abra um ticket de suporte.
+              After payment, your balance is credited automatically. If it takes too long, open a support ticket.
             </p>
           </div>
         )}
       </div>
 
-      <h2 style={{ fontSize: "1.05rem", marginBottom: "0.75rem" }}>Histórico (ledger)</h2>
+      <h2 style={{ fontSize: "1.05rem", marginBottom: "0.75rem" }}>History (ledger)</h2>
       {txs.length === 0 ? (
         <div className="card">
-          <p style={{ color: "var(--muted)" }}>Sem transações ainda.</p>
+          <p style={{ color: "var(--muted)" }}>No transactions yet.</p>
         </div>
       ) : (
         <div className="card" style={{ padding: 0 }}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ background: "var(--accent-dimmer)" }}>
-                <th style={{ padding: "0.6rem 1rem", textAlign: "left", fontSize: "0.8rem", color: "var(--muted)" }}>Quando</th>
-                <th style={{ padding: "0.6rem 1rem", textAlign: "left", fontSize: "0.8rem", color: "var(--muted)" }}>Tipo</th>
-                <th style={{ padding: "0.6rem 1rem", textAlign: "left", fontSize: "0.8rem", color: "var(--muted)" }}>Descrição</th>
-                <th style={{ padding: "0.6rem 1rem", textAlign: "right", fontSize: "0.8rem", color: "var(--muted)" }}>Valor</th>
-                <th style={{ padding: "0.6rem 1rem", textAlign: "right", fontSize: "0.8rem", color: "var(--muted)" }}>Saldo</th>
+                <th style={{ padding: "0.6rem 1rem", textAlign: "left", fontSize: "0.8rem", color: "var(--muted)" }}>When</th>
+                <th style={{ padding: "0.6rem 1rem", textAlign: "left", fontSize: "0.8rem", color: "var(--muted)" }}>Type</th>
+                <th style={{ padding: "0.6rem 1rem", textAlign: "left", fontSize: "0.8rem", color: "var(--muted)" }}>Description</th>
+                <th style={{ padding: "0.6rem 1rem", textAlign: "right", fontSize: "0.8rem", color: "var(--muted)" }}>Amount</th>
+                <th style={{ padding: "0.6rem 1rem", textAlign: "right", fontSize: "0.8rem", color: "var(--muted)" }}>Balance</th>
               </tr>
             </thead>
             <tbody>
               {txs.map((t) => (
                 <tr key={t.id} style={{ borderBottom: "1px solid var(--border)" }}>
                   <td style={{ padding: "0.6rem 1rem", fontSize: "0.85rem", color: "var(--muted)" }}>
-                    {new Date(t.created_at).toLocaleString("pt-BR")}
+                    {new Date(t.created_at).toLocaleString()}
                   </td>
                   <td style={{ padding: "0.6rem 1rem", fontSize: "0.85rem" }}>{TX_LABEL[t.type] ?? t.type}</td>
                   <td style={{ padding: "0.6rem 1rem", fontSize: "0.85rem" }}>
@@ -201,7 +201,7 @@ function CustomAmount({ onSubmit, disabled }: { onSubmit: (v: number) => void; d
         min={5}
         step="0.01"
         className="input"
-        placeholder="Outro valor em R$ (mín. 5)"
+        placeholder="Other amount in R$ (min. 5)"
         value={val}
         onChange={(e) => setVal(e.target.value)}
         style={{ flex: 1 }}
@@ -212,7 +212,7 @@ function CustomAmount({ onSubmit, disabled }: { onSubmit: (v: number) => void; d
         onClick={() => ok && onSubmit(num)}
         disabled={!ok || disabled}
       >
-        Recarregar
+        Top up
       </button>
     </div>
   );
