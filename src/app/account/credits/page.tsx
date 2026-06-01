@@ -17,8 +17,9 @@ const TX_LABEL: Record<string, string> = {
   adjustment: "Adjustment",
 };
 
-function formatBRL(cents: number): string {
-  return `R$ ${(cents / 100).toFixed(2).replace(".", ",")}`;
+// Créditos são canonicamente USD-cents.
+function formatUSD(cents: number): string {
+  return `$ ${(cents / 100).toFixed(2)}`;
 }
 
 export default function CreditsPage() {
@@ -59,7 +60,7 @@ export default function CreditsPage() {
     try {
       const inv = await requestRecharge(token, {
         amount_cents: Math.round(amountReais * 100),
-        display_currency: currency?.code ?? "BRL",
+        display_currency: currency?.code ?? "USD",
       });
       setRechargeUrl(inv.payment_url ?? null);
       setRechargeExtra(inv.payment_extra ?? {});
@@ -89,7 +90,7 @@ export default function CreditsPage() {
           Available balance
         </p>
         <p className="plan-price" style={{ fontSize: "2.5rem", margin: 0 }}>
-          {acct ? formatBRL(acct.balance_cents) : "—"}
+          {acct ? formatUSD(acct.balance_cents) : "—"}
         </p>
       </div>
 
@@ -175,10 +176,10 @@ export default function CreditsPage() {
                     </div>
                   </td>
                   <td style={{ padding: "0.6rem 1rem", textAlign: "right", fontSize: "0.9rem", fontWeight: 600, color: t.amount_cents > 0 ? "var(--success)" : "var(--danger)", fontVariantNumeric: "tabular-nums" }}>
-                    {t.amount_cents > 0 ? "+ " : "− "}{formatBRL(Math.abs(t.amount_cents))}
+                    {t.amount_cents > 0 ? "+ " : "− "}{formatUSD(Math.abs(t.amount_cents))}
                   </td>
                   <td style={{ padding: "0.6rem 1rem", textAlign: "right", fontSize: "0.85rem", color: "var(--muted)", fontVariantNumeric: "tabular-nums" }}>
-                    {formatBRL(t.balance_after_cents)}
+                    {formatUSD(t.balance_after_cents)}
                   </td>
                 </tr>
               ))}

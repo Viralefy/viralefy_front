@@ -23,7 +23,15 @@ export type CategoryCode =
   | "compartilhamentos_tiktok"
   | "visualizacoes_instagram"
   | "visualizacoes_tiktok"
-  | "servicos";
+  | "servicos"
+  // Recovery: LP própria por país, com formulário ao invés de tabela
+  // de pacotes.
+  | "recuperacao_perfil"
+  // Marketplace de assets reais: BMs FB, perfis com seguidores, emails
+  // validados. UI = mesma da categoria de planos (CategoryCardGrid).
+  | "bms_facebook"
+  | "perfis_redes"
+  | "emails_validados";
 
 export const CATEGORY_CODES: CategoryCode[] = [
   "seguidores_instagram",
@@ -37,7 +45,20 @@ export const CATEGORY_CODES: CategoryCode[] = [
   "visualizacoes_instagram",
   "visualizacoes_tiktok",
   "servicos",
+  "recuperacao_perfil",
+  "bms_facebook",
+  "perfis_redes",
+  "emails_validados",
 ];
+
+// Categorias cujo checkout pós-pagamento abre um ticket de suporte
+// automaticamente (handoff manual com o time). Espelha
+// `ShouldOpenTicketForCategory` no backend.
+export const TICKET_OPENING_CATEGORIES: ReadonlySet<CategoryCode> = new Set<CategoryCode>([
+  "recuperacao_perfil",
+  "bms_facebook",
+  "perfis_redes",
+]);
 
 // Label curto (usado em chips / tabs)
 export const CATEGORY_LABEL: Record<CategoryCode, Partial<Record<LangCode, string>>> = {
@@ -158,10 +179,44 @@ export const CATEGORY_LABEL: Record<CategoryCode, Partial<Record<LangCode, strin
     sv: "Premiumtjänster", da: "Premium-tjenester", no: "Premium-tjenester",
     fi: "Premium-palvelut", is: "Premium þjónusta",
     et: "Premium teenused", lv: "Premium pakalpojumi", lt: "Premium paslaugos",
-    cs: "Prémiové služby", sk: "Prémiové služby", hu: "Prémium szolgáltatások",
+    cs: "Prémiové služby", sk: "Prémiové služby", hu: "Prémium szolgáltatações",
     ro: "Servicii premium", bg: "Премиум услуги", el: "Premium υπηρεσίες",
     hr: "Premium usluge", sl: "Premium storitve", ca: "Serveis premium",
     ru: "Премиум услуги",
+  },
+  recuperacao_perfil: {
+    en: "Account recovery", pt: "Recuperação de perfil",
+    es: "Recuperación de cuenta", es_AR: "Recuperación de cuenta",
+    fr: "Récupération de compte", de: "Konto-Wiederherstellung",
+    it: "Recupero account", nl: "Accountherstel",
+    ru: "Восстановление аккаунта", ja: "アカウント復旧", ko: "계정 복구",
+    ar: "استرداد الحساب", hi: "अकाउंट रिकवरी",
+    id: "Pemulihan akun", vi: "Khôi phục tài khoản",
+    th: "กู้คืนบัญชี", tr: "Hesap kurtarma", uk: "Відновлення акаунта",
+  },
+  bms_facebook: {
+    en: "Facebook BMs", pt: "BMs Facebook",
+    es: "BMs de Facebook", es_AR: "BMs de Facebook",
+    fr: "BMs Facebook", de: "Facebook BMs", it: "BM Facebook",
+    nl: "Facebook BMs", ru: "Бизнес-менеджеры Facebook",
+    ja: "Facebookビジネスマネージャ", ko: "페이스북 BM",
+    ar: "حسابات Facebook BM", hi: "Facebook बिज़नेस मैनेजर",
+    id: "Akun BM Facebook", vi: "BM Facebook",
+    th: "Facebook BM", tr: "Facebook BM",
+  },
+  perfis_redes: {
+    en: "Aged profiles", pt: "Perfis envelhecidos",
+    es: "Perfiles maduros", es_AR: "Perfiles maduros",
+    fr: "Comptes anciens", de: "Etablierte Profile",
+    it: "Profili maturi", nl: "Gevestigde profielen",
+    ru: "Старые профили",
+  },
+  emails_validados: {
+    en: "Validated emails", pt: "E-mails validados",
+    es: "E-mails validados", es_AR: "E-mails validados",
+    fr: "E-mails validés", de: "Validierte E-Mails",
+    it: "E-mail validate", nl: "Geverifieerde e-mails",
+    ru: "Проверенные e-mail",
   },
 };
 
@@ -235,6 +290,31 @@ export const CATEGORY_SLUG: Record<CategoryCode, Partial<Record<LangCode, string
     cs: "sluzby", sk: "sluzby", hu: "szolgaltatasok", ro: "servicii",
     bg: "uslugi", el: "ipiresies", hr: "usluge", sl: "storitve", ca: "serveis",
     ru: "uslugi",
+  },
+  recuperacao_perfil: {
+    en: "account-recovery", pt: "recuperacao-de-perfil",
+    es: "recuperacion-de-cuenta", es_AR: "recuperacion-de-cuenta",
+    fr: "recuperation-de-compte", de: "konto-wiederherstellung",
+    it: "recupero-account", nl: "accountherstel",
+    ru: "vosstanovlenie-akkaunta",
+  },
+  bms_facebook: {
+    en: "facebook-bms", pt: "bms-facebook",
+    es: "bms-facebook", fr: "bms-facebook",
+    de: "facebook-bms", it: "bm-facebook", nl: "facebook-bms",
+    ru: "biznes-menedzhery-facebook",
+  },
+  perfis_redes: {
+    en: "aged-profiles", pt: "perfis-envelhecidos",
+    es: "perfiles-maduros", fr: "comptes-anciens",
+    de: "etablierte-profile", it: "profili-maturi",
+    nl: "gevestigde-profielen", ru: "starye-profili",
+  },
+  emails_validados: {
+    en: "validated-emails", pt: "e-mails-validados",
+    es: "e-mails-validados", fr: "e-mails-valides",
+    de: "validierte-e-mails", it: "e-mail-validate",
+    nl: "geverifieerde-e-mails", ru: "proverennye-e-mail",
   },
 };
 
@@ -1301,6 +1381,30 @@ export const COPY: Record<CategoryCode, Partial<Record<LangCode, LongCopy>>> = {
     ru: COPY_VIEWS_RU,
   },
   servicos: {
+    en: COPY_SERV_EN, pt: COPY_SERV_PT, es: COPY_SERV_ES, es_AR: COPY_SERV_ES,
+    fr: COPY_SERV_FR, de: COPY_SERV_DE, it: COPY_SERV_IT, nl: COPY_SERV_NL,
+    ru: COPY_SERV_RU,
+  },
+  // 4 categorias novas reaproveitam o COPY de serviços premium como base —
+  // são produtos de alto-toque que se beneficiam do mesmo gancho copy
+  // ("hands-on growth"). Os labels (CATEGORY_LABEL) já carregam a
+  // identidade visual da categoria.
+  recuperacao_perfil: {
+    en: COPY_SERV_EN, pt: COPY_SERV_PT, es: COPY_SERV_ES, es_AR: COPY_SERV_ES,
+    fr: COPY_SERV_FR, de: COPY_SERV_DE, it: COPY_SERV_IT, nl: COPY_SERV_NL,
+    ru: COPY_SERV_RU,
+  },
+  bms_facebook: {
+    en: COPY_SERV_EN, pt: COPY_SERV_PT, es: COPY_SERV_ES, es_AR: COPY_SERV_ES,
+    fr: COPY_SERV_FR, de: COPY_SERV_DE, it: COPY_SERV_IT, nl: COPY_SERV_NL,
+    ru: COPY_SERV_RU,
+  },
+  perfis_redes: {
+    en: COPY_SERV_EN, pt: COPY_SERV_PT, es: COPY_SERV_ES, es_AR: COPY_SERV_ES,
+    fr: COPY_SERV_FR, de: COPY_SERV_DE, it: COPY_SERV_IT, nl: COPY_SERV_NL,
+    ru: COPY_SERV_RU,
+  },
+  emails_validados: {
     en: COPY_SERV_EN, pt: COPY_SERV_PT, es: COPY_SERV_ES, es_AR: COPY_SERV_ES,
     fr: COPY_SERV_FR, de: COPY_SERV_DE, it: COPY_SERV_IT, nl: COPY_SERV_NL,
     ru: COPY_SERV_RU,

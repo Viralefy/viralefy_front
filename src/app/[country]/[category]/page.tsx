@@ -17,6 +17,7 @@ import { QuantitySlider } from "@/components/QuantitySlider";
 import { Footer } from "@/components/Footer";
 import { TrustSignals } from "@/components/TrustSignals";
 import { LiveCounter } from "@/components/LiveCounter";
+import { RecoveryForm } from "@/components/RecoveryForm";
 
 // Página de categoria por país. Slug aceita o nome local (`/br/seguidores`,
 // `/us/followers`, `/de/follower`). A página entrega:
@@ -202,26 +203,40 @@ export default async function CategoryPage({ params }: { params: Promise<Params>
             })}
           </nav>
 
-          {/* Variante A — cards */}
-          <section aria-labelledby="plans-cards">
-            <h2 id="plans-cards" style={{ textAlign: "center", marginBottom: "1rem" }}>{t.category.intro}</h2>
-            <CategoryCardGrid
-              plans={sortedPlans}
-              lang={lang}
-              countryCode={c.code}
-              category={cat}
-              unitLabel={unitLabel}
-            />
-          </section>
-
-          {/* Variante B — slider */}
-          {sortedPlans.length >= 2 && cat !== "servicos" && (
-            <section aria-labelledby="plans-slider" style={{ marginTop: "3rem" }}>
-              <h2 id="plans-slider" style={{ textAlign: "center", marginBottom: "1rem", fontSize: "1.25rem" }}>
-                {t.category.chooseQty}
-              </h2>
-              <QuantitySlider plans={sortedPlans} lang={lang} unitLabel={unitLabel} />
+          {/* Account Recovery: LP especializada — formulário no lugar dos
+              cards de plano. Único item de catálogo nessa categoria. */}
+          {cat === "recuperacao_perfil" ? (
+            <section style={{ marginTop: "1rem" }}>
+              <RecoveryForm lang={lang} />
             </section>
+          ) : (
+            <>
+              {/* Variante A — cards */}
+              <section aria-labelledby="plans-cards">
+                <h2 id="plans-cards" style={{ textAlign: "center", marginBottom: "1rem" }}>{t.category.intro}</h2>
+                <CategoryCardGrid
+                  plans={sortedPlans}
+                  lang={lang}
+                  countryCode={c.code}
+                  category={cat}
+                  unitLabel={unitLabel}
+                />
+              </section>
+
+              {/* Variante B — slider só faz sentido em categorias com ladder. */}
+              {sortedPlans.length >= 2 &&
+                cat !== "servicos" &&
+                cat !== "bms_facebook" &&
+                cat !== "perfis_redes" &&
+                cat !== "emails_validados" && (
+                  <section aria-labelledby="plans-slider" style={{ marginTop: "3rem" }}>
+                    <h2 id="plans-slider" style={{ textAlign: "center", marginBottom: "1rem", fontSize: "1.25rem" }}>
+                      {t.category.chooseQty}
+                    </h2>
+                    <QuantitySlider plans={sortedPlans} lang={lang} unitLabel={unitLabel} />
+                  </section>
+                )}
+            </>
           )}
 
           {/* Cópia longa — parágrafos 2..N */}

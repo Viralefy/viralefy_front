@@ -116,16 +116,19 @@ test("search('xxxx-nope-xxxx') returns []", () => {
   assert.deepEqual(search("xxxx-nope-xxxx"), []);
 });
 
-test("search('recovery') matches at least 1 /XX/servicos URL", () => {
+test("search('recovery') matches /XX/{servicos,recuperacao_perfil} URLs", () => {
+  // Antes 'recovery' caía só em /servicos. Depois do split, há uma
+  // categoria dedicada `recuperacao_perfil` com LP de formulário, então
+  // tanto recuperacao_perfil quanto servicos são respostas válidas.
+  const ALLOWED = new Set(["servicos", "recuperacao_perfil"]);
   const hits = search("recovery");
-  assert.ok(hits.length >= 1, "expected at least 1 services hit");
-  // Every hit should be in /servicos (or its localized slug → servicos category).
+  assert.ok(hits.length >= 1, "expected at least 1 hit for 'recovery'");
   for (const h of hits) {
     const slug = h.url.split("/")[2];
-    assert.equal(
-      categoryFromSlug(slug),
-      "servicos",
-      `expected services category, got ${h.url}`
+    const cat = categoryFromSlug(slug);
+    assert.ok(
+      cat && ALLOWED.has(cat),
+      `expected servicos or recuperacao_perfil, got ${cat} from ${h.url}`,
     );
   }
 });
@@ -206,14 +209,17 @@ test("search results URLs are unique (no duplicates)", () => {
   }
 });
 
-test("rank: 'recovery' surfaces /servicos URLs above non-servicos URLs", () => {
-  // Only /servicos URLs have 'recovery' in EXTRA_KEYWORDS; any non-servicos
-  // category should not match at all (single-token AND filter).
+test("rank: 'recovery' surfaces servicos OU recuperacao_perfil URLs", () => {
+  // Após o split de Account Recovery em categoria dedicada, 'recovery'
+  // legitimamente bate em duas famílias: a LP de formulário
+  // (recuperacao_perfil) e o agrupamento premium services. Nenhuma outra
+  // família compartilha o keyword.
+  const ALLOWED = new Set(["servicos", "recuperacao_perfil"]);
   const hits = search("recovery");
   assert.ok(hits.length >= 1);
-  const allServicos = hits.every((h) => {
+  const allValid = hits.every((h) => {
     const slug = h.url.split("/")[2];
-    return categoryFromSlug(slug) === "servicos";
+    return ALLOWED.has(categoryFromSlug(slug));
   });
-  assert.ok(allServicos, "non-servicos category leaked into 'recovery' search");
+  assert.ok(allValid, "non-recovery category leaked into 'recovery' search");
 });

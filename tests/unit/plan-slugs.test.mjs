@@ -121,20 +121,23 @@ test("CATEGORY_LABEL has at least en/pt/es/ru entries for every category", () =>
   }
 });
 
-test("CATEGORY_CODES has exactly 11 entries (engagement split by primitive)", () => {
-  // Engagement foi separado em 3 primitivas (curtidas, comentarios,
-  // compartilhamentos) × 2 plataformas = 6 codes. Mais 2 seguidores, 2 views
-  // e servicos = 11.
-  assert.equal(CATEGORY_CODES.length, 11);
+test("CATEGORY_CODES has 15 entries (storefront + marketplace + recovery)", () => {
+  // 11 storefront + 4 marketplace/recovery (recuperacao_perfil,
+  // bms_facebook, perfis_redes, emails_validados).
+  assert.equal(CATEGORY_CODES.length, 15);
   assert.deepEqual(
     [...CATEGORY_CODES].sort(),
     [
+      "bms_facebook",
       "comentarios_instagram",
       "comentarios_tiktok",
       "compartilhamentos_instagram",
       "compartilhamentos_tiktok",
       "curtidas_instagram",
       "curtidas_tiktok",
+      "emails_validados",
+      "perfis_redes",
+      "recuperacao_perfil",
       "seguidores_instagram",
       "seguidores_tiktok",
       "servicos",

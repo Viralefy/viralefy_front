@@ -67,7 +67,7 @@ export function CheckoutModal({
         plan_id: plan.id,
         email: String(fd.get("email") ?? user?.email ?? ""),
         name: String(fd.get("name") ?? user?.name ?? ""),
-        display_currency: currency?.code ?? "BRL",
+        display_currency: currency?.code ?? "USD",
         payment_method: payMethod,
       };
       if (isProfile) {

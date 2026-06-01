@@ -16,10 +16,9 @@ import {
   copyFor,
 } from "../../src/i18n/categories.ts";
 
-test("CATEGORY_CODES exposes the 11 canonical platform+primitive-split codes", () => {
-  // Engagement separado em 3 primitivas (curtidas / comentarios /
-  // compartilhamentos) × 2 plataformas. Saves do IG ficam embutidos em
-  // compartilhamentos_instagram.
+test("CATEGORY_CODES expõe 15 códigos (storefront + marketplace + recovery)", () => {
+  // 11 storefront + 4 marketplace/recovery: recuperacao_perfil (LP custom
+  // com formulário), bms_facebook, perfis_redes, emails_validados.
   assert.deepEqual(CATEGORY_CODES, [
     "seguidores_instagram",
     "seguidores_tiktok",
@@ -32,6 +31,10 @@ test("CATEGORY_CODES exposes the 11 canonical platform+primitive-split codes", (
     "visualizacoes_instagram",
     "visualizacoes_tiktok",
     "servicos",
+    "recuperacao_perfil",
+    "bms_facebook",
+    "perfis_redes",
+    "emails_validados",
   ]);
 });
 

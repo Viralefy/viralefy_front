@@ -179,15 +179,18 @@ test("search('followers') returns hits including English markets", () => {
   );
 });
 
-test("search('recuperacao') matches /XX/servicos URLs (EXTRA_KEYWORDS hook)", () => {
+test("search('recuperacao') matches /XX/{servicos,recuperacao_perfil}", () => {
+  // Categoria dedicada de recovery foi adicionada; 'recuperacao' agora
+  // bate em ambas (a LP de form e o agrupamento de premium services).
+  const ALLOWED = new Set(["servicos", "recuperacao_perfil"]);
   const hits = search("recuperacao");
   assert.ok(hits.length > 0, "expected at least one hit for 'recuperacao'");
   for (const h of hits) {
     const slug = h.url.split("/")[2];
-    assert.equal(
-      categoryFromSlug(slug),
-      "servicos",
-      `expected services category, got url: ${h.url}`
+    const cat = categoryFromSlug(slug);
+    assert.ok(
+      cat && ALLOWED.has(cat),
+      `expected servicos or recuperacao_perfil, got ${cat} from ${h.url}`,
     );
   }
 });

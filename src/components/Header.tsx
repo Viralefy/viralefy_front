@@ -68,11 +68,29 @@ export function Header() {
     </select>
   );
 
+  // Support sempre visível, com badge "💬", pra dar acesso rápido tanto
+  // pra logado (vai pros tickets dele) quanto pra anônimo (cai em /login
+  // que devolve pra /tickets depois).
+  const SupportButton = (
+    <Link
+      href="/tickets"
+      className="btn btn-outline"
+      style={{
+        padding: "0.5rem 0.85rem",
+        fontSize: "0.85rem",
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "0.4rem",
+      }}
+    >
+      <span aria-hidden>💬</span>
+      {t.header.support}
+    </Link>
+  );
+
   const AuthButtons = user ? (
     <>
-      <Link href="/tickets" className="btn btn-outline" style={{ padding: "0.5rem 0.85rem", fontSize: "0.85rem" }}>
-        {t.header.support}
-      </Link>
+      {SupportButton}
       <Link href="/account" className="btn btn-outline" style={{ padding: "0.5rem 0.85rem", fontSize: "0.85rem" }}>
         {t.header.account}
       </Link>
@@ -90,6 +108,7 @@ export function Header() {
     </>
   ) : (
     <>
+      {SupportButton}
       <Link href="/login" className="btn btn-outline" style={{ padding: "0.5rem 0.85rem", fontSize: "0.85rem" }}>
         {t.header.login}
       </Link>
