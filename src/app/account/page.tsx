@@ -75,36 +75,71 @@ export default function AccountPage() {
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          {orders.map((o) => (
-            <div
-              key={o.id}
-              className="card"
-              style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem", flexWrap: "wrap" }}
-            >
-              <div>
-                <strong>{o.plan_name || "Plan"}</strong>
-                <div style={{ color: "var(--muted)", fontSize: "0.85rem" }}>
-                  #{o.id.slice(0, 8)} · {new Date(o.created_at).toLocaleString()}
-                </div>
-              </div>
-              <div style={{ textAlign: "right" }}>
+          {orders.map((o) => {
+            const isHighTouch =
+              o.plan_category === "recuperacao_perfil" ||
+              o.plan_category === "bms_facebook" ||
+              o.plan_category === "perfis_redes";
+            const hasTicket = !!o.ticket_id;
+            return (
+              <div
+                key={o.id}
+                className="card"
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  gap: "1rem",
+                  flexWrap: "wrap",
+                  // Borda destacada quando o pedido é high-touch e tem
+                  // ticket vivo — chama o olho do user pra ir conversar lá.
+                  border: hasTicket ? "1px solid var(--accent)" : undefined,
+                  background: hasTicket ? "var(--accent-dim)" : undefined,
+                }}
+              >
                 <div>
-                  {o.display_amount} {o.display_currency}
-                  {o.settlement_currency !== o.display_currency && (
-                    <span style={{ color: "var(--muted)" }}> → {o.settlement_amount} {o.settlement_currency}</span>
+                  <strong>{o.plan_name || "Plan"}</strong>
+                  <div style={{ color: "var(--muted)", fontSize: "0.85rem" }}>
+                    #{o.id.slice(0, 8)} · {new Date(o.created_at).toLocaleString()}
+                  </div>
+                  {hasTicket && (
+                    <Link
+                      href={`/tickets/${o.ticket_id}`}
+                      style={{
+                        display: "inline-block",
+                        marginTop: "0.5rem",
+                        fontSize: "0.85rem",
+                        textDecoration: "underline",
+                      }}
+                    >
+                      💬 Open support ticket →
+                    </Link>
+                  )}
+                  {isHighTouch && !hasTicket && o.status === "pending" && (
+                    <div style={{ color: "var(--muted)", fontSize: "0.8rem", marginTop: "0.25rem" }}>
+                      Ticket will open automatically once payment confirms.
+                    </div>
                   )}
                 </div>
-                <span
-                  style={{
-                    fontSize: "0.8rem",
-                    color: o.status === "paid" ? "var(--success)" : "var(--muted)",
-                  }}
-                >
-                  {statusLabel[o.status] ?? o.status}
-                </span>
+                <div style={{ textAlign: "right" }}>
+                  <div>
+                    {o.display_amount} {o.display_currency}
+                    {o.settlement_currency !== o.display_currency && (
+                      <span style={{ color: "var(--muted)" }}> → {o.settlement_amount} {o.settlement_currency}</span>
+                    )}
+                  </div>
+                  <span
+                    style={{
+                      fontSize: "0.8rem",
+                      color: o.status === "paid" ? "var(--success)" : "var(--muted)",
+                    }}
+                  >
+                    {statusLabel[o.status] ?? o.status}
+                  </span>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </main>

@@ -17,12 +17,16 @@ export function CategoryCardGrid({
   countryCode,
   category,
   unitLabel,
+  hideDetailLink = false,
 }: {
   plans: Plan[];
   lang: LangCode;
   countryCode: string;
   category: CategoryCode;
   unitLabel: string;
+  // Esconde o link "+" pra página dedicada do plano. Usado em LPs globais
+  // (marketplace/* não tem rota por-plano).
+  hideDetailLink?: boolean;
 }) {
   const { currency } = useApp();
   const t = tr(lang);
@@ -53,13 +57,15 @@ export function CategoryCardGrid({
                 <button type="button" className="btn btn-primary" style={{ flex: 1, minWidth: 0 }} onClick={() => setSelected(plan)}>
                   {t.cta.buyNow}
                 </button>
-                <Link
-                  href={`/${countryCode}/${catSlug}/${planSlug}`}
-                  className="btn btn-outline"
-                  style={{ padding: "0.5rem 0.75rem", fontSize: "0.85rem" }}
-                >
-                  +
-                </Link>
+                {!hideDetailLink && (
+                  <Link
+                    href={`/${countryCode}/${catSlug}/${planSlug}`}
+                    className="btn btn-outline"
+                    style={{ padding: "0.5rem 0.75rem", fontSize: "0.85rem" }}
+                  >
+                    +
+                  </Link>
+                )}
               </div>
             </article>
           );

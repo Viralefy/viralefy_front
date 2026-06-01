@@ -43,6 +43,9 @@ export type CheckoutPayload = {
   new_profile?: { platform: Platform; handle: string; display_name?: string };
   publication_url?: string;
   payment_method?: "gateway" | "credits";
+  // Snapshot do form custom da categoria (BMs, perfis, emails). Backend
+  // grava em orders.custom_data e replayed no ticket pós-pagamento.
+  custom_data?: Record<string, string>;
 };
 
 export type CheckoutResult = {
@@ -87,6 +90,10 @@ export type Order = {
   status: string;
   amount_cents: number;
   currency: string;
+  // ticket_id é setado automaticamente pelo backend quando a categoria
+  // exige handoff manual (recovery/BMs/perfis) e o pagamento confirma.
+  // Usado pelo /account pra linkar pro ticket aberto.
+  ticket_id?: string | null;
   display_currency: string;
   display_amount: string;
   settlement_currency: string;
@@ -114,8 +121,28 @@ export const fetchPlans = () => request<Plan[]>("/v1/plans");
 export const fetchCategories = () => request<Category[]>("/v1/categories");
 export const fetchCurrencies = () => request<Currency[]>("/v1/currencies");
 
+// Gera Idempotency-Key fresca por chamada de checkout. F5 re-tenta com a
+// mesma key durante a sessão? NÃO — uma key por click. Se o usuário clicar
+// duas vezes acidental, o segundo click reusa a key (porque o form não foi
+// remontado), mas o backend devolve a resposta original (idempotência).
+function newIdempotencyKey(): string {
+  // crypto.randomUUID() é safe em browser moderno e edge runtimes.
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID();
+  }
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
 export const checkout = (payload: CheckoutPayload, token?: string) =>
-  request<CheckoutResult>("/v1/checkout", { method: "POST", body: JSON.stringify(payload) }, token);
+  request<CheckoutResult>(
+    "/v1/checkout",
+    {
+      method: "POST",
+      body: JSON.stringify(payload),
+      headers: { "Idempotency-Key": newIdempotencyKey() },
+    },
+    token,
+  );
 
 export const userRegister = (body: { email: string; name: string; password: string }) =>
   request<Session>("/v1/auth/user/register", { method: "POST", body: JSON.stringify(body) });
@@ -160,6 +187,10 @@ export type TicketDetail = {
 
 export const fetchMyTickets = (token: string) =>
   request<Ticket[]>("/v1/me/tickets", undefined, token);
+
+// Conta tickets em open/pending — usado no badge "💬 (N)" do Header.
+export const fetchMyOpenTicketsCount = (token: string) =>
+  request<{ open: number }>("/v1/me/tickets/open-count", undefined, token);
 
 export const fetchMyTicket = (token: string, id: string) =>
   request<TicketDetail>(`/v1/me/tickets/${id}`, undefined, token);

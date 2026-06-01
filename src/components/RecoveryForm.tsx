@@ -126,9 +126,18 @@ export function RecoveryForm({ lang }: { lang: LangCode }) {
     setLoading(true);
     try {
       const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
+      // Idempotency-Key: F5 / clique duplo durante o submit volta a mesma
+      // resposta em vez de criar um novo order/cobrança.
+      const idem =
+        typeof crypto !== "undefined" && "randomUUID" in crypto
+          ? crypto.randomUUID()
+          : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
       const res = await fetch(`${apiBase}/v1/recovery-request`, {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: {
+          "content-type": "application/json",
+          "Idempotency-Key": idem,
+        },
         body: JSON.stringify({
           handle: form.handle,
           platform: form.platform,

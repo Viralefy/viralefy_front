@@ -96,11 +96,19 @@ The cookies we use are strictly functional and exempt from the EU/UK consent ban
   },
   refund: {
     title: "Refund Policy",
-    updatedAt: "2026-05-30",
+    updatedAt: "2026-05-31",
     body: `## Refill first
-Most issues are not a quality issue but a follower-drop or pacing question. Both are covered by our 30-day refill — no refund needed, we just top your numbers back up.
+Most issues with follower / engagement / view packages are not a quality issue but a follower-drop or pacing question. Both are covered by our 30-day refill — no refund needed, we just top your numbers back up.
 
-## When a refund applies
+## Account recovery — full guarantee
+Account Recovery orders carry a stronger commitment: **full refund within 30 calendar days** if we do not recover the suspended, hacked or restricted account. The clock starts when payment confirms and the support ticket is opened in your account. We work the case for up to 30 days; if the account is not back online on day 30, the entire amount is refunded to the original payment method (card / bank / crypto). No questions asked, no fees retained.
+
+This guarantee covers genuine recovery attempts only. It does not apply when the cause of the suspension turns out to be unrecoverable by negotiation (e.g. confirmed CSAM, OFAC sanctions match, full-state takedown).
+
+## BMs / aged profiles / email packs
+Marketplace items (Facebook BMs, aged Instagram/TikTok profiles, validated email lists) are delivered as-is. Refunds apply only when the item never delivered or arrived materially different from the listing tier (e.g. follower count more than 20% short, BM banned at first login).
+
+## When a refund applies (other categories)
 - The service could not be delivered (the target account or post was private, deleted or blocked at our end).
 - The order was duplicated by accident and we charged twice for the same package.
 - An obvious billing mistake (wrong amount).
@@ -111,7 +119,7 @@ Most issues are not a quality issue but a follower-drop or pacing question. Both
 - A drop within 30 days that we already offered to refill.
 
 ## How to request
-Open a support ticket from inside your account or write to the email in the footer with the order ID. We respond within 48 hours. Approved refunds land back on the original payment method within 5 business days for card and bank, or by separate crypto transaction for crypto.`,
+Open the support ticket that opens automatically with your order, or write to the email in the footer with the order ID. We respond within 48 hours. Approved refunds land back on the original payment method within 5 business days for card and bank, or by separate crypto transaction for crypto.`,
   },
   about: {
     title: "About Viralefy",

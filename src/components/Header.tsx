@@ -5,6 +5,8 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useApp } from "./Providers";
+import { fetchMyOpenTicketsCount } from "@/lib/api";
+import { getToken } from "@/lib/auth";
 import { langOfCountry, tr } from "@/i18n/languages";
 import { getCountry } from "@/i18n/countries";
 import { MegaMenuMarkets } from "./MegaMenuMarkets";
@@ -36,11 +38,35 @@ export function Header() {
   const lang = langFromPath(pathname ?? "");
   const t = tr(lang);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  // Contagem de tickets em open/pending — alimenta o badge ao lado do 💬.
+  // null = ainda não buscado; 0 = sem tickets ativos; >0 = mostra badge.
+  const [openTickets, setOpenTickets] = useState<number | null>(null);
 
   // Fecha drawer quando navega
   useEffect(() => {
     setDrawerOpen(false);
   }, [pathname]);
+
+  // Polling do badge de tickets — só quando logado. Refresh manual
+  // dispara re-fetch ao mudar de rota (pra refletir respostas recentes
+  // sem precisar de WebSocket).
+  useEffect(() => {
+    if (!user) {
+      setOpenTickets(null);
+      return;
+    }
+    const token = getToken();
+    if (!token) return;
+    let cancelled = false;
+    fetchMyOpenTicketsCount(token)
+      .then((r) => {
+        if (!cancelled) setOpenTickets(r.open);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [user, pathname]);
 
   // Esc fecha drawer
   useEffect(() => {
@@ -70,7 +96,8 @@ export function Header() {
 
   // Support sempre visível, com badge "💬", pra dar acesso rápido tanto
   // pra logado (vai pros tickets dele) quanto pra anônimo (cai em /login
-  // que devolve pra /tickets depois).
+  // que devolve pra /tickets depois). Quando logado e tem tickets ativos,
+  // mostra contador em vermelho.
   const SupportButton = (
     <Link
       href="/tickets"
@@ -81,10 +108,29 @@ export function Header() {
         display: "inline-flex",
         alignItems: "center",
         gap: "0.4rem",
+        position: "relative",
       }}
     >
       <span aria-hidden>💬</span>
       {t.header.support}
+      {openTickets != null && openTickets > 0 && (
+        <span
+          aria-label={`${openTickets} ticket(s) abertos`}
+          style={{
+            background: "var(--danger, #ef4444)",
+            color: "#fff",
+            borderRadius: "999px",
+            padding: "0.05rem 0.45rem",
+            fontSize: "0.7rem",
+            fontWeight: 700,
+            minWidth: "1.2rem",
+            textAlign: "center",
+            lineHeight: 1.4,
+          }}
+        >
+          {openTickets > 99 ? "99+" : openTickets}
+        </span>
+      )}
     </Link>
   );
 

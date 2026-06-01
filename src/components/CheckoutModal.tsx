@@ -8,6 +8,8 @@ import { priceFor } from "@/lib/format";
 import { getToken } from "@/lib/auth";
 import { useApp } from "./Providers";
 import { TrustSignals } from "./TrustSignals";
+import { CustomDataFields, hasCustomFields, type CustomData } from "./CustomDataFields";
+import type { CategoryCode } from "@/i18n/categories";
 import type { LangCode } from "@/i18n/languages";
 
 export function CheckoutModal({
@@ -33,6 +35,9 @@ export function CheckoutModal({
   const [selectedProfileId, setSelectedProfileId] = useState<string>("");
   const [useNewProfile, setUseNewProfile] = useState(false);
   const [payMethod, setPayMethod] = useState<"gateway" | "credits">("gateway");
+  // Snapshot dos campos extras por categoria (BMs, perfis, emails).
+  // Passa por custom_data no /v1/checkout e cai no ticket pós-pagamento.
+  const [customData, setCustomData] = useState<CustomData>({});
 
   useEffect(() => {
     const token = getToken();
@@ -70,6 +75,11 @@ export function CheckoutModal({
         display_currency: currency?.code ?? "USD",
         payment_method: payMethod,
       };
+      // Carrega o snapshot dos campos custom da categoria (BMs/perfis/emails)
+      // — só inclui se houver dado, senão o objeto vazio polui o ticket.
+      if (Object.keys(customData).length > 0) {
+        payload.custom_data = customData;
+      }
       if (isProfile) {
         if (user && profiles && !useNewProfile && selectedProfileId) {
           payload.profile_id = selectedProfileId;
@@ -150,6 +160,16 @@ export function CheckoutModal({
                 />
               ) : (
                 <PublicationSection platform={plan.platform} platformLabel={platformLabel} platformIcon={platformIcon} />
+              )}
+
+              {/* Campos custom por categoria (BMs/perfis/emails). Para as
+                  outras categorias, hasCustomFields=false → não renderiza. */}
+              {hasCustomFields(plan.category as CategoryCode) && (
+                <CustomDataFields
+                  category={plan.category as CategoryCode}
+                  value={customData}
+                  onChange={setCustomData}
+                />
               )}
 
               {user && credit && (
