@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import type { CheckoutResult, Plan, Platform, Profile, CreditAccount } from "@/lib/api";
+import type { CheckoutResult, Currency, Plan, Platform, Profile, CreditAccount } from "@/lib/api";
 import { checkout, fetchCredits, fetchMyProfiles } from "@/lib/api";
 import { getTracking } from "@/lib/tracking";
-import { priceFor } from "@/lib/format";
+import { priceFor, formatBalance } from "@/lib/format";
 import { getToken } from "@/lib/auth";
 import { useApp } from "./Providers";
 import { TrustSignals } from "./TrustSignals";
@@ -122,7 +122,7 @@ export function CheckoutModal({
     >
       <div className="card" style={{ maxWidth: 480, width: "100%", maxHeight: "90vh", overflowY: "auto" }} onClick={(e) => e.stopPropagation()}>
         {result ? (
-          <CheckoutSuccess result={result} onClose={onClose} />
+          <CheckoutSuccess result={result} onClose={onClose} currency={currency} />
         ) : (
           <>
             <h2 style={{ marginBottom: "0.25rem" }}>Complete purchase</h2>
@@ -186,6 +186,7 @@ export function CheckoutModal({
                   enough={enoughCredits}
                   payMethod={payMethod}
                   setPayMethod={setPayMethod}
+                  currency={currency}
                 />
               )}
 
@@ -275,13 +276,14 @@ function PublicationSection({ platform, platformLabel, platformIcon }: { platfor
 }
 
 function PaymentMethodSection({
-  credit, priceCents, enough, payMethod, setPayMethod,
+  credit, priceCents, enough, payMethod, setPayMethod, currency,
 }: {
   credit: CreditAccount;
   priceCents: number;
   enough: boolean;
   payMethod: "gateway" | "credits";
   setPayMethod: (m: "gateway" | "credits") => void;
+  currency: Currency | null;
 }) {
   return (
     <div>
@@ -301,15 +303,15 @@ function PaymentMethodSection({
         </button>
       </div>
       <p style={{ color: enough ? "var(--muted)" : "var(--danger)", fontSize: "0.78rem", marginTop: "0.4rem" }}>
-        Balance: R$ {(credit.balance_cents / 100).toFixed(2)}
-        {!enough && ` — short by R$ ${((priceCents - credit.balance_cents) / 100).toFixed(2)}. `}
+        Balance: {formatBalance(credit.balance_cents, currency)}
+        {!enough && ` — short by ${formatBalance(priceCents - credit.balance_cents, currency)}. `}
         {!enough && <Link href="/account/credits" style={{ color: "var(--accent)" }}>Top up</Link>}
       </p>
     </div>
   );
 }
 
-function CheckoutSuccess({ result, onClose }: { result: CheckoutResult; onClose: () => void }) {
+function CheckoutSuccess({ result, onClose, currency }: { result: CheckoutResult; onClose: () => void; currency: Currency | null }) {
   return (
     <>
       <h2 style={{ marginBottom: "0.75rem" }}>Order created! 🎉</h2>
@@ -322,7 +324,7 @@ function CheckoutSuccess({ result, onClose }: { result: CheckoutResult; onClose:
           <>
             <li style={{ color: "var(--success)" }}>✓ Paid with credits</li>
             <li style={{ color: "var(--muted)", fontSize: "0.85rem" }}>
-              Remaining balance: R$ {((result.credit_balance_cents ?? 0) / 100).toFixed(2)}
+              Remaining balance: {formatBalance(result.credit_balance_cents ?? 0, currency)}
             </li>
           </>
         ) : (

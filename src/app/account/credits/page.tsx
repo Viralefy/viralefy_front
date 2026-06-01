@@ -7,8 +7,13 @@ import type { CreditAccount, CreditTransaction } from "@/lib/api";
 import { fetchCredits, fetchTransactions, requestRecharge } from "@/lib/api";
 import { getToken } from "@/lib/auth";
 import { useApp } from "@/components/Providers";
+import { formatBalance, formatPresetUsd } from "@/lib/format";
 
-const PRESETS = [50, 100, 200, 500, 1000, 2000]; // em reais
+// Presets canônicos em USD. Tudo no sistema (créditos, invoices, ledger)
+// é canonicamente USD-cents — o botão "+ $25" gera invoice de 2500 cents
+// USD. O gateway cobra na moeda de display escolhida (BRL, EUR, USDT…)
+// usando a taxa da tabela `currencies` no backend.
+const PRESETS_USD = [10, 25, 50, 100, 250, 500];
 
 const TX_LABEL: Record<string, string> = {
   recharge: "Top-up",
@@ -16,11 +21,6 @@ const TX_LABEL: Record<string, string> = {
   refund: "Refund",
   adjustment: "Adjustment",
 };
-
-// Créditos são canonicamente USD-cents.
-function formatUSD(cents: number): string {
-  return `$ ${(cents / 100).toFixed(2)}`;
-}
 
 export default function CreditsPage() {
   const router = useRouter();
@@ -52,14 +52,16 @@ export default function CreditsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  async function onRecharge(amountReais: number) {
+  // amountUsd é sempre em dólares (USD). Backend espera amount_cents na moeda
+  // canônica (USD-cents) e usa o display_currency só pra escolher como cobrar.
+  async function onRecharge(amountUsd: number) {
     const token = getToken();
     if (!token) return;
     setError(null);
     setSubmitting(true);
     try {
       const inv = await requestRecharge(token, {
-        amount_cents: Math.round(amountReais * 100),
+        amount_cents: Math.round(amountUsd * 100),
         display_currency: currency?.code ?? "USD",
       });
       setRechargeUrl(inv.payment_url ?? null);
@@ -71,6 +73,11 @@ export default function CreditsPage() {
       setSubmitting(false);
     }
   }
+
+  // Mostra a moeda corrente do display do usuário (não a base USD) para
+  // contextualizar o ledger — o saldo continua canonicamente USD-cents,
+  // mas formatamos com a taxa do `currency` selecionado.
+  const showsConvertedSuffix = currency && currency.code !== "USD" && currency.code !== "USDT";
 
   return (
     <main className="container" style={{ paddingTop: "2rem", paddingBottom: "4rem", maxWidth: 760 }}>
@@ -90,14 +97,19 @@ export default function CreditsPage() {
           Available balance
         </p>
         <p className="plan-price" style={{ fontSize: "2.5rem", margin: 0 }}>
-          {acct ? formatUSD(acct.balance_cents) : "—"}
+          {acct ? formatBalance(acct.balance_cents, currency) : "—"}
         </p>
+        {acct && showsConvertedSuffix && (
+          <p style={{ color: "var(--muted)", fontSize: "0.8rem", margin: "0.25rem 0 0" }}>
+            ≈ $ {(acct.balance_cents / 100).toFixed(2)} USD
+          </p>
+        )}
       </div>
 
       <div className="card" style={{ marginBottom: "1.5rem" }}>
         <h2 style={{ fontSize: "1.05rem", marginBottom: "0.75rem" }}>Top up</h2>
         <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginBottom: "0.75rem" }}>
-          {PRESETS.map((v) => (
+          {PRESETS_USD.map((v) => (
             <button
               key={v}
               type="button"
@@ -105,12 +117,16 @@ export default function CreditsPage() {
               style={{ padding: "0.5rem 0.9rem" }}
               onClick={() => onRecharge(v)}
               disabled={submitting}
+              title={`Top up $ ${v} USD`}
             >
-              + R$ {v}
+              + {formatPresetUsd(v, currency)}
             </button>
           ))}
         </div>
         <CustomAmount onSubmit={onRecharge} disabled={submitting} />
+        <p style={{ color: "var(--muted)", fontSize: "0.78rem", margin: "0.5rem 0 0" }}>
+          Amounts are canonical in USD. You&apos;ll be charged in {currency?.code ?? "USDT"} using the latest exchange rate.
+        </p>
 
         {rechargeExtra && (rechargeExtra["br_code"] || rechargeExtra["address"] || rechargeUrl || rechargeExtra["pix_key"]) && (
           <div style={{ marginTop: "1rem", padding: "1rem", borderTop: "1px solid var(--border)" }}>
@@ -176,10 +192,10 @@ export default function CreditsPage() {
                     </div>
                   </td>
                   <td style={{ padding: "0.6rem 1rem", textAlign: "right", fontSize: "0.9rem", fontWeight: 600, color: t.amount_cents > 0 ? "var(--success)" : "var(--danger)", fontVariantNumeric: "tabular-nums" }}>
-                    {t.amount_cents > 0 ? "+ " : "− "}{formatUSD(Math.abs(t.amount_cents))}
+                    {t.amount_cents > 0 ? "+ " : "− "}{formatBalance(Math.abs(t.amount_cents), currency)}
                   </td>
                   <td style={{ padding: "0.6rem 1rem", textAlign: "right", fontSize: "0.85rem", color: "var(--muted)", fontVariantNumeric: "tabular-nums" }}>
-                    {formatUSD(t.balance_after_cents)}
+                    {formatBalance(t.balance_after_cents, currency)}
                   </td>
                 </tr>
               ))}
@@ -202,7 +218,7 @@ function CustomAmount({ onSubmit, disabled }: { onSubmit: (v: number) => void; d
         min={5}
         step="0.01"
         className="input"
-        placeholder="Other amount in R$ (min. 5)"
+        placeholder="Other amount in USD (min. 5)"
         value={val}
         onChange={(e) => setVal(e.target.value)}
         style={{ flex: 1 }}

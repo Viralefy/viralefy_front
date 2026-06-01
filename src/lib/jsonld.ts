@@ -13,8 +13,10 @@ import type { Plan } from "./api";
 // com Rich Results Test do Google + JSON-LD Validator do Schema.org.
 
 // Preferência de moeda no JSON-LD. USD é a moeda mais portável globalmente
-// pro Google e Bing — caímos pra outras se USD não estiver no plan.prices.
-const PREFERRED_OFFER_CURRENCIES = ["USD", "EUR", "BRL", "USDT", "BTC"] as const;
+// pro Google e Bing; USDT logo em seguida porque é a canônica do storefront
+// (1:1 com USD). EUR é o terceiro maior bloco; BRL fica por último pra
+// nunca virar default mundial em rich results. BTC só pra completar.
+const PREFERRED_OFFER_CURRENCIES = ["USD", "USDT", "EUR", "BRL", "BTC"] as const;
 
 function pickOfferCurrency(prices: Record<string, string> | undefined): { code: string; amount: string } | null {
   if (!prices) return null;
