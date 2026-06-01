@@ -46,6 +46,10 @@ export type CheckoutPayload = {
   // Snapshot do form custom da categoria (BMs, perfis, emails). Backend
   // grava em orders.custom_data e replayed no ticket pós-pagamento.
   custom_data?: Record<string, string>;
+  // First-touch tracking (utm/fbclid/gclid/referrer/landing_url +
+  // browser context). Backend enriquece com IP+UA antes de salvar em
+  // orders.tracking (e users.tracking_data se conta for criada na hora).
+  tracking?: Record<string, unknown>;
 };
 
 export type CheckoutResult = {
@@ -144,11 +148,19 @@ export const checkout = (payload: CheckoutPayload, token?: string) =>
     token,
   );
 
-export const userRegister = (body: { email: string; name: string; password: string }) =>
-  request<Session>("/v1/auth/user/register", { method: "POST", body: JSON.stringify(body) });
+export const userRegister = (body: {
+  email: string;
+  name: string;
+  password: string;
+  turnstile_token?: string;
+  tracking?: Record<string, unknown>;
+}) => request<Session>("/v1/auth/user/register", { method: "POST", body: JSON.stringify(body) });
 
-export const userLogin = (email: string, password: string) =>
-  request<Session>("/v1/auth/user/login", { method: "POST", body: JSON.stringify({ email, password }) });
+export const userLogin = (email: string, password: string, turnstileToken?: string) =>
+  request<Session>("/v1/auth/user/login", {
+    method: "POST",
+    body: JSON.stringify({ email, password, turnstile_token: turnstileToken ?? "" }),
+  });
 
 export const fetchMyOrders = (token: string) =>
   request<Order[]>("/v1/me/orders", undefined, token);

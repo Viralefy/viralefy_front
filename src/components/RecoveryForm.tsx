@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useApp } from "./Providers";
 import { Turnstile } from "./Turnstile";
+import { getTracking } from "@/lib/tracking";
 import type { LangCode } from "@/i18n/languages";
 
 // Formulário do Account Recovery por país. Coleta:
@@ -149,6 +150,7 @@ export function RecoveryForm({ lang }: { lang: LangCode }) {
           contact_name: form.contactName,
           display_currency: currency?.code ?? "USD",
           turnstile_token: turnstileToken,
+          tracking: getTracking(),
         }),
       });
       if (!res.ok) {

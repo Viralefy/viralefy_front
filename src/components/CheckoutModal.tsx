@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { CheckoutResult, Plan, Platform, Profile, CreditAccount } from "@/lib/api";
 import { checkout, fetchCredits, fetchMyProfiles } from "@/lib/api";
+import { getTracking } from "@/lib/tracking";
 import { priceFor } from "@/lib/format";
 import { getToken } from "@/lib/auth";
 import { useApp } from "./Providers";
@@ -79,6 +80,12 @@ export function CheckoutModal({
       // — só inclui se houver dado, senão o objeto vazio polui o ticket.
       if (Object.keys(customData).length > 0) {
         payload.custom_data = customData;
+      }
+      // First-touch tracking (UTM/fbclid/gclid/referrer/landing_url +
+      // browser context). Sempre vai — backend enriquece com IP+UA.
+      const tracking = getTracking();
+      if (Object.keys(tracking).length > 0) {
+        payload.tracking = tracking;
       }
       if (isProfile) {
         if (user && profiles && !useNewProfile && selectedProfileId) {

@@ -5,12 +5,17 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { userLogin } from "@/lib/api";
 import { useApp } from "@/components/Providers";
+import { Turnstile } from "@/components/Turnstile";
 
 export default function LoginPage() {
   const router = useRouter();
   const { login } = useApp();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  // Turnstile token: vazio = ainda não validado (ou env desabilitada).
+  // Mandamos como string ("" quando bypassed) — o backend trata bypass
+  // pelo lado de TURNSTILE_SECRET_KEY.
+  const [turnstileToken, setTurnstileToken] = useState("");
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -18,7 +23,11 @@ export default function LoginPage() {
     setError(null);
     const fd = new FormData(e.currentTarget);
     try {
-      const session = await userLogin(String(fd.get("email")), String(fd.get("password")));
+      const session = await userLogin(
+        String(fd.get("email")),
+        String(fd.get("password")),
+        turnstileToken,
+      );
       login(session);
       router.push("/account");
     } catch (err) {
@@ -42,6 +51,7 @@ export default function LoginPage() {
             <label className="label" htmlFor="password">Password</label>
             <input className="input" id="password" name="password" type="password" required />
           </div>
+          <Turnstile onToken={setTurnstileToken} />
           <button type="submit" className="btn btn-primary" disabled={loading}>
             {loading ? "Signing in…" : "Sign in"}
           </button>

@@ -5,12 +5,15 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { userRegister } from "@/lib/api";
 import { useApp } from "@/components/Providers";
+import { Turnstile } from "@/components/Turnstile";
+import { getTracking } from "@/lib/tracking";
 
 export default function RegisterPage() {
   const router = useRouter();
   const { login } = useApp();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -22,6 +25,8 @@ export default function RegisterPage() {
         name: String(fd.get("name")),
         email: String(fd.get("email")),
         password: String(fd.get("password")),
+        turnstile_token: turnstileToken,
+        tracking: getTracking(),
       });
       login(session);
       router.push("/account");
@@ -50,6 +55,7 @@ export default function RegisterPage() {
             <label className="label" htmlFor="password">Password (min. 8 characters)</label>
             <input className="input" id="password" name="password" type="password" minLength={8} required />
           </div>
+          <Turnstile onToken={setTurnstileToken} />
           <button type="submit" className="btn btn-primary" disabled={loading}>
             {loading ? "Creating…" : "Create account"}
           </button>

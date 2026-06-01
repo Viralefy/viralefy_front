@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import type { Currency, Session, User } from "@/lib/api";
 import { fetchCurrencies } from "@/lib/api";
 import { clearSession, getUser, saveSession } from "@/lib/auth";
+import { initTracking } from "@/lib/tracking";
 
 type AppState = {
   currencies: Currency[];
@@ -38,6 +39,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     setUser(getUser());
+    // First-touch tracking captura na primeira pintura do client.
+    // UTM/fbclid/etc. da URL atual + landing_url + referrer + viewport
+    // ficam em sessionStorage pra serem anexados em checkout/recovery.
+    initTracking();
     const saved = localStorage.getItem(CURRENCY_KEY);
     if (saved) {
       setCode(saved);
