@@ -1,21 +1,23 @@
 import type { NextConfig } from "next";
 
 // Headers de segurança — recomendações OWASP + relaxa o que GTM/Twemoji/SVG
-// CDN precisam:
+// CDN/Turnstile precisam:
 //   - Twemoji SVG: cdn.jsdelivr.net (img-src)
 //   - GTM JS: googletagmanager.com (script-src) + dataLayer (frame-src ns.html)
+//   - Turnstile (Cloudflare): challenges.cloudflare.com em script-src (api.js),
+//     frame-src (iframe do desafio) e connect-src (siteverify postback).
 //   - Próprio: 'self' pra script/style/conexão de API
 const SECURITY_HEADERS = [
   {
     key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://cdn.jsdelivr.net",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://cdn.jsdelivr.net https://challenges.cloudflare.com",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https://cdn.jsdelivr.net https://www.googletagmanager.com https://*.google-analytics.com https://*.google.com",
       "font-src 'self' data:",
-      "connect-src 'self' https://api.viralefy.com https://www.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com",
-      "frame-src https://www.googletagmanager.com",
+      "connect-src 'self' https://api.viralefy.com https://www.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://challenges.cloudflare.com",
+      "frame-src https://www.googletagmanager.com https://challenges.cloudflare.com",
       "frame-ancestors 'none'",
       "base-uri 'self'",
       "form-action 'self'",
