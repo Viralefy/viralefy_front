@@ -18,6 +18,63 @@ import type { Plan } from "./api";
 // nunca virar default mundial em rich results. BTC só pra completar.
 const PREFERRED_OFFER_CURRENCIES = ["USD", "USDT", "EUR", "BRL", "BTC"] as const;
 
+// Merchant Listings (rich result) exige `image`, `hasMerchantReturnPolicy`,
+// `shippingDetails` em offers — sem isso o item fica inválido pra rich
+// snippet no Search Console (warning ou erro dependendo do campo).
+//
+// Como Viralefy é 100% digital (entrega via API/automação, sem produto
+// físico):
+//   - shippingDetails: $0, processamento instantâneo, sem transporte. Schema
+//     ainda exige a estrutura completa pra validar.
+//   - hasMerchantReturnPolicy: 30-day refill/refund — a garantia padrão do
+//     storefront. Mapeia pra FiniteReturnWindow + FreeReturn.
+
+export type OfferEnhancements = {
+  shippingDetails: object;
+  hasMerchantReturnPolicy: object;
+};
+
+/**
+ * Devolve os campos opcionais-mas-críticos que o Google espera em cada Offer
+ * pra qualificar como Merchant Listing rich result. Centraliza pra todas as
+ * superfícies (slug, category, country) emitirem a mesma forma.
+ *
+ * Estrutura conforme docs:
+ *   https://developers.google.com/search/docs/appearance/structured-data/merchant-listing
+ *   https://developers.google.com/search/docs/appearance/structured-data/product
+ */
+export function buildOfferEnhancements(countryCode: string): OfferEnhancements {
+  const region = countryCode.toUpperCase();
+  return {
+    shippingDetails: {
+      "@type": "OfferShippingDetails",
+      shippingRate: {
+        "@type": "MonetaryAmount",
+        value: "0",
+        currency: "USD",
+      },
+      shippingDestination: {
+        "@type": "DefinedRegion",
+        addressCountry: region,
+      },
+      deliveryTime: {
+        "@type": "ShippingDeliveryTime",
+        // Digital — sem handling, entrega instantânea após confirmação de pagamento.
+        handlingTime: { "@type": "QuantitativeValue", minValue: 0, maxValue: 0, unitCode: "DAY" },
+        transitTime: { "@type": "QuantitativeValue", minValue: 0, maxValue: 1, unitCode: "DAY" },
+      },
+    },
+    hasMerchantReturnPolicy: {
+      "@type": "MerchantReturnPolicy",
+      applicableCountry: region,
+      returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+      merchantReturnDays: 30,
+      returnMethod: "https://schema.org/ReturnByMail",
+      returnFees: "https://schema.org/FreeReturn",
+    },
+  };
+}
+
 function pickOfferCurrency(prices: Record<string, string> | undefined): { code: string; amount: string } | null {
   if (!prices) return null;
   for (const code of PREFERRED_OFFER_CURRENCIES) {
@@ -33,6 +90,9 @@ export function buildCountryJsonLd(country: Country, plans: Plan[], siteUrl: str
   const logoUrl = `${siteUrl}/logo.png`;
 
   // Offers — uma por plano, com moeda preferencial e info de região.
+  // Inclui shipping + return policy pra qualificar como Merchant Listing
+  // rich result no Google (sem isso, items ficam inválidos no GSC).
+  const enhancements = buildOfferEnhancements(country.code);
   const offers = plans.map((p) => {
     const priced = pickOfferCurrency(p.prices) ?? { code: "USD", amount: (p.price_cents / 100).toFixed(2) };
     return {
@@ -46,6 +106,7 @@ export function buildCountryJsonLd(country: Country, plans: Plan[], siteUrl: str
       eligibleRegion: { "@type": "Country", name: country.name },
       // priceValidUntil (1 ano a partir de agora) atende validação do Google
       priceValidUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
+      ...enhancements,
     };
   });
 

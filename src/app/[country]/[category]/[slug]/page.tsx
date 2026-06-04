@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Plan } from "@/lib/api";
+import { buildOfferEnhancements } from "@/lib/jsonld";
 import { COUNTRIES, getCountry } from "@/i18n/countries";
 import { langOfCountry, tr } from "@/i18n/languages";
 import {
@@ -185,6 +186,10 @@ export default async function PlanPage({ params }: { params: Promise<Params> }) 
   const url = siteUrl();
   const pageUrl = `${url}/${c.code}/${catSlug}/${qty}-${catSlug}`;
   const narrative = planNarrative(lang, cat, catLabel, qty, c.name);
+  // OG image absoluta — Google Merchant Listings exige `image` em Product;
+  // sem isso o item é INVÁLIDO pra rich snippet (erro no GSC).
+  const ogImageUrl = `${url}/og/${c.code}/${catSlug}/${qty}-${catSlug}`;
+  const offerEnhancements = buildOfferEnhancements(c.code);
 
   const jsonld: object[] = [
     {
@@ -204,6 +209,10 @@ export default async function PlanPage({ params }: { params: Promise<Params> }) 
       description: narrative[0],
       brand: { "@type": "Brand", name: "Viralefy" },
       category: catLabel,
+      // image: REQUIRED por Google Merchant Listings. Usa a OG dinâmica do
+      // próprio plano — gerada server-side por src/app/og/[...slug]/route.tsx
+      // em 1200×630 (formato amplo aceito pelo Google).
+      image: ogImageUrl,
       offers: {
         "@type": "Offer",
         price: plan.prices?.["USD"] ?? (plan.price_cents / 100).toFixed(2),
@@ -211,6 +220,12 @@ export default async function PlanPage({ params }: { params: Promise<Params> }) 
         availability: "https://schema.org/InStock",
         url: pageUrl,
         eligibleRegion: { "@type": "Country", name: c.name },
+        // priceValidUntil (1 ano a partir de agora) atende validação do Google.
+        priceValidUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
+        // shippingDetails + hasMerchantReturnPolicy: warnings no GSC — items
+        // são válidos sem eles mas perdem recursos visuais. Storefront é
+        // 100% digital, então shipping=$0 e return policy=30-day refill.
+        ...offerEnhancements,
       },
     },
   ];

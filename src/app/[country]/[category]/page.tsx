@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Plan } from "@/lib/api";
+import { buildOfferEnhancements } from "@/lib/jsonld";
 import { COUNTRIES, getCountry } from "@/i18n/countries";
 import { langOfCountry, tr } from "@/i18n/languages";
 import {
@@ -104,6 +105,8 @@ export default async function CategoryPage({ params }: { params: Promise<Params>
   // Offers para AggregateOffer (e cada plano vira ProductGroup ofertado).
   // Schema.org exige priceCurrency em ISO 4217; usamos USD (não USDT, que
   // não é fiat). USD é o canônico interno (plan.prices["USD"]).
+  // shippingDetails + hasMerchantReturnPolicy: warnings no GSC sem isso.
+  const offerEnhancements = buildOfferEnhancements(c.code);
   const offers = sortedPlans.map((p) => {
     const usd = p.prices?.["USD"] ?? (p.price_cents / 100).toFixed(2);
     return {
@@ -114,6 +117,7 @@ export default async function CategoryPage({ params }: { params: Promise<Params>
       url: `${pageUrl}/${p.followers_qty}-${catSlug}`,
       availability: "https://schema.org/InStock",
       eligibleRegion: { "@type": "Country", name: c.name },
+      ...offerEnhancements,
     };
   });
   const prices = offers.map((o) => parseFloat(o.price)).filter((n) => !isNaN(n));
