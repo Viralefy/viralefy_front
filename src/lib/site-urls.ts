@@ -29,7 +29,10 @@ function siteUrl(): string {
 async function fetchPlans(): Promise<Plan[]> {
   const base = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
   try {
-    const res = await fetch(`${base}/v1/plans`, { cache: "no-store" });
+    // Revalidate=3600 (1h). Antes era `cache: "no-store"` o que forçava o
+    // sitemap a regerar 18k URLs em CADA request (~950ms TTFB, 3.2s total —
+    // Ahrefs flagou como "slow page" em 2026-06-05). Catálogo muda devagar.
+    const res = await fetch(`${base}/v1/plans`, { next: { revalidate: 3600 } });
     const json = await res.json();
     return (json.data as Plan[]) ?? [];
   } catch {
