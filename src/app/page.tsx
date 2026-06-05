@@ -7,6 +7,7 @@ import { Footer } from "@/components/Footer";
 import { TrustSignals } from "@/components/TrustSignals";
 import { tr } from "@/i18n/languages";
 import { homeAlternates } from "@/lib/hreflang";
+import { buildHomeJsonLd } from "@/lib/jsonld";
 
 // Home global. Inglês "international" — atende quem chega sem cookie de
 // idioma/país detectado. Conteúdo focado em "global followers" + lista de
@@ -60,28 +61,13 @@ export default async function HomePage() {
   const t = tr("en");
   const url = siteUrl();
 
-  // JSON-LD para a home global. Organization + WebSite + ItemList dos planos.
-  const jsonld = [
-    {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      name: "Viralefy",
-      url,
-      logo: `${url}/logo.png`,
-      sameAs: [],
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      name: "Viralefy",
-      url,
-      potentialAction: {
-        "@type": "SearchAction",
-        target: `${url}/{country}`,
-        "query-input": "required name=country",
-      },
-    },
-  ];
+  // JSON-LD para a home global.
+  // Antes: Organization + WebSite (sem rich result de Product/Offer).
+  // Agora: Organization + WebSite + Service com AggregateOffer.offers contendo
+  // TODOS os planos (com image, shippingDetails, hasMerchantReturnPolicy).
+  // Cada Offer linka pra variante en-US canônica (/us/<en-slug>/<qty>-<en-slug>).
+  // Ver lib/jsonld.buildHomeJsonLd.
+  const jsonld = buildHomeJsonLd(plans, url);
 
   return (
     <>

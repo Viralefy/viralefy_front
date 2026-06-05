@@ -50,8 +50,52 @@ const SECTIONS = [
 ];
 
 export default function MarketplaceIndex() {
+  const url = siteUrl();
+  const pageUrl = `${url}/marketplace`;
+
+  // JSON-LD: CollectionPage + BreadcrumbList + ItemList das 3 LPs.
+  // Antes a /marketplace tinha ZERO schema (Ahrefs/Google viam só uma página
+  // texto). Agora cada section vira um ListItem rich result candidato.
+  const jsonld: object[] = [
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "@id": `${pageUrl}#collection`,
+      name: "Viralefy Marketplace",
+      url: pageUrl,
+      description: "Digital assets — Facebook BMs, aged Instagram/TikTok profiles and validated email packs.",
+      inLanguage: "en",
+      isPartOf: { "@id": `${url}/#website` },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: url },
+        { "@type": "ListItem", position: 2, name: "Marketplace", item: pageUrl },
+      ],
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "@id": `${pageUrl}#itemlist`,
+      name: "Marketplace categories",
+      numberOfItems: SECTIONS.length,
+      itemListElement: SECTIONS.map((s, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        name: s.title,
+        url: `${url}/marketplace/${s.slug}`,
+      })),
+    },
+  ];
+
   return (
     <>
+      {jsonld.map((doc, i) => (
+        <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(doc) }} />
+      ))}
+
       <article lang="en">
         <header className="hero container">
           <h1>Marketplace</h1>

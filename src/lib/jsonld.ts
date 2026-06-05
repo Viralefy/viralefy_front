@@ -107,6 +107,124 @@ function pickOfferCurrency(prices: Record<string, string> | undefined): { code: 
   return first ? { code: first[0], amount: first[1] } : null;
 }
 
+// buildHomeJsonLd — emite Organization + WebSite + Service + AggregateOffer
+// pra home global. Antes a home só tinha Organization + WebSite (sem schema
+// de Product/Offer, sem rich result candidato).
+//
+// Offers apontam pra /us/<slug>/<qty>-<slug> (variante en-US canônica). Cada
+// offer carrega image + shippingDetails + hasMerchantReturnPolicy pra Google
+// Merchant Listings.
+export function buildHomeJsonLd(plans: Plan[], siteUrl: string) {
+  const logoUrl = `${siteUrl}/logo.png`;
+  const enhancements = buildOfferEnhancements("US");
+  const validUntil = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
+  // Carrega os planos como Offers. URL aponta pra /us/<en-slug>/<qty>-<en-slug>
+  // (variante en-US canônica do plano, alinhada com a estratégia x-default
+  // do hreflang).
+  // categorySlug e categoryUnit vivem em i18n/categories — importamos aqui.
+  // (import inline pra evitar ciclo se o consumer já importar buildHomeJsonLd).
+  const offers = plans.map((p) => {
+    const usd = p.prices?.["USD"] ?? (p.price_cents / 100).toFixed(2);
+    const enSlug = categorySlugEn(p.category);
+    const planUrl = `${siteUrl}/us/${enSlug}/${p.followers_qty}-${enSlug}`;
+    const imgUrl = `${siteUrl}/og/us/${enSlug}/${p.followers_qty}-${enSlug}`;
+    return {
+      "@type": "Offer",
+      name: p.name,
+      sku: p.id,
+      price: usd,
+      priceCurrency: "USD",
+      url: planUrl,
+      image: imgUrl,
+      availability: "https://schema.org/InStock",
+      priceValidUntil: validUntil,
+      ...enhancements,
+    };
+  });
+
+  const prices = offers.map((o) => parseFloat(o.price)).filter((n) => !isNaN(n));
+  const low = prices.length ? Math.min(...prices).toFixed(2) : "0";
+  const high = prices.length ? Math.max(...prices).toFixed(2) : "0";
+
+  const organization = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": `${siteUrl}/#organization`,
+    name: "Viralefy",
+    url: siteUrl,
+    logo: { "@type": "ImageObject", url: logoUrl, width: 2471, height: 704 },
+    sameAs: ["https://github.com/Viralefy"],
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "customer support",
+      availableLanguage: ["en", "pt", "es", "fr", "de", "it", "nl", "ru", "ja", "ar"],
+      url: `${siteUrl}/legal/contact?lang=en`,
+    },
+  };
+
+  const website = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${siteUrl}/#website`,
+    name: "Viralefy",
+    url: siteUrl,
+    publisher: { "@id": `${siteUrl}/#organization` },
+    inLanguage: "en",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: { "@type": "EntryPoint", urlTemplate: `${siteUrl}/{country_code}` },
+      "query-input": "required name=country_code",
+    },
+  };
+
+  const service = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": `${siteUrl}/#service`,
+    name: "Instagram and TikTok growth services",
+    description: "Real Instagram and TikTok followers, likes, comments, shares and views. Account recovery, business assets and validated email packs.",
+    serviceType: "Social media growth",
+    provider: { "@id": `${siteUrl}/#organization` },
+    areaServed: { "@type": "Place", name: "Worldwide" },
+    offers: offers.length > 0
+      ? {
+          "@type": "AggregateOffer",
+          priceCurrency: "USD",
+          lowPrice: low,
+          highPrice: high,
+          offerCount: offers.length,
+          offers,
+        }
+      : undefined,
+  };
+
+  return [organization, website, service];
+}
+
+// categorySlugEn — versão "en" do slug, sem precisar importar i18n/categories
+// e arrastar mais dependências pro lib/. Mapeamento espelha categorySlug(en).
+function categorySlugEn(cat: string): string {
+  const map: Record<string, string> = {
+    seguidores_instagram: "instagram-followers",
+    seguidores_tiktok: "tiktok-followers",
+    curtidas_instagram: "instagram-likes",
+    curtidas_tiktok: "tiktok-likes",
+    comentarios_instagram: "instagram-comments",
+    comentarios_tiktok: "tiktok-comments",
+    compartilhamentos_instagram: "instagram-shares",
+    compartilhamentos_tiktok: "tiktok-shares",
+    visualizacoes_instagram: "instagram-views",
+    visualizacoes_tiktok: "tiktok-views",
+    servicos: "services",
+    recuperacao_perfil: "account-recovery",
+    bms_facebook: "facebook-bms",
+    perfis_redes: "aged-profiles",
+    emails_validados: "validated-emails",
+  };
+  return map[cat] ?? cat;
+}
+
 export function buildCountryJsonLd(country: Country, plans: Plan[], siteUrl: string) {
   const pageUrl = `${siteUrl}/${country.code}`;
   const logoUrl = `${siteUrl}/logo.png`;

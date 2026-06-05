@@ -11,6 +11,7 @@ import {
   categoryUnit,
   type CategoryCode,
 } from "@/i18n/categories";
+import { buildOfferEnhancements } from "@/lib/jsonld";
 
 // Marketplace global (sem país). Assets digitais (BMs FB, perfis
 // envelhecidos, e-mail packs) não são geo-específicos — fazem sentido
@@ -161,22 +162,44 @@ export default async function MarketplacePage({ params }: { params: Promise<Para
         { "@type": "ListItem", position: 3, name: label, item: pageUrl },
       ],
     },
-    {
-      "@context": "https://schema.org",
-      "@type": "Service",
-      name: item.h1,
-      description: item.metaDescription,
-      provider: { "@type": "Organization", name: "Viralefy", url },
-      offers: plans.length
-        ? {
-            "@type": "AggregateOffer",
-            priceCurrency: "USD",
-            lowPrice: plans.length ? plans[0].prices?.["USD"] ?? "0" : "0",
-            highPrice: plans.length ? plans[plans.length - 1].prices?.["USD"] ?? "0" : "0",
-            offerCount: plans.length,
-          }
-        : undefined,
-    },
+    (() => {
+      // AggregateOffer + offers[] com cada plano como Offer rich-result
+      // candidato. Antes só tinha o agregado (lowPrice/highPrice/offerCount)
+      // sem os Offer individuais, que perdia o Merchant Listings.
+      const enhancements = buildOfferEnhancements("US");
+      const validUntil = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+      const offerList = plans.map((p) => ({
+        "@type": "Offer",
+        name: p.name,
+        sku: p.id,
+        price: p.prices?.["USD"] ?? (p.price_cents / 100).toFixed(2),
+        priceCurrency: "USD",
+        url: pageUrl,
+        availability: "https://schema.org/InStock",
+        priceValidUntil: validUntil,
+        ...enhancements,
+      }));
+      const prices = offerList.map((o) => parseFloat(o.price)).filter((n) => !isNaN(n));
+      const low = prices.length ? Math.min(...prices).toFixed(2) : "0";
+      const high = prices.length ? Math.max(...prices).toFixed(2) : "0";
+      return {
+        "@context": "https://schema.org",
+        "@type": "Service",
+        name: item.h1,
+        description: item.metaDescription,
+        provider: { "@type": "Organization", name: "Viralefy", url },
+        offers: offerList.length > 0
+          ? {
+              "@type": "AggregateOffer",
+              priceCurrency: "USD",
+              lowPrice: low,
+              highPrice: high,
+              offerCount: offerList.length,
+              offers: offerList,
+            }
+          : undefined,
+      };
+    })(),
     {
       "@context": "https://schema.org",
       "@type": "FAQPage",
