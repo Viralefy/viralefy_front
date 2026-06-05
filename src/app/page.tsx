@@ -24,8 +24,9 @@ export const metadata: Metadata = {
   // absolute = bypass do template "%s | Viralefy" do root layout, já que
   // esse título já termina em "| Viralefy" pra cuidar do SEO da home.
   title: { absolute: "Buy Instagram & TikTok followers worldwide | Viralefy" },
+  // 158 chars — Ahrefs flagga > 160 como "meta description too long".
   description:
-    "Real followers, engagement and views for Instagram and TikTok. Fast delivery, 30-day refill guarantee, support in your language. Pay in USDT, USD, EUR or crypto.",
+    "Real Instagram and TikTok followers, engagement and views. Fast delivery, 30-day refill guarantee, support in your language. Pay in USDT, USD or crypto.",
   // Home tem seu próprio grupo hreflang (só ela). Ver lib/hreflang.ts —
   // antes a home declarava hreflang pros 130 country roots, mas eles têm
   // conteúdo diferente (localização) e Ahrefs flagava como hreflang

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { LEGAL_SLUGS, legalDoc, type LegalSlug } from "@/i18n/legal";
+import { LEGAL_SLUGS, legalDoc, legalMetaDescription, type LegalSlug } from "@/i18n/legal";
 import { PACKS, tr, type LangCode } from "@/i18n/languages";
 import { renderLegalBody } from "@/lib/legal-render";
 import { Footer } from "@/components/Footer";
@@ -32,10 +32,15 @@ export async function generateMetadata({
   const { doc } = await params;
   const { lang: rawLang } = await searchParams;
   if (!isSlug(doc)) return { title: "Not found" };
-  const lang = (rawLang ?? "en") as LangCode;
-  const d = legalDoc(lang in PACKS ? lang : "en", doc);
+  const rawLangCode = (rawLang ?? "en") as LangCode;
+  // Coage pra um lang válido (presente em PACKS) — fora disso cai em "en".
+  const lang: LangCode = rawLangCode in PACKS ? rawLangCode : "en";
+  const d = legalDoc(lang, doc);
 
-  // hreflang: a mesma rota com cada idioma.
+  // hreflang: a mesma rota com cada idioma. x-default aponta pro EN
+  // (fallback global). Cada variante self-canonicaliza pra seu próprio
+  // ?lang=... (antes TODAS canonicalizavam pra ?lang=en, marcando as
+  // outras como duplicatas e gerando short-description em massa).
   const languages: Record<string, string> = { "x-default": `/legal/${doc}?lang=en` };
   for (const code of Object.keys(PACKS) as LangCode[]) {
     languages[code] = `/legal/${doc}?lang=${code}`;
@@ -44,8 +49,14 @@ export async function generateMetadata({
   return {
     // absolute pra não duplicar o "| Viralefy" via template do root layout.
     title: { absolute: `${d.title} | Viralefy` },
-    description: `${d.title} — Viralefy`,
-    alternates: { canonical: `/legal/${doc}?lang=en`, languages },
+    // Description real extraída do body — antes era só `${d.title} — Viralefy`
+    // (25 chars), o que Ahrefs flagga como "meta description too short" (33
+    // ocorrências no audit 2026-06-05).
+    description: legalMetaDescription(lang, doc),
+    alternates: {
+      canonical: `/legal/${doc}?lang=${lang}`,
+      languages,
+    },
   };
 }
 

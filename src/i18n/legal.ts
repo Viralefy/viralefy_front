@@ -1093,3 +1093,38 @@ export function legalDoc(lang: LangCode, slug: LegalSlug): LegalDoc {
   const pack = LEGAL[lang] ?? EN;
   return pack[slug];
 }
+
+// metaDescription extrai uma descrição SEO real do body do doc legal.
+// Junta o primeiro parágrafo de texto (depois do primeiro heading "##")
+// e trunca em ~155 caracteres pra ficar na faixa ótima do Google
+// (entre 70 e 160 chars — fora disso Ahrefs flagga como too short/long).
+export function legalMetaDescription(lang: LangCode, slug: LegalSlug): string {
+  const d = legalDoc(lang, slug);
+  // Body = "## Heading\nParagraph...\n\n## Heading\nParagraph..."
+  // Pega o primeiro parágrafo não-heading.
+  const lines = d.body.split("\n");
+  let paragraph = "";
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    if (trimmed.startsWith("##")) continue;
+    paragraph = trimmed;
+    break;
+  }
+  if (!paragraph) {
+    // Fallback caso o body esteja vazio ou só com headings.
+    return `${d.title} — last updated ${d.updatedAt}. Viralefy operates global social media growth services for Instagram and TikTok with a 30-day refill guarantee.`;
+  }
+  if (paragraph.length <= 155) {
+    // Pad com sufixo do storefront pra ficar acima dos 70 chars (Ahrefs short).
+    const suffix = ` — Viralefy ${d.title.toLowerCase()}.`;
+    if (paragraph.length + suffix.length <= 158) {
+      return paragraph + suffix;
+    }
+    return paragraph;
+  }
+  // Trunca em palavra (corta no último espaço antes do limite).
+  const cut = paragraph.slice(0, 155);
+  const lastSpace = cut.lastIndexOf(" ");
+  return (lastSpace > 100 ? cut.slice(0, lastSpace) : cut) + "…";
+}

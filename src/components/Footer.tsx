@@ -33,7 +33,7 @@ export function Footer({ lang = "en", compact = false }: { lang?: LangCode; comp
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: compact ? "1fr 1fr" : "1.4fr 1fr 1fr",
+            gridTemplateColumns: compact ? "1fr 1fr 1fr" : "1.4fr 1fr 1fr 1fr",
             gap: "2rem",
             marginBottom: "2rem",
           }}
@@ -42,6 +42,22 @@ export function Footer({ lang = "en", compact = false }: { lang?: LangCode; comp
             <p style={{ fontWeight: 700, fontSize: "1.05rem", marginBottom: "0.4rem" }}>Viralefy</p>
             <p style={{ color: "var(--muted)", fontSize: "0.9rem" }}>{t.footer.tagline}</p>
           </div>
+
+          {/* Marketplace — antes era orphan (zero incoming links) e os
+              sub-paths (/marketplace/facebook-bms, /aged-profiles, /validated-emails)
+              ganham 1 incoming link cada, resolvendo o flag "Page has only
+              one dofollow incoming internal link" do Ahrefs. */}
+          <nav aria-label="Marketplace">
+            <h3 style={{ fontSize: "0.85rem", color: "var(--muted)", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: "0.5rem" }}>
+              Marketplace
+            </h3>
+            <ul style={{ listStyle: "none", padding: 0, display: "grid", gap: "0.35rem", fontSize: "0.9rem" }}>
+              <li><Link href="/marketplace" style={{ color: "var(--text)" }}>Overview</Link></li>
+              <li><Link href="/marketplace/facebook-bms" style={{ color: "var(--text)" }}>Facebook BMs</Link></li>
+              <li><Link href="/marketplace/aged-profiles" style={{ color: "var(--text)" }}>Aged profiles</Link></li>
+              <li><Link href="/marketplace/validated-emails" style={{ color: "var(--text)" }}>Validated emails</Link></li>
+            </ul>
+          </nav>
 
           <nav aria-label={t.footer.sections.legal}>
             <h3 style={{ fontSize: "0.85rem", color: "var(--muted)", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: "0.5rem" }}>
