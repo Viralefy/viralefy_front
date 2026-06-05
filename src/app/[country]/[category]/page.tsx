@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Plan } from "@/lib/api";
 import { buildOfferEnhancements } from "@/lib/jsonld";
+import { categoryAlternates } from "@/lib/hreflang";
 import { COUNTRIES, getCountry } from "@/i18n/countries";
 import { langOfCountry, tr } from "@/i18n/languages";
 import {
@@ -45,20 +46,18 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const lang = langOfCountry(c.code);
   const copy = copyFor(cat, lang);
 
-  // hreflang: este mesmo país-categoria em todos os outros países (com seu slug local).
-  const languages: Record<string, string> = { "x-default": "/" };
-  for (const other of COUNTRIES) {
-    const otherLang = langOfCountry(other.code);
-    languages[other.htmlLang] = `/${other.code}/${categorySlug(cat, otherLang)}`;
-  }
-
-  const canonical = `/${c.code}/${categorySlug(cat, lang)}`;
+  // hreflang via helper centralizado. x-default aponta pra variante en-US
+  // DA MESMA categoria (ex.: /us/instagram-followers), NÃO pra `/`. Antes
+  // apontava pra home → 197 "missing reciprocal" no Ahrefs (Site Audit
+  // 2026-06-05).
+  const altsCat = categoryAlternates(c.code, cat);
+  const canonical = altsCat.canonical;
   const ogUrl = `/og/${c.code}/${categorySlug(cat, lang)}`;
   return {
     // metaTitle já vem com "| Viralefy" — absolute pra não duplicar.
     title: { absolute: copy.metaTitle(c.name) },
     description: copy.metaDescription(c.name),
-    alternates: { canonical, languages },
+    alternates: altsCat,
     openGraph: {
       title: copy.metaTitle(c.name),
       description: copy.metaDescription(c.name),

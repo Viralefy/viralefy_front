@@ -10,6 +10,7 @@ import { TrustSignals } from "@/components/TrustSignals";
 import { LiveCounter } from "@/components/LiveCounter";
 import { langOfCountry, tr } from "@/i18n/languages";
 import { CATEGORY_CODES, categoryLabel, categorySlug } from "@/i18n/categories";
+import { countryRootAlternates } from "@/lib/hreflang";
 
 export const dynamic = "force-dynamic";
 
@@ -24,20 +25,17 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const c = getCountry(country);
   if (!c) return { title: "Not found" };
 
-  const languages: Record<string, string> = { "x-default": "/", en: "/" };
-  for (const other of COUNTRIES) {
-    languages[other.htmlLang] = `/${other.code}`;
-  }
+  // Country roots formam um grupo hreflang isolado da home. x-default
+  // aponta pra /us (en-US canônico do grupo), não pra `/` (home global —
+  // grupo separado). Ver lib/hreflang.ts.
+  const altsCountry = countryRootAlternates(c.code);
 
   return {
     // c.title já vem com sufixo "| Viralefy" — usamos absolute para o
     // template do root layout não duplicar.
     title: { absolute: c.title },
     description: c.description,
-    alternates: {
-      canonical: `/${c.code}`,
-      languages,
-    },
+    alternates: altsCountry,
     openGraph: {
       title: c.title,
       description: c.description,

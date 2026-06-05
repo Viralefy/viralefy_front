@@ -6,6 +6,7 @@ import { CategoryGroupedGrid } from "@/components/CategoryGroupedGrid";
 import { Footer } from "@/components/Footer";
 import { TrustSignals } from "@/components/TrustSignals";
 import { tr } from "@/i18n/languages";
+import { homeAlternates } from "@/lib/hreflang";
 
 // Home global. Inglês "international" — atende quem chega sem cookie de
 // idioma/país detectado. Conteúdo focado em "global followers" + lista de
@@ -25,11 +26,11 @@ export const metadata: Metadata = {
   title: { absolute: "Buy Instagram & TikTok followers worldwide | Viralefy" },
   description:
     "Real followers, engagement and views for Instagram and TikTok. Fast delivery, 30-day refill guarantee, support in your language. Pay in USDT, USD, EUR or crypto.",
-  alternates: (() => {
-    const languages: Record<string, string> = { "x-default": "/", en: "/" };
-    for (const c of COUNTRIES) languages[c.htmlLang] = `/${c.code}`;
-    return { canonical: "/", languages };
-  })(),
+  // Home tem seu próprio grupo hreflang (só ela). Ver lib/hreflang.ts —
+  // antes a home declarava hreflang pros 130 country roots, mas eles têm
+  // conteúdo diferente (localização) e Ahrefs flagava como hreflang
+  // inválido + reciprocidade quebrada (Site Audit 2026-06-05).
+  alternates: homeAlternates(),
   openGraph: {
     title: "Buy Instagram & TikTok followers worldwide | Viralefy",
     description:

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { AggregateRating, Plan, PublicReview } from "@/lib/api";
 import { buildAggregateRating, buildOfferEnhancements } from "@/lib/jsonld";
+import { slugAlternates } from "@/lib/hreflang";
 import { COUNTRIES, getCountry } from "@/i18n/countries";
 import { langOfCountry, tr } from "@/i18n/languages";
 import {
@@ -95,19 +96,17 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const title = titleByLang[lang] ?? titleByLang.en;
   const description = descByLang[lang] ?? descByLang.en;
 
-  const languages: Record<string, string> = { "x-default": "/" };
-  for (const other of COUNTRIES) {
-    const oLang = langOfCountry(other.code);
-    languages[other.htmlLang] = `/${other.code}/${categorySlug(cat, oLang)}/${qty}-${categorySlug(cat, oLang)}`;
-  }
-  const canonical = `/${c.code}/${catSlug}/${qty}-${catSlug}`;
+  // hreflang via helper centralizado. x-default = variante en-US do
+  // mesmo slug (não a home). Ver lib/hreflang.ts + Site Audit 2026-06-05.
+  const altsSlug = slugAlternates(c.code, cat, qty);
+  const canonical = altsSlug.canonical;
 
   const ogUrl = `/og/${c.code}/${catSlug}/${qty}-${catSlug}`;
   return {
     // titleByLang já termina em "| Viralefy" — absolute pra não duplicar.
     title: { absolute: title },
     description,
-    alternates: { canonical, languages },
+    alternates: altsSlug,
     openGraph: {
       title,
       description,
