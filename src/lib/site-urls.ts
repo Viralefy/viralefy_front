@@ -90,12 +90,16 @@ export function urlsForLang(all: SiteUrl[], lang: LangCode | "legal"): SiteUrl[]
 // Lista de buckets — usada pelo índice e pelos route handlers.
 // Cada bucket gera um per-lang sitemap. "legal" é o cross-language para
 // as variantes ?lang= das páginas jurídicas.
+//
+// `fa` (persa) foi removido em 2026-06-05: não há Irã/Tajiquistão no catálogo
+// de países e o Google Search Console reportava o sitemap vazio como erro.
+// Reintroduzir apenas quando `ir` for adicionado em `countries.ts`.
 export const SITEMAP_BUCKETS: Array<LangCode | "legal"> = [
   "en", "pt", "es", "es_AR", "fr", "de", "it", "nl",
   "ja", "ko", "ar", "hi", "id", "vi", "th", "tr",
   "ru", "uk",
   "pl", "sv", "da", "no", "fi", "is", "et", "lv", "lt",
   "cs", "sk", "hu", "ro", "bg", "el", "hr", "sl", "ca",
-  "tl", "ms", "sr", "sq", "bs", "fa", "he", "bn", "ur", "sw", "am",
+  "tl", "ms", "sr", "sq", "bs", "he", "bn", "ur", "sw", "am",
   "legal",
 ];

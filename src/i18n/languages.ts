@@ -14,6 +14,13 @@ export type LangCode =
   | "ru";
 
 // Mapa país → idioma. Para países sem entrada cai no inglês.
+//
+// NOTA sobre colisões ISO 3166 vs ISO 639:
+//   - `sr` é Suriname (3166) E sérvio (639). Suriname continua mapeado pra
+//     `nl`; Sérvia usa código de país `rs`, mapeado pra `sr`.
+//   - `et` é Etiópia (3166) E estoniano (639). Etiópia mapeada pra `am`
+//     (amárico); Estônia usa código de país `ee`, mapeado pra `et`.
+//   - `id` é Indonésia (3166) E indonésio (639). Mesmo código pra ambos é OK.
 const COUNTRY_LANG: Record<string, LangCode> = {
   // pt
   br: "pt", pt: "pt",
@@ -22,6 +29,10 @@ const COUNTRY_LANG: Record<string, LangCode> = {
   // en (americas + sepa + caribbean + global default)
   us: "en", ca: "en", gb: "en", ie: "en", mt: "en", gi: "en",
   jm: "en", tt: "en", bs: "en", bb: "en", bz: "en", gy: "en",
+  // anglofonos extras (Oceania, África subsahariana de tradição britânica, etc.)
+  au: "en", nz: "en", fj: "en", pg: "en",
+  za: "en", ng: "en", gh: "en", ug: "en",
+  sg: "en", hk: "en", mo: "en", lk: "en", np: "en",
   // es (regional spanish — Argentina destaca-se com voseo)
   mx: "es", gt: "es", hn: "es", sv: "es", ni: "es", cr: "es", pa: "es",
   cu: "es", do: "es", pr: "es", es: "es",
@@ -29,17 +40,49 @@ const COUNTRY_LANG: Record<string, LangCode> = {
   py: "es", uy: "es", ar: "es_AR",
   // fr
   ht: "fr", fr: "fr", lu: "fr", mc: "fr",
+  ci: "fr", cm: "fr", sn: "fr",
   // de
   de: "de", at: "de", ch: "de", li: "de",
   // it
   it: "it", sm: "it", va: "it",
   // nl
   nl: "nl", be: "nl", sr: "nl",
-  // outros
+  // outros SEPA / Europa
   pl: "pl", se: "sv", dk: "da", no: "no", fi: "fi", is: "is",
   ee: "et", lv: "lv", lt: "lt",
-  cz: "cs", sk: "sk", hu: "hu", ro: "ro", bg: "bg",
+  cz: "cs", sk: "sk", hu: "hu", ro: "ro", md: "ro", bg: "bg",
   gr: "el", cy: "el", hr: "hr", si: "sl", ad: "ca",
+  // Europa não-SEPA / Balcãs / EX-URSS
+  ua: "uk",
+  rs: "sr", me: "sr",
+  ba: "bs",
+  al: "sq", xk: "sq", mk: "sq",
+  tr: "tr",
+  // Ásia Oriental
+  jp: "ja", kr: "ko",
+  tw: "en", // Mandarim ainda não tem Pack; cai em en
+  // Sudeste Asiático
+  id: "id",
+  vn: "vi",
+  th: "th",
+  my: "ms", bn: "ms",
+  ph: "tl",
+  // Sul-Asiático
+  in: "hi",
+  pk: "ur",
+  bd: "bn",
+  // Oriente Médio
+  il: "he",
+  // Arábico
+  sa: "ar", ae: "ar", qa: "ar", kw: "ar", bh: "ar", om: "ar",
+  jo: "ar", lb: "ar", iq: "ar",
+  eg: "ar", ma: "ar", dz: "ar", tn: "ar",
+  // África subsahariana — Suaíli (Kenya/Tanzânia)
+  ke: "sw", tz: "sw",
+  // África subsahariana — Amárico (Etiópia)
+  et: "am",
+  // África restante sem Pack dedicado → inglês
+  ao: "pt", mz: "pt",
 };
 
 export function langOfCountry(code: string): LangCode {

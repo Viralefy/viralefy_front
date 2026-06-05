@@ -60,7 +60,14 @@ export const TICKET_OPENING_CATEGORIES: ReadonlySet<CategoryCode> = new Set<Cate
   "perfis_redes",
 ]);
 
-// Label curto (usado em chips / tabs)
+// Label curto (usado em chips / tabs).
+//
+// NOTA 2026-06-05: idiomas adicionados no COUNTRY_LANG fix (ms/sr/sq/bs/he/
+// bn/ur/sw/am/tl) caem no fallback `en` aqui — extensão p/ esses idiomas é
+// trabalho de tradutor profissional (native-script + checagem cultural).
+// Não bloqueia indexação porque hreflang + per-lang sitemap continuam
+// corretos: o crawler sabe que `/il/instagram-followers` é he-IL ainda que
+// o chip diga "Instagram followers" em inglês.
 export const CATEGORY_LABEL: Record<CategoryCode, Partial<Record<LangCode, string>>> = {
   seguidores_instagram: {
     en: "Instagram followers", pt: "Seguidores Instagram",
