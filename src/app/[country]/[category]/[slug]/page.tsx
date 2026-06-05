@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import type { Plan } from "@/lib/api";
+import type { AggregateRating, Plan, PublicReview } from "@/lib/api";
 import { buildAggregateRating, buildOfferEnhancements } from "@/lib/jsonld";
 import { COUNTRIES, getCountry } from "@/i18n/countries";
 import { langOfCountry, tr } from "@/i18n/languages";
@@ -36,6 +36,22 @@ async function getPlans(): Promise<Plan[]> {
     return (json.data as Plan[]) ?? [];
   } catch {
     return [];
+  }
+}
+
+// Server-side reviews fetch. Cacheado por 5min — review novo só aparece no
+// próximo revalidate. Trade-off: menor carga no DB vs frescor. Aceitável
+// porque reviews crescem devagar.
+async function getReviews(planID: string): Promise<{ reviews: PublicReview[]; aggregate: AggregateRating | null }> {
+  const base = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
+  try {
+    const res = await fetch(`${base}/v1/plans/${planID}/reviews`, {
+      next: { revalidate: 300 },
+    });
+    const json = await res.json();
+    return (json.data as { reviews: PublicReview[]; aggregate: AggregateRating | null }) ?? { reviews: [], aggregate: null };
+  } catch {
+    return { reviews: [], aggregate: null };
   }
 }
 
@@ -181,6 +197,9 @@ export default async function PlanPage({ params }: { params: Promise<Params> }) 
   const plan = catPlans.find((p) => p.followers_qty === qty);
   if (!plan) notFound();
 
+  // Fetch reviews paralelo aos outros lookups (não bloqueia o crítico).
+  const { reviews, aggregate } = await getReviews(plan.id);
+
   const idx = catPlans.findIndex((p) => p.id === plan.id);
   const related = [catPlans[idx - 1], catPlans[idx + 1]].filter(Boolean) as Plan[];
   const url = siteUrl();
@@ -216,7 +235,7 @@ export default async function PlanPage({ params }: { params: Promise<Params> }) 
       // aggregateRating só entra quando há reviews REAIS no plano. O backend
       // (ListPublicPlans) devolve null quando review_count=0; buildAggregateRating
       // também devolve null nesse caso. Spread condicional pra omitir a key.
-      ...(buildAggregateRating(plan.aggregate_rating) ? { aggregateRating: buildAggregateRating(plan.aggregate_rating) } : {}),
+      ...(buildAggregateRating(aggregate ?? plan.aggregate_rating) ? { aggregateRating: buildAggregateRating(aggregate ?? plan.aggregate_rating) } : {}),
       offers: {
         "@type": "Offer",
         price: plan.prices?.["USD"] ?? (plan.price_cents / 100).toFixed(2),
@@ -256,6 +275,9 @@ export default async function PlanPage({ params }: { params: Promise<Params> }) 
         <header className="hero container" style={{ paddingBottom: "1.5rem" }}>
           <h1>{plan.name} — {c.name}</h1>
           <p>{narrative[0]}</p>
+          {aggregate && aggregate.review_count > 0 && (
+            <ReviewStars aggregate={aggregate} />
+          )}
         </header>
 
         <main className="container" style={{ paddingBottom: "4rem" }}>
@@ -279,6 +301,10 @@ export default async function PlanPage({ params }: { params: Promise<Params> }) 
           </div>
 
           <BuyPlanCta plan={plan} lang={lang} />
+
+          {reviews.length > 0 && (
+            <ReviewsSection reviews={reviews} aggregate={aggregate} />
+          )}
 
           {related.length > 0 && (
             <section style={{ marginTop: "3rem" }}>
@@ -310,5 +336,89 @@ export default async function PlanPage({ params }: { params: Promise<Params> }) 
       <Footer lang={lang} />
       <LiveCounter lang={lang} />
     </>
+  );
+}
+
+// ReviewStars renderiza o badge agregado abaixo do H1: ★★★★★ 4.7 (12 reviews)
+// Server-component puro, sem JS no cliente.
+function ReviewStars({ aggregate }: { aggregate: AggregateRating }) {
+  const filled = Math.round(aggregate.rating_value);
+  const stars = "★".repeat(filled) + "☆".repeat(5 - filled);
+  return (
+    <p
+      style={{
+        display: "inline-flex",
+        gap: "0.5rem",
+        alignItems: "center",
+        fontSize: "0.95rem",
+        color: "var(--muted)",
+        marginTop: "0.5rem",
+      }}
+      aria-label={`Average rating ${aggregate.rating_value.toFixed(1)} out of 5 based on ${aggregate.review_count} customer reviews`}
+    >
+      <span style={{ color: "#f59e0b", letterSpacing: "0.1em" }} aria-hidden>{stars}</span>
+      <span>
+        <strong style={{ color: "var(--text)" }}>{aggregate.rating_value.toFixed(1)}</strong>
+        {" · "}
+        {aggregate.review_count} {aggregate.review_count === 1 ? "review" : "reviews"}
+      </span>
+    </p>
+  );
+}
+
+// ReviewsSection — social proof na página do plano. Mostra agregado + até 5
+// reviews recentes. Resto fica acessível via "Show more" (UI futura — por ora
+// render-truncate é suficiente).
+function ReviewsSection({ reviews, aggregate }: { reviews: PublicReview[]; aggregate: AggregateRating | null }) {
+  const top = reviews.slice(0, 5);
+  return (
+    <section style={{ marginTop: "3rem" }}>
+      <h2 style={{ marginBottom: "1rem", fontSize: "1.2rem" }}>
+        Customer reviews
+        {aggregate && (
+          <span style={{ fontWeight: 400, fontSize: "0.9rem", color: "var(--muted)", marginLeft: "0.5rem" }}>
+            · <strong>{aggregate.rating_value.toFixed(1)}</strong>/5 ({aggregate.review_count})
+          </span>
+        )}
+      </h2>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "1rem" }}>
+        {top.map((r, i) => (
+          <ReviewCard key={i} review={r} />
+        ))}
+      </div>
+      {reviews.length > top.length && (
+        <p style={{ color: "var(--muted)", fontSize: "0.85rem", marginTop: "0.75rem" }}>
+          Showing {top.length} of {reviews.length} reviews.
+        </p>
+      )}
+    </section>
+  );
+}
+
+function ReviewCard({ review }: { review: PublicReview }) {
+  const filled = Math.max(0, Math.min(5, review.rating));
+  const stars = "★".repeat(filled) + "☆".repeat(5 - filled);
+  const date = new Date(review.created_at);
+  return (
+    <article className="card" style={{ padding: "1rem" }}>
+      <header style={{ display: "flex", justifyContent: "space-between", gap: "0.5rem", alignItems: "baseline", marginBottom: "0.5rem" }}>
+        <strong style={{ fontSize: "0.95rem" }}>{review.author_name}</strong>
+        <time
+          dateTime={review.created_at}
+          style={{ color: "var(--muted)", fontSize: "0.78rem" }}
+        >
+          {date.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
+        </time>
+      </header>
+      <p style={{ color: "#f59e0b", letterSpacing: "0.05em", margin: "0 0 0.5rem", fontSize: "1rem" }} aria-label={`${filled} out of 5 stars`}>
+        <span aria-hidden>{stars}</span>
+      </p>
+      {review.title && <p style={{ fontWeight: 600, margin: "0 0 0.25rem" }}>{review.title}</p>}
+      {review.body && (
+        <p style={{ color: "var(--muted)", margin: 0, whiteSpace: "pre-wrap", fontSize: "0.9rem" }}>
+          {review.body}
+        </p>
+      )}
+    </article>
   );
 }
