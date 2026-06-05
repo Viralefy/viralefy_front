@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import type { Plan } from "@/lib/api";
 import { buildOfferEnhancements } from "@/lib/jsonld";
 import { categoryAlternates } from "@/lib/hreflang";
+import { indexableMeta } from "@/lib/seo-meta";
 import { COUNTRIES, getCountry } from "@/i18n/countries";
 import { langOfCountry, tr } from "@/i18n/languages";
 import {
@@ -53,11 +54,14 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const altsCat = categoryAlternates(c.code, cat);
   const canonical = altsCat.canonical;
   const ogUrl = `/og/${c.code}/${categorySlug(cat, lang)}`;
+  const seoMeta = indexableMeta();
   return {
     // metaTitle já vem com "| Viralefy" — absolute pra não duplicar.
     title: { absolute: copy.metaTitle(c.name) },
     description: copy.metaDescription(c.name),
     alternates: altsCat,
+    robots: seoMeta.robots,
+    other: seoMeta.other,
     openGraph: {
       title: copy.metaTitle(c.name),
       description: copy.metaDescription(c.name),

@@ -313,6 +313,10 @@ export function buildCountryJsonLd(country: Country, plans: Plan[], siteUrl: str
     inLanguage: country.htmlLang,
     isPartOf: { "@id": `${siteUrl}/#website` },
     about: { "@id": `${siteUrl}/#organization` },
+    // Datas explícitas (antes Ahrefs reportava "Publicado/Modificado Ausente").
+    // datePublished = launch HML; dateModified = build atual (force-dynamic).
+    datePublished: "2026-01-01T00:00:00Z",
+    dateModified: new Date().toISOString(),
   };
 
   const breadcrumb = {

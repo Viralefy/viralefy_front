@@ -8,6 +8,9 @@ import { TrustSignals } from "@/components/TrustSignals";
 import { tr } from "@/i18n/languages";
 import { homeAlternates } from "@/lib/hreflang";
 import { buildHomeJsonLd } from "@/lib/jsonld";
+import { indexableMeta } from "@/lib/seo-meta";
+
+const seoMeta = indexableMeta();
 
 // Home global. Inglês "international" — atende quem chega sem cookie de
 // idioma/país detectado. Conteúdo focado em "global followers" + lista de
@@ -33,6 +36,8 @@ export const metadata: Metadata = {
   // conteúdo diferente (localização) e Ahrefs flagava como hreflang
   // inválido + reciprocidade quebrada (Site Audit 2026-06-05).
   alternates: homeAlternates(),
+  robots: seoMeta.robots,
+  other: seoMeta.other,
   openGraph: {
     title: "Buy Instagram & TikTok followers worldwide | Viralefy",
     description:

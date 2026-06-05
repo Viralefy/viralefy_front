@@ -11,6 +11,7 @@ import { LiveCounter } from "@/components/LiveCounter";
 import { langOfCountry, tr } from "@/i18n/languages";
 import { CATEGORY_CODES, categoryLabel, categorySlug } from "@/i18n/categories";
 import { countryRootAlternates } from "@/lib/hreflang";
+import { indexableMeta } from "@/lib/seo-meta";
 
 export const dynamic = "force-dynamic";
 
@@ -30,12 +31,15 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   // grupo separado). Ver lib/hreflang.ts.
   const altsCountry = countryRootAlternates(c.code);
 
+  const seoMeta = indexableMeta();
   return {
     // c.title já vem com sufixo "| Viralefy" — usamos absolute para o
     // template do root layout não duplicar.
     title: { absolute: c.title },
     description: c.description,
     alternates: altsCountry,
+    robots: seoMeta.robots,
+    other: seoMeta.other,
     openGraph: {
       title: c.title,
       description: c.description,
