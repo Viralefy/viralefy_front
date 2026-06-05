@@ -33,7 +33,7 @@ export function Footer({ lang = "en", compact = false }: { lang?: LangCode; comp
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: compact ? "1fr 1fr 1fr" : "1.4fr 1fr 1fr 1fr",
+            gridTemplateColumns: compact ? "1fr 1fr 1fr 1fr" : "1.4fr 1fr 1fr 1fr 1fr",
             gap: "2rem",
             marginBottom: "2rem",
           }}
@@ -56,6 +56,21 @@ export function Footer({ lang = "en", compact = false }: { lang?: LangCode; comp
               <li><Link href="/marketplace/facebook-bms" style={{ color: "var(--text)" }}>Facebook BMs</Link></li>
               <li><Link href="/marketplace/aged-profiles" style={{ color: "var(--text)" }}>Aged profiles</Link></li>
               <li><Link href="/marketplace/validated-emails" style={{ color: "var(--text)" }}>Validated emails</Link></li>
+            </ul>
+          </nav>
+
+          {/* Discover — hub p/ as 5 verticais Tier 4: pricing, help, cities,
+              vs-competitors, case studies. Cada uma é um pillar SEO próprio. */}
+          <nav aria-label="Discover">
+            <h3 style={{ fontSize: "0.85rem", color: "var(--muted)", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: "0.5rem" }}>
+              Discover
+            </h3>
+            <ul style={{ listStyle: "none", padding: 0, display: "grid", gap: "0.35rem", fontSize: "0.9rem" }}>
+              <li><Link href="/pricing" style={{ color: "var(--text)" }}>Pricing</Link></li>
+              <li><Link href="/cities" style={{ color: "var(--text)" }}>Cities</Link></li>
+              <li><Link href="/vs" style={{ color: "var(--text)" }}>Compare Viralefy</Link></li>
+              <li><Link href="/help" style={{ color: "var(--text)" }}>Help center</Link></li>
+              <li><Link href="/case-studies" style={{ color: "var(--text)" }}>Case studies</Link></li>
             </ul>
           </nav>
 

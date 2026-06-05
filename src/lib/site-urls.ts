@@ -12,6 +12,10 @@ import { COUNTRIES } from "@/i18n/countries";
 import { CATEGORY_CODES, categorySlug } from "@/i18n/categories";
 import { LEGAL_SLUGS } from "@/i18n/legal";
 import { PACKS, langOfCountry, type LangCode } from "@/i18n/languages";
+import { CITIES } from "@/lib/cities";
+import { COMPETITORS } from "@/lib/competitors";
+import { HELP_TOPICS } from "@/lib/help";
+import { CASE_STUDIES } from "@/lib/case-studies";
 import type { Plan } from "./api";
 
 export type SiteUrl = {
@@ -66,6 +70,31 @@ export async function allSiteUrls(): Promise<SiteUrl[]> {
         });
       }
     }
+  }
+
+  // Tier 4 SEO/Growth — landings standalone EN. Caem no bucket "en".
+  // /pricing, /cities + 50 cidades, /vs + N competidores, /help + 12 tópicos,
+  // /case-studies + 6 estudos. Todas no bucket "en" porque copy é EN-only.
+  out.push({ url: `${base}/pricing`, changeFrequency: "weekly", priority: 0.7, lang: "en" });
+
+  out.push({ url: `${base}/cities`, changeFrequency: "weekly", priority: 0.7, lang: "en" });
+  for (const c of CITIES) {
+    out.push({ url: `${base}/cities/${c.slug}`, changeFrequency: "monthly", priority: 0.6, lang: "en" });
+  }
+
+  out.push({ url: `${base}/vs`, changeFrequency: "weekly", priority: 0.6, lang: "en" });
+  for (const c of COMPETITORS) {
+    out.push({ url: `${base}/vs/${c.slug}`, changeFrequency: "monthly", priority: 0.5, lang: "en" });
+  }
+
+  out.push({ url: `${base}/help`, changeFrequency: "weekly", priority: 0.7, lang: "en" });
+  for (const t of HELP_TOPICS) {
+    out.push({ url: `${base}/help/${t.slug}`, changeFrequency: "monthly", priority: 0.6, lang: "en" });
+  }
+
+  out.push({ url: `${base}/case-studies`, changeFrequency: "monthly", priority: 0.6, lang: "en" });
+  for (const cs of CASE_STUDIES) {
+    out.push({ url: `${base}/case-studies/${cs.slug}`, changeFrequency: "monthly", priority: 0.5, lang: "en" });
   }
 
   // Legais — uma URL por idioma. Caem no bucket "legal" pra não inflar nenhum lang.
