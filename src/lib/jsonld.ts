@@ -1,5 +1,5 @@
 import type { Country } from "@/i18n/countries";
-import type { Plan } from "./api";
+import type { AggregateRating, Plan } from "./api";
 
 // Schema.org JSON-LD para landing de país. Blocos emitidos:
 //   - Organization (marca, logo, contactPoint, sameAs)
@@ -43,6 +43,28 @@ export type OfferEnhancements = {
  *   https://developers.google.com/search/docs/appearance/structured-data/merchant-listing
  *   https://developers.google.com/search/docs/appearance/structured-data/product
  */
+/**
+ * Constrói o bloco AggregateRating do Schema.org a partir do summary do
+ * backend. Devolve null quando review_count = 0 — Google rejeita
+ * aggregateRating sem reviews reais (e o handler do backend devolve null
+ * justamente pra calller omitir o bloco).
+ *
+ * Política: NÃO fabricar. ratingValue/reviewCount vêm direto da tabela
+ * `reviews` populada pelo formulário /orders/[id]/review, que só aceita
+ * submissões de orders pagas e dono autenticado.
+ */
+export function buildAggregateRating(agg: AggregateRating | null | undefined): object | null {
+  if (!agg) return null;
+  if (!agg.review_count || agg.review_count < 1) return null;
+  return {
+    "@type": "AggregateRating",
+    ratingValue: agg.rating_value.toFixed(2),
+    reviewCount: agg.review_count,
+    bestRating: agg.best_rating ?? 5,
+    worstRating: agg.worst_rating ?? 1,
+  };
+}
+
 export function buildOfferEnhancements(countryCode: string): OfferEnhancements {
   const region = countryCode.toUpperCase();
   return {

@@ -3,6 +3,21 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
 export type Platform = "instagram" | "tiktok";
 export type TargetType = "profile" | "publication";
 
+export type AggregateRating = {
+  rating_value: number;
+  review_count: number;
+  best_rating: number;
+  worst_rating: number;
+};
+
+export type PublicReview = {
+  rating: number;
+  title: string;
+  body: string;
+  author_name: string;
+  created_at: string;
+};
+
 export type Plan = {
   id: string;
   name: string;
@@ -16,6 +31,8 @@ export type Plan = {
   active: boolean;
   sort_order: number;
   prices: Record<string, string>; // preço manual por moeda
+  // Populado pelo backend quando o plano tem reviews visíveis. nil quando 0.
+  aggregate_rating?: AggregateRating | null;
 };
 
 export type Category = {
@@ -307,3 +324,52 @@ export const requestRecharge = (
   body: { amount_cents: number; display_currency?: string }
 ) =>
   request<Invoice>("/v1/me/recharge", { method: "POST", body: JSON.stringify(body) }, token);
+
+// ----- Reviews ----- //
+
+export type Review = {
+  id: string;
+  user_id: string;
+  order_id: string;
+  plan_id: string;
+  plan_category: string;
+  country_code: string;
+  rating: number;
+  title: string;
+  body: string;
+  visible: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+function newIdempotencyKeyForReview(): string {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) return crypto.randomUUID();
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+export const submitReview = (
+  token: string,
+  body: { order_id: string; rating: number; title: string; body: string; country_code?: string }
+) =>
+  request<Review>(
+    "/v1/me/reviews",
+    {
+      method: "POST",
+      body: JSON.stringify(body),
+      headers: { "Idempotency-Key": newIdempotencyKeyForReview() },
+    },
+    token,
+  );
+
+export const fetchMyReviewForOrder = (token: string, orderID: string) =>
+  request<Review>(`/v1/me/reviews/by-order/${orderID}`, undefined, token);
+
+export const fetchPlanReviews = (planID: string) =>
+  request<{ reviews: PublicReview[]; aggregate: AggregateRating | null }>(
+    `/v1/plans/${planID}/reviews`,
+  );
+
+export const fetchCategoryReviewAggregate = (categoryCode: string) =>
+  request<{ aggregate: AggregateRating | null }>(
+    `/v1/categories/${categoryCode}/reviews`,
+  );

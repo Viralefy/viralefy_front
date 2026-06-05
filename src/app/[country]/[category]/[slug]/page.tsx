@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Plan } from "@/lib/api";
-import { buildOfferEnhancements } from "@/lib/jsonld";
+import { buildAggregateRating, buildOfferEnhancements } from "@/lib/jsonld";
 import { COUNTRIES, getCountry } from "@/i18n/countries";
 import { langOfCountry, tr } from "@/i18n/languages";
 import {
@@ -213,6 +213,10 @@ export default async function PlanPage({ params }: { params: Promise<Params> }) 
       // próprio plano — gerada server-side por src/app/og/[...slug]/route.tsx
       // em 1200×630 (formato amplo aceito pelo Google).
       image: ogImageUrl,
+      // aggregateRating só entra quando há reviews REAIS no plano. O backend
+      // (ListPublicPlans) devolve null quando review_count=0; buildAggregateRating
+      // também devolve null nesse caso. Spread condicional pra omitir a key.
+      ...(buildAggregateRating(plan.aggregate_rating) ? { aggregateRating: buildAggregateRating(plan.aggregate_rating) } : {}),
       offers: {
         "@type": "Offer",
         price: plan.prices?.["USD"] ?? (plan.price_cents / 100).toFixed(2),
