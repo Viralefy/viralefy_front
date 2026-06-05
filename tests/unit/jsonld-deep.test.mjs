@@ -25,27 +25,29 @@ const PLANS = [
 const PREFERRED = ["USD", "EUR", "BRL", "USDT", "BTC"];
 
 test("buildCountryJsonLd returns exactly 5 blocks (Org/WebSite/WebPage/Breadcrumb/Service)", () => {
-  const blocks = buildCountryJsonLd(br, PLANS, SITE);
+  const blocks = buildCountryJsonLd(br, PLANS, SITE)["@graph"];
   assert.equal(blocks.length, 5);
   const types = blocks.map((b) => b["@type"]);
   assert.deepEqual(types, ["Organization", "WebSite", "WebPage", "BreadcrumbList", "Service"]);
 });
 
-test("every block carries @context = https://schema.org", () => {
-  const blocks = buildCountryJsonLd(br, PLANS, SITE);
-  for (const b of blocks) {
-    assert.equal(b["@context"], "https://schema.org", `${b["@type"]} missing @context`);
-  }
+test("root document carries @context = https://schema.org (single @graph wrapper)", () => {
+  // Antes cada bloco tinha @context próprio (5 scripts separados). Agora
+  // emitimos 1 script com {@context, @graph: [...]} — @context vive na raiz
+  // e os nós dentro do @graph herdam.
+  const result = buildCountryJsonLd(br, PLANS, SITE);
+  assert.equal(result["@context"], "https://schema.org");
+  assert.ok(Array.isArray(result["@graph"]), "must wrap nodes in @graph array");
 });
 
 test("every @id present in the document is unique", () => {
-  const blocks = buildCountryJsonLd(br, PLANS, SITE);
+  const blocks = buildCountryJsonLd(br, PLANS, SITE)["@graph"];
   const ids = blocks.map((b) => b["@id"]).filter(Boolean);
   assert.equal(new Set(ids).size, ids.length, "duplicate @id detected");
 });
 
 test("Organization.contactPoint.availableLanguage is an array of lang codes", () => {
-  const [org] = buildCountryJsonLd(br, PLANS, SITE);
+  const [org] = buildCountryJsonLd(br, PLANS, SITE)["@graph"];
   assert.ok(Array.isArray(org.contactPoint.availableLanguage));
   assert.ok(org.contactPoint.availableLanguage.length >= 1);
   for (const lang of org.contactPoint.availableLanguage) {
@@ -54,7 +56,7 @@ test("Organization.contactPoint.availableLanguage is an array of lang codes", ()
 });
 
 test("Organization.logo is an ImageObject with numeric width/height", () => {
-  const [org] = buildCountryJsonLd(br, PLANS, SITE);
+  const [org] = buildCountryJsonLd(br, PLANS, SITE)["@graph"];
   assert.equal(org.logo["@type"], "ImageObject");
   assert.equal(typeof org.logo.width, "number");
   assert.equal(typeof org.logo.height, "number");
@@ -63,21 +65,21 @@ test("Organization.logo is an ImageObject with numeric width/height", () => {
 });
 
 test("WebSite.publisher.@id === Organization.@id (reference resolves)", () => {
-  const blocks = buildCountryJsonLd(br, PLANS, SITE);
+  const blocks = buildCountryJsonLd(br, PLANS, SITE)["@graph"];
   const org = blocks.find((b) => b["@type"] === "Organization");
   const site = blocks.find((b) => b["@type"] === "WebSite");
   assert.equal(site.publisher["@id"], org["@id"]);
 });
 
 test("WebPage.isPartOf.@id === WebSite.@id (reference resolves)", () => {
-  const blocks = buildCountryJsonLd(br, PLANS, SITE);
+  const blocks = buildCountryJsonLd(br, PLANS, SITE)["@graph"];
   const site = blocks.find((b) => b["@type"] === "WebSite");
   const page = blocks.find((b) => b["@type"] === "WebPage");
   assert.equal(page.isPartOf["@id"], site["@id"]);
 });
 
 test("BreadcrumbList.itemListElement positions are sequential starting at 1", () => {
-  const blocks = buildCountryJsonLd(br, PLANS, SITE);
+  const blocks = buildCountryJsonLd(br, PLANS, SITE)["@graph"];
   const crumb = blocks.find((b) => b["@type"] === "BreadcrumbList");
   const positions = crumb.itemListElement.map((e) => e.position);
   for (let i = 0; i < positions.length; i++) {
@@ -86,20 +88,20 @@ test("BreadcrumbList.itemListElement positions are sequential starting at 1", ()
 });
 
 test("Service.provider.@id === Organization.@id", () => {
-  const blocks = buildCountryJsonLd(br, PLANS, SITE);
+  const blocks = buildCountryJsonLd(br, PLANS, SITE)["@graph"];
   const org = blocks.find((b) => b["@type"] === "Organization");
   const svc = blocks.find((b) => b["@type"] === "Service");
   assert.equal(svc.provider["@id"], org["@id"]);
 });
 
 test("Service.areaServed.name === country.name", () => {
-  const blocks = buildCountryJsonLd(br, PLANS, SITE);
+  const blocks = buildCountryJsonLd(br, PLANS, SITE)["@graph"];
   const svc = blocks.find((b) => b["@type"] === "Service");
   assert.equal(svc.areaServed.name, br.name);
 });
 
 test("AggregateOffer.lowPrice <= AggregateOffer.highPrice (numeric)", () => {
-  const blocks = buildCountryJsonLd(br, PLANS, SITE);
+  const blocks = buildCountryJsonLd(br, PLANS, SITE)["@graph"];
   const svc = blocks.find((b) => b["@type"] === "Service");
   const low = parseFloat(svc.offers.lowPrice);
   const high = parseFloat(svc.offers.highPrice);
@@ -109,13 +111,13 @@ test("AggregateOffer.lowPrice <= AggregateOffer.highPrice (numeric)", () => {
 });
 
 test("AggregateOffer.offerCount equals offers.length", () => {
-  const blocks = buildCountryJsonLd(br, PLANS, SITE);
+  const blocks = buildCountryJsonLd(br, PLANS, SITE)["@graph"];
   const svc = blocks.find((b) => b["@type"] === "Service");
   assert.equal(svc.offers.offerCount, svc.offers.offers.length);
 });
 
 test("every Offer.price is a string parseable as a positive number", () => {
-  const blocks = buildCountryJsonLd(br, PLANS, SITE);
+  const blocks = buildCountryJsonLd(br, PLANS, SITE)["@graph"];
   const svc = blocks.find((b) => b["@type"] === "Service");
   for (const o of svc.offers.offers) {
     assert.equal(typeof o.price, "string", `offer.price is not string: ${typeof o.price}`);
@@ -125,7 +127,7 @@ test("every Offer.price is a string parseable as a positive number", () => {
 });
 
 test("every Offer.priceCurrency is a 3+ char string in the preferred set", () => {
-  const blocks = buildCountryJsonLd(br, PLANS, SITE);
+  const blocks = buildCountryJsonLd(br, PLANS, SITE)["@graph"];
   const svc = blocks.find((b) => b["@type"] === "Service");
   for (const o of svc.offers.offers) {
     assert.equal(typeof o.priceCurrency, "string");
@@ -138,7 +140,7 @@ test("every Offer.priceCurrency is a 3+ char string in the preferred set", () =>
 });
 
 test("every Offer.priceValidUntil is a future ISO date (YYYY-MM-DD)", () => {
-  const blocks = buildCountryJsonLd(br, PLANS, SITE);
+  const blocks = buildCountryJsonLd(br, PLANS, SITE)["@graph"];
   const svc = blocks.find((b) => b["@type"] === "Service");
   const now = new Date();
   for (const o of svc.offers.offers) {
@@ -149,7 +151,7 @@ test("every Offer.priceValidUntil is a future ISO date (YYYY-MM-DD)", () => {
 });
 
 test("every Offer.sku is a non-empty string (the plan id)", () => {
-  const blocks = buildCountryJsonLd(br, PLANS, SITE);
+  const blocks = buildCountryJsonLd(br, PLANS, SITE)["@graph"];
   const svc = blocks.find((b) => b["@type"] === "Service");
   const skus = svc.offers.offers.map((o) => o.sku);
   for (const sku of skus) {
@@ -161,15 +163,15 @@ test("every Offer.sku is a non-empty string (the plan id)", () => {
   assert.deepEqual([...skus].sort(), expectedSkus.sort());
 });
 
-test("buildCountryJsonLd with empty plans returns 5 blocks, Service.offers undefined", () => {
-  const blocks = buildCountryJsonLd(br, [], SITE);
+test("buildCountryJsonLd with empty plans returns 5 nodes, Service.offers undefined", () => {
+  const blocks = buildCountryJsonLd(br, [], SITE)["@graph"];
   assert.equal(blocks.length, 5);
   const svc = blocks.find((b) => b["@type"] === "Service");
   assert.equal(svc.offers, undefined);
 });
 
 test("WebPage.inLanguage matches country.htmlLang", () => {
-  const blocks = buildCountryJsonLd(br, PLANS, SITE);
+  const blocks = buildCountryJsonLd(br, PLANS, SITE)["@graph"];
   const page = blocks.find((b) => b["@type"] === "WebPage");
   assert.equal(page.inLanguage, br.htmlLang);
 });

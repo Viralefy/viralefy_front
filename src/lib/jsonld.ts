@@ -147,14 +147,21 @@ export function buildHomeJsonLd(plans: Plan[], siteUrl: string) {
   const low = prices.length ? Math.min(...prices).toFixed(2) : "0";
   const high = prices.length ? Math.max(...prices).toFixed(2) : "0";
 
+  // Schema.org @graph: agrupa todos os nós num único documento. Validators
+  // tratam refs @id como ponteiros (não inlinam o conteúdo de novo), o que
+  // elimina o efeito visual de "duplicação" que aparece quando emitimos N
+  // <script> separados (Ahrefs/Rich Results expandem cada ref como nó
+  // standalone). Também é a forma canônica recomendada pelo Schema.org pra
+  // documentos multi-entidade.
   const organization = {
-    "@context": "https://schema.org",
     "@type": "Organization",
     "@id": `${siteUrl}/#organization`,
     name: "Viralefy",
     url: siteUrl,
     logo: { "@type": "ImageObject", url: logoUrl, width: 2471, height: 704 },
-    sameAs: ["https://github.com/Viralefy"],
+    // sameAs intencionalmente omitido: até termos perfis sociais públicos
+    // (Twitter, Instagram da marca, LinkedIn), não vale apontar pra repos
+    // GitHub — Ahrefs/Schema.org não esperam isso pra Organization comercial.
     contactPoint: {
       "@type": "ContactPoint",
       contactType: "customer support",
@@ -164,7 +171,6 @@ export function buildHomeJsonLd(plans: Plan[], siteUrl: string) {
   };
 
   const website = {
-    "@context": "https://schema.org",
     "@type": "WebSite",
     "@id": `${siteUrl}/#website`,
     name: "Viralefy",
@@ -179,7 +185,6 @@ export function buildHomeJsonLd(plans: Plan[], siteUrl: string) {
   };
 
   const service = {
-    "@context": "https://schema.org",
     "@type": "Service",
     "@id": `${siteUrl}/#service`,
     name: "Instagram and TikTok growth services",
@@ -199,7 +204,10 @@ export function buildHomeJsonLd(plans: Plan[], siteUrl: string) {
       : undefined,
   };
 
-  return [organization, website, service];
+  return {
+    "@context": "https://schema.org",
+    "@graph": [organization, website, service],
+  };
 }
 
 // categorySlugEn — versão "en" do slug, sem precisar importar i18n/categories
@@ -258,8 +266,8 @@ export function buildCountryJsonLd(country: Country, plans: Plan[], siteUrl: str
   const low = prices.length ? Math.min(...prices).toFixed(2) : "0";
   const high = prices.length ? Math.max(...prices).toFixed(2) : "0";
 
+  // @graph wrapper canônico — ver buildHomeJsonLd pra detalhe da decisão.
   const organization = {
-    "@context": "https://schema.org",
     "@type": "Organization",
     "@id": `${siteUrl}/#organization`,
     name: "Viralefy",
@@ -270,9 +278,7 @@ export function buildCountryJsonLd(country: Country, plans: Plan[], siteUrl: str
       width: 2471,
       height: 704,
     },
-    sameAs: [
-      "https://github.com/Viralefy",
-    ],
+    // sameAs intencionalmente omitido (ver buildHomeJsonLd).
     contactPoint: {
       "@type": "ContactPoint",
       contactType: "customer support",
@@ -282,7 +288,6 @@ export function buildCountryJsonLd(country: Country, plans: Plan[], siteUrl: str
   };
 
   const website = {
-    "@context": "https://schema.org",
     "@type": "WebSite",
     "@id": `${siteUrl}/#website`,
     name: "Viralefy",
@@ -300,7 +305,6 @@ export function buildCountryJsonLd(country: Country, plans: Plan[], siteUrl: str
   };
 
   const webpage = {
-    "@context": "https://schema.org",
     "@type": "WebPage",
     "@id": `${pageUrl}#webpage`,
     url: pageUrl,
@@ -312,7 +316,6 @@ export function buildCountryJsonLd(country: Country, plans: Plan[], siteUrl: str
   };
 
   const breadcrumb = {
-    "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
@@ -321,7 +324,6 @@ export function buildCountryJsonLd(country: Country, plans: Plan[], siteUrl: str
   };
 
   const service = {
-    "@context": "https://schema.org",
     "@type": "Service",
     "@id": `${pageUrl}#service`,
     name: country.h1,
@@ -342,5 +344,8 @@ export function buildCountryJsonLd(country: Country, plans: Plan[], siteUrl: str
     } : undefined,
   };
 
-  return [organization, website, webpage, breadcrumb, service];
+  return {
+    "@context": "https://schema.org",
+    "@graph": [organization, website, webpage, breadcrumb, service],
+  };
 }

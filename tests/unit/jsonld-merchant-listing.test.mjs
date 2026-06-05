@@ -90,7 +90,7 @@ function offersOf(blocks) {
 }
 
 test("every Offer in country JSON-LD carries shippingDetails", () => {
-  const offers = offersOf(buildCountryJsonLd(br, PLANS, SITE));
+  const offers = offersOf(buildCountryJsonLd(br, PLANS, SITE)["@graph"]);
   for (const o of offers) {
     assert.ok(o.shippingDetails, `Offer ${o.name} missing shippingDetails`);
     assert.equal(o.shippingDetails["@type"], "OfferShippingDetails");
@@ -98,7 +98,7 @@ test("every Offer in country JSON-LD carries shippingDetails", () => {
 });
 
 test("every Offer in country JSON-LD carries hasMerchantReturnPolicy", () => {
-  const offers = offersOf(buildCountryJsonLd(br, PLANS, SITE));
+  const offers = offersOf(buildCountryJsonLd(br, PLANS, SITE)["@graph"]);
   for (const o of offers) {
     assert.ok(o.hasMerchantReturnPolicy, `Offer ${o.name} missing hasMerchantReturnPolicy`);
     assert.equal(o.hasMerchantReturnPolicy["@type"], "MerchantReturnPolicy");
@@ -107,7 +107,7 @@ test("every Offer in country JSON-LD carries hasMerchantReturnPolicy", () => {
 
 test("every Offer keeps its existing fields (regression — no fields dropped)", () => {
   // Sanity check: spreading enhancements must NOT remove price/url/availability/etc.
-  const offers = offersOf(buildCountryJsonLd(br, PLANS, SITE));
+  const offers = offersOf(buildCountryJsonLd(br, PLANS, SITE)["@graph"]);
   for (const o of offers) {
     for (const key of ["name", "sku", "price", "priceCurrency", "url", "availability", "eligibleRegion", "priceValidUntil"]) {
       assert.ok(o[key] !== undefined, `Offer ${o.name} missing pre-existing field ${key}`);

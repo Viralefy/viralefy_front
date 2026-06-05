@@ -61,19 +61,14 @@ export default async function HomePage() {
   const t = tr("en");
   const url = siteUrl();
 
-  // JSON-LD para a home global.
-  // Antes: Organization + WebSite (sem rich result de Product/Offer).
-  // Agora: Organization + WebSite + Service com AggregateOffer.offers contendo
-  // TODOS os planos (com image, shippingDetails, hasMerchantReturnPolicy).
-  // Cada Offer linka pra variante en-US canônica (/us/<en-slug>/<qty>-<en-slug>).
-  // Ver lib/jsonld.buildHomeJsonLd.
+  // JSON-LD em um único @graph (canônico Schema.org). Antes emitia N scripts
+  // separados, o que fazia validators expandir refs @id como nós inlinados
+  // (efeito visual de duplicação no Ahrefs/Rich Results).
   const jsonld = buildHomeJsonLd(plans, url);
 
   return (
     <>
-      {jsonld.map((doc, i) => (
-        <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(doc) }} />
-      ))}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonld) }} />
 
       <section className="hero container">
         <h1>{t.home.heroTitle}</h1>

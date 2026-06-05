@@ -29,7 +29,7 @@ test("when plan has BOTH USD and USDT, JSON-LD picks USD (most portable for SEO)
     { id: "p1", name: "100 followers", category: "seguidores", price_cents: 990,
       prices: { USD: "9.90", USDT: "9.90", EUR: "9.10", BRL: "49.90" }, followers_qty: 100 },
   ];
-  const offers = offersOf(buildCountryJsonLd(br, plans, SITE));
+  const offers = offersOf(buildCountryJsonLd(br, plans, SITE)["@graph"]);
   assert.equal(offers.length, 1);
   assert.equal(offers[0].priceCurrency, "USD", "expected USD to win over USDT");
 });
@@ -39,7 +39,7 @@ test("when plan has USDT but NOT USD, JSON-LD picks USDT (canon storefront)", ()
     { id: "p1", name: "100 followers", category: "seguidores", price_cents: 990,
       prices: { USDT: "9.90", EUR: "9.10", BRL: "49.90" }, followers_qty: 100 },
   ];
-  const offers = offersOf(buildCountryJsonLd(br, plans, SITE));
+  const offers = offersOf(buildCountryJsonLd(br, plans, SITE)["@graph"]);
   assert.equal(offers[0].priceCurrency, "USDT");
 });
 
@@ -48,7 +48,7 @@ test("when plan has only EUR and BRL, EUR wins (BRL fica no fim da lista)", () =
     { id: "p1", name: "100 followers", category: "seguidores", price_cents: 990,
       prices: { EUR: "9.10", BRL: "49.90" }, followers_qty: 100 },
   ];
-  const offers = offersOf(buildCountryJsonLd(br, plans, SITE));
+  const offers = offersOf(buildCountryJsonLd(br, plans, SITE)["@graph"]);
   assert.equal(offers[0].priceCurrency, "EUR", "BRL must NOT win over EUR in SEO");
 });
 
@@ -57,7 +57,7 @@ test("when plan has only BRL, fallback to BRL is acceptable (last resort)", () =
     { id: "p1", name: "100 followers", category: "seguidores", price_cents: 990,
       prices: { BRL: "49.90" }, followers_qty: 100 },
   ];
-  const offers = offersOf(buildCountryJsonLd(br, plans, SITE));
+  const offers = offersOf(buildCountryJsonLd(br, plans, SITE)["@graph"]);
   assert.equal(offers[0].priceCurrency, "BRL");
 });
 
@@ -66,7 +66,7 @@ test("plan without any prices falls back to USD constructed from cents", () => {
     { id: "p1", name: "100 followers", category: "seguidores", price_cents: 990,
       prices: {}, followers_qty: 100 },
   ];
-  const offers = offersOf(buildCountryJsonLd(br, plans, SITE));
+  const offers = offersOf(buildCountryJsonLd(br, plans, SITE)["@graph"]);
   assert.equal(offers[0].priceCurrency, "USD");
   assert.equal(offers[0].price, "9.90");
 });
@@ -79,7 +79,7 @@ test("aggregate currency is the first offer's currency (consistent across catalo
     { id: "p2", name: "big", category: "seguidores", price_cents: 9990,
       prices: { USD: "99.90", BRL: "499.90" }, followers_qty: 1000 },
   ];
-  const blocks = buildCountryJsonLd(br, plans, SITE);
+  const blocks = buildCountryJsonLd(br, plans, SITE)["@graph"];
   const svc = blocks.find((b) => b["@type"] === "Service");
   assert.equal(svc.offers.priceCurrency, "USD");
 });
@@ -93,7 +93,7 @@ test("BRL must NEVER appear in priceCurrency when USD/USDT/EUR are available (3-
     { id: "p3", name: "c", category: "seguidores", price_cents: 2990,
       prices: { EUR: "27.50", BRL: "149.90" }, followers_qty: 500 },
   ];
-  const offers = offersOf(buildCountryJsonLd(br, plans, SITE));
+  const offers = offersOf(buildCountryJsonLd(br, plans, SITE)["@graph"]);
   for (const o of offers) {
     assert.notEqual(o.priceCurrency, "BRL", `unexpected BRL pick: ${JSON.stringify(o)}`);
   }
