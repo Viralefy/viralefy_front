@@ -71,6 +71,7 @@ export function Footer({ lang = "en", compact = false }: { lang?: LangCode; comp
               <li><Link href="/vs" style={{ color: "var(--text)" }}>Compare Viralefy</Link></li>
               <li><Link href="/help" style={{ color: "var(--text)" }}>Help center</Link></li>
               <li><Link href="/case-studies" style={{ color: "var(--text)" }}>Case studies</Link></li>
+              <li><Link href="/status" style={{ color: "var(--text)" }}>System status</Link></li>
             </ul>
           </nav>
 
