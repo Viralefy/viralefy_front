@@ -3,14 +3,18 @@ import Link from "next/link";
 import { Footer } from "@/components/Footer";
 import { indexableMeta } from "@/lib/seo-meta";
 
-// Status page público — consome /v1/status do API. SSR com cache curto (15s)
-// pra ter dados frescos sem martelar a API a cada request.
+// Status page público — consome /v1/status do API por request.
+//
+// force-dynamic (não ISR): durante o build o API está PARADO (build_node
+// roda antes de 70-start.sh) — qualquer prerender capturaria "Down" e
+// cachearia indefinidamente. Renderizar por request garante estado fresh
+// no exato momento do hit.
 //
 // Renderização tolerante a falha: se a API estiver fora, mostra "API down"
 // e segue exibindo a página (próprio /status precisa funcionar pra você
 // saber que o resto está fora).
 
-export const revalidate = 15;
+export const dynamic = "force-dynamic";
 
 function siteUrl() {
   return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
@@ -44,7 +48,7 @@ type Payload = { timestamp: string; overall: Status; services: Service[] };
 async function fetchStatus(): Promise<Payload | null> {
   const base = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
   try {
-    const res = await fetch(`${base}/v1/status`, { next: { revalidate: 15 } });
+    const res = await fetch(`${base}/v1/status`, { cache: "no-store" });
     if (!res.ok) return null;
     const json = await res.json();
     return json.data as Payload;
