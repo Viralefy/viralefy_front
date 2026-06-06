@@ -61,9 +61,17 @@ export async function allSiteUrls(): Promise<SiteUrl[]> {
       out.push({ url: `${base}/${c.code}/${slug}`, changeFrequency: "weekly", priority: 0.8, lang });
 
       const catPlans = plans.filter((p) => p.category === cat);
+      // Categorias de serviço (servicos, bms_facebook, perfis_redes,
+      // emails_validados, recuperacao_perfil) têm múltiplos planos com
+      // followers_qty=1 — a URL pattern `${qty}-${slug}` colidiria N vezes.
+      // Dedup por URL: o sitemap só lista cada URL uma vez.
+      const seenInCat = new Set<string>();
       for (const p of catPlans) {
+        const planUrl = `${base}/${c.code}/${slug}/${p.followers_qty}-${slug}`;
+        if (seenInCat.has(planUrl)) continue;
+        seenInCat.add(planUrl);
         out.push({
-          url: `${base}/${c.code}/${slug}/${p.followers_qty}-${slug}`,
+          url: planUrl,
           changeFrequency: "weekly",
           priority: 0.7,
           lang,
