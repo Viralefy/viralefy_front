@@ -1,24 +1,33 @@
 import type { Currency, Plan } from "./api";
 
-// Preço manual do plano na moeda selecionada (sem conversão automática).
+// Preço do plano na moeda selecionada.
 //
-// Fallback chain (NUNCA BRL como default global):
-//   1. Moeda escolhida (currency!=null + plan.prices tem o code).
-//   2. SSR — currency é null no primeiro paint, então caímos em USDT ("$").
-//   3. Se nem USDT existe, USD; depois price_cents/100. BRL só aparece se
-//      o usuário escolheu BRL explicitamente (selector + localStorage) ou se
-//      `/api/geo` detectou BR (CF-IPCountry/Accept-Language). Global default
-//      é USDT pra storefront mundial; antes era BRL/R$ e visitantes fora do
-//      Brasil viam "R$" no primeiro paint — acidente histórico do MVP.
+// Ordem de precedência (NUNCA BRL como default global):
+//   1. Override manual: `plan.prices[code]` — admin gravou um valor por
+//      mercado e isso vence o cálculo automático.
+//   2. Conversão automática: pega o canônico USD (`plan.prices["USD"]` ou
+//      `price_cents/100`) e multiplica por `currency.rate` (units per 1 USD).
+//      Aplica `currency.decimals`.
+//   3. SSR (currency=null) — exibe USDT/USD direto, 2 casas.
+//
+// Antes só usava (1) com fallback pra USDT/USD em string — então mudar
+// `rate` no backoffice não mexia em preço nenhum (rate ficava ignorada
+// pra planos, embora estivesse correta pra saldo via formatBalance).
 export function priceFor(plan: Plan, currency: Currency | null): string {
-  const code = currency?.code ?? "USDT";
-  const symbol = currency?.symbol ?? "$";
-  const amount =
-    plan.prices?.[code] ??
-    plan.prices?.["USDT"] ??
-    plan.prices?.["USD"] ??
-    (plan.price_cents / 100).toFixed(2);
-  return `${symbol} ${amount}`;
+  // Sem moeda: SSR — usa o canônico USD direto.
+  if (!currency) {
+    const amount = plan.prices?.["USDT"] ?? plan.prices?.["USD"] ?? (plan.price_cents / 100).toFixed(2);
+    return `$ ${amount}`;
+  }
+  // Override manual por moeda — admin sobrescreveu o cálculo para esse mercado.
+  const manual = plan.prices?.[currency.code];
+  if (manual != null) return `${currency.symbol} ${manual}`;
+  // Conversão a partir do canônico USD via rate.
+  const usdStr = plan.prices?.["USD"];
+  const usd = usdStr != null ? parseFloat(usdStr) : plan.price_cents / 100;
+  const decimals = currency.decimals ?? 2;
+  const amount = (usd * (currency.rate || 1)).toFixed(decimals);
+  return `${currency.symbol} ${amount}`;
 }
 
 // Converte um valor canônico em USD-cents para uma string formatada na

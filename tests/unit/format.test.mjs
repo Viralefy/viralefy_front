@@ -66,3 +66,41 @@ test("priceFor always returns a string", () => {
   assert.equal(typeof priceFor(plan, BRL), "string");
   assert.equal(typeof priceFor(plan, null), "string");
 });
+
+// Conversão automática via currency.rate quando NÃO há override manual.
+// Regressão 2026-06-06: mudar `rate` no backoffice não refletia em
+// /<country>/<categoria> porque priceFor só usava plan.prices[code].
+const planUsdOnly = {
+  ...plan,
+  prices: { USD: "10.00" }, // só USD canônico, sem override por moeda local
+};
+
+test("priceFor converts USD canonical to selected currency using rate (no manual override)", () => {
+  const inrLike = { code: "INR", name: "Rupee", symbol: "₹", rate: 83, decimals: 2, kind: "fiat", settlement_code: "INR" };
+  assert.equal(priceFor(planUsdOnly, inrLike), "₹ 830.00");
+});
+
+test("priceFor reflects rate changes immediately when no manual price exists", () => {
+  const eurLike = { code: "EUR", name: "Euro", symbol: "€", rate: 0.9, decimals: 2, kind: "fiat", settlement_code: "EUR" };
+  const eurUpdated = { ...eurLike, rate: 1.1 };
+  assert.equal(priceFor(planUsdOnly, eurLike), "€ 9.00");
+  assert.equal(priceFor(planUsdOnly, eurUpdated), "€ 11.00");
+});
+
+test("priceFor still honors manual override when both manual and rate exist", () => {
+  // BRL tem manual "9.90" e rate=1; manual vence o cálculo (admin sobrescreveu)
+  assert.equal(priceFor(plan, BRL), "R$ 9.90");
+});
+
+test("priceFor falls back to price_cents/100 as USD canonical when prices.USD missing", () => {
+  const planCentsOnly = { ...plan, prices: {} };
+  const inrLike = { code: "INR", name: "Rupee", symbol: "₹", rate: 80, decimals: 2, kind: "fiat", settlement_code: "INR" };
+  // price_cents = 990 → USD 9.90 → INR 9.90 * 80 = 792.00
+  assert.equal(priceFor(planCentsOnly, inrLike), "₹ 792.00");
+});
+
+test("priceFor respects currency.decimals (BTC uses 8 decimals)", () => {
+  const btc = { code: "BTC", name: "Bitcoin", symbol: "₿", rate: 0.000025, decimals: 8, kind: "crypto", settlement_code: "BTC" };
+  // USD 10 * rate 0.000025 = 0.00025 BTC
+  assert.equal(priceFor(planUsdOnly, btc), "₿ 0.00025000");
+});
