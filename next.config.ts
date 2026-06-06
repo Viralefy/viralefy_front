@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 
 // Headers de segurança — recomendações OWASP + relaxa o que GTM/Twemoji/SVG
 // CDN/Turnstile precisam:
@@ -57,4 +58,15 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// withSentryConfig integra source maps + tunnel route + auto-instrument SDK.
+// Sem SENTRY_AUTH_TOKEN, o upload de source maps é skipped (build não falha).
+export default withSentryConfig(nextConfig, {
+  silent: true,
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT_FRONT,
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  // Bundle só sobe se houver token; sem ele, build segue sem upload.
+  disableLogger: true,
+  tunnelRoute: "/monitoring",
+  // sourcemaps: { disable: true } se quiser pular upload no build CI.
+});

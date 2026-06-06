@@ -20,6 +20,7 @@
     "test:all": "npm test && npm run test:smoke && npm run test:pentest && npm run test:emulated:browse && npm run test:emulated:i18n && npm run test:emulated:contracts && npm run test:emulated:a11y"
   },
   "dependencies": {
+    "@sentry/nextjs": "^10.56.0",
     "next": "^15.3.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
