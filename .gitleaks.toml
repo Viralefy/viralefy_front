@@ -1,0 +1,12 @@
+# Excluir test fixtures intencionalmente óbvios (zeros/hexa repetidos).
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Test fixtures using sentinel-like fake secrets."
+paths = [
+  '''tests/unit/indexnow.test.mjs''',
+]
+regexes = [
+  '''0123456789abcdef0123456789abcdef''',
+]
