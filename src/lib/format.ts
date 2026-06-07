@@ -1,4 +1,4 @@
-import type { Currency, Plan } from "./api";
+import type { Currency, PPPEntry, Plan } from "./api";
 
 // Preço do plano na moeda selecionada.
 //
@@ -40,6 +40,53 @@ export function formatBalance(usdCents: number, currency: Currency | null): stri
   const usd = usdCents / 100;
   const amount = usd * (currency.rate || 1);
   return `${currency.symbol} ${amount.toFixed(decimals)}`;
+}
+
+// priceForCountry — wrapper PPP em torno de priceFor (Fase 6.5).
+//
+// Pega o canônico USD do plano, multiplica pelo PPP do país detectado, e SÓ
+// DEPOIS aplica a conversão de moeda + formatação. Settlement intocado: o
+// gateway segue cobrando o valor canônico em USD. Esse é apenas o número que
+// o visitante vê na home.
+//
+// Regras:
+//   - countryCode vazio/desconhecido OU pppMap vazio → fallback exato pra
+//     priceFor() (sem qualquer transformação). Garantia: nunca pioramos o
+//     comportamento atual ao introduzir PPP.
+//   - multiplier ∈ [0.10, 1.00] → display = round(usd × multiplier, decimals).
+//   - Override manual (plan.prices[currency.code]) tem precedência absoluta:
+//     se o admin gravou um valor pra essa moeda, PPP não toca nele (admin
+//     já decidiu o preço local). Idem priceFor().
+export function priceForCountry(
+  plan: Plan,
+  currency: Currency | null,
+  countryCode: string | null | undefined,
+  pppMap: Record<string, number> | null | undefined,
+): string {
+  // Sem contexto PPP → comportamento padrão preservado.
+  if (!countryCode || !pppMap) return priceFor(plan, currency);
+  const cc = countryCode.toLowerCase();
+  const mult = pppMap[cc];
+  // País fora do catálogo OU multiplier inválido (≥1.0 idem 1.0, mas
+  // guardamos por defensividade) → preço cheio.
+  if (mult == null || mult >= 1 || mult <= 0) return priceFor(plan, currency);
+
+  // Override manual por moeda — admin já cravou; PPP não sobrescreve.
+  if (currency && plan.prices?.[currency.code] != null) {
+    return priceFor(plan, currency);
+  }
+
+  // Canônico USD ajustado pelo multiplier ANTES da conversão de moeda.
+  const usdStr = plan.prices?.["USD"];
+  const usd = usdStr != null ? parseFloat(usdStr) : plan.price_cents / 100;
+  const adjusted = usd * mult;
+
+  // SSR (sem currency) → renderiza em USDT/USD com 2 casas.
+  if (!currency) return `$ ${adjusted.toFixed(2)}`;
+
+  const decimals = currency.decimals ?? 2;
+  const amount = (adjusted * (currency.rate || 1)).toFixed(decimals);
+  return `${currency.symbol} ${amount}`;
 }
 
 // Converte um preset em USD (ex.: 25, 50, 100) para o valor equivalente já

@@ -85,6 +85,7 @@ export async function allSiteUrls(): Promise<SiteUrl[]> {
   // /case-studies + 6 estudos. Todas no bucket "en" porque copy é EN-only.
   out.push({ url: `${base}/pricing`, changeFrequency: "weekly", priority: 0.7, lang: "en" });
   out.push({ url: `${base}/status`, changeFrequency: "hourly", priority: 0.4, lang: "en" });
+  out.push({ url: `${base}/legal/cookie-preferences`, changeFrequency: "yearly", priority: 0.3, lang: "en" });
 
   out.push({ url: `${base}/cities`, changeFrequency: "weekly", priority: 0.7, lang: "en" });
   for (const c of CITIES) {

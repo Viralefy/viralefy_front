@@ -166,6 +166,16 @@ export const fetchPlans = () => request<Plan[]>("/v1/plans");
 export const fetchCategories = () => request<Category[]>("/v1/categories");
 export const fetchCurrencies = () => request<Currency[]>("/v1/currencies");
 
+// PPP (Purchasing Power Parity) — Fase 6.5. multiplier ∈ [0.10, 1.00]. Aplicado
+// SÓ no display do front via priceForCountry(); USD canônico e settlement
+// permanecem intocados. País fora do catálogo → tratar como multiplier 1.00.
+export type PPPEntry = {
+  country_code: string;
+  multiplier: number;
+};
+
+export const fetchCountryPPP = () => request<PPPEntry[]>("/v1/country-ppp");
+
 // Gera Idempotency-Key fresca por chamada de checkout. F5 re-tenta com a
 // mesma key durante a sessão? NÃO — uma key por click. Se o usuário clicar
 // duas vezes acidental, o segundo click reusa a key (porque o form não foi
@@ -205,6 +215,37 @@ export const userLogin = (email: string, password: string, turnstileToken?: stri
 
 export const fetchMyOrders = (token: string) =>
   request<Order[]>("/v1/me/orders", undefined, token);
+
+// OrderDetail expande o shape básico de Order com os campos crus do
+// pedido — payment_url, métricas de baseline/delivery e timestamps de
+// captura. Usado pela página de tracking (/account/orders/{id}) pra
+// renderizar timeline + CTA "Complete payment" quando pendente.
+export type OrderDetail = {
+  id: string;
+  user_id: string;
+  plan_id: string;
+  status: string;
+  amount_cents: number;
+  currency: string;
+  display_currency: string;
+  display_amount: string;
+  settlement_currency: string;
+  settlement_amount: string;
+  payment_url?: string | null;
+  payment_method: string;
+  credits_used_cents: number;
+  publication_url?: string | null;
+  ticket_id?: string | null;
+  baseline_captured_at?: string | null;
+  delivery_captured_at?: string | null;
+  baseline_metrics?: Record<string, unknown> | null;
+  delivery_metrics?: Record<string, unknown> | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export const fetchMyOrder = (token: string, id: string) =>
+  request<OrderDetail>(`/v1/me/orders/${encodeURIComponent(id)}`, undefined, token);
 
 // ----- Tickets (helpdesk) ----- //
 
@@ -349,6 +390,83 @@ export const requestRecharge = (
 ) =>
   request<Invoice>("/v1/me/recharge", { method: "POST", body: JSON.stringify(body) }, token);
 
+// ----- Manage my data (LGPD/GDPR — Fase 5.2) ----- //
+
+export type DeletionRequestStatus = "pending" | "cancelled" | "executed";
+
+export type DeletionRequest = {
+  requested_at: string;
+  executes_at: string;
+  status: DeletionRequestStatus;
+  reason: string;
+};
+
+// O export é um "saco" tipado fracamente — o backend devolve um dump
+// inteiro do usuário e o conteúdo pode evoluir a cada release. Usamos
+// `unknown` em vez de `any` pra forçar narrowing onde for usado.
+export type ExportedData = {
+  exported_at: string;
+  user_id: string;
+  user?: Record<string, unknown>;
+  orders?: Array<Record<string, unknown>>;
+  tickets?: Array<Record<string, unknown>>;
+  profiles?: Array<Record<string, unknown>>;
+  reviews?: Array<Record<string, unknown>>;
+  notification_preferences?: unknown;
+  deletion_request?: DeletionRequest;
+};
+
+// exportMyData consome /v1/me/data/export — o backend manda Content-
+// Disposition: attachment, mas como fazemos fetch via JS, lemos como
+// JSON e o caller dispara o download client-side via Blob/URL.
+export const exportMyData = async (token: string): Promise<ExportedData> => {
+  const res = await fetch(`${API_URL}/v1/me/data/export`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    const j = await res.json().catch(() => ({}));
+    throw new Error(
+      (j as { error?: { message?: string } })?.error?.message ?? "Export failed",
+    );
+  }
+  return (await res.json()) as ExportedData;
+};
+
+// requestDeletion agenda exclusão; backend devolve 202 sem body.
+export const requestDeletion = async (
+  token: string,
+  body: { reason?: string },
+): Promise<void> => {
+  const res = await fetch(`${API_URL}/v1/me/data/deletion`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const j = await res.json().catch(() => ({}));
+    throw new Error(
+      (j as { error?: { message?: string } })?.error?.message ?? "Request failed",
+    );
+  }
+};
+
+// cancelDeletion desfaz o pedido pendente. Idempotente — backend 204.
+export const cancelDeletion = async (token: string): Promise<void> => {
+  const res = await fetch(`${API_URL}/v1/me/data/deletion`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    const j = await res.json().catch(() => ({}));
+    throw new Error(
+      (j as { error?: { message?: string } })?.error?.message ?? "Cancel failed",
+    );
+  }
+};
+
 // ----- Reviews ----- //
 
 export type Review = {
@@ -396,4 +514,29 @@ export const fetchPlanReviews = (planID: string) =>
 export const fetchCategoryReviewAggregate = (categoryCode: string) =>
   request<{ aggregate: AggregateRating | null }>(
     `/v1/categories/${categoryCode}/reviews`,
+  );
+
+// ----- Notification preferences ----- //
+
+// NotifPrefs espelha o JSONB users.notif_prefs. As 4 chaves vêm sempre
+// presentes do backend (defaults aplicados ao GET), então o front pode
+// renderizar os 4 toggles sem fallback condicional.
+export type NotifPrefs = {
+  order_updates: boolean;
+  marketing: boolean;
+  reviews: boolean;
+  cart_recovery: boolean;
+};
+
+export const fetchNotifPrefs = (token: string) =>
+  request<NotifPrefs>("/v1/me/notif-prefs", undefined, token);
+
+// updateNotifPrefs envia o snapshot completo no PUT. Backend faz merge
+// JSONB (||), então mandar parcial é seguro — mas o front sempre tem o
+// estado completo na tela, então não há razão pra dividir.
+export const updateNotifPrefs = (prefs: NotifPrefs, token: string) =>
+  request<NotifPrefs>(
+    "/v1/me/notif-prefs",
+    { method: "PUT", body: JSON.stringify(prefs) },
+    token,
   );

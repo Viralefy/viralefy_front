@@ -1,8 +1,8 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import type { Currency, Session, User } from "@/lib/api";
-import { fetchCurrencies } from "@/lib/api";
+import type { Currency, PPPEntry, Session, User } from "@/lib/api";
+import { fetchCountryPPP, fetchCurrencies } from "@/lib/api";
 import { clearSession, getUser, saveSession } from "@/lib/auth";
 import { initTracking } from "@/lib/tracking";
 
@@ -13,6 +13,10 @@ type AppState = {
   user: User | null;
   login: (s: Session) => void;
   logout: () => void;
+  // PPP (Fase 6.5) — multiplier por country_code lowercase. Vazio enquanto a
+  // call /v1/country-ppp não resolve; consumidores devem tratar ausência como
+  // multiplier 1.00 (priceForCountry() já faz isso).
+  pppMap: Record<string, number>;
 };
 
 const CURRENCY_KEY = "viralefy_currency";
@@ -26,6 +30,10 @@ export function useApp(): AppState {
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [currencies, setCurrencies] = useState<Currency[]>([]);
+  // Catálogo PPP em memória. Baixado uma vez no mount; tabela pequena (<50
+  // linhas) → custo trivial. Consumido por priceForCountry() pra ajustar
+  // display_amount ao poder de compra local.
+  const [pppMap, setPppMap] = useState<Record<string, number>>({});
   // Padrão global: USDT. É a moeda de liquidação canônica e fica 1:1 com
   // USD pra visitantes globais (símbolo "$"). Antes era USD; antes ainda
   // era BRL (acidente histórico do MVP brasileiro). Visitante novo cai em
@@ -68,6 +76,16 @@ export function Providers({ children }: { children: React.ReactNode }) {
         })
         .catch(() => undefined);
     }
+
+    // PPP catalog — best-effort. Falha de rede mantém mapa vazio (=preço cheio).
+    fetchCountryPPP()
+      .then((list: PPPEntry[]) => {
+        if (cancelled) return;
+        const m: Record<string, number> = {};
+        for (const e of list) m[e.country_code.toLowerCase()] = e.multiplier;
+        setPppMap(m);
+      })
+      .catch(() => undefined);
 
     fetchCurrencies()
       .then((list) => {
@@ -115,7 +133,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     ?? null;
 
   return (
-    <AppContext.Provider value={{ currencies, currency, setCurrencyCode, user, login, logout }}>
+    <AppContext.Provider value={{ currencies, currency, setCurrencyCode, user, login, logout, pppMap }}>
       {children}
     </AppContext.Provider>
   );

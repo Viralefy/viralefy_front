@@ -4,6 +4,7 @@ import "./globals.css";
 import { Providers } from "@/components/Providers";
 import { Header } from "@/components/Header";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { CookieBanner } from "@/components/CookieBanner";
 
 // Layout raiz. `<html lang>` é "en" (root é home global em inglês); páginas
 // de país sobrescrevem o lang no `<article lang>` interno.
@@ -144,6 +145,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
               estiver setado E o idioma do país atual for pt/es/es_AR. */}
           <WhatsAppButton />
         </Providers>
+        {/* GDPR cookie banner — client component; renderiza só quando o
+            usuário ainda não tomou decisão (localStorage vazio). */}
+        <CookieBanner />
         {/*
           TODO: backend cron will pick this up — adds a column
           `notified_abandoned_at` to orders table and runs hourly to e-mail
