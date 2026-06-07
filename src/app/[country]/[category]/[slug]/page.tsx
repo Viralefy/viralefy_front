@@ -129,19 +129,19 @@ function planNarrative(lang: string, cat: string, catLabel: string, qty: number,
   const NARR: Record<string, (q: number, country: string, label: string) => string[]> = {
     en: (q, ctry, label) => [
       `${q.toLocaleString()} ${label} delivered to your Instagram or TikTok account in ${ctry}. Fast pacing, 30-day refill guarantee, no password required.`,
-      `This package is sized for ${describeSize(q)}. We start delivery within 30 minutes of payment confirmation and finish over a window of ${windowFor(q)} — long enough to look natural to the platform algorithm, short enough that you see the impact the same day.`,
+      `This package is sized for ${describeSize(q)}. We start delivery from 1 hour of payment confirmation and finish over a window of ${windowFor(q)} — long enough to look natural to the platform algorithm, short enough that you see the impact the same day.`,
       `Every order is anonymous and never visible to your audience. We never request your password. Just hand us your public @ handle (or the public post URL for engagement and views) and we handle the rest.`,
       `If anyone drops within 30 days we top your count back up at no cost. Pay in USDT, USD, EUR or crypto — invoices are emailed automatically.`,
     ],
     pt: (q, ctry, label) => [
       `${q.toLocaleString()} ${label} entregues na sua conta de Instagram ou TikTok em ${ctry}. Pacing rápido, reposição de 30 dias, sem senha.`,
-      `O tamanho desse pacote é ideal para ${describeSizePt(q)}. Começamos a entregar em até 30 minutos depois da confirmação do pagamento e finalizamos numa janela de ${windowForPt(q)} — tempo suficiente pra parecer natural pro algoritmo, curto o bastante pra você ver o impacto no mesmo dia.`,
+      `O tamanho desse pacote é ideal para ${describeSizePt(q)}. Começamos a entregar em até 1 hora depois da confirmação do pagamento e finalizamos numa janela de ${windowForPt(q)} — tempo suficiente pra parecer natural pro algoritmo, curto o bastante pra você ver o impacto no mesmo dia.`,
       `Cada pedido é anônimo e invisível pra sua audiência. Nunca pedimos senha. Você passa o seu @ público (ou a URL pública do post pra engajamento/views) e a gente cuida do resto.`,
       `Se alguém cair em 30 dias, repomos sem custo. Pague em real, dólar, euro ou cripto — recibos chegam automáticos no e-mail.`,
     ],
     es: (q, ctry, label) => [
       `${q.toLocaleString()} ${label} entregados a tu Instagram o TikTok en ${ctry}. Pacing rápido, reposición de 30 días, sin contraseña.`,
-      `Este paquete es para ${describeSizeEs(q)}. Empezamos a entregar en menos de 30 minutos tras confirmar el pago y terminamos en una ventana de ${windowForPt(q)}.`,
+      `Este paquete es para ${describeSizeEs(q)}. Empezamos a entregar en menos de 1 hora tras confirmar el pago y terminamos en una ventana de ${windowForPt(q)}.`,
       `Cada pedido es anónimo e invisible para tu audiencia. Nunca pedimos contraseña.`,
       `Si alguien se va dentro de 30 días, reponemos sin coste. Paga en USD, EUR o cripto.`,
     ],

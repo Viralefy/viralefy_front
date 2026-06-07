@@ -150,7 +150,7 @@ export function QuantitySlider({
         </table>
       </div>
 
-      {selected && <CheckoutModal plan={selected} onClose={() => setSelected(null)} />}
+      {selected && <CheckoutModal plan={selected} onClose={() => setSelected(null)} targetCountry={countryCode} />}
     </>
   );
 }

@@ -38,7 +38,7 @@ export function BuyPlanCta({ plan, lang, countryCode }: { plan: Plan; lang: Lang
         {t.cta.buyNow}
       </button>
       <TrustSignals lang={lang} variant="compact" />
-      {open && <CheckoutModal plan={plan} lang={lang} onClose={() => setOpen(false)} />}
+      {open && <CheckoutModal plan={plan} lang={lang} onClose={() => setOpen(false)} targetCountry={countryCode} />}
     </div>
   );
 }

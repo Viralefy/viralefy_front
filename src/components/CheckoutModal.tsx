@@ -17,10 +17,14 @@ export function CheckoutModal({
   plan,
   lang = "en",
   onClose,
+  targetCountry,
 }: {
   plan: Plan;
   lang?: LangCode;
   onClose: () => void;
+  // Mercado da entrega — herda da LP (/us, /de, ...) que abriu o modal.
+  // Operador usa pra escolher supplier. Independente de userCountry (VAT).
+  targetCountry?: string;
 }) {
   const { currency, user } = useApp();
   const isProfile = plan.target_type === "profile";
@@ -138,6 +142,10 @@ export function CheckoutModal({
       // é apenas pra que o cálculo final bata com o pre-display.
       if (userCountry) {
         payload.country = userCountry;
+      }
+      // target_country: mercado da entrega herdado da URL da LP.
+      if (targetCountry) {
+        payload.target_country = targetCountry;
       }
       if (isProfile) {
         if (user && profiles && !useNewProfile && selectedProfileId) {

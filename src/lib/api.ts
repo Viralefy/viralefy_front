@@ -86,6 +86,8 @@ export type CheckoutPayload = {
   // País do visitante (ISO alpha-2 lowercase). Se EU/GB e TaxService
   // configurado no API, VAT é cobrado em settlement_amount.
   country?: string;
+  // País do MERCADO da entrega — herdado da LP (/us/, /de/...).
+  target_country?: string;
 };
 
 export type CouponPreview = {

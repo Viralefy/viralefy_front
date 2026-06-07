@@ -123,7 +123,7 @@ export function CategoryCardGrid({
           {subErr ?? (subOk ? "Subscription created. Manage at /account/subscriptions." : "")}
         </p>
       )}
-      {selected && <CheckoutModal plan={selected} onClose={() => setSelected(null)} />}
+      {selected && <CheckoutModal plan={selected} onClose={() => setSelected(null)} targetCountry={countryCode} />}
     </>
   );
 }

@@ -149,7 +149,7 @@ export type Pack = {
   };
   plan: {
     delivery: string;         // "Entrega rápida"
-    deliveryDesc: string;     // ex. "início em até 30 minutos"
+    deliveryDesc: string;     // ex. "início em até 1 hora"
     safe: string;             // "Sem senha"
     safeDesc: string;
     refill: string;           // "Reposição garantida"
@@ -164,7 +164,7 @@ export type Pack = {
   trust: {
     refill: string;     // "30-day refill guarantee"
     password: string;   // "No password required"
-    delivery: string;   // "Delivery starts in 30 minutes"
+    delivery: string;   // "Delivery starts from 1 hour"
     guarantee: string;  // "30-day guarantee" — versão badge
   };
   // Widget de contador "ao vivo" (LiveCounter).
@@ -234,7 +234,7 @@ const en: Pack = {
   },
   plan: {
     delivery: "Fast delivery",
-    deliveryDesc: "Most orders start within 30 minutes after payment is confirmed.",
+    deliveryDesc: "Most orders start from 1 hour after payment is confirmed.",
     safe: "No password required",
     safeDesc: "We never ask for your account password. Just hand us your public @ or the public URL.",
     refill: "Refill guarantee",
@@ -248,7 +248,7 @@ const en: Pack = {
   trust: {
     refill: "30-day refill guarantee",
     password: "No password required",
-    delivery: "Delivery starts in 30 minutes",
+    delivery: "Delivery starts from 1 hour",
     guarantee: "30-day guarantee",
   },
   live: {
@@ -317,7 +317,7 @@ const pt: Pack = {
   },
   plan: {
     delivery: "Entrega rápida",
-    deliveryDesc: "A maioria dos pedidos começa em até 30 minutos após a confirmação do pagamento.",
+    deliveryDesc: "A maioria dos pedidos começa em até 1 hora após a confirmação do pagamento.",
     safe: "Não pedimos sua senha",
     safeDesc: "Nunca solicitamos a senha da sua conta. Basta nos passar seu @ público ou o link da publicação.",
     refill: "Reposição garantida",
@@ -331,7 +331,7 @@ const pt: Pack = {
   trust: {
     refill: "Reposição garantida por 30 dias",
     password: "Sem precisar de senha",
-    delivery: "Entrega começa em 30 minutos",
+    delivery: "Entrega começa em 1 hora",
     guarantee: "Garantia de 30 dias",
   },
   live: {
@@ -400,7 +400,7 @@ const es: Pack = {
   },
   plan: {
     delivery: "Entrega rápida",
-    deliveryDesc: "La mayoría de los pedidos comienza en menos de 30 minutos tras confirmar el pago.",
+    deliveryDesc: "La mayoría de los pedidos comienza en menos de 1 hora tras confirmar el pago.",
     safe: "Sin contraseña",
     safeDesc: "Nunca pedimos la contraseña de tu cuenta. Solo necesitamos tu @ público o el enlace de la publicación.",
     refill: "Reposición garantizada",
@@ -414,7 +414,7 @@ const es: Pack = {
   trust: {
     refill: "Reposición garantizada 30 días",
     password: "Sin contraseña",
-    delivery: "La entrega comienza en 30 minutos",
+    delivery: "La entrega comienza en 1 hora",
     guarantee: "Garantía de 30 días",
   },
   live: {
@@ -483,7 +483,7 @@ const fr: Pack = {
   },
   plan: {
     delivery: "Livraison rapide",
-    deliveryDesc: "La plupart des commandes démarrent en moins de 30 minutes après confirmation du paiement.",
+    deliveryDesc: "La plupart des commandes démarrent en moins d'1 heure après confirmation du paiement.",
     safe: "Aucun mot de passe demandé",
     safeDesc: "Nous ne demandons jamais le mot de passe de votre compte. Donnez-nous votre @ public ou le lien de la publication.",
     refill: "Garantie de recharge",
@@ -497,7 +497,7 @@ const fr: Pack = {
   trust: {
     refill: "Garantie de recharge 30 jours",
     password: "Aucun mot de passe requis",
-    delivery: "Livraison sous 30 minutes",
+    delivery: "Livraison sous 1 heure",
     guarantee: "Garantie 30 jours",
   },
   live: {
@@ -649,7 +649,7 @@ const it: Pack = {
   },
   plan: {
     delivery: "Consegna rapida",
-    deliveryDesc: "La maggior parte degli ordini parte entro 30 minuti dalla conferma del pagamento.",
+    deliveryDesc: "La maggior parte degli ordini parte entro 1 ora dalla conferma del pagamento.",
     safe: "Nessuna password",
     safeDesc: "Non chiediamo mai la password del tuo account. Basta il tuo @ pubblico o il link del post.",
     refill: "Garanzia di ricarica",
@@ -663,7 +663,7 @@ const it: Pack = {
   trust: {
     refill: "Garanzia di ricarica 30 giorni",
     password: "Nessuna password richiesta",
-    delivery: "Consegna in 30 minuti",
+    delivery: "Consegna in 1 ora",
     guarantee: "Garanzia 30 giorni",
   },
   live: {
@@ -692,7 +692,7 @@ export const PACKS: Record<LangCode, Pack> = {
     trust: {
       refill: "30 dagen aanvulgarantie",
       password: "Geen wachtwoord nodig",
-      delivery: "Levering start in 30 minuten",
+      delivery: "Levering start in 1 uur",
       guarantee: "30 dagen garantie",
     },
     live: {

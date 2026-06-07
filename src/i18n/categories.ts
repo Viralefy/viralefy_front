@@ -439,7 +439,7 @@ const COPY_SEGUIDORES_EN: LongCopy = {
     `Buy real followers for Instagram and TikTok in ${c}. Fast delivery, refill guarantee, support in your language. Pay in USD, EUR or crypto.`,
   paragraphs: (c) => [
     `Building an audience from scratch in ${c} is hard. The algorithms behind Instagram and TikTok favor accounts that already look "alive" — accounts with a steady follower count, recurring likes and a baseline of views. New profiles get caught in a chicken-and-egg loop: nobody discovers you because you have no traction, and you have no traction because nobody discovers you. Buying a starter pack of followers is the most direct way to break that loop and put your content in front of a wider reach pool.`,
-    `Viralefy ships followers that survive: high-quality profiles drip-fed at a natural pace so the platform never flags your account as buying. Every package is delivered with a refill guarantee — if anyone drops within 30 days we top your count back up at no cost. Our orders for ${c} start within 30 minutes of payment confirmation and complete within 24 to 72 hours depending on the volume, with no need to share your password. All we ask is your public @ handle.`,
+    `Viralefy ships followers that survive: high-quality profiles drip-fed at a natural pace so the platform never flags your account as buying. Every package is delivered with a refill guarantee — if anyone drops within 30 days we top your count back up at no cost. Our orders for ${c} start from 1 hour of payment confirmation and complete within 24 to 72 hours depending on the volume, with no need to share your password. All we ask is your public @ handle.`,
     `Compared with shady storefronts that drop thousands of bots overnight, Viralefy works in pacing windows that mimic organic growth. A 1,000-follower order is split across several hours; a 10,000-follower order runs over a couple of days. That pattern keeps your engagement ratio healthy and protects the reach you already earned. For creators in ${c} who rely on the algorithm to surface their content, that distinction is everything.`,
     `Pricing is transparent and flat per quantity. There are no subscriptions, no auto-renewals, no upsells in the checkout. You pay once for a package and we deliver it. Payment options cover bank transfer, card, Pix when available, and crypto (USDT, BTC). Receipts and invoices are emailed automatically and the full history stays inside your account so you can re-order with one click.`,
     `If you've never used a growth service before, the cheapest starter package is the safest way to test the waters. Pick a 100- or 250-follower bundle, watch how it lands, and only scale up once you're comfortable with what you see. The pages below let you pick from preset packages or use a slider to dial the exact quantity you want.`,
@@ -468,7 +468,7 @@ const COPY_SEGUIDORES_PT: LongCopy = {
     `Compre seguidores reais para Instagram e TikTok em ${c}. Entrega rápida, garantia de reposição e suporte no seu idioma. Pague em real, USD, EUR ou cripto.`,
   paragraphs: (c) => [
     `Crescer do zero em ${c} é difícil. Os algoritmos do Instagram e do TikTok favorecem perfis que já parecem "vivos" — contas com base estável de seguidores, curtidas recorrentes e um mínimo de visualizações. Perfis novos caem num beco circular: ninguém te descobre porque você não tem tração, e você não ganha tração porque ninguém te descobre. Comprar um pacote inicial de seguidores é o caminho mais direto para sair desse ciclo e colocar seu conteúdo num pool de alcance maior.`,
-    `A Viralefy entrega seguidores que ficam: perfis de alta qualidade, distribuídos em ritmo natural para que a plataforma nunca marque sua conta como compradora. Todo pacote vem com garantia de reposição — se alguém deixar de te seguir nos próximos 30 dias, repomos sem custo. Pedidos para ${c} começam em até 30 minutos depois da confirmação do pagamento e finalizam em 24 a 72 horas, dependendo do volume, sem precisar da sua senha. Pedimos só o seu @ público.`,
+    `A Viralefy entrega seguidores que ficam: perfis de alta qualidade, distribuídos em ritmo natural para que a plataforma nunca marque sua conta como compradora. Todo pacote vem com garantia de reposição — se alguém deixar de te seguir nos próximos 30 dias, repomos sem custo. Pedidos para ${c} começam em até 1 hora depois da confirmação do pagamento e finalizam em 24 a 72 horas, dependendo do volume, sem precisar da sua senha. Pedimos só o seu @ público.`,
     `Diferente das lojas duvidosas que jogam milhares de bots de uma vez, a Viralefy trabalha em janelas de pacing que imitam o crescimento orgânico. Um pedido de 1.000 seguidores é dividido ao longo de algumas horas; um de 10.000 roda durante dois dias. Esse padrão mantém sua proporção de engajamento saudável e protege o alcance que você já conquistou. Para criadores em ${c} que dependem do algoritmo para distribuir o conteúdo, essa diferença é tudo.`,
     `O preço é direto e fixo por quantidade. Não tem assinatura, não tem renovação automática, não tem upsell escondido no checkout. Você paga uma vez pelo pacote, a gente entrega. As formas de pagamento cobrem boleto, cartão, Pix (no Brasil) e cripto (USDT, BTC). Os recibos chegam automáticos no e-mail e o histórico fica salvo na sua conta para você refazer o pedido com um clique.`,
     `Se você nunca usou um serviço de crescimento, o pacote mais barato é a melhor forma de testar a água. Pegue um starter de 100 ou 250 seguidores, observe o resultado, e só escale quando estiver confortável com o que vê. Logo abaixo você escolhe entre pacotes pré-definidos ou usa o slider para definir a quantidade exata que quer.`,
@@ -497,7 +497,7 @@ const COPY_SEGUIDORES_ES: LongCopy = {
     `Compra seguidores reales para Instagram y TikTok en ${c}. Entrega rápida, garantía de reposición y soporte en tu idioma. Paga en USD, EUR o cripto.`,
   paragraphs: (c) => [
     `Crecer desde cero en ${c} es duro. Los algoritmos de Instagram y TikTok favorecen a las cuentas que ya parecen "vivas" — perfiles con una base estable de seguidores, likes recurrentes y un mínimo de visualizaciones. Los perfiles nuevos caen en un círculo vicioso: nadie te descubre porque no tienes tracción y no tienes tracción porque nadie te descubre. Comprar un paquete inicial de seguidores es la forma más directa de romper ese círculo y meter tu contenido en una piscina de alcance mayor.`,
-    `Viralefy entrega seguidores que se quedan: perfiles de alta calidad distribuidos a un ritmo natural para que la plataforma nunca marque tu cuenta como compradora. Cada paquete viene con garantía de reposición — si alguien deja de seguirte dentro de 30 días, reponemos sin coste. Los pedidos para ${c} arrancan en menos de 30 minutos tras la confirmación del pago y terminan en 24 a 72 horas según el volumen, sin necesidad de compartir tu contraseña. Solo necesitamos tu @ público.`,
+    `Viralefy entrega seguidores que se quedan: perfiles de alta calidad distribuidos a un ritmo natural para que la plataforma nunca marque tu cuenta como compradora. Cada paquete viene con garantía de reposición — si alguien deja de seguirte dentro de 30 días, reponemos sin coste. Los pedidos para ${c} arrancan en menos de 1 hora tras la confirmación del pago y terminan en 24 a 72 horas según el volumen, sin necesidad de compartir tu contraseña. Solo necesitamos tu @ público.`,
     `A diferencia de las tiendas dudosas que lanzan miles de bots de golpe, Viralefy trabaja en ventanas de pacing que imitan el crecimiento orgánico. Un pedido de 1.000 seguidores se reparte en varias horas; uno de 10.000 corre durante un par de días. Ese patrón mantiene tu ratio de engagement sano y protege el alcance que ya tienes. Para creadores en ${c} que dependen del algoritmo para difundir su contenido, esa diferencia lo es todo.`,
     `El precio es transparente y plano por cantidad. Sin suscripciones, sin renovaciones automáticas, sin upsells escondidos en el checkout. Pagas una vez por el paquete y lo entregamos. Las formas de pago cubren tarjeta, transferencia, y cripto (USDT, BTC). Los recibos llegan automáticos al correo y el historial queda guardado en tu cuenta para que repitas el pedido con un clic.`,
     `Si nunca usaste un servicio de crecimiento, el paquete más barato es la mejor forma de probar. Empieza con 100 o 250 seguidores, mira cómo cae, y solo escala cuando te sientas cómodo con lo que ves. Más abajo eliges entre paquetes preestablecidos o usas el deslizador para definir la cantidad exacta.`,
@@ -523,7 +523,7 @@ const COPY_ENG_EN: LongCopy = {
   h1: (c) => `Buy likes & engagement for Instagram and TikTok in ${c}`,
   metaTitle: (c) => `Buy Instagram & TikTok likes in ${c} | Viralefy`,
   metaDescription: (c) =>
-    `Boost any post with real-looking likes and engagement in ${c}. Delivery starts in 30 minutes, no password required.`,
+    `Boost any post with real-looking likes and engagement in ${c}. Delivery starts from 1 hour, no password required.`,
   paragraphs: (c) => [
     `Likes are the first social proof a viewer sees. A post with 12 likes reads "amateur"; the same post with 1,200 reads "must be worth a look". The algorithm uses early engagement as one of the strongest ranking signals — a post that gets a strong like-to-impression ratio in the first hour gets pushed harder. That's the window where buying likes pays for itself in ${c}: you raise the floor of the early curve and let the algorithm do the rest.`,
     `Viralefy delivers likes from accounts that have profile pictures, posts and real-looking activity — not the throwaway profiles that platforms scrub during the next sweep. Every like is paced naturally over the first hour so the rise looks organic. If you pair it with a follower package the lift compounds: more followers means a wider impression pool, more likes means a higher CTR on those impressions, and the post climbs faster.`,
@@ -542,7 +542,7 @@ const COPY_ENG_EN: LongCopy = {
     { q: "Will the platform detect bought likes?", a: "Likes are paced over the first hour to mimic organic growth. The accounts have profile pictures and activity, not empty-egg patterns." },
     { q: "Do you need the post URL?", a: "Yes — paste the public post or reel URL during checkout. Private posts cannot be reached." },
     { q: "Can I split a package across multiple posts?", a: "Each package targets one post. Run several orders to cover multiple posts." },
-    { q: "How fast does delivery start?", a: "Most orders start within 30 minutes of payment confirmation." },
+    { q: "How fast does delivery start?", a: "Most orders start from 1 hour of payment confirmation." },
   ],
 };
 
@@ -550,7 +550,7 @@ const COPY_ENG_PT: LongCopy = {
   h1: (c) => `Comprar curtidas e engajamento em ${c}`,
   metaTitle: (c) => `Comprar curtidas para Instagram e TikTok em ${c} | Viralefy`,
   metaDescription: (c) =>
-    `Impulsione qualquer post com curtidas e engajamento reais em ${c}. Início em 30 minutos, sem senha.`,
+    `Impulsione qualquer post com curtidas e engajamento reais em ${c}. Início em 1 hora, sem senha.`,
   paragraphs: (c) => [
     `Curtida é a primeira prova social que o usuário vê. Um post com 12 curtidas lê "amador"; o mesmo post com 1.200 lê "deve valer a pena olhar". O algoritmo usa o engajamento inicial como um dos sinais mais fortes de ranqueamento — um post com uma razão curtida/impressão alta na primeira hora ganha empurrão. Essa é a janela em que comprar curtidas em ${c} se paga: você levanta o piso da curva inicial e deixa o algoritmo fazer o resto.`,
     `A Viralefy entrega curtidas vindas de contas com foto, posts e atividade real — não os perfis descartáveis que as plataformas limpam na próxima varredura. Cada curtida é distribuída de forma natural ao longo da primeira hora para a subida parecer orgânica. Combinado com um pacote de seguidores o efeito compõe: mais seguidores = pool de impressões maior, mais curtidas = CTR maior sobre essas impressões, e o post sobe mais rápido.`,
@@ -569,7 +569,7 @@ const COPY_ENG_PT: LongCopy = {
     { q: "A plataforma vai detectar?", a: "As curtidas caem ao longo da primeira hora para imitar orgânico. As contas têm foto e atividade, não são perfis vazios." },
     { q: "Vocês precisam da URL do post?", a: "Sim — cole a URL pública do post ou reel no checkout. Posts privados não são alcançáveis." },
     { q: "Posso dividir o pacote em vários posts?", a: "Cada pacote mira um post. Faça vários pedidos pra cobrir vários posts." },
-    { q: "Em quanto tempo começa?", a: "A maioria dos pedidos começa em até 30 minutos após confirmar o pagamento." },
+    { q: "Em quanto tempo começa?", a: "A maioria dos pedidos começa em até 1 hora após confirmar o pagamento." },
   ],
 };
 
@@ -577,7 +577,7 @@ const COPY_ENG_ES: LongCopy = {
   h1: (c) => `Comprar likes e interacciones para Instagram y TikTok en ${c}`,
   metaTitle: (c) => `Comprar likes para Instagram y TikTok en ${c} | Viralefy`,
   metaDescription: (c) =>
-    `Impulsa cualquier publicación con likes reales en ${c}. Comienzo en 30 minutos, sin contraseña.`,
+    `Impulsa cualquier publicación con likes reales en ${c}. Comienzo en 1 hora, sin contraseña.`,
   paragraphs: (c) => [
     `Los likes son la primera prueba social. Un post con 12 likes parece amateur; el mismo post con 1.200 parece "vale la pena verlo". El algoritmo usa el engagement inicial como una de las señales más fuertes — un post con buena ratio like/impresión en la primera hora se empuja más. Esa es la ventana en que comprar likes en ${c} se paga: levantas el piso de la curva inicial y dejas que el algoritmo haga el resto.`,
     `Viralefy entrega likes desde cuentas con foto, posts y actividad real — no los perfiles desechables que las plataformas limpian en la siguiente barrida. Cada like se distribuye de forma natural a lo largo de la primera hora para que la subida parezca orgánica. Combinado con un paquete de seguidores el efecto se compone.`,
@@ -596,7 +596,7 @@ const COPY_ENG_ES: LongCopy = {
     { q: "¿La plataforma detecta likes comprados?", a: "Los likes caen a lo largo de la primera hora para imitar lo orgánico. Las cuentas tienen foto y actividad." },
     { q: "¿Necesitan la URL del post?", a: "Sí — pega la URL pública del post o reel en el checkout." },
     { q: "¿Puedo repartir el paquete entre varios posts?", a: "Cada paquete apunta a un post. Haz varios pedidos para cubrir varios posts." },
-    { q: "¿Cuánto tarda en empezar?", a: "La mayoría arranca en menos de 30 minutos." },
+    { q: "¿Cuánto tarda en empezar?", a: "La mayoría arranca en menos de 1 hora." },
   ],
 };
 
@@ -605,7 +605,7 @@ const COPY_VIEWS_EN: LongCopy = {
   h1: (c) => `Buy Reels, TikTok and Story views in ${c}`,
   metaTitle: (c) => `Buy Instagram & TikTok views in ${c} | Viralefy`,
   metaDescription: (c) =>
-    `Boost any video with real-looking views in ${c}. Reels, TikTok and Stories. Delivery starts in 30 minutes.`,
+    `Boost any video with real-looking views in ${c}. Reels, TikTok and Stories. Delivery starts from 1 hour.`,
   paragraphs: (c) => [
     `View count is the headline metric for any short-form video. A reel sitting at 320 views looks dead; the same reel at 32,000 looks like it's catching fire. Viewers in ${c} use that number as a heuristic to decide whether to watch — and the algorithm uses it as a ranking signal to decide whether to push the video further. Buying views is the cheapest way to raise that baseline.`,
     `Viralefy delivers views that count for the algorithm: full-watch impressions from accounts that have real activity, paced so the rise mirrors organic discovery. Stories views are non-public to your followers; Reels views are public and add directly to the count displayed on your profile. Both work the same way for the algorithm.`,
@@ -632,7 +632,7 @@ const COPY_VIEWS_PT: LongCopy = {
   h1: (c) => `Comprar visualizações de Reels, TikTok e Stories em ${c}`,
   metaTitle: (c) => `Comprar visualizações para Instagram e TikTok em ${c} | Viralefy`,
   metaDescription: (c) =>
-    `Impulsione qualquer vídeo com visualizações reais em ${c}. Reels, TikTok e Stories. Início em 30 minutos.`,
+    `Impulsione qualquer vídeo com visualizações reais em ${c}. Reels, TikTok e Stories. Início em 1 hora.`,
   paragraphs: (c) => [
     `Visualização é a métrica de manchete de qualquer vídeo curto. Um reel parado em 320 views parece morto; o mesmo reel em 32.000 parece estar pegando fogo. Os espectadores em ${c} usam esse número como heurística pra decidir se assistem — e o algoritmo usa como sinal de ranqueamento pra decidir se empurra o vídeo mais longe. Comprar views é a forma mais barata de subir essa linha de base.`,
     `A Viralefy entrega views que contam para o algoritmo: impressões de assistência completa, vindas de contas com atividade real, distribuídas para a curva imitar descoberta orgânica. Views de Story não aparecem para sua audiência; views de Reels aparecem no contador público. Os dois funcionam igual para o algoritmo.`,
@@ -659,7 +659,7 @@ const COPY_VIEWS_ES: LongCopy = {
   h1: (c) => `Comprar visualizaciones de Reels, TikTok y Stories en ${c}`,
   metaTitle: (c) => `Comprar visualizaciones para Instagram y TikTok en ${c} | Viralefy`,
   metaDescription: (c) =>
-    `Impulsa cualquier vídeo con visualizaciones reales en ${c}. Reels, TikTok y Stories. Inicio en 30 minutos.`,
+    `Impulsa cualquier vídeo con visualizaciones reales en ${c}. Reels, TikTok y Stories. Inicio en 1 hora.`,
   paragraphs: (c) => [
     `La cantidad de vistas es la métrica titular de cualquier vídeo corto. Un reel con 320 vistas parece muerto; el mismo reel con 32.000 parece estar despegando. Los espectadores en ${c} usan ese número como heurística para decidir si miran — y el algoritmo lo usa como señal de ranking para decidir si empuja el vídeo más lejos.`,
     `Viralefy entrega vistas que cuentan para el algoritmo: impresiones de visualización completa desde cuentas con actividad real, distribuidas para que la curva parezca orgánica. Las vistas de Stories no son públicas para tu audiencia; las vistas de Reels son públicas y se suman al contador del perfil.`,
@@ -772,7 +772,7 @@ const COPY_SEGUIDORES_FR: LongCopy = {
     `Achetez de vrais abonnés Instagram et TikTok en ${c}. Livraison rapide, garantie de recharge, support dans votre langue. Paiement en EUR, USD ou crypto.`,
   paragraphs: (c) => [
     `Construire une audience à partir de zéro en ${c} relève du parcours du combattant. Les algorithmes d'Instagram et de TikTok privilégient les comptes qui ont déjà l'air "vivants" — des profils avec un socle stable d'abonnés, des likes récurrents et un minimum de vues. Les nouveaux comptes sont pris dans une boucle absurde : personne ne vous découvre parce que vous n'avez pas de traction, et vous n'avez pas de traction parce que personne ne vous découvre. Acheter un pack de démarrage d'abonnés est la manière la plus directe de briser ce cercle et de pousser votre contenu dans une zone de portée plus large.`,
-    `Viralefy livre des abonnés qui restent : des profils de qualité diffusés à un rythme naturel pour que la plateforme ne signale jamais votre compte comme acheteur. Chaque pack est livré avec une garantie de recharge — si quelqu'un se désabonne dans les 30 jours, nous rétablissons votre compteur sans frais. Les commandes pour ${c} démarrent dans les 30 minutes qui suivent la confirmation du paiement et se terminent en 24 à 72 heures selon le volume, sans jamais avoir à partager votre mot de passe. Nous ne demandons que votre @ public.`,
+    `Viralefy livre des abonnés qui restent : des profils de qualité diffusés à un rythme naturel pour que la plateforme ne signale jamais votre compte comme acheteur. Chaque pack est livré avec une garantie de recharge — si quelqu'un se désabonne dans les 30 jours, nous rétablissons votre compteur sans frais. Les commandes pour ${c} démarrent dans l'heure qui suivent la confirmation du paiement et se terminent en 24 à 72 heures selon le volume, sans jamais avoir à partager votre mot de passe. Nous ne demandons que votre @ public.`,
     `Contrairement aux boutiques douteuses qui lâchent des milliers de bots d'un coup, Viralefy travaille en fenêtres de diffusion qui imitent la croissance organique. Une commande de 1 000 abonnés est répartie sur plusieurs heures ; une commande de 10 000 s'étale sur deux jours. Ce schéma maintient votre ratio d'engagement en bonne santé et protège la portée que vous avez déjà gagnée. Pour les créateurs en ${c} qui dépendent de l'algorithme pour diffuser leur contenu, cette distinction fait toute la différence.`,
     `La tarification est transparente et forfaitaire selon la quantité. Pas d'abonnement, pas de renouvellement automatique, pas de vente additionnelle cachée dans le tunnel d'achat. Vous payez une fois pour le pack, nous livrons. Les moyens de paiement couvrent la carte bancaire, le virement, et les cryptos (USDT, BTC). Les reçus arrivent automatiquement par e-mail et l'historique reste enregistré dans votre compte pour que vous puissiez relancer une commande en un clic.`,
     `Si vous n'avez jamais utilisé de service de croissance, le pack le moins cher reste la meilleure façon de tester. Prenez un starter de 100 ou 250 abonnés, observez comment ça se passe, et ne montez en puissance que lorsque vous êtes à l'aise avec ce que vous voyez. Plus bas, vous choisissez entre des packs préconfigurés ou utilisez le curseur pour définir la quantité exacte que vous voulez.`,
@@ -830,7 +830,7 @@ const COPY_SEGUIDORES_IT: LongCopy = {
     `Compra follower veri per Instagram e TikTok in ${c}. Consegna rapida, garanzia di ripristino e supporto nella tua lingua. Paga in EUR, USD o cripto.`,
   paragraphs: (c) => [
     `Far crescere un pubblico da zero in ${c} è dura. Gli algoritmi di Instagram e TikTok premiano i profili che sembrano già "vivi" — account con una base stabile di follower, like ricorrenti e un minimo di visualizzazioni. I profili nuovi finiscono in un loop circolare: nessuno ti scopre perché non hai trazione, e non hai trazione perché nessuno ti scopre. Comprare un pacchetto iniziale di follower è il modo più diretto di rompere quel cerchio e mettere i tuoi contenuti in un bacino di reach più ampio.`,
-    `Viralefy consegna follower che restano: profili di alta qualità distribuiti a ritmo naturale così la piattaforma non segnala mai il tuo account come acquirente. Ogni pacchetto è coperto da garanzia di ripristino — se qualcuno smette di seguirti entro 30 giorni, ripristiniamo il conteggio senza costi. Gli ordini per ${c} partono entro 30 minuti dalla conferma del pagamento e si concludono in 24-72 ore in base al volume, senza che tu debba condividere la tua password. Ci serve solo la tua @ pubblica.`,
+    `Viralefy consegna follower che restano: profili di alta qualità distribuiti a ritmo naturale così la piattaforma non segnala mai il tuo account come acquirente. Ogni pacchetto è coperto da garanzia di ripristino — se qualcuno smette di seguirti entro 30 giorni, ripristiniamo il conteggio senza costi. Gli ordini per ${c} partono entro 1 ora dalla conferma del pagamento e si concludono in 24-72 ore in base al volume, senza che tu debba condividere la tua password. Ci serve solo la tua @ pubblica.`,
     `A differenza dei negozi loschi che scaricano migliaia di bot in una sola volta, Viralefy lavora con finestre di pacing che imitano la crescita organica. Un ordine da 1.000 follower viene spalmato su diverse ore; uno da 10.000 gira per un paio di giorni. Questo schema mantiene sano il tuo rapporto di engagement e protegge la reach che hai già conquistato. Per i creator in ${c} che si affidano all'algoritmo per distribuire i contenuti, quella distinzione è tutto.`,
     `Il prezzo è trasparente e a forfait per quantità. Niente abbonamenti, niente rinnovi automatici, niente upsell nascosti al checkout. Paghi una volta per il pacchetto e noi consegniamo. I metodi di pagamento coprono carta, bonifico e cripto (USDT, BTC). Le ricevute arrivano in automatico via e-mail e lo storico resta dentro il tuo account così puoi ripetere l'ordine con un click.`,
     `Se non hai mai usato un servizio di crescita, il pacchetto più economico è il modo più sicuro per testare. Prendi un starter da 100 o 250 follower, osserva come va e scala solo quando ti senti a tuo agio con ciò che vedi. Più sotto puoi scegliere tra pacchetti preconfigurati o usare lo slider per fissare la quantità esatta.`,
@@ -859,7 +859,7 @@ const COPY_SEGUIDORES_NL: LongCopy = {
     `Koop echte volgers voor Instagram en TikTok in ${c}. Snelle levering, aanvulgarantie en support in jouw taal. Betaal in EUR, USD of crypto.`,
   paragraphs: (c) => [
     `Vanaf nul een publiek opbouwen in ${c} is loodzwaar. De algoritmes van Instagram en TikTok bevoordelen accounts die er al "levend" uitzien — profielen met een stabiele volgersbasis, terugkerende likes en een basislaag aan weergaven. Nieuwe profielen belanden in een kip-en-ei-spiraal: niemand ontdekt je omdat je geen tractie hebt, en je krijgt geen tractie omdat niemand je ontdekt. Een starterspakket volgers kopen is de meest directe manier om die lus te doorbreken en je content in een grotere bereikpool te duwen.`,
-    `Viralefy levert volgers die blijven: profielen van hoge kwaliteit, in een natuurlijk tempo gedoseerd zodat het platform je account nooit als koper aanmerkt. Elk pakket komt met een aanvulgarantie — als iemand binnen 30 dagen ontvolgt, vullen we je teller gratis weer aan. Bestellingen voor ${c} starten binnen 30 minuten na betalingsbevestiging en lopen in 24 tot 72 uur af, afhankelijk van het volume, zonder dat je je wachtwoord hoeft te delen. Wij vragen alleen je openbare @-naam.`,
+    `Viralefy levert volgers die blijven: profielen van hoge kwaliteit, in een natuurlijk tempo gedoseerd zodat het platform je account nooit als koper aanmerkt. Elk pakket komt met een aanvulgarantie — als iemand binnen 30 dagen ontvolgt, vullen we je teller gratis weer aan. Bestellingen voor ${c} starten binnen 1 uur na betalingsbevestiging en lopen in 24 tot 72 uur af, afhankelijk van het volume, zonder dat je je wachtwoord hoeft te delen. Wij vragen alleen je openbare @-naam.`,
     `In tegenstelling tot louche winkels die in één keer duizenden bots dumpen, werkt Viralefy met pacing-vensters die organische groei nabootsen. Een order van 1.000 volgers wordt over meerdere uren verdeeld; een order van 10.000 loopt over twee dagen. Dat patroon houdt je engagement-ratio gezond en beschermt het bereik dat je al hebt opgebouwd. Voor creators in ${c} die op het algoritme leunen om hun content uit te serveren, maakt precies dat onderscheid het verschil.`,
     `De prijzen zijn transparant en vast per hoeveelheid. Geen abonnementen, geen automatische verlengingen, geen verborgen upsells in de checkout. Je betaalt één keer voor een pakket en wij leveren. De betaalopties omvatten kaart, bankoverschrijving en crypto (USDT, BTC). Bonnen worden automatisch per e-mail verstuurd en de volledige historie blijft in je account zodat je met één klik kunt herhalen.`,
     `Heb je nog nooit een groei-service gebruikt, dan is het goedkoopste starterspakket de veiligste manier om het water te testen. Pak een bundel van 100 of 250 volgers, kijk hoe het landt, en schaal pas op wanneer je je comfortabel voelt bij wat je ziet. Hieronder kies je tussen vooraf ingestelde pakketten of bepaal je de exacte hoeveelheid met de slider.`,
@@ -885,7 +885,7 @@ const COPY_ENG_FR: LongCopy = {
   h1: (c) => `Acheter des likes et de l'engagement pour Instagram et TikTok en ${c}`,
   metaTitle: (c) => `Acheter des likes Instagram et TikTok en ${c} | Viralefy`,
   metaDescription: (c) =>
-    `Boostez n'importe quelle publication avec des likes et de l'engagement crédibles en ${c}. Démarrage en 30 minutes, sans mot de passe.`,
+    `Boostez n'importe quelle publication avec des likes et de l'engagement crédibles en ${c}. Démarrage sous 1 heure, sans mot de passe.`,
   paragraphs: (c) => [
     `Le like est la première preuve sociale qu'un visiteur voit. Un post à 12 likes a l'air "amateur" ; le même post à 1 200 likes donne envie d'aller voir. L'algorithme utilise l'engagement précoce comme l'un des signaux de classement les plus forts — une publication qui obtient un bon ratio like/impression dans la première heure est poussée plus loin. C'est précisément cette fenêtre où acheter des likes en ${c} se rentabilise : vous relevez le plancher de la courbe initiale et laissez l'algorithme faire le reste.`,
     `Viralefy livre des likes provenant de comptes avec photo de profil, publications et activité réelle — pas les profils jetables que les plateformes nettoient au prochain coup de balai. Chaque like est cadencé naturellement sur la première heure pour que la montée ait l'air organique. Combiné à un pack d'abonnés, l'effet se cumule : plus d'abonnés = pool d'impressions plus large, plus de likes = meilleur CTR sur ces impressions, et le post grimpe plus vite.`,
@@ -904,7 +904,7 @@ const COPY_ENG_FR: LongCopy = {
     { q: "La plateforme va-t-elle détecter les likes achetés ?", a: "Les likes sont cadencés sur la première heure pour imiter une croissance organique. Les comptes ont une photo et de l'activité, pas les patterns d'œufs vides." },
     { q: "Avez-vous besoin de l'URL du post ?", a: "Oui — collez l'URL publique du post ou du Reel pendant le checkout. Les publications privées ne sont pas atteignables." },
     { q: "Puis-je répartir un pack sur plusieurs publications ?", a: "Chaque pack cible une publication. Passez plusieurs commandes pour couvrir plusieurs posts." },
-    { q: "À quelle vitesse démarre la livraison ?", a: "La plupart des commandes démarrent dans les 30 minutes suivant la confirmation du paiement." },
+    { q: "À quelle vitesse démarre la livraison ?", a: "La plupart des commandes démarrent dans l'heure suivant la confirmation du paiement." },
   ],
 };
 
@@ -941,7 +941,7 @@ const COPY_ENG_IT: LongCopy = {
   h1: (c) => `Comprare like e engagement per Instagram e TikTok in ${c}`,
   metaTitle: (c) => `Comprare like Instagram e TikTok in ${c} | Viralefy`,
   metaDescription: (c) =>
-    `Spingi qualunque post con like e engagement credibili in ${c}. Avvio in 30 minuti, senza password.`,
+    `Spingi qualunque post con like e engagement credibili in ${c}. Avvio in 1 ora, senza password.`,
   paragraphs: (c) => [
     `Il like è la prima prova sociale che un visitatore vede. Un post con 12 like sa di "amatoriale"; lo stesso post con 1.200 like sembra "vale la pena guardarlo". L'algoritmo usa l'engagement iniziale come uno dei segnali di ranking più forti — un post con un buon rapporto like/impression nella prima ora viene spinto più a fondo. Quella è la finestra in cui comprare like in ${c} si ripaga: alzi il pavimento della curva iniziale e lasci che l'algoritmo faccia il resto.`,
     `Viralefy consegna like da account con foto profilo, post e attività realistica — non i profili usa-e-getta che le piattaforme rimuovono al prossimo giro. Ogni like viene cadenzato naturalmente sulla prima ora così la salita sembra organica. Combinato con un pacchetto follower l'effetto si compone: più follower = pool di impression più ampio, più like = CTR più alto su quelle impression, e il post sale più in fretta.`,
@@ -960,7 +960,7 @@ const COPY_ENG_IT: LongCopy = {
     { q: "La piattaforma rileverà i like comprati?", a: "I like sono cadenzati sulla prima ora per imitare la crescita organica. Gli account hanno foto e attività, non pattern usa-e-getta." },
     { q: "Vi serve l'URL del post?", a: "Sì — incolla l'URL pubblica del post o del reel al checkout. I post privati non sono raggiungibili." },
     { q: "Posso dividere un pacchetto su più post?", a: "Ogni pacchetto mira a un post. Fai più ordini per coprire più post." },
-    { q: "Quanto rapida è la partenza?", a: "La maggior parte degli ordini parte entro 30 minuti dalla conferma del pagamento." },
+    { q: "Quanto rapida è la partenza?", a: "La maggior parte degli ordini parte entro 1 ora dalla conferma del pagamento." },
   ],
 };
 
@@ -969,7 +969,7 @@ const COPY_ENG_NL: LongCopy = {
   h1: (c) => `Likes en engagement kopen voor Instagram en TikTok in ${c}`,
   metaTitle: (c) => `Instagram- en TikTok-likes kopen in ${c} | Viralefy`,
   metaDescription: (c) =>
-    `Geef elk bericht een boost met echt ogende likes en engagement in ${c}. Start binnen 30 minuten, zonder wachtwoord.`,
+    `Geef elk bericht een boost met echt ogende likes en engagement in ${c}. Start binnen 1 uur, zonder wachtwoord.`,
   paragraphs: (c) => [
     `Likes zijn het eerste sociale bewijs dat een bezoeker ziet. Een post met 12 likes leest als "amateur"; dezelfde post met 1.200 likes leest als "die moet ik bekijken". Het algoritme gebruikt vroeg engagement als een van de sterkste rangschikkingsignalen — een post met een sterke like-impressie-ratio in het eerste uur wordt harder geduwd. Dat is precies het venster waarin likes kopen in ${c} zichzelf terugverdient: je tilt de bodem van de beginkromme op en laat het algoritme de rest doen.`,
     `Viralefy levert likes van accounts met profielfoto, posts en realistische activiteit — niet de wegwerp-profielen die platforms in de volgende opruimronde wegvegen. Elke like wordt natuurlijk gedoseerd over het eerste uur, zodat de stijging er organisch uitziet. In combinatie met een volgerspakket versterkt het effect: meer volgers = grotere impressiepool, meer likes = hogere CTR op die impressies, en de post klimt sneller.`,
@@ -988,7 +988,7 @@ const COPY_ENG_NL: LongCopy = {
     { q: "Detecteert het platform gekochte likes?", a: "Likes worden over het eerste uur gedoseerd om organische groei na te bootsen. De accounts hebben profielfoto's en activiteit, geen lege wegwerp-patronen." },
     { q: "Hebben jullie de post-URL nodig?", a: "Ja — plak de openbare URL van de post of Reel in de checkout. Privé-posts zijn niet bereikbaar." },
     { q: "Kan ik een pakket verdelen over meerdere posts?", a: "Elk pakket richt zich op één post. Plaats meerdere bestellingen om meerdere posts te dekken." },
-    { q: "Hoe snel start de levering?", a: "De meeste bestellingen starten binnen 30 minuten na bevestiging van de betaling." },
+    { q: "Hoe snel start de levering?", a: "De meeste bestellingen starten binnen 1 uur na bevestiging van de betaling." },
   ],
 };
 
@@ -997,7 +997,7 @@ const COPY_VIEWS_FR: LongCopy = {
   h1: (c) => `Acheter des vues Reels, TikTok et Stories en ${c}`,
   metaTitle: (c) => `Acheter des vues Instagram et TikTok en ${c} | Viralefy`,
   metaDescription: (c) =>
-    `Boostez n'importe quelle vidéo avec des vues crédibles en ${c}. Reels, TikTok et Stories. Démarrage en 30 minutes.`,
+    `Boostez n'importe quelle vidéo avec des vues crédibles en ${c}. Reels, TikTok et Stories. Démarrage sous 1 heure.`,
   paragraphs: (c) => [
     `Le compteur de vues est la métrique d'en-tête de toute vidéo courte. Un Reel posé à 320 vues a l'air mort ; le même Reel à 32 000 vues a l'air d'être en train de prendre feu. Les spectateurs en ${c} utilisent ce chiffre comme heuristique pour décider de regarder ou non — et l'algorithme l'utilise comme signal de classement pour décider de pousser la vidéo plus loin. Acheter des vues est le moyen le moins coûteux de relever cette ligne de base.`,
     `Viralefy livre des vues qui comptent pour l'algorithme : impressions de visionnage complet provenant de comptes avec activité réelle, cadencées pour que la montée reflète une découverte organique. Les vues de Story ne sont pas publiques pour vos abonnés ; les vues de Reels sont publiques et s'ajoutent directement au compteur affiché sur votre profil. Les deux fonctionnent de la même façon pour l'algorithme.`,
@@ -1053,7 +1053,7 @@ const COPY_VIEWS_IT: LongCopy = {
   h1: (c) => `Comprare visualizzazioni di Reels, TikTok e Stories in ${c}`,
   metaTitle: (c) => `Comprare visualizzazioni Instagram e TikTok in ${c} | Viralefy`,
   metaDescription: (c) =>
-    `Spingi qualunque video con visualizzazioni credibili in ${c}. Reels, TikTok e Stories. Avvio in 30 minuti.`,
+    `Spingi qualunque video con visualizzazioni credibili in ${c}. Reels, TikTok e Stories. Avvio in 1 ora.`,
   paragraphs: (c) => [
     `Il conteggio delle visualizzazioni è la metrica titolo di qualunque video breve. Un reel fermo a 320 view sembra morto; lo stesso reel a 32.000 view sembra stia prendendo fuoco. Gli spettatori in ${c} usano quel numero come euristica per decidere se guardare — e l'algoritmo lo usa come segnale di ranking per decidere se spingere il video oltre. Comprare visualizzazioni è il modo più economico per alzare quella linea di base.`,
     `Viralefy consegna visualizzazioni che contano per l'algoritmo: impression di visione completa da account con attività reale, cadenzate perché la salita rispecchi una scoperta organica. Le visualizzazioni di Stories non sono pubbliche per il tuo pubblico; quelle dei Reels sono pubbliche e si sommano direttamente al contatore mostrato sul profilo. Entrambe funzionano allo stesso modo per l'algoritmo.`,
@@ -1081,7 +1081,7 @@ const COPY_VIEWS_NL: LongCopy = {
   h1: (c) => `Reels-, TikTok- en Story-weergaven kopen in ${c}`,
   metaTitle: (c) => `Instagram- en TikTok-weergaven kopen in ${c} | Viralefy`,
   metaDescription: (c) =>
-    `Geef elke video een boost met echt ogende weergaven in ${c}. Reels, TikTok en Stories. Start binnen 30 minuten.`,
+    `Geef elke video een boost met echt ogende weergaven in ${c}. Reels, TikTok en Stories. Start binnen 1 uur.`,
   paragraphs: (c) => [
     `Het weergavenaantal is de koptekstmetric van elke korte video. Een Reel die op 320 weergaven blijft hangen lijkt dood; dezelfde Reel op 32.000 lijkt vlam te vatten. Kijkers in ${c} gebruiken dat getal als vuistregel om te beslissen of ze kijken — en het algoritme gebruikt het als rangschikkingsignaal om te beslissen of het de video verder duwt. Weergaven kopen is de goedkoopste manier om die basislijn op te tillen.`,
     `Viralefy levert weergaven die meetellen voor het algoritme: volledig uitgekeken impressies van accounts met echte activiteit, gedoseerd zodat de stijging organische ontdekking nabootst. Story-weergaven zijn niet publiek zichtbaar voor je volgers; Reels-weergaven zijn wel publiek en tellen rechtstreeks op bij de teller op je profiel. Beide werken voor het algoritme op dezelfde manier.`,
