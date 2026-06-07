@@ -67,7 +67,28 @@ export type CheckoutPayload = {
   // browser context). Backend enriquece com IP+UA antes de salvar em
   // orders.tracking (e users.tracking_data se conta for criada na hora).
   tracking?: Record<string, unknown>;
+  // Cupom opcional. Backend valida + aplica desconto; falha = 422.
+  coupon_code?: string;
 };
+
+export type CouponPreview = {
+  code: string;
+  discount_usd_cents: number;
+  final_usd_cents: number;
+  description: string;
+};
+
+export async function previewCoupon(input: {
+  code: string;
+  plan_id: string;
+  email?: string;
+  display_currency?: string;
+}): Promise<CouponPreview> {
+  return request<CouponPreview>("/v1/coupons/validate", {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+}
 
 export type CheckoutResult = {
   order_id: string;
@@ -88,6 +109,9 @@ export type CheckoutResult = {
   payment_method: "gateway" | "credits";
   credits_used_cents?: number;
   credit_balance_cents?: number;
+  coupon_code?: string;
+  original_usd_cents?: number;
+  discount_usd_cents?: number;
 };
 
 export type User = {

@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import type { CheckoutResult, Currency, Plan, Platform, Profile, CreditAccount } from "@/lib/api";
-import { checkout, fetchCredits, fetchMyProfiles } from "@/lib/api";
+import type { CheckoutResult, Currency, Plan, Platform, Profile, CreditAccount, CouponPreview } from "@/lib/api";
+import { checkout, fetchCredits, fetchMyProfiles, previewCoupon } from "@/lib/api";
 import { getTracking } from "@/lib/tracking";
 import { priceFor, formatBalance } from "@/lib/format";
 import { getToken } from "@/lib/auth";
@@ -39,6 +39,10 @@ export function CheckoutModal({
   // Snapshot dos campos extras por categoria (BMs, perfis, emails).
   // Passa por custom_data no /v1/checkout e cai no ticket pós-pagamento.
   const [customData, setCustomData] = useState<CustomData>({});
+  const [couponCode, setCouponCode] = useState<string>("");
+  const [couponPreview, setCouponPreview] = useState<CouponPreview | null>(null);
+  const [couponError, setCouponError] = useState<string | null>(null);
+  const [couponChecking, setCouponChecking] = useState(false);
 
   useEffect(() => {
     const token = getToken();
@@ -86,6 +90,10 @@ export function CheckoutModal({
       const tracking = getTracking();
       if (Object.keys(tracking).length > 0) {
         payload.tracking = tracking;
+      }
+      // Cupom: só envia se passou no preview (backend revalida atomicamente).
+      if (couponPreview) {
+        payload.coupon_code = couponPreview.code;
       }
       if (isProfile) {
         if (user && profiles && !useNewProfile && selectedProfileId) {
@@ -189,6 +197,60 @@ export function CheckoutModal({
                   currency={currency}
                 />
               )}
+
+              <div>
+                <label className="label" htmlFor="coupon_code">Promo code (optional)</label>
+                <div style={{ display: "flex", gap: "0.5rem" }}>
+                  <input
+                    className="input"
+                    id="coupon_code"
+                    value={couponCode}
+                    onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponError(null); }}
+                    placeholder="BLACK10"
+                    disabled={!!couponPreview}
+                    style={{ flex: 1, textTransform: "uppercase" }}
+                  />
+                  {couponPreview ? (
+                    <button
+                      type="button"
+                      className="btn btn-outline"
+                      onClick={() => { setCouponPreview(null); setCouponCode(""); setCouponError(null); }}
+                    >Remove</button>
+                  ) : (
+                    <button
+                      type="button"
+                      className="btn btn-outline"
+                      disabled={!couponCode || couponChecking}
+                      onClick={async () => {
+                        setCouponChecking(true);
+                        setCouponError(null);
+                        try {
+                          const p = await previewCoupon({
+                            code: couponCode,
+                            plan_id: plan.id,
+                            email: user?.email,
+                            display_currency: currency?.code,
+                          });
+                          setCouponPreview(p);
+                        } catch (err) {
+                          setCouponError(err instanceof Error ? err.message : "Invalid coupon");
+                        } finally {
+                          setCouponChecking(false);
+                        }
+                      }}
+                    >{couponChecking ? "Checking…" : "Apply"}</button>
+                  )}
+                </div>
+                {couponError && (
+                  <p style={{ color: "var(--danger)", fontSize: "0.8rem", marginTop: "0.3rem" }}>{couponError}</p>
+                )}
+                {couponPreview && (
+                  <p style={{ color: "#3cd87d", fontSize: "0.85rem", marginTop: "0.3rem" }}>
+                    ✓ {couponPreview.code}: −${(couponPreview.discount_usd_cents / 100).toFixed(2)} off
+                    {couponPreview.description && ` (${couponPreview.description})`}
+                  </p>
+                )}
+              </div>
 
               <button type="submit" className="btn btn-primary" disabled={loading}>
                 {loading ? "Processing…" : payMethod === "credits" ? "Pay with credits" : "Confirm order"}
