@@ -1,3 +1,17 @@
+import { z, type ZodType } from "zod";
+import {
+  PlanSchema,
+  CategorySchema,
+  CurrencySchema,
+  CheckoutResultSchema,
+  CouponPreviewSchema,
+  OrderSchema,
+  OrderDetailSchema,
+  SessionSchema,
+  NotifPrefsSchema,
+  parseOr,
+} from "./schemas";
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
 
 export type Platform = "instagram" | "tiktok";
@@ -84,10 +98,12 @@ export async function previewCoupon(input: {
   email?: string;
   display_currency?: string;
 }): Promise<CouponPreview> {
-  return request<CouponPreview>("/v1/coupons/validate", {
-    method: "POST",
-    body: JSON.stringify(input),
-  });
+  return request<CouponPreview>(
+    "/v1/coupons/validate",
+    { method: "POST", body: JSON.stringify(input) },
+    undefined,
+    CouponPreviewSchema,
+  );
 }
 
 export type CheckoutResult = {
@@ -146,7 +162,18 @@ export type Order = {
   created_at: string;
 };
 
-async function request<T>(path: string, init?: RequestInit, token?: string): Promise<T> {
+// request<T> faz a chamada HTTP e devolve json.data tipado.
+//
+// Quando passamos `schema`, validamos json.data via Zod e falhamos early
+// com mensagem específica do path — esse é o caminho preferido nos boundaries
+// (todo endpoint com payload estruturado deveria passar). Quando não passamos
+// schema (ex.: respostas vazias / void), caímos no cast `as T` legado.
+async function request<T>(
+  path: string,
+  init?: RequestInit,
+  token?: string,
+  schema?: ZodType<T>,
+): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, {
     ...init,
     headers: {
@@ -159,12 +186,18 @@ async function request<T>(path: string, init?: RequestInit, token?: string): Pro
   if (!res.ok) {
     throw new Error(json?.error?.message ?? "Request failed");
   }
+  if (schema) {
+    return parseOr(schema, json.data, path);
+  }
   return json.data as T;
 }
 
-export const fetchPlans = () => request<Plan[]>("/v1/plans");
-export const fetchCategories = () => request<Category[]>("/v1/categories");
-export const fetchCurrencies = () => request<Currency[]>("/v1/currencies");
+export const fetchPlans = () =>
+  request<Plan[]>("/v1/plans", undefined, undefined, z.array(PlanSchema));
+export const fetchCategories = () =>
+  request<Category[]>("/v1/categories", undefined, undefined, z.array(CategorySchema));
+export const fetchCurrencies = () =>
+  request<Currency[]>("/v1/currencies", undefined, undefined, z.array(CurrencySchema));
 
 // PPP (Purchasing Power Parity) — Fase 6.5. multiplier ∈ [0.10, 1.00]. Aplicado
 // SÓ no display do front via priceForCountry(); USD canônico e settlement
@@ -175,6 +208,18 @@ export type PPPEntry = {
 };
 
 export const fetchCountryPPP = () => request<PPPEntry[]>("/v1/country-ppp");
+
+// Tax rates — VAT UE + GB (Fase 5.3). rate_pct ∈ [0, 27.00]. O front
+// pre-computa o display do VAT no checkout; a autoridade do cálculo final
+// é o TaxService.ComputeTax server-side. País fora do catálogo (US, BR,
+// IN, etc.) = rate 0% e a linha de VAT some do summary.
+export type TaxRate = {
+  country_code: string;
+  rate_pct: number;
+  rate_type: string;
+};
+
+export const fetchTaxRates = () => request<TaxRate[]>("/v1/tax-rates");
 
 // Gera Idempotency-Key fresca por chamada de checkout. F5 re-tenta com a
 // mesma key durante a sessão? NÃO — uma key por click. Se o usuário clicar
@@ -197,6 +242,7 @@ export const checkout = (payload: CheckoutPayload, token?: string) =>
       headers: { "Idempotency-Key": newIdempotencyKey() },
     },
     token,
+    CheckoutResultSchema,
   );
 
 export const userRegister = (body: {
@@ -205,16 +251,27 @@ export const userRegister = (body: {
   password: string;
   turnstile_token?: string;
   tracking?: Record<string, unknown>;
-}) => request<Session>("/v1/auth/user/register", { method: "POST", body: JSON.stringify(body) });
+}) =>
+  request<Session>(
+    "/v1/auth/user/register",
+    { method: "POST", body: JSON.stringify(body) },
+    undefined,
+    SessionSchema,
+  );
 
 export const userLogin = (email: string, password: string, turnstileToken?: string) =>
-  request<Session>("/v1/auth/user/login", {
-    method: "POST",
-    body: JSON.stringify({ email, password, turnstile_token: turnstileToken ?? "" }),
-  });
+  request<Session>(
+    "/v1/auth/user/login",
+    {
+      method: "POST",
+      body: JSON.stringify({ email, password, turnstile_token: turnstileToken ?? "" }),
+    },
+    undefined,
+    SessionSchema,
+  );
 
 export const fetchMyOrders = (token: string) =>
-  request<Order[]>("/v1/me/orders", undefined, token);
+  request<Order[]>("/v1/me/orders", undefined, token, z.array(OrderSchema));
 
 // OrderDetail expande o shape básico de Order com os campos crus do
 // pedido — payment_url, métricas de baseline/delivery e timestamps de
@@ -245,7 +302,12 @@ export type OrderDetail = {
 };
 
 export const fetchMyOrder = (token: string, id: string) =>
-  request<OrderDetail>(`/v1/me/orders/${encodeURIComponent(id)}`, undefined, token);
+  request<OrderDetail>(
+    `/v1/me/orders/${encodeURIComponent(id)}`,
+    undefined,
+    token,
+    OrderDetailSchema,
+  );
 
 // ----- Tickets (helpdesk) ----- //
 
@@ -529,7 +591,7 @@ export type NotifPrefs = {
 };
 
 export const fetchNotifPrefs = (token: string) =>
-  request<NotifPrefs>("/v1/me/notif-prefs", undefined, token);
+  request<NotifPrefs>("/v1/me/notif-prefs", undefined, token, NotifPrefsSchema);
 
 // updateNotifPrefs envia o snapshot completo no PUT. Backend faz merge
 // JSONB (||), então mandar parcial é seguro — mas o front sempre tem o
@@ -539,6 +601,7 @@ export const updateNotifPrefs = (prefs: NotifPrefs, token: string) =>
     "/v1/me/notif-prefs",
     { method: "PUT", body: JSON.stringify(prefs) },
     token,
+    NotifPrefsSchema,
   );
 
 // --- A/B testing harness (Fase 6.6) --- //
@@ -603,3 +666,99 @@ export type ReferralInfo = {
 
 export const lookupReferralCode = (code: string) =>
   request<ReferralInfo>(`/v1/referrals/${encodeURIComponent(code)}/info`);
+
+// ----- WhatsApp opt-in (Fase 7.3) ----- //
+//
+// Separado do NotifPrefs porque carrega PII (número E.164) e tem um toggle
+// de opt-in dedicado. Backend valida o formato no PUT; o front deixa o
+// usuário digitar livre e mostra erro do backend se inválido.
+
+export type WhatsAppPref = {
+  number: string;
+  opt_in: boolean;
+};
+
+export const fetchWhatsAppPref = (token: string) =>
+  request<WhatsAppPref>("/v1/me/whatsapp", undefined, token);
+
+export const updateWhatsApp = (pref: WhatsAppPref, token: string) =>
+  request<WhatsAppPref>(
+    "/v1/me/whatsapp",
+    { method: "PUT", body: JSON.stringify(pref) },
+    token,
+  );
+
+// ----- B2B API keys (Fase 7.5) ----- //
+
+// APIKey é o metadata público de uma credencial. NUNCA inclui o plain.
+export type APIKey = {
+  id: string;
+  label: string;
+  owner_user_id: string;
+  revoked_at?: string | null;
+  created_at: string;
+  last_used_at?: string | null;
+};
+
+// CreateAPIKeyResult inclui o plain UMA vez no campo "key". Após esse
+// response não há como recuperar — front mostra em modal com warning.
+export type CreateAPIKeyResult = {
+  api_key: APIKey;
+  key: string;
+};
+
+export const fetchMyAPIKeys = (token: string) =>
+  request<APIKey[]>("/v1/me/api-keys", undefined, token);
+
+export const createMyAPIKey = (label: string, token: string) =>
+  request<CreateAPIKeyResult>(
+    "/v1/me/api-keys",
+    { method: "POST", body: JSON.stringify({ label }) },
+    token,
+  );
+
+export const revokeMyAPIKey = (id: string, token: string) =>
+  fetch(`${API_URL}/v1/me/api-keys/${encodeURIComponent(id)}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  }).then((res) => {
+    if (!res.ok) throw new Error("Failed to revoke key");
+  });
+
+// ----- Subscriptions (Fase 6.3) ----- //
+
+// Subscription é um plano mensal recorrente. Cron de renovação gera
+// uma order pending a cada ciclo (via CheckoutService público); o user
+// paga via payment_url normal. N falhas seguidas → cancela auto.
+export type SubscriptionStatus = "active" | "paused" | "cancelled";
+
+export type Subscription = {
+  id: string;
+  user_id: string;
+  plan_id: string;
+  status: SubscriptionStatus;
+  interval: string; // "month"
+  next_billing_at: string;
+  cancelled_at?: string | null;
+  failed_payments: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export const fetchMySubscriptions = (token: string) =>
+  request<Subscription[]>("/v1/me/subscriptions", undefined, token);
+
+export const subscribe = (token: string, planID: string) =>
+  request<Subscription>(
+    "/v1/me/subscriptions",
+    { method: "POST", body: JSON.stringify({ plan_id: planID }) },
+    token,
+  );
+
+export const cancelSubscription = (token: string, id: string) =>
+  fetch(`${API_URL}/v1/me/subscriptions/${encodeURIComponent(id)}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  }).then((res) => {
+    if (!res.ok) throw new Error("Failed to cancel subscription");
+  });

@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import type { CheckoutResult, Currency, Plan, Platform, Profile, CreditAccount, CouponPreview } from "@/lib/api";
-import { checkout, fetchCredits, fetchMyProfiles, previewCoupon } from "@/lib/api";
+import type { CheckoutResult, Currency, Plan, Platform, Profile, CreditAccount, CouponPreview, TaxRate } from "@/lib/api";
+import { checkout, fetchCredits, fetchMyProfiles, fetchTaxRates, previewCoupon } from "@/lib/api";
 import { getTracking } from "@/lib/tracking";
 import { priceFor, formatBalance } from "@/lib/format";
 import { getToken } from "@/lib/auth";
@@ -44,6 +44,13 @@ export function CheckoutModal({
   const [couponError, setCouponError] = useState<string | null>(null);
   const [couponChecking, setCouponChecking] = useState(false);
 
+  // VAT (Fase 5.3) — catálogo baixado on-mount + país do user (localStorage
+  // OU best-effort via /api/geo). País não-EU → vatRate=0 e a linha some.
+  // Cálculo final é autoritativo no server (CheckoutService + TaxService);
+  // aqui é só pre-display pra evitar surpresa no botão "Confirm".
+  const [taxRates, setTaxRates] = useState<TaxRate[]>([]);
+  const [userCountry, setUserCountry] = useState<string>("");
+
   useEffect(() => {
     const token = getToken();
     if (!token) return;
@@ -63,6 +70,38 @@ export function CheckoutModal({
     }
     fetchCredits(token).then(setCredit).catch(() => undefined);
   }, [isProfile, plan.platform]);
+
+  // VAT catalog + country detect. Best-effort: falha mantém vatRate=0
+  // (preview transparente — server decide se cobra). Ordem: localStorage
+  // (preferência manual) → /api/geo (cf-ipcountry/x-vercel-ip-country).
+  useEffect(() => {
+    fetchTaxRates().then(setTaxRates).catch(() => setTaxRates([]));
+    let cancelled = false;
+    const saved = typeof window !== "undefined" ? localStorage.getItem("viralefy_country") : null;
+    if (saved) {
+      setUserCountry(saved.toLowerCase());
+      return;
+    }
+    fetch("/api/geo", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((j) => {
+        if (cancelled) return;
+        const cc = (j?.data?.country ?? "") as string;
+        if (cc) setUserCountry(cc.toLowerCase());
+      })
+      .catch(() => undefined);
+    return () => { cancelled = true; };
+  }, []);
+
+  // Pre-display do VAT. amount líquido = price_cents − discount_cents
+  // (cupom). rate_pct vem do catálogo público; país fora do catálogo cai
+  // em rate 0 e a linha some. Round meio-cima espelha TaxService server-side.
+  const vatRate = userCountry
+    ? (taxRates.find((t) => t.country_code === userCountry)?.rate_pct ?? 0)
+    : 0;
+  const discountCents = couponPreview?.discount_usd_cents ?? 0;
+  const netCents = Math.max(0, plan.price_cents - discountCents);
+  const taxUsdCents = vatRate > 0 ? Math.round((netCents * vatRate) / 100) : 0;
 
   const enoughCredits = credit ? credit.balance_cents >= plan.price_cents : false;
 
@@ -251,6 +290,24 @@ export function CheckoutModal({
                   </p>
                 )}
               </div>
+
+              {/* VAT pre-display (Fase 5.3). Server decide o cobrança final
+                  via TaxService.ComputeTax; aqui é só preview pra UE/GB.
+                  País fora do catálogo → vatRate=0 e o bloco some. */}
+              {vatRate > 0 && (
+                <p
+                  style={{
+                    color: "var(--muted)",
+                    fontSize: "0.85rem",
+                    margin: 0,
+                    paddingTop: "0.25rem",
+                    borderTop: "1px dashed rgba(255,255,255,0.08)",
+                  }}
+                  aria-label="VAT estimate"
+                >
+                  VAT ({vatRate.toFixed(2)}%): +${(taxUsdCents / 100).toFixed(2)}
+                </p>
+              )}
 
               <button type="submit" className="btn btn-primary" disabled={loading}>
                 {loading ? "Processing…" : payMethod === "credits" ? "Pay with credits" : "Confirm order"}

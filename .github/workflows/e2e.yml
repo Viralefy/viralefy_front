@@ -1,0 +1,62 @@
+name: e2e
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: 'PLAYWRIGHT_BASE_URL override (defaults to http://localhost:3000)'
+        required: false
+        default: ''
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  playwright:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      NODE_ENV: production
+      PLAYWRIGHT_BASE_URL: ${{ github.event.inputs.base_url || 'http://localhost:3000' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Build app
+        run: npm run build
+
+      - name: Start app
+        run: npm start &
+        env:
+          PORT: '3000'
+
+      - name: Wait for app to be ready
+        run: npx wait-on http://localhost:3000 --timeout 120000
+
+      - name: Run Playwright tests
+        run: npm run e2e
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report
+            test-results
+          retention-days: 7

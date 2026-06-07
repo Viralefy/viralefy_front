@@ -17,18 +17,27 @@
     "test:emulated:contracts": "node tests/emulated/api-contracts.mjs",
     "test:emulated:a11y": "node tests/emulated/accessibility.mjs",
     "test:coverage": "node --import ./tests/ts-loader.mjs --experimental-test-coverage --test tests/unit/*.test.mjs",
-    "test:all": "npm test && npm run test:smoke && npm run test:pentest && npm run test:emulated:browse && npm run test:emulated:i18n && npm run test:emulated:contracts && npm run test:emulated:a11y"
+    "test:all": "npm test && npm run test:smoke && npm run test:pentest && npm run test:emulated:browse && npm run test:emulated:i18n && npm run test:emulated:contracts && npm run test:emulated:a11y",
+    "e2e": "playwright test",
+    "e2e:install": "playwright install --with-deps chromium",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@sentry/nextjs": "^10.56.0",
     "next": "^15.3.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@playwright/test": "^1.49.0",
+    "@storybook/nextjs": "^8.4.0",
+    "@storybook/react": "^8.4.0",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "storybook": "^8.4.0",
     "typescript": "^5.8.0"
   },
   "browserslist": [
