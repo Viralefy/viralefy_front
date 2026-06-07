@@ -540,3 +540,66 @@ export const updateNotifPrefs = (prefs: NotifPrefs, token: string) =>
     { method: "PUT", body: JSON.stringify(prefs) },
     token,
   );
+
+// --- A/B testing harness (Fase 6.6) --- //
+//
+// Backend trackeia experiments + assignments + events. Front lê variant via
+// abAssign() (sticky por visitor_id) e dispara abTrack() em pontos chave
+// (exposure auto via <ABExperiment>, conversion na thank-you page, etc.).
+
+export type ABAssignmentResponse = {
+  variant: string;
+};
+
+// abAssign — devolve a variant atribuída ao visitor no experimento. Se o
+// experimento está inativo, backend devolve { variant: "control" } como
+// fallback seguro. Se não existir, throw.
+export const abAssign = (visitorId: string, experimentKey: string) =>
+  request<ABAssignmentResponse>("/v1/ab/assign", {
+    method: "POST",
+    body: JSON.stringify({ visitor_id: visitorId, experiment_key: experimentKey }),
+  });
+
+// abTrack — registra um evento. event_name canônicos: "exposure" |
+// "conversion" | qualquer string custom. Payload opcional (objeto serializável).
+// Fire-and-forget no front: a UI não bloqueia esperando o ack.
+export const abTrack = (
+  visitorId: string,
+  experimentKey: string,
+  eventName: string,
+  payload?: Record<string, unknown>,
+): Promise<void> =>
+  fetch(`${API_URL}/v1/ab/track`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      visitor_id: visitorId,
+      experiment_key: experimentKey,
+      event_name: eventName,
+      payload,
+    }),
+  }).then(() => undefined);
+
+// ----- Referrals (Fase 6.4) ----- //
+
+// MyReferral mostra o painel "Refer & earn": código próprio + métricas
+// de referrals concedidos + créditos ganhos (USD-cents).
+export type MyReferral = {
+  code: string;
+  total_referred: number;
+  total_earned_cents: number;
+};
+
+export const fetchMyReferral = (token: string) =>
+  request<MyReferral>("/v1/me/referral", undefined, token);
+
+// ReferralInfo é a resposta pública de /v1/referrals/{code}/info — usada
+// pelo checkout pra mostrar selo "Convidado por X" sem vazar email/IDs.
+// Quando valid=false o front degrada silenciosamente.
+export type ReferralInfo = {
+  valid: boolean;
+  referrer_name?: string;
+};
+
+export const lookupReferralCode = (code: string) =>
+  request<ReferralInfo>(`/v1/referrals/${encodeURIComponent(code)}/info`);

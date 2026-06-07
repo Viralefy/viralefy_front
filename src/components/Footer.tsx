@@ -73,6 +73,7 @@ export function Footer({ lang = "en", compact = false }: { lang?: LangCode; comp
               <li><Link href="/case-studies" style={{ color: "var(--text)" }}>Case studies</Link></li>
               <li><Link href="/status" style={{ color: "var(--text)" }}>System status</Link></li>
               <li><Link href="/legal/cookie-preferences" style={{ color: "var(--text)" }}>Cookie preferences</Link></li>
+              <li><Link href="/account/referral" style={{ color: "var(--text)" }}>Refer &amp; earn</Link></li>
             </ul>
           </nav>
 

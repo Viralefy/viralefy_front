@@ -16,6 +16,13 @@
 const SS_KEY = "viralefy_tracking";
 const LS_CLIENT_ID = "viralefy_client_id";
 
+// Referral sticky cookie — visitante usando ?ref=<code> persiste em
+// localStorage por 30 dias. Survives sessions e tabs. Quem se cadastrar/
+// pagar nesse intervalo deixa referrer_code no payload de tracking.
+const LS_REFERRER_CODE = "viralefy_referrer_code";
+const LS_REFERRER_AT = "viralefy_referrer_at";
+const REFERRER_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 dias
+
 const PARAM_KEYS = [
   "utm_source",
   "utm_medium",
@@ -53,6 +60,10 @@ export type TrackingData = {
   screen?: string;
   viewport?: string;
   user_agent?: string;
+  // Referral sticky (Fase 6.4) — populado pelo helper getStickyReferrerCode
+  // a partir de localStorage. Backend lê de tracking.referrer_code no
+  // signup e seta users.referred_by_user_id (first-touch).
+  referrer_code?: string;
 };
 
 function uuid(): string {
@@ -80,6 +91,44 @@ function getOrCreateClientId(): string {
     }
   }
   return id;
+}
+
+// captureReferrerFromURL lê ?ref=<code> e persiste em localStorage por
+// 30 dias. Sticky: chamadas subsequentes sem ?ref preservam o valor até
+// expirar. Chamadas COM novo ?ref sobrescrevem (campanhas frescas).
+function captureReferrerFromURL(): void {
+  if (typeof window === "undefined" || typeof localStorage === "undefined") return;
+  try {
+    const ref = new URL(window.location.href).searchParams.get("ref");
+    if (!ref) return;
+    const code = ref.trim().toUpperCase();
+    if (!code) return;
+    localStorage.setItem(LS_REFERRER_CODE, code);
+    localStorage.setItem(LS_REFERRER_AT, String(Date.now()));
+  } catch {
+    /* engole — localStorage cheio/desabilitado */
+  }
+}
+
+// getStickyReferrerCode devolve o referral code ainda válido (TTL 30d).
+// Retorna undefined se nunca capturado ou se expirou.
+export function getStickyReferrerCode(): string | undefined {
+  if (typeof localStorage === "undefined") return undefined;
+  try {
+    const code = localStorage.getItem(LS_REFERRER_CODE);
+    const atStr = localStorage.getItem(LS_REFERRER_AT);
+    if (!code || !atStr) return undefined;
+    const at = Number.parseInt(atStr, 10);
+    if (!Number.isFinite(at) || Date.now() - at > REFERRER_TTL_MS) {
+      // Expirado — limpa pra não acumular lixo.
+      localStorage.removeItem(LS_REFERRER_CODE);
+      localStorage.removeItem(LS_REFERRER_AT);
+      return undefined;
+    }
+    return code;
+  } catch {
+    return undefined;
+  }
 }
 
 function read(): TrackingData {
@@ -111,6 +160,11 @@ export function initTracking(): TrackingData {
   const next: TrackingData = { ...existing };
 
   next.client_id = existing.client_id ?? getOrCreateClientId();
+
+  // Referral sticky — captura ?ref= se presente; survive 30 dias.
+  captureReferrerFromURL();
+  const refCode = getStickyReferrerCode();
+  if (refCode) next.referrer_code = refCode;
 
   // first-touch wins — só preenche o que ainda não tem.
   if (!next.landing_url) next.landing_url = window.location.href;
@@ -157,5 +211,9 @@ export function getTracking(): TrackingData {
   if (typeof window === "undefined") return {};
   const data = read();
   if (!data.client_id) data.client_id = getOrCreateClientId();
+  // Referrer pode ter sido capturado em outra aba/sessão depois do init —
+  // sempre re-lê do localStorage pra não perder.
+  const refCode = getStickyReferrerCode();
+  if (refCode) data.referrer_code = refCode;
   return data;
 }
