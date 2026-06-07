@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { Plan } from "@/lib/api";
-import { priceFor } from "@/lib/format";
+import { priceFor, priceForCountry } from "@/lib/format";
 import { useApp } from "./Providers";
 import { CheckoutModal } from "./CheckoutModal";
 import { tr, type LangCode } from "@/i18n/languages";
@@ -15,12 +15,16 @@ export function QuantitySlider({
   plans,
   lang,
   unitLabel,
+  countryCode,
 }: {
   plans: Plan[];
   lang: LangCode;
   unitLabel: string; // ex. "seguidores", "curtidas", "views"
+  countryCode?: string; // ISO alpha-2 lowercase; ativa PPP via priceForCountry
 }) {
-  const { currency } = useApp();
+  const { currency, pppMap } = useApp();
+  const renderPrice = (p: Plan): string =>
+    countryCode ? priceForCountry(p, currency, countryCode, pppMap) : priceFor(p, currency);
   const t = tr(lang);
   const sorted = useMemo(
     () => [...plans].sort((a, b) => a.followers_qty - b.followers_qty),
@@ -35,7 +39,7 @@ export function QuantitySlider({
     return sorted.find((p) => p.followers_qty >= qty) ?? sorted[sorted.length - 1];
   }, [sorted, qty]);
 
-  const price = matched ? priceFor(matched, currency) : "—";
+  const price = matched ? renderPrice(matched) : "—";
   const perUnit = matched && currency
     ? `${currency.symbol} ${(
         parseFloat(matched.prices?.[currency.code] ?? "0") / matched.followers_qty
@@ -133,7 +137,7 @@ export function QuantitySlider({
                   {p.followers_qty.toLocaleString()}
                 </td>
                 <td style={{ padding: "0.75rem 1rem", textAlign: "right", fontVariantNumeric: "tabular-nums", fontWeight: 600 }}>
-                  {priceFor(p, currency)}
+                  {renderPrice(p)}
                 </td>
                 <td style={{ padding: "0.75rem 1rem", textAlign: "right" }}>
                   <button type="button" className="btn btn-outline" style={{ padding: "0.4rem 0.8rem", fontSize: "0.85rem" }} onClick={() => setSelected(p)}>

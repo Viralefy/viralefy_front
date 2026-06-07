@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { Plan } from "@/lib/api";
-import { priceFor } from "@/lib/format";
+import { priceFor, priceForCountry } from "@/lib/format";
 import { useApp } from "./Providers";
 import { CheckoutModal } from "./CheckoutModal";
 import { TrustSignals } from "./TrustSignals";
@@ -10,10 +10,13 @@ import { tr, type LangCode } from "@/i18n/languages";
 
 // Bloco isolado de CTA na página do plano. Mantemos `client` aqui pra deixar
 // o resto da página de plano server-rendered.
-export function BuyPlanCta({ plan, lang }: { plan: Plan; lang: LangCode }) {
-  const { currency } = useApp();
+export function BuyPlanCta({ plan, lang, countryCode }: { plan: Plan; lang: LangCode; countryCode?: string }) {
+  const { currency, pppMap } = useApp();
   const [open, setOpen] = useState(false);
   const t = tr(lang);
+  const displayPrice = countryCode
+    ? priceForCountry(plan, currency, countryCode, pppMap)
+    : priceFor(plan, currency);
 
   return (
     <div
@@ -25,7 +28,7 @@ export function BuyPlanCta({ plan, lang }: { plan: Plan; lang: LangCode }) {
       }}
     >
       <p style={{ fontSize: "0.85rem", color: "var(--muted)", marginBottom: "0.25rem" }}>{t.category.total}</p>
-      <p className="plan-price" style={{ fontSize: "2.25rem", margin: "0 0 1rem" }}>{priceFor(plan, currency)}</p>
+      <p className="plan-price" style={{ fontSize: "2.25rem", margin: "0 0 1rem" }}>{displayPrice}</p>
       <button
         type="button"
         className="btn btn-primary"

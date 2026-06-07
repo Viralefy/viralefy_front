@@ -83,6 +83,9 @@ export type CheckoutPayload = {
   tracking?: Record<string, unknown>;
   // Cupom opcional. Backend valida + aplica desconto; falha = 422.
   coupon_code?: string;
+  // País do visitante (ISO alpha-2 lowercase). Se EU/GB e TaxService
+  // configurado no API, VAT é cobrado em settlement_amount.
+  country?: string;
 };
 
 export type CouponPreview = {

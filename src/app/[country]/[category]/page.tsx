@@ -240,7 +240,7 @@ export default async function CategoryPage({ params }: { params: Promise<Params>
                     <h2 id="plans-slider" style={{ textAlign: "center", marginBottom: "1rem", fontSize: "1.25rem" }}>
                       {t.category.chooseQty}
                     </h2>
-                    <QuantitySlider plans={sortedPlans} lang={lang} unitLabel={unitLabel} />
+                    <QuantitySlider plans={sortedPlans} lang={lang} unitLabel={unitLabel} countryCode={c.code} />
                   </section>
                 )}
             </>

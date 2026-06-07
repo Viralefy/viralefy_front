@@ -303,7 +303,7 @@ export default async function PlanPage({ params }: { params: Promise<Params> }) 
             </div>
           </div>
 
-          <BuyPlanCta plan={plan} lang={lang} />
+          <BuyPlanCta plan={plan} lang={lang} countryCode={c.code} />
 
           {reviews.length > 0 && (
             <ReviewsSection reviews={reviews} aggregate={aggregate} />

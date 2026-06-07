@@ -134,6 +134,11 @@ export function CheckoutModal({
       if (couponPreview) {
         payload.coupon_code = couponPreview.code;
       }
+      // Country pra VAT (Fase 5.3) — server autoritativo, este envio
+      // é apenas pra que o cálculo final bata com o pre-display.
+      if (userCountry) {
+        payload.country = userCountry;
+      }
       if (isProfile) {
         if (user && profiles && !useNewProfile && selectedProfileId) {
           payload.profile_id = selectedProfileId;

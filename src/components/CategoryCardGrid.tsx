@@ -1,8 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import type { Plan } from "@/lib/api";
-import { priceFor } from "@/lib/format";
+import { priceForCountry } from "@/lib/format";
+import { subscribe as apiSubscribe } from "@/lib/api";
+import { getToken } from "@/lib/auth";
 import { useApp } from "./Providers";
 import { CheckoutModal } from "./CheckoutModal";
 import { tr, type LangCode } from "@/i18n/languages";
@@ -28,14 +31,42 @@ export function CategoryCardGrid({
   // (marketplace/* não tem rota por-plano).
   hideDetailLink?: boolean;
 }) {
-  const { currency } = useApp();
+  const { currency, pppMap, user } = useApp();
   const t = tr(lang);
   const [selected, setSelected] = useState<Plan | null>(null);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  // Subscribe mode: ?subscribe=1 ativa botão extra "Subscribe monthly" em
+  // cada card. Sem token → redireciona pra /login mantendo o ?subscribe=1.
+  const subscribeMode = searchParams.get("subscribe") === "1";
+  const [subBusy, setSubBusy] = useState<string | null>(null);
+  const [subOk, setSubOk] = useState<string | null>(null);
+  const [subErr, setSubErr] = useState<string | null>(null);
+  async function onSubscribeClick(planID: string) {
+    const token = getToken();
+    if (!token) {
+      router.push("/login?next=" + encodeURIComponent(window.location.pathname + "?subscribe=1"));
+      return;
+    }
+    setSubBusy(planID); setSubErr(null);
+    try {
+      await apiSubscribe(token, planID);
+      setSubOk(planID);
+    } catch (e) {
+      setSubErr(e instanceof Error ? e.message : "Subscribe failed");
+    } finally {
+      setSubBusy(null);
+    }
+  }
+  useEffect(() => { if (subscribeMode && !user) setSubErr("Sign in to subscribe."); }, [subscribeMode, user]);
 
   const sorted = [...plans].sort((a, b) => a.followers_qty - b.followers_qty);
   if (sorted.length === 0) return null;
 
   const catSlug = categorySlug(category, lang);
+  // PPP ativo quando multiplier < 1.00 pro country. Mostra selo "Local pricing".
+  const pppMult = pppMap[countryCode.toLowerCase()];
+  const pppActive = pppMult != null && pppMult > 0 && pppMult < 1;
 
   return (
     <>
@@ -47,7 +78,12 @@ export function CategoryCardGrid({
             <article key={plan.id} className={`card plan-card ${i === Math.floor(sorted.length / 2) ? "featured" : ""}`}>
               <h3>{plan.name}</h3>
               <p style={{ color: "var(--muted)", fontSize: "0.9rem" }}>{plan.description}</p>
-              <p className="plan-price">{priceFor(plan, currency)}</p>
+              <p className="plan-price">{priceForCountry(plan, currency, countryCode, pppMap)}</p>
+              {pppActive && (
+                <p style={{ fontSize: "0.7rem", color: "var(--accent)", margin: 0, fontWeight: 600 }}>
+                  Local pricing applied
+                </p>
+              )}
               {category !== "servicos" && (
                 <p style={{ fontSize: "0.95rem" }}>
                   <strong>{plan.followers_qty.toLocaleString()}</strong> {unitLabel}
@@ -67,10 +103,26 @@ export function CategoryCardGrid({
                   </Link>
                 )}
               </div>
+              {subscribeMode && (
+                <button
+                  type="button"
+                  className="btn btn-outline"
+                  style={{ marginTop: "0.5rem", fontSize: "0.82rem", color: "var(--accent)" }}
+                  onClick={() => onSubscribeClick(plan.id)}
+                  disabled={subBusy === plan.id || subOk === plan.id}
+                >
+                  {subOk === plan.id ? "✓ Subscribed" : subBusy === plan.id ? "Subscribing…" : "Subscribe monthly"}
+                </button>
+              )}
             </article>
           );
         })}
       </div>
+      {subscribeMode && (subErr || subOk) && (
+        <p style={{ textAlign: "center", marginTop: "1rem", color: subErr ? "var(--danger)" : "var(--accent)", fontSize: "0.9rem" }}>
+          {subErr ?? (subOk ? "Subscription created. Manage at /account/subscriptions." : "")}
+        </p>
+      )}
       {selected && <CheckoutModal plan={selected} onClose={() => setSelected(null)} />}
     </>
   );
