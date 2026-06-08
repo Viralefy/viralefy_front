@@ -126,6 +126,66 @@ export function urlsForLang(all: SiteUrl[], lang: LangCode | "legal"): SiteUrl[]
   return all.filter((u) => u.lang === lang);
 }
 
+// Limite por sitemap. Google/Bing aceitam até 50k URLs/sitemap, mas o user
+// pediu max 100 por XML pra ter granularidade fina (sitemap mais leve =
+// crawler atualiza só o slice que mudou; SEO audit lê mais rápido).
+//
+// Sitemaps maiores que isso quebram em páginas; bucket id vira "<lang>" pra
+// página 1 (back-compat) e "<lang>-<n>" pra páginas seguintes (n=2,3,…).
+export const SITEMAP_URLS_PER_PAGE = 100;
+
+// SitemapBucketID descreve um shard concreto de URLs no sitemap. id é o
+// que vai pra rota /sitemap/<id>.xml; lang/page são os componentes parsed
+// pra debug + filtro no sitemap({id}) handler.
+export type SitemapBucketID = {
+  id: string;                  // "en", "en-2", "legal", "pt-3"
+  lang: LangCode | "legal";
+  page: number;                // 1-based
+};
+
+// parseSitemapBucketID decodifica "en-3" → {lang: "en", page: 3}. "en" sem
+// sufixo é page=1. Strings inválidas caem em {lang:"en", page:1} como
+// fallback gracioso (evita 500 quando crawler especula com bucket inexistente).
+export function parseSitemapBucketID(raw: string): SitemapBucketID {
+  const m = raw.match(/^(.+?)(?:-(\d+))?$/);
+  if (!m) return { id: raw, lang: "en", page: 1 };
+  const lang = m[1] as LangCode | "legal";
+  const page = m[2] ? Math.max(1, parseInt(m[2], 10)) : 1;
+  return { id: raw, lang, page };
+}
+
+// paginatedBuckets enumera TODOS os buckets concretos a partir do snapshot
+// de URLs. Usado tanto pelo Next.js (generateSitemaps) quanto pelo route
+// handler do índice XML — ambos têm que enumerar a mesma lista pra crawler
+// não baixar 404. Buckets vazios são DESCARTADOS (não inserimos lang sem
+// URL, evita sitemap vazio que Search Console alerta).
+export function paginatedBuckets(all: SiteUrl[]): SitemapBucketID[] {
+  const out: SitemapBucketID[] = [];
+  for (const lang of SITEMAP_BUCKETS) {
+    const slice = urlsForLang(all, lang);
+    if (slice.length === 0) continue;
+    const pages = Math.max(1, Math.ceil(slice.length / SITEMAP_URLS_PER_PAGE));
+    for (let p = 1; p <= pages; p++) {
+      out.push({
+        id: p === 1 ? lang : `${lang}-${p}`,
+        lang,
+        page: p,
+      });
+    }
+  }
+  return out;
+}
+
+// urlsForBucket devolve o slice exato pra um bucket id paginado. Out-of-
+// range (page > pages) → [] silencioso; Next.js gera sitemap vazio
+// ({ siteMap: [] }), prefer a vazio que erro.
+export function urlsForBucket(all: SiteUrl[], b: SitemapBucketID): SiteUrl[] {
+  const slice = urlsForLang(all, b.lang);
+  const start = (b.page - 1) * SITEMAP_URLS_PER_PAGE;
+  const end = start + SITEMAP_URLS_PER_PAGE;
+  return slice.slice(start, end);
+}
+
 // Lista de buckets — usada pelo índice e pelos route handlers.
 // Cada bucket gera um per-lang sitemap. "legal" é o cross-language para
 // as variantes ?lang= das páginas jurídicas.

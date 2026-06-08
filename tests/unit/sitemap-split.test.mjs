@@ -7,7 +7,14 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { allSiteUrls } from "../../src/lib/site-urls.ts";
+import {
+  allSiteUrls,
+  paginatedBuckets,
+  parseSitemapBucketID,
+  urlsForBucket,
+  SITEMAP_URLS_PER_PAGE,
+  SITEMAP_BUCKETS,
+} from "../../src/lib/site-urls.ts";
 import { COUNTRIES } from "../../src/i18n/countries.ts";
 import { langOfCountry } from "../../src/i18n/languages.ts";
 
@@ -91,6 +98,56 @@ test("Per-language sitemap split: feature pending, will activate once implemente
     assert.ok(Array.isArray(ids));
     assert.ok(ids.length >= 1);
   }
+});
+
+test("paginatedBuckets: no shard exceeds SITEMAP_URLS_PER_PAGE", () => {
+  const buckets = paginatedBuckets(urls);
+  for (const b of buckets) {
+    const slice = urlsForBucket(urls, b);
+    assert.ok(
+      slice.length <= SITEMAP_URLS_PER_PAGE,
+      `bucket ${b.id} has ${slice.length} urls (cap is ${SITEMAP_URLS_PER_PAGE})`,
+    );
+    assert.ok(slice.length > 0, `bucket ${b.id} is empty`);
+  }
+});
+
+test("paginatedBuckets: page-1 buckets keep back-compat <lang>.xml ids", () => {
+  const buckets = paginatedBuckets(urls);
+  const page1Ids = buckets.filter((b) => b.page === 1).map((b) => b.id);
+  // Sem hífen e dentro do conjunto conhecido de SITEMAP_BUCKETS.
+  for (const id of page1Ids) {
+    assert.ok(!id.includes("-"), `page 1 id should not have suffix: ${id}`);
+    assert.ok(SITEMAP_BUCKETS.includes(id), `unknown bucket: ${id}`);
+  }
+});
+
+test("paginatedBuckets: page-2+ buckets are <lang>-<n> with n>=2", () => {
+  const buckets = paginatedBuckets(urls);
+  for (const b of buckets) {
+    if (b.page === 1) continue;
+    assert.match(b.id, /^.+-\d+$/, `bad paginated id: ${b.id}`);
+    const parsed = parseSitemapBucketID(b.id);
+    assert.equal(parsed.lang, b.lang);
+    assert.equal(parsed.page, b.page);
+    assert.ok(b.page >= 2, `page must be >=2 for suffixed id: ${b.id}`);
+  }
+});
+
+test("parseSitemapBucketID: 'en' -> page 1; 'en-3' -> page 3", () => {
+  assert.deepEqual(parseSitemapBucketID("en"), { id: "en", lang: "en", page: 1 });
+  assert.deepEqual(parseSitemapBucketID("en-3"), { id: "en-3", lang: "en", page: 3 });
+  assert.deepEqual(parseSitemapBucketID("legal-2"), { id: "legal-2", lang: "legal", page: 2 });
+});
+
+test("paginatedBuckets: total URL count across all shards equals total urls", () => {
+  const buckets = paginatedBuckets(urls);
+  let sum = 0;
+  for (const b of buckets) {
+    sum += urlsForBucket(urls, b).length;
+  }
+  // Cada URL aparece em exatamente um bucket (lang dela). Soma == count.
+  assert.equal(sum, urls.length, `partition mismatch: ${sum} vs ${urls.length}`);
 });
 
 test("Lang coverage: at least one URL exists per resolved country language", () => {

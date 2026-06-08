@@ -1,8 +1,14 @@
-// /sitemap.xml — índice (sitemapindex) que aponta pra /sitemap/<lang>.xml.
-// Next.js generateSitemaps em app/sitemap.ts gera os per-lang em /sitemap/<id>.xml
-// mas NÃO auto-gera o /sitemap.xml de índice — fazemos manualmente aqui.
+// /sitemap.xml — índice (sitemapindex) que aponta pra /sitemap/<id>.xml.
+// Next.js generateSitemaps em app/sitemap.ts gera os per-bucket em
+// /sitemap/<id>.xml mas NÃO auto-gera o /sitemap.xml de índice — fazemos
+// manualmente aqui pra controle de cache + escape correto.
+//
+// Com a paginação (sitemap-split, 2026-06-08), buckets viram
+// "<lang>-<page>" pra páginas 2+. O índice precisa enumerar TODOS os
+// shards reais — usar a mesma função de paginatedBuckets garante que o
+// crawler nunca veja um <loc> pra sitemap inexistente.
 
-import { SITEMAP_BUCKETS } from "@/lib/site-urls";
+import { allSiteUrls, paginatedBuckets } from "@/lib/site-urls";
 
 export const dynamic = "force-dynamic";
 
@@ -17,10 +23,12 @@ function xmlEscape(s: string): string {
 export async function GET() {
   const base = siteUrl();
   const today = new Date().toISOString().slice(0, 10);
+  const all = await allSiteUrls();
+  const buckets = paginatedBuckets(all);
 
-  const entries = SITEMAP_BUCKETS.map((b) => `
+  const entries = buckets.map((b) => `
   <sitemap>
-    <loc>${xmlEscape(`${base}/sitemap/${b}.xml`)}</loc>
+    <loc>${xmlEscape(`${base}/sitemap/${b.id}.xml`)}</loc>
     <lastmod>${today}</lastmod>
   </sitemap>`).join("");
 
