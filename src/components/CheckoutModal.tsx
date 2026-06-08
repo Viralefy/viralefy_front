@@ -851,15 +851,24 @@ function CheckoutSuccess({ result, onClose, currency }: { result: CheckoutResult
   );
 }
 
+// PIX_PROVIDERS — providers que efetivamente cobram via PIX. Guard
+// defensivo no client: mesmo que payment_extra venha com pix_key/br_code
+// por configuração errada do gateway, NÃO renderiza UI de PIX se o
+// provider não for um dos abaixo. Cliente internacional não deve ver
+// PIX em hipótese alguma; backend já bloqueia, mas defesa em profundidade.
+const PIX_PROVIDERS = new Set(["manual_pix", "woovi"]);
+
 function PaymentInstructions({ result }: { result: CheckoutResult }) {
   const extra = result.payment_extra ?? {};
-  const brCode = extra["br_code"];
-  const qrImage = extra["qr_code_image"];
+  const provider = (result.gateway_provider ?? "").toLowerCase();
+  const isPixRail = PIX_PROVIDERS.has(provider);
+  const brCode = isPixRail ? extra["br_code"] : undefined;
+  const qrImage = isPixRail ? extra["qr_code_image"] : undefined;
+  const pixKey = isPixRail ? extra["pix_key"] : undefined;
   const address = extra["address"];
   const network = extra["network"];
   const networkWarning = extra["network_warning"];
   const networkLabel = extra["network_label"];
-  const pixKey = extra["pix_key"];
   const walletAddress = extra["wallet_address"];
   const memo = extra["memo"];
   const memoWarning = extra["memo_warning"];
