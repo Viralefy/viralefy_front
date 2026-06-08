@@ -196,7 +196,13 @@ export function CheckoutModal({
         display_currency: currency?.code ?? "USD",
         payment_method: payMethod,
       };
-      if (method) payload.gateway_id = method.gateway_id;
+      if (method) {
+        payload.gateway_id = method.gateway_id;
+        // Quando o gateway é multi-currency (Heleket/Stripe), o card escolhido
+        // carrega a moeda específica de pay-in. Server usa pra criar invoice
+        // na moeda certa (BTC, ETH, USDT...) em vez do settlement canonical.
+        payload.pay_currency = method.charged_currency;
+      }
       if (Object.keys(customData).length > 0) payload.custom_data = customData;
       const tracking = getTracking();
       if (Object.keys(tracking).length > 0) payload.tracking = tracking;

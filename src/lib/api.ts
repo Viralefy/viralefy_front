@@ -92,6 +92,10 @@ export type CheckoutPayload = {
   // pagamento. Quando ausente, backend cai no pickGateway por settlement
   // (back-compat). Quando presente, valida + usa esse gateway específico.
   gateway_id?: string;
+  // Moeda escolhida pra pay-in em gateways multi-currency (Heleket/Stripe).
+  // Ex.: gateway Heleket aceita [USDT, BTC, ETH] → cliente escolheu BTC.
+  // Ignorado por providers single-currency (PIX, manual_crypto).
+  pay_currency?: string;
 };
 
 // PaymentMethodOption — uma das opções de pagamento devolvidas por
