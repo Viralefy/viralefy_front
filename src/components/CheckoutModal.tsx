@@ -159,12 +159,15 @@ export function CheckoutModal({
       return;
     }
     setMethodsError(null);
+    setSelectedMethod(null);
     setStep("method");
     setLoading(true);
     try {
       const list = await fetchPaymentMethods(plan.id, currency?.code, userCountry);
       setMethods(list);
-      if (list.length === 1) setSelectedMethod(list[0]);
+      // NÃO pre-selecionamos mesmo com 1 opção — cliente precisa ver
+      // os termos (network warning, conversão) e clicar deliberadamente.
+      // Pular estágio camufla decisões caras (rede crypto errada = perda).
     } catch (err) {
       setMethodsError(err instanceof Error ? err.message : "Failed to load payment methods");
     } finally {
@@ -438,8 +441,20 @@ function MethodPicker({
   if (!methods || methods.length === 0) {
     return (
       <>
-        <div className="alert alert-warning">
-          No payment methods are available right now. Please contact support.
+        <div
+          style={{
+            background: "rgba(255, 76, 76, 0.10)",
+            border: "1px solid rgba(255, 76, 76, 0.45)",
+            color: "#ff8a8a",
+            padding: "0.85rem",
+            borderRadius: "0.5rem",
+            marginBottom: "0.75rem",
+          }}
+        >
+          <strong>No payment methods available for your region/currency.</strong>
+          <p style={{ margin: "0.4rem 0 0", fontSize: "0.85rem" }}>
+            We don&apos;t currently support a payment method for your country and selected display currency. Switch to USD/USDT in the top-right currency picker, or contact support.
+          </p>
         </div>
         <button type="button" className="btn btn-outline" onClick={onBack} style={{ width: "100%" }}>← Back</button>
       </>
