@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import Script from "next/script";
+import { Suspense } from "react";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
 import { Header } from "@/components/Header";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { CookieBanner } from "@/components/CookieBanner";
+import { TrackingHydrator } from "@/components/TrackingHydrator";
 
 // Layout raiz. `<html lang>` é "en" (root é home global em inglês); páginas
 // de país sobrescrevem o lang no `<article lang>` interno.
@@ -139,6 +141,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           />
         </noscript>
         <Providers>
+          {/* TrackingHydrator — dispara pageview/landing em CADA nav do App
+              Router. Suspense pq usePathname/useSearchParams precisam de
+              boundary no Next 15. */}
+          <Suspense fallback={null}>
+            <TrackingHydrator />
+          </Suspense>
           <Header />
           {children}
           {/* WhatsApp flutuante — só renderiza se NEXT_PUBLIC_WHATSAPP_NUMBER
