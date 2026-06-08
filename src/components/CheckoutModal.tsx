@@ -492,6 +492,9 @@ function PaymentInstructions({ result }: { result: CheckoutResult }) {
   const address = extra["address"];
   const network = extra["network"];
   const pixKey = extra["pix_key"];
+  // Manual USDT: carteira fixa do admin. extras: wallet_address + network + amount + memo.
+  const walletAddress = extra["wallet_address"];
+  const memo = extra["memo"];
 
   if (brCode || qrImage) {
     return (
@@ -548,6 +551,38 @@ function PaymentInstructions({ result }: { result: CheckoutResult }) {
         <h3 style={{ fontSize: "1rem", marginBottom: "0.5rem" }}>Pay with Pix</h3>
         <label className="label">Pix key</label>
         <input readOnly className="input" value={pixKey} />
+      </div>
+    );
+  }
+  if (walletAddress) {
+    return (
+      <div style={{ borderTop: "1px solid var(--border)", paddingTop: "1rem", marginBottom: "1rem" }}>
+        <h3 style={{ fontSize: "1rem", marginBottom: "0.5rem" }}>
+          Pay {result.settlement_amount} {result.settlement_currency}
+          {network && <span style={{ color: "var(--muted)", fontWeight: "normal" }}> ({network})</span>}
+        </h3>
+        <p style={{ color: "var(--danger)", fontSize: "0.85rem", marginBottom: "0.75rem" }}>
+          ⚠ Send on <strong>{network || "the network shown"}</strong> only. Wrong network = lost funds.
+        </p>
+        <label className="label">Wallet address</label>
+        <textarea readOnly className="input" rows={2} style={{ fontFamily: "monospace", fontSize: "0.8rem" }} value={walletAddress} />
+        <button
+          type="button"
+          className="btn btn-outline"
+          style={{ marginTop: "0.5rem", width: "100%" }}
+          onClick={() => navigator.clipboard.writeText(walletAddress).catch(() => undefined)}
+        >
+          Copy address
+        </button>
+        {memo && (
+          <div style={{ marginTop: "0.75rem" }}>
+            <label className="label">Memo / tag (required)</label>
+            <input readOnly className="input" style={{ fontFamily: "monospace" }} value={memo} />
+          </div>
+        )}
+        <p style={{ color: "var(--muted)", fontSize: "0.8rem", marginTop: "0.75rem" }}>
+          Your order will be activated within 1 hour after confirmation on chain. Need help? Open a ticket from <strong>My account</strong>.
+        </p>
       </div>
     );
   }
