@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 // /auth/handoff?token=...&user_id=...&user_email=...&user_name=...&next=/account
@@ -12,7 +12,20 @@ import { useRouter, useSearchParams } from "next/navigation";
 //
 // Não-bloqueante: nenhum estado server-side persistido aqui — token já é
 // válido. Se algum field faltar, redireciona pra /login.
+//
+// force-dynamic: useSearchParams precisa de Suspense ou rota dinâmica em
+// Next 15 — fluxo é client-only de qualquer jeito, então dinâmica é fit.
+export const dynamic = "force-dynamic";
+
 export default function HandoffPage() {
+  return (
+    <Suspense fallback={null}>
+      <Handoff />
+    </Suspense>
+  );
+}
+
+function Handoff() {
   const router = useRouter();
   const params = useSearchParams();
 
