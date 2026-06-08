@@ -2,8 +2,26 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import type { CheckoutResult, Currency, Plan, Platform, Profile, CreditAccount, CouponPreview, TaxRate } from "@/lib/api";
-import { checkout, fetchCredits, fetchMyProfiles, fetchTaxRates, previewCoupon } from "@/lib/api";
+import type {
+  CheckoutResult,
+  Currency,
+  Plan,
+  Platform,
+  Profile,
+  CreditAccount,
+  CouponPreview,
+  TaxRate,
+  PaymentMethodOption,
+} from "@/lib/api";
+import {
+  checkout,
+  fetchCredits,
+  fetchMyProfiles,
+  fetchPaymentMethods,
+  fetchTaxRates,
+  previewCoupon,
+  uploadOrderProof,
+} from "@/lib/api";
 import { getTracking } from "@/lib/tracking";
 import { priceFor, formatBalance } from "@/lib/format";
 import { getToken } from "@/lib/auth";
@@ -12,6 +30,19 @@ import { TrustSignals } from "./TrustSignals";
 import { CustomDataFields, hasCustomFields, type CustomData } from "./CustomDataFields";
 import type { CategoryCode } from "@/i18n/categories";
 import type { LangCode } from "@/i18n/languages";
+
+// Fluxo novo de checkout em 4 steps:
+//   1. form        — preenche dados do pedido (nome, perfil, cupom...)
+//   2. method      — mostra todos os métodos de pagamento elegíveis com
+//                    transparência de conversão (X em BRL → Y em USDT)
+//   3. instructions — após criar o pedido com gateway_id escolhido, mostra
+//                    QR/wallet/Stripe URL e área pra upload de comprovante
+//   4. success     — confirma e linka pra "Meus pedidos"
+//
+// "credits" continua sendo método paralelo (pula direto pro step success
+// porque não precisa de instruções externas).
+
+type Step = "form" | "method" | "instructions" | "success";
 
 export function CheckoutModal({
   plan,
@@ -22,8 +53,6 @@ export function CheckoutModal({
   plan: Plan;
   lang?: LangCode;
   onClose: () => void;
-  // Mercado da entrega — herda da LP (/us, /de, ...) que abriu o modal.
-  // Operador usa pra escolher supplier. Independente de userCountry (VAT).
   targetCountry?: string;
 }) {
   const { currency, user } = useApp();
@@ -31,6 +60,7 @@ export function CheckoutModal({
   const platformLabel = plan.platform === "tiktok" ? "TikTok" : "Instagram";
   const platformIcon = plan.platform === "tiktok" ? "🎵" : "📷";
 
+  const [step, setStep] = useState<Step>("form");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<CheckoutResult | null>(null);
@@ -40,18 +70,28 @@ export function CheckoutModal({
   const [selectedProfileId, setSelectedProfileId] = useState<string>("");
   const [useNewProfile, setUseNewProfile] = useState(false);
   const [payMethod, setPayMethod] = useState<"gateway" | "credits">("gateway");
-  // Snapshot dos campos extras por categoria (BMs, perfis, emails).
-  // Passa por custom_data no /v1/checkout e cai no ticket pós-pagamento.
   const [customData, setCustomData] = useState<CustomData>({});
   const [couponCode, setCouponCode] = useState<string>("");
   const [couponPreview, setCouponPreview] = useState<CouponPreview | null>(null);
   const [couponError, setCouponError] = useState<string | null>(null);
   const [couponChecking, setCouponChecking] = useState(false);
 
-  // VAT (Fase 5.3) — catálogo baixado on-mount + país do user (localStorage
-  // OU best-effort via /api/geo). País não-EU → vatRate=0 e a linha some.
-  // Cálculo final é autoritativo no server (CheckoutService + TaxService);
-  // aqui é só pre-display pra evitar surpresa no botão "Confirm".
+  // Snapshot dos dados do step 1 — guardamos pra reaproveitar quando o
+  // usuário escolhe um método de pagamento e o form é submetido de novo
+  // no step 2 (a chamada de checkout acontece DEPOIS da escolha do método).
+  const [formSnapshot, setFormSnapshot] = useState<{
+    name: string;
+    email: string;
+    handle: string;
+    display_name: string;
+    publication_url: string;
+  } | null>(null);
+
+  // Methods + escolha
+  const [methods, setMethods] = useState<PaymentMethodOption[] | null>(null);
+  const [methodsError, setMethodsError] = useState<string | null>(null);
+  const [selectedMethod, setSelectedMethod] = useState<PaymentMethodOption | null>(null);
+
   const [taxRates, setTaxRates] = useState<TaxRate[]>([]);
   const [userCountry, setUserCountry] = useState<string>("");
 
@@ -75,9 +115,6 @@ export function CheckoutModal({
     fetchCredits(token).then(setCredit).catch(() => undefined);
   }, [isProfile, plan.platform]);
 
-  // VAT catalog + country detect. Best-effort: falha mantém vatRate=0
-  // (preview transparente — server decide se cobra). Ordem: localStorage
-  // (preferência manual) → /api/geo (cf-ipcountry/x-vercel-ip-country).
   useEffect(() => {
     fetchTaxRates().then(setTaxRates).catch(() => setTaxRates([]));
     let cancelled = false;
@@ -97,73 +134,91 @@ export function CheckoutModal({
     return () => { cancelled = true; };
   }, []);
 
-  // Pre-display do VAT. amount líquido = price_cents − discount_cents
-  // (cupom). rate_pct vem do catálogo público; país fora do catálogo cai
-  // em rate 0 e a linha some. Round meio-cima espelha TaxService server-side.
   const vatRate = userCountry
     ? (taxRates.find((t) => t.country_code === userCountry)?.rate_pct ?? 0)
     : 0;
   const discountCents = couponPreview?.discount_usd_cents ?? 0;
   const netCents = Math.max(0, plan.price_cents - discountCents);
   const taxUsdCents = vatRate > 0 ? Math.round((netCents * vatRate) / 100) : 0;
-
   const enoughCredits = credit ? credit.balance_cents >= plan.price_cents : false;
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  // Step 1 → Step 2: valida campos básicos, captura snapshot, busca métodos
+  async function advanceToMethod(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    const snap = {
+      name: String(fd.get("name") ?? user?.name ?? ""),
+      email: String(fd.get("email") ?? user?.email ?? ""),
+      handle: String(fd.get("handle") ?? ""),
+      display_name: String(fd.get("display_name") ?? ""),
+      publication_url: String(fd.get("publication_url") ?? ""),
+    };
+    setFormSnapshot(snap);
+    if (payMethod === "credits") {
+      await submitCheckout(snap, null);
+      return;
+    }
+    setMethodsError(null);
+    setStep("method");
+    setLoading(true);
+    try {
+      const list = await fetchPaymentMethods(plan.id, currency?.code, userCountry);
+      setMethods(list);
+      if (list.length === 1) setSelectedMethod(list[0]);
+    } catch (err) {
+      setMethodsError(err instanceof Error ? err.message : "Failed to load payment methods");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Step 2 → cria pedido com gateway_id escolhido
+  async function confirmSelectedMethod() {
+    if (!selectedMethod || !formSnapshot) return;
+    await submitCheckout(formSnapshot, selectedMethod);
+  }
+
+  async function submitCheckout(
+    snap: NonNullable<typeof formSnapshot>,
+    method: PaymentMethodOption | null,
+  ) {
     setLoading(true);
     setError(null);
-    const fd = new FormData(e.currentTarget);
     const token = getToken() ?? undefined;
     try {
       const payload: Parameters<typeof checkout>[0] = {
         plan_id: plan.id,
-        email: String(fd.get("email") ?? user?.email ?? ""),
-        name: String(fd.get("name") ?? user?.name ?? ""),
+        email: snap.email,
+        name: snap.name,
         display_currency: currency?.code ?? "USD",
         payment_method: payMethod,
       };
-      // Carrega o snapshot dos campos custom da categoria (BMs/perfis/emails)
-      // — só inclui se houver dado, senão o objeto vazio polui o ticket.
-      if (Object.keys(customData).length > 0) {
-        payload.custom_data = customData;
-      }
-      // First-touch tracking (UTM/fbclid/gclid/referrer/landing_url +
-      // browser context). Sempre vai — backend enriquece com IP+UA.
+      if (method) payload.gateway_id = method.gateway_id;
+      if (Object.keys(customData).length > 0) payload.custom_data = customData;
       const tracking = getTracking();
-      if (Object.keys(tracking).length > 0) {
-        payload.tracking = tracking;
-      }
-      // Cupom: só envia se passou no preview (backend revalida atomicamente).
-      if (couponPreview) {
-        payload.coupon_code = couponPreview.code;
-      }
-      // Country pra VAT (Fase 5.3) — server autoritativo, este envio
-      // é apenas pra que o cálculo final bata com o pre-display.
-      if (userCountry) {
-        payload.country = userCountry;
-      }
-      // target_country: mercado da entrega herdado da URL da LP.
-      if (targetCountry) {
-        payload.target_country = targetCountry;
-      }
+      if (Object.keys(tracking).length > 0) payload.tracking = tracking;
+      if (couponPreview) payload.coupon_code = couponPreview.code;
+      if (userCountry) payload.country = userCountry;
+      if (targetCountry) payload.target_country = targetCountry;
       if (isProfile) {
         if (user && profiles && !useNewProfile && selectedProfileId) {
           payload.profile_id = selectedProfileId;
         } else {
           payload.new_profile = {
             platform: plan.platform as Platform,
-            handle: String(fd.get("handle") ?? ""),
-            display_name: String(fd.get("display_name") ?? "") || undefined,
+            handle: snap.handle,
+            display_name: snap.display_name || undefined,
           };
         }
       } else {
-        payload.publication_url = String(fd.get("publication_url") ?? "");
+        payload.publication_url = snap.publication_url;
       }
       const res = await checkout(payload, token);
       setResult(res);
+      setStep(payMethod === "credits" ? "success" : "instructions");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Checkout error");
+      setStep("form");
     } finally {
       setLoading(false);
     }
@@ -180,21 +235,33 @@ export function CheckoutModal({
       }}
       onClick={onClose}
     >
-      <div className="card" style={{ maxWidth: 480, width: "100%", maxHeight: "90vh", overflowY: "auto" }} onClick={(e) => e.stopPropagation()}>
-        {result ? (
-          <CheckoutSuccess result={result} onClose={onClose} currency={currency} />
-        ) : (
-          <>
-            <h2 style={{ marginBottom: "0.25rem" }}>Complete purchase</h2>
-            <p style={{ color: "var(--muted)", fontSize: "0.85rem", marginBottom: "0.25rem" }}>
-              {platformIcon} {platformLabel} · {isProfile ? "delivered to the profile" : "delivered to the post"}
-            </p>
-            <p style={{ marginBottom: "0.5rem" }}>
-              <strong>{plan.name}</strong> — {priceFor(plan, currency)}
-            </p>
-            <TrustSignals lang={lang} variant="compact" />
+      <div
+        className="card"
+        style={{ maxWidth: 520, width: "100%", maxHeight: "90vh", overflowY: "auto" }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <StepHeader step={step} onBack={
+          step === "method" ? () => setStep("form") :
+          step === "instructions" ? null :
+          null
+        } />
+        <h2 style={{ marginBottom: "0.25rem" }}>
+          {step === "form" && "Complete purchase"}
+          {step === "method" && "Choose payment method"}
+          {step === "instructions" && "Complete your payment"}
+          {step === "success" && "Order created! 🎉"}
+        </h2>
+        <p style={{ color: "var(--muted)", fontSize: "0.85rem", marginBottom: "0.25rem" }}>
+          {platformIcon} {platformLabel} · {isProfile ? "delivered to the profile" : "delivered to the post"}
+        </p>
+        <p style={{ marginBottom: "0.5rem" }}>
+          <strong>{plan.name}</strong> — {priceFor(plan, currency)}
+        </p>
 
-            <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+        {step === "form" && (
+          <>
+            <TrustSignals lang={lang} variant="compact" />
+            <form onSubmit={advanceToMethod} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               {error && <div className="alert alert-error">{error}</div>}
 
               {!user && (
@@ -229,8 +296,6 @@ export function CheckoutModal({
                 <PublicationSection platform={plan.platform} platformLabel={platformLabel} platformIcon={platformIcon} />
               )}
 
-              {/* Campos custom por categoria (BMs/perfis/emails). Para as
-                  outras categorias, hasCustomFields=false → não renderiza. */}
               {hasCustomFields(plan.category as CategoryCode) && (
                 <CustomDataFields
                   category={plan.category as CategoryCode}
@@ -250,71 +315,25 @@ export function CheckoutModal({
                 />
               )}
 
-              <div>
-                <label className="label" htmlFor="coupon_code">Promo code (optional)</label>
-                <div style={{ display: "flex", gap: "0.5rem" }}>
-                  <input
-                    className="input"
-                    id="coupon_code"
-                    value={couponCode}
-                    onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponError(null); }}
-                    placeholder="BLACK10"
-                    disabled={!!couponPreview}
-                    style={{ flex: 1, textTransform: "uppercase" }}
-                  />
-                  {couponPreview ? (
-                    <button
-                      type="button"
-                      className="btn btn-outline"
-                      onClick={() => { setCouponPreview(null); setCouponCode(""); setCouponError(null); }}
-                    >Remove</button>
-                  ) : (
-                    <button
-                      type="button"
-                      className="btn btn-outline"
-                      disabled={!couponCode || couponChecking}
-                      onClick={async () => {
-                        setCouponChecking(true);
-                        setCouponError(null);
-                        try {
-                          const p = await previewCoupon({
-                            code: couponCode,
-                            plan_id: plan.id,
-                            email: user?.email,
-                            display_currency: currency?.code,
-                          });
-                          setCouponPreview(p);
-                        } catch (err) {
-                          setCouponError(err instanceof Error ? err.message : "Invalid coupon");
-                        } finally {
-                          setCouponChecking(false);
-                        }
-                      }}
-                    >{couponChecking ? "Checking…" : "Apply"}</button>
-                  )}
-                </div>
-                {couponError && (
-                  <p style={{ color: "var(--danger)", fontSize: "0.8rem", marginTop: "0.3rem" }}>{couponError}</p>
-                )}
-                {couponPreview && (
-                  <p style={{ color: "#3cd87d", fontSize: "0.85rem", marginTop: "0.3rem" }}>
-                    ✓ {couponPreview.code}: −${(couponPreview.discount_usd_cents / 100).toFixed(2)} off
-                    {couponPreview.description && ` (${couponPreview.description})`}
-                  </p>
-                )}
-              </div>
+              <CouponInput
+                code={couponCode}
+                setCode={setCouponCode}
+                preview={couponPreview}
+                setPreview={setCouponPreview}
+                error={couponError}
+                setError={setCouponError}
+                checking={couponChecking}
+                setChecking={setCouponChecking}
+                planId={plan.id}
+                userEmail={user?.email}
+                currencyCode={currency?.code}
+              />
 
-              {/* VAT pre-display (Fase 5.3). Server decide o cobrança final
-                  via TaxService.ComputeTax; aqui é só preview pra UE/GB.
-                  País fora do catálogo → vatRate=0 e o bloco some. */}
               {vatRate > 0 && (
                 <p
                   style={{
-                    color: "var(--muted)",
-                    fontSize: "0.85rem",
-                    margin: 0,
-                    paddingTop: "0.25rem",
-                    borderTop: "1px dashed rgba(255,255,255,0.08)",
+                    color: "var(--muted)", fontSize: "0.85rem", margin: 0,
+                    paddingTop: "0.25rem", borderTop: "1px dashed rgba(255,255,255,0.08)",
                   }}
                   aria-label="VAT estimate"
                 >
@@ -323,7 +342,8 @@ export function CheckoutModal({
               )}
 
               <button type="submit" className="btn btn-primary" disabled={loading}>
-                {loading ? "Processing…" : payMethod === "credits" ? "Pay with credits" : "Confirm order"}
+                {loading ? "Processing…" :
+                  payMethod === "credits" ? "Pay with credits" : "Continue → choose method"}
               </button>
             </form>
             <button type="button" className="btn btn-outline" style={{ marginTop: "1rem", width: "100%" }} onClick={onClose}>
@@ -331,7 +351,336 @@ export function CheckoutModal({
             </button>
           </>
         )}
+
+        {step === "method" && (
+          <MethodPicker
+            methods={methods}
+            error={methodsError}
+            loading={loading}
+            selected={selectedMethod}
+            onSelect={setSelectedMethod}
+            onConfirm={confirmSelectedMethod}
+            onBack={() => setStep("form")}
+          />
+        )}
+
+        {step === "instructions" && result && (
+          <Instructions result={result} onDone={() => setStep("success")} />
+        )}
+
+        {step === "success" && result && (
+          <CheckoutSuccess result={result} onClose={onClose} currency={currency} />
+        )}
       </div>
+    </div>
+  );
+}
+
+function StepHeader({ step, onBack }: { step: Step; onBack: (() => void) | null }) {
+  const labels: Record<Step, string> = {
+    form: "1. Details",
+    method: "2. Payment method",
+    instructions: "3. Complete payment",
+    success: "4. Done",
+  };
+  const order: Step[] = ["form", "method", "instructions", "success"];
+  const currentIdx = order.indexOf(step);
+  return (
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.5rem" }}>
+      <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap" }}>
+        {order.map((s, i) => (
+          <span
+            key={s}
+            style={{
+              fontSize: "0.7rem",
+              padding: "0.15rem 0.5rem",
+              borderRadius: 999,
+              background: i === currentIdx ? "var(--accent)" : i < currentIdx ? "rgba(60,216,125,0.18)" : "rgba(255,255,255,0.06)",
+              color: i === currentIdx ? "#000" : i < currentIdx ? "#3cd87d" : "var(--muted)",
+              fontWeight: i === currentIdx ? 600 : 400,
+            }}
+          >
+            {labels[s]}
+          </span>
+        ))}
+      </div>
+      {onBack && (
+        <button type="button" onClick={onBack} className="btn btn-ghost" style={{ padding: "0.1rem 0.5rem", fontSize: "0.75rem" }}>
+          ← Back
+        </button>
+      )}
+    </div>
+  );
+}
+
+function MethodPicker({
+  methods, error, loading, selected, onSelect, onConfirm, onBack,
+}: {
+  methods: PaymentMethodOption[] | null;
+  error: string | null;
+  loading: boolean;
+  selected: PaymentMethodOption | null;
+  onSelect: (m: PaymentMethodOption) => void;
+  onConfirm: () => void;
+  onBack: () => void;
+}) {
+  if (loading && !methods) {
+    return <p style={{ color: "var(--muted)" }}>Loading payment options…</p>;
+  }
+  if (error) {
+    return (
+      <>
+        <div className="alert alert-error">{error}</div>
+        <button type="button" className="btn btn-outline" onClick={onBack} style={{ width: "100%" }}>← Back</button>
+      </>
+    );
+  }
+  if (!methods || methods.length === 0) {
+    return (
+      <>
+        <div className="alert alert-warning">
+          No payment methods are available right now. Please contact support.
+        </div>
+        <button type="button" className="btn btn-outline" onClick={onBack} style={{ width: "100%" }}>← Back</button>
+      </>
+    );
+  }
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+      <p style={{ fontSize: "0.85rem", color: "var(--muted)", margin: 0 }}>
+        Pick how you want to pay. The amount in your chosen method is shown below.
+      </p>
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+        {methods.map((m) => (
+          <MethodCard
+            key={m.gateway_id}
+            method={m}
+            active={selected?.gateway_id === m.gateway_id}
+            onSelect={() => onSelect(m)}
+          />
+        ))}
+      </div>
+      <button
+        type="button"
+        className="btn btn-primary"
+        disabled={!selected || loading}
+        onClick={onConfirm}
+        style={{ width: "100%" }}
+      >
+        {loading ? "Creating order…" : selected ? `Confirm — pay ${selected.charged_amount} ${selected.charged_currency}` : "Pick a method first"}
+      </button>
+    </div>
+  );
+}
+
+function MethodCard({
+  method, active, onSelect,
+}: {
+  method: PaymentMethodOption;
+  active: boolean;
+  onSelect: () => void;
+}) {
+  const icon =
+    method.kind === "card" ? "💳" :
+    method.kind === "pix" ? "🇧🇷 PIX" :
+    method.kind === "crypto_manual" ? "🪙" :
+    method.kind === "crypto_auto" ? "⚡" : "💰";
+  const subtitle =
+    method.kind === "card" ? "Credit/debit card via Stripe" :
+    method.kind === "pix" ? "Instant Brazilian transfer" :
+    method.kind === "crypto_manual" ? (method.network_label || "Crypto wallet") :
+    method.kind === "crypto_auto" ? "Crypto, auto-confirmed on chain" :
+    "Other";
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      style={{
+        textAlign: "left",
+        padding: "0.85rem",
+        borderRadius: "0.6rem",
+        border: active ? "2px solid var(--accent)" : "1px solid var(--border)",
+        background: active ? "rgba(60,216,125,0.06)" : "transparent",
+        color: "inherit",
+        cursor: "pointer",
+        display: "flex",
+        flexDirection: "column",
+        gap: "0.35rem",
+      }}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+        <strong style={{ fontSize: "0.95rem" }}>{icon} {method.name}</strong>
+        <span style={{ fontWeight: 700 }}>
+          {method.charged_symbol} {method.charged_amount} {method.charged_currency}
+        </span>
+      </div>
+      <span style={{ fontSize: "0.78rem", color: "var(--muted)" }}>{subtitle}</span>
+      {method.conversion_note && (
+        <span style={{ fontSize: "0.75rem", color: "#7cc4ff" }}>
+          ℹ {method.conversion_note}
+        </span>
+      )}
+      {method.network_warning && (
+        <span style={{ fontSize: "0.75rem", color: "var(--danger)" }}>
+          ⚠ {method.network_warning}
+        </span>
+      )}
+    </button>
+  );
+}
+
+function Instructions({ result, onDone }: { result: CheckoutResult; onDone: () => void }) {
+  return (
+    <>
+      <PaymentInstructions result={result} />
+      <ProofUploadSection orderId={result.order_id} onUploaded={onDone} />
+      <button type="button" className="btn btn-outline" style={{ marginTop: "0.75rem", width: "100%" }} onClick={onDone}>
+        Skip — I&apos;ll upload later
+      </button>
+    </>
+  );
+}
+
+function ProofUploadSection({ orderId, onUploaded }: { orderId: string; onUploaded: () => void }) {
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const [note, setNote] = useState("");
+  const [fileName, setFileName] = useState("");
+
+  async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    setFileName(f.name);
+    if (f.size > 800 * 1024) {
+      setErr("File too large — max 800 KB (we use base64). Use a screenshot, not a full-res photo.");
+      return;
+    }
+    setErr(null);
+    setBusy(true);
+    try {
+      const dataUrl = await new Promise<string>((resolve, reject) => {
+        const r = new FileReader();
+        r.onload = () => resolve(String(r.result));
+        r.onerror = () => reject(new Error("Read failed"));
+        r.readAsDataURL(f);
+      });
+      const token = getToken();
+      if (!token) {
+        setErr("You need to be logged in to upload proof. Please log in and try again.");
+        return;
+      }
+      await uploadOrderProof(token, orderId, {
+        file_url: dataUrl,
+        file_name: f.name,
+        mime_type: f.type,
+        size_bytes: f.size,
+        note: note || undefined,
+      });
+      onUploaded();
+    } catch (er) {
+      setErr(er instanceof Error ? er.message : "Upload failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div
+      style={{
+        borderTop: "1px solid var(--border)",
+        paddingTop: "1rem",
+        marginTop: "1rem",
+      }}
+    >
+      <h3 style={{ fontSize: "1rem", marginBottom: "0.4rem" }}>
+        Already paid? Upload your proof
+      </h3>
+      <p style={{ color: "var(--muted)", fontSize: "0.8rem", marginBottom: "0.5rem" }}>
+        Send a screenshot of your PIX receipt or your crypto transaction hash. We&apos;ll activate the order once we confirm the deposit.
+      </p>
+      {err && <div className="alert alert-error" style={{ marginBottom: "0.5rem" }}>{err}</div>}
+      <label className="label">Receipt file (image, max 800 KB)</label>
+      <input className="input" type="file" accept="image/*,application/pdf" onChange={onFile} disabled={busy} />
+      {fileName && <p style={{ fontSize: "0.75rem", color: "var(--muted)" }}>Selected: {fileName}</p>}
+      <label className="label" style={{ marginTop: "0.5rem" }}>Note (TX hash, time, etc.)</label>
+      <textarea
+        className="input"
+        rows={2}
+        value={note}
+        onChange={(e) => setNote(e.target.value)}
+        placeholder="ex.: 0x1234abcd… at 14:32 BRT"
+      />
+      {busy && <p style={{ fontSize: "0.8rem", color: "var(--muted)" }}>Uploading…</p>}
+    </div>
+  );
+}
+
+function CouponInput({
+  code, setCode, preview, setPreview, error, setError, checking, setChecking,
+  planId, userEmail, currencyCode,
+}: {
+  code: string;
+  setCode: (s: string) => void;
+  preview: CouponPreview | null;
+  setPreview: (p: CouponPreview | null) => void;
+  error: string | null;
+  setError: (e: string | null) => void;
+  checking: boolean;
+  setChecking: (b: boolean) => void;
+  planId: string;
+  userEmail?: string;
+  currencyCode?: string;
+}) {
+  return (
+    <div>
+      <label className="label" htmlFor="coupon_code">Promo code (optional)</label>
+      <div style={{ display: "flex", gap: "0.5rem" }}>
+        <input
+          className="input"
+          id="coupon_code"
+          value={code}
+          onChange={(e) => { setCode(e.target.value.toUpperCase()); setError(null); }}
+          placeholder="BLACK10"
+          disabled={!!preview}
+          style={{ flex: 1, textTransform: "uppercase" }}
+        />
+        {preview ? (
+          <button
+            type="button"
+            className="btn btn-outline"
+            onClick={() => { setPreview(null); setCode(""); setError(null); }}
+          >Remove</button>
+        ) : (
+          <button
+            type="button"
+            className="btn btn-outline"
+            disabled={!code || checking}
+            onClick={async () => {
+              setChecking(true);
+              setError(null);
+              try {
+                const p = await previewCoupon({
+                  code, plan_id: planId, email: userEmail, display_currency: currencyCode,
+                });
+                setPreview(p);
+              } catch (err) {
+                setError(err instanceof Error ? err.message : "Invalid coupon");
+              } finally {
+                setChecking(false);
+              }
+            }}
+          >{checking ? "Checking…" : "Apply"}</button>
+        )}
+      </div>
+      {error && (
+        <p style={{ color: "var(--danger)", fontSize: "0.8rem", marginTop: "0.3rem" }}>{error}</p>
+      )}
+      {preview && (
+        <p style={{ color: "#3cd87d", fontSize: "0.85rem", marginTop: "0.3rem" }}>
+          ✓ {preview.code}: −${(preview.discount_usd_cents / 100).toFixed(2)} off
+          {preview.description && ` (${preview.description})`}
+        </p>
+      )}
     </div>
   );
 }
@@ -446,7 +795,6 @@ function PaymentMethodSection({
 function CheckoutSuccess({ result, onClose, currency }: { result: CheckoutResult; onClose: () => void; currency: Currency | null }) {
   return (
     <>
-      <h2 style={{ marginBottom: "0.75rem" }}>Order created! 🎉</h2>
       <div className="alert alert-success" style={{ marginBottom: "1rem" }}>
         Order <strong>#{result.order_id.slice(0, 8)}</strong> for plan <strong>{result.plan_name}</strong>.
       </div>
@@ -463,9 +811,6 @@ function CheckoutSuccess({ result, onClose, currency }: { result: CheckoutResult
           <li>Charged in: <strong>{result.settlement_amount} {result.settlement_currency}</strong></li>
         )}
       </ul>
-
-      {result.payment_method === "gateway" && <PaymentInstructions result={result} />}
-
       {result.account_created ? (
         <p style={{ color: "var(--muted)", fontSize: "0.85rem", marginBottom: "1rem" }}>
           Account created for <strong>{result.email}</strong>. {result.email_sent ? "We've emailed your password and instructions." : "Email failed to send — open a ticket."}
@@ -491,15 +836,38 @@ function PaymentInstructions({ result }: { result: CheckoutResult }) {
   const qrImage = extra["qr_code_image"];
   const address = extra["address"];
   const network = extra["network"];
+  const networkWarning = extra["network_warning"];
+  const networkLabel = extra["network_label"];
   const pixKey = extra["pix_key"];
-  // Manual USDT: carteira fixa do admin. extras: wallet_address + network + amount + memo.
   const walletAddress = extra["wallet_address"];
   const memo = extra["memo"];
+  const memoWarning = extra["memo_warning"];
+  const methodKind = extra["method_kind"];
+
+  // Stripe / cartão — payment_url é a sessão hospedada
+  if (methodKind === "card" || (result.gateway_provider === "stripe" && result.payment_url)) {
+    return (
+      <div style={{ borderTop: "1px solid var(--border)", paddingTop: "1rem", marginBottom: "1rem" }}>
+        <h3 style={{ fontSize: "1rem", marginBottom: "0.5rem" }}>Pay with card</h3>
+        <p style={{ color: "var(--muted)", fontSize: "0.85rem", marginBottom: "0.5rem" }}>
+          You&apos;ll be redirected to Stripe to enter your card details.
+        </p>
+        <a href={result.payment_url} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ width: "100%" }}>
+          Open Stripe checkout →
+        </a>
+      </div>
+    );
+  }
 
   if (brCode || qrImage) {
     return (
       <div style={{ borderTop: "1px solid var(--border)", paddingTop: "1rem", marginBottom: "1rem" }}>
         <h3 style={{ fontSize: "1rem", marginBottom: "0.5rem" }}>Pay with Pix</h3>
+        {result.settlement_currency !== result.display_currency && (
+          <p style={{ fontSize: "0.8rem", color: "#7cc4ff", marginBottom: "0.5rem" }}>
+            ℹ You pay {result.display_symbol} {result.display_amount} {result.display_currency} via PIX. The platform converts to {result.settlement_amount} {result.settlement_currency} on receipt.
+          </p>
+        )}
         {qrImage && (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={qrImage} alt="Pix QR code" style={{ display: "block", maxWidth: 220, margin: "0 auto 0.75rem", borderRadius: "0.5rem" }} />
@@ -521,56 +889,62 @@ function PaymentInstructions({ result }: { result: CheckoutResult }) {
       </div>
     );
   }
-  if (address) {
-    return (
-      <div style={{ borderTop: "1px solid var(--border)", paddingTop: "1rem", marginBottom: "1rem" }}>
-        <h3 style={{ fontSize: "1rem", marginBottom: "0.5rem" }}>
-          Pay {result.settlement_amount} {result.settlement_currency}
-          {network && <span style={{ color: "var(--muted)", fontWeight: "normal" }}> ({network} network)</span>}
-        </h3>
-        <label className="label">Wallet</label>
-        <textarea readOnly className="input" rows={2} style={{ fontFamily: "monospace", fontSize: "0.8rem" }} value={address} />
-        {result.payment_url && (
-          <a href={result.payment_url} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ marginTop: "0.5rem", width: "100%" }}>
-            Open payment page
-          </a>
-        )}
-      </div>
-    );
-  }
-  if (result.payment_url) {
-    return (
-      <a href={result.payment_url} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ marginBottom: "1rem", width: "100%" }}>
-        Go to payment page
-      </a>
-    );
-  }
+
   if (pixKey) {
     return (
       <div style={{ borderTop: "1px solid var(--border)", paddingTop: "1rem", marginBottom: "1rem" }}>
         <h3 style={{ fontSize: "1rem", marginBottom: "0.5rem" }}>Pay with Pix</h3>
+        {result.settlement_currency !== result.display_currency && (
+          <p style={{ fontSize: "0.8rem", color: "#7cc4ff", marginBottom: "0.5rem" }}>
+            ℹ You pay {result.display_symbol} {result.display_amount} {result.display_currency} via PIX. The platform converts to {result.settlement_amount} {result.settlement_currency} on receipt.
+          </p>
+        )}
         <label className="label">Pix key</label>
         <input readOnly className="input" value={pixKey} />
-      </div>
-    );
-  }
-  if (walletAddress) {
-    return (
-      <div style={{ borderTop: "1px solid var(--border)", paddingTop: "1rem", marginBottom: "1rem" }}>
-        <h3 style={{ fontSize: "1rem", marginBottom: "0.5rem" }}>
-          Pay {result.settlement_amount} {result.settlement_currency}
-          {network && <span style={{ color: "var(--muted)", fontWeight: "normal" }}> ({network})</span>}
-        </h3>
-        <p style={{ color: "var(--danger)", fontSize: "0.85rem", marginBottom: "0.75rem" }}>
-          ⚠ Send on <strong>{network || "the network shown"}</strong> only. Wrong network = lost funds.
-        </p>
-        <label className="label">Wallet address</label>
-        <textarea readOnly className="input" rows={2} style={{ fontFamily: "monospace", fontSize: "0.8rem" }} value={walletAddress} />
         <button
           type="button"
           className="btn btn-outline"
           style={{ marginTop: "0.5rem", width: "100%" }}
-          onClick={() => navigator.clipboard.writeText(walletAddress).catch(() => undefined)}
+          onClick={() => navigator.clipboard.writeText(pixKey).catch(() => undefined)}
+        >
+          Copy key
+        </button>
+      </div>
+    );
+  }
+
+  // Crypto manual / auto — wallet_address ou address
+  const wallet = walletAddress || address;
+  if (wallet) {
+    return (
+      <div style={{ borderTop: "1px solid var(--border)", paddingTop: "1rem", marginBottom: "1rem" }}>
+        <h3 style={{ fontSize: "1rem", marginBottom: "0.5rem" }}>
+          Pay {result.settlement_amount} {result.settlement_currency}
+          {(networkLabel || network) && (
+            <span style={{ color: "var(--muted)", fontWeight: "normal" }}> · {networkLabel || network}</span>
+          )}
+        </h3>
+        <div
+          style={{
+            background: "rgba(255, 76, 76, 0.12)",
+            border: "1px solid rgba(255, 76, 76, 0.45)",
+            color: "#ff8a8a",
+            padding: "0.65rem 0.75rem",
+            borderRadius: "0.5rem",
+            fontSize: "0.85rem",
+            marginBottom: "0.75rem",
+            fontWeight: 600,
+          }}
+        >
+          ⚠ {networkWarning || `Send ONLY on the ${network || "shown"} network. Deposits on any other network will be lost forever.`}
+        </div>
+        <label className="label">Wallet address</label>
+        <textarea readOnly className="input" rows={2} style={{ fontFamily: "monospace", fontSize: "0.8rem" }} value={wallet} />
+        <button
+          type="button"
+          className="btn btn-outline"
+          style={{ marginTop: "0.5rem", width: "100%" }}
+          onClick={() => navigator.clipboard.writeText(wallet).catch(() => undefined)}
         >
           Copy address
         </button>
@@ -578,12 +952,28 @@ function PaymentInstructions({ result }: { result: CheckoutResult }) {
           <div style={{ marginTop: "0.75rem" }}>
             <label className="label">Memo / tag (required)</label>
             <input readOnly className="input" style={{ fontFamily: "monospace" }} value={memo} />
+            {memoWarning && (
+              <p style={{ color: "var(--danger)", fontSize: "0.8rem", marginTop: "0.25rem" }}>⚠ {memoWarning}</p>
+            )}
           </div>
         )}
+        {result.payment_url && (
+          <a href={result.payment_url} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ marginTop: "0.5rem", width: "100%" }}>
+            Open payment page
+          </a>
+        )}
         <p style={{ color: "var(--muted)", fontSize: "0.8rem", marginTop: "0.75rem" }}>
-          Your order will be activated within 1 hour after confirmation on chain. Need help? Open a ticket from <strong>My account</strong>.
+          Your order will be activated within 1 hour after the deposit is confirmed on chain. Upload the transaction hash or receipt below to speed up review.
         </p>
       </div>
+    );
+  }
+
+  if (result.payment_url) {
+    return (
+      <a href={result.payment_url} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ marginBottom: "1rem", width: "100%" }}>
+        Go to payment page
+      </a>
     );
   }
   return null;

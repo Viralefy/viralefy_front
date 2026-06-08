@@ -88,7 +88,60 @@ export type CheckoutPayload = {
   country?: string;
   // País do MERCADO da entrega — herdado da LP (/us/, /de/...).
   target_country?: string;
+  // Gateway escolhido pelo cliente no step de seleção de método de
+  // pagamento. Quando ausente, backend cai no pickGateway por settlement
+  // (back-compat). Quando presente, valida + usa esse gateway específico.
+  gateway_id?: string;
 };
+
+// PaymentMethodOption — uma das opções de pagamento devolvidas por
+// /v1/plans/:id/payment-methods. UI usa pra montar a lista de cards no
+// step de seleção. conversion_note é populado SÓ quando charged !=
+// settlement (transparência: "você paga X em BRL, plataforma recebe Y USDT").
+export type PaymentMethodOption = {
+  gateway_id: string;
+  provider: string;        // woovi | heleket | manual_pix | manual_crypto | manual_usdt | stripe
+  name: string;            // nome do gateway (admin escolheu — ex.: "USDT TRC20")
+  kind: "card" | "pix" | "crypto_manual" | "crypto_auto" | "other";
+  charged_currency: string;
+  charged_amount: string;
+  charged_symbol: string;
+  settlement_currency: string;
+  settlement_amount: string;
+  settlement_symbol: string;
+  display_currency: string;
+  display_amount: string;
+  conversion_note?: string;
+  network_label?: string;
+  network_warning?: string;
+};
+
+export const fetchPaymentMethods = (
+  planId: string,
+  displayCurrency?: string,
+  country?: string,
+): Promise<PaymentMethodOption[]> => {
+  const qs = new URLSearchParams();
+  if (displayCurrency) qs.set("display_currency", displayCurrency);
+  if (country) qs.set("country", country);
+  const tail = qs.toString() ? `?${qs}` : "";
+  return request<PaymentMethodOption[]>(`/v1/plans/${planId}/payment-methods${tail}`);
+};
+
+export const uploadOrderProof = (
+  token: string,
+  orderId: string,
+  body: { file_url: string; file_name?: string; mime_type?: string; size_bytes?: number; note?: string },
+) =>
+  request<OrderDetail>(
+    `/v1/me/orders/${orderId}/proof`,
+    {
+      method: "POST",
+      body: JSON.stringify(body),
+      headers: { "Idempotency-Key": newIdempotencyKey() },
+    },
+    token,
+  );
 
 export type CouponPreview = {
   code: string;
