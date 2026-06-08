@@ -82,23 +82,28 @@ function flush(): void {
 
 // flushBeacon — usado em beforeunload/pagehide. sendBeacon mantém o request
 // vivo mesmo se a aba fechar. Fallback fetch+keepalive quando indisponível.
+//
+// Importante: NÃO limpamos a queue antes do sendBeacon retornar. sendBeacon
+// pode retornar false (payload >64KB no Chrome, ou queue do browser cheia)
+// — nesse caso queremos o evento na queue pra próxima tentativa.
 function flushBeacon(): void {
   if (typeof navigator === "undefined" || queue.length === 0) return;
-  const batch = queue;
-  queue = [];
-  for (const ev of batch) {
+  const survivors: typeof queue = [];
+  for (const ev of queue) {
     try {
       const url = `${API_URL}/v1/track`;
       const blob = new Blob([JSON.stringify(ev)], { type: "application/json" });
       if ("sendBeacon" in navigator) {
-        navigator.sendBeacon(url, blob);
+        const ok = navigator.sendBeacon(url, blob);
+        if (!ok) survivors.push(ev);
       } else {
         void postOne(ev);
       }
     } catch {
-      /* engole — best-effort */
+      survivors.push(ev);
     }
   }
+  queue = survivors;
 }
 
 function currentPath(): string {
