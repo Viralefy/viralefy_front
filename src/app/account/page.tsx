@@ -7,6 +7,7 @@ import type { Order } from "@/lib/api";
 import { fetchMyOrders } from "@/lib/api";
 import { getToken } from "@/lib/auth";
 import { useApp } from "@/components/Providers";
+import { Setup2FAPrompt } from "@/components/Setup2FAPrompt";
 
 const statusLabel: Record<string, string> = {
   pending: "Pending",
@@ -36,6 +37,7 @@ export default function AccountPage() {
 
   return (
     <main className="container" style={{ paddingTop: "2rem", paddingBottom: "4rem" }}>
+      <Setup2FAPrompt />
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", flexWrap: "wrap", gap: "1rem" }}>
         <div>
           <h1>My account</h1>

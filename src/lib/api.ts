@@ -179,6 +179,36 @@ export async function uploadOrderProofMultipart(
 export const fetchProofURL = (token: string, orderId: string) =>
   request<{ url: string }>(`/v1/me/orders/${orderId}/proof-url`, undefined, token);
 
+// ======= 2FA — opcional pro user =======
+
+export type TwoFAStatus = { enrolled: boolean; should_prompt: boolean };
+export type TwoFAEnroll = { secret_base32: string; otpauth_url: string; backup_codes: string[] };
+
+export const fetchTwoFAStatus = (token: string) =>
+  request<TwoFAStatus>("/v1/me/2fa/status", undefined, token);
+
+export const enrollUserTwoFA = (token: string) =>
+  request<TwoFAEnroll>("/v1/me/2fa/enroll", { method: "POST" }, token);
+
+export const verifyUserTwoFA = (token: string, code: string) =>
+  request<void>(
+    "/v1/me/2fa/verify",
+    { method: "POST", body: JSON.stringify({ code }) },
+    token,
+  );
+
+export const disableUserTwoFA = (token: string) =>
+  request<void>("/v1/me/2fa/disable", { method: "POST" }, token);
+
+export const dismissTwoFAPrompt = (token: string) =>
+  request<void>("/v1/me/2fa/dismiss-prompt", { method: "POST" }, token);
+
+export const completeUserLoginTwoFA = (partialToken: string, code: string) =>
+  request<Session>(
+    "/v1/auth/user/login/2fa",
+    { method: "POST", body: JSON.stringify({ partial_token: partialToken, code }) },
+  );
+
 export type CouponPreview = {
   code: string;
   discount_usd_cents: number;
@@ -235,6 +265,10 @@ export type Session = {
   token: string;
   expires_at: string;
   user: User;
+  // 2FA gate (PHASE-7 §7.2). Quando twofa_required=true, token vem vazio
+  // e o cliente DEVE chamar completeUserLoginTwoFA(partial_token, code).
+  twofa_required?: boolean;
+  partial_token?: string;
 };
 
 export type Order = {
