@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { completeUserLoginTwoFA, userLogin } from "@/lib/api";
 import { useApp } from "@/components/Providers";
 import { Turnstile } from "@/components/Turnstile";
@@ -12,22 +12,35 @@ export default function LoginPage() {
   const { login } = useApp();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  // Turnstile token: vazio = ainda não validado (ou env desabilitada).
-  // Mandamos como string ("" quando bypassed) — o backend trata bypass
-  // pelo lado de TURNSTILE_SECRET_KEY.
+  // turnstileTokenRef captura o valor mais recente sem precisar de
+  // re-render pra o handler. Sem o ref, a 1ª submissão pega "" porque
+  // a closure congelou o state antes do callback do widget rodar.
+  const turnstileTokenRef = useRef<string>("");
   const [turnstileToken, setTurnstileToken] = useState("");
   const [partialToken, setPartialToken] = useState("");
+
+  function handleTurnstileToken(t: string) {
+    turnstileTokenRef.current = t;
+    setTurnstileToken(t);
+  }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
     setError(null);
     const fd = new FormData(e.currentTarget);
+    // Espera até 3s pelo Turnstile token (lê do ref, vê updates async).
+    // Sem isso, usuário que clica antes do widget carregar pega 422.
+    let tok = turnstileTokenRef.current;
+    for (let i = 0; i < 30 && !tok; i++) {
+      await new Promise((r) => setTimeout(r, 100));
+      tok = turnstileTokenRef.current;
+    }
     try {
       const session = await userLogin(
         String(fd.get("email")),
         String(fd.get("password")),
-        turnstileToken,
+        tok,
       );
       // 2FA gate (opt-in pro user): backend retorna twofa_required quando
       // user fez enroll prévio. Token vem vazio; cliente precisa do código.
@@ -103,10 +116,13 @@ export default function LoginPage() {
               <label className="label" htmlFor="password">Password</label>
               <input className="input" id="password" name="password" type="password" required />
             </div>
-            <Turnstile onToken={setTurnstileToken} />
+            <Turnstile onToken={handleTurnstileToken} />
             <button type="submit" className="btn btn-primary" disabled={loading}>
               {loading ? "Signing in…" : "Sign in"}
             </button>
+            <p style={{ color: "var(--muted)", fontSize: "0.75rem", margin: "0.5rem 0 0", textAlign: "center" }}>
+              {turnstileToken ? "" : "Aguarde 2-3s para a verificação anti-bot."}
+            </p>
           </form>
         )}
 

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { userRegister } from "@/lib/api";
 import { useApp } from "@/components/Providers";
 import { Turnstile } from "@/components/Turnstile";
@@ -13,11 +13,18 @@ export default function RegisterPage() {
   const { login } = useApp();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [turnstileToken, setTurnstileToken] = useState("");
+  // Ref espelha o state pra leitura sem stale closure (vide /login).
+  const turnstileTokenRef = useRef<string>("");
+  const [, setTurnstileToken] = useState("");
   const [phone, setPhone] = useState("");
   const [telegram, setTelegram] = useState("");
 
   const contactOk = phone.trim().length > 0 || telegram.trim().length > 0;
+
+  function handleTurnstileToken(t: string) {
+    turnstileTokenRef.current = t;
+    setTurnstileToken(t);
+  }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -28,6 +35,12 @@ export default function RegisterPage() {
     setLoading(true);
     setError(null);
     const fd = new FormData(e.currentTarget);
+    // Aguarda até 3s pelo Turnstile token — evita 422 na 1ª tentativa.
+    let tok = turnstileTokenRef.current;
+    for (let i = 0; i < 30 && !tok; i++) {
+      await new Promise((r) => setTimeout(r, 100));
+      tok = turnstileTokenRef.current;
+    }
     try {
       const session = await userRegister({
         name: String(fd.get("name")),
@@ -35,7 +48,7 @@ export default function RegisterPage() {
         password: String(fd.get("password")),
         phone: phone.trim() || undefined,
         telegram: telegram.trim() || undefined,
-        turnstile_token: turnstileToken,
+        turnstile_token: tok,
         tracking: getTracking(),
       });
       login(session);
@@ -107,7 +120,7 @@ export default function RegisterPage() {
             )}
           </div>
 
-          <Turnstile onToken={setTurnstileToken} />
+          <Turnstile onToken={handleTurnstileToken} />
           <button type="submit" className="btn btn-primary" disabled={loading || !contactOk}>
             {loading ? "Creating…" : "Create account"}
           </button>
