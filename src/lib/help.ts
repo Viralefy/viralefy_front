@@ -29,7 +29,7 @@ export const HELP_TOPICS: HelpTopic[] = [
     category: "buying",
     updatedAt: UPDATED,
     intro:
-      "Viralefy is a marketplace for Instagram and TikTok engagement plans, plus a small catalogue of digital assets. The buying flow is the same for every product: pick a country storefront, open a plan, set the quantity, paste the public username or URL you want to boost, choose a payment method, and finish checkout. There is no signup gate. You receive a one-time link to your order page and a magic link by email so you can come back later, follow progress, open tickets and download invoices without ever creating a password.",
+      "Viralefy sells Instagram and TikTok engagement plans. The buying flow is the same for every product: pick a country storefront, open a plan, set the quantity, paste the public username or URL you want to boost, choose a payment method, and finish checkout. There is no signup gate. You receive a one-time link to your order page and a magic link by email so you can come back later, follow progress, open tickets and download invoices without ever creating a password.",
     sections: [
       {
         heading: "Pick a storefront and plan",
@@ -292,33 +292,6 @@ export const HELP_TOPICS: HelpTopic[] = [
       },
     ],
     relatedSlugs: ["instagram-followers-buying-guide", "choose-the-right-plan", "refill-guarantee"],
-  },
-  {
-    slug: "what-is-a-business-manager",
-    title: "What is a Facebook Business Manager (BM)?",
-    category: "buying",
-    updatedAt: UPDATED,
-    intro:
-      "A Facebook Business Manager — usually shortened to BM — is the central control panel that Meta provides for running ads, owning Pages, owning Pixels, and managing the people who have access to those assets. For media buyers who run Meta ads at scale, the BM is the unit of organisation: each BM has its own daily spend cap, its own ad accounts, and its own reputation against Meta's enforcement systems. The Viralefy marketplace lists pre-built BMs ready to use; this article explains what that means.",
-    sections: [
-      {
-        heading: "Why media buyers buy BMs instead of creating one",
-        body: "Anyone can create a Business Manager from scratch in a few minutes. The difference between a freshly created BM and a pre-built one is reputation: aged BMs that have already passed Meta's verification, that have a clean payment history, and that have run small amounts of spend tend to receive higher daily caps and less aggressive review than a brand-new one. Media buyers who need to ramp ad spend quickly often start from a pre-built BM to skip the friction of the first weeks.",
-      },
-      {
-        heading: "What a BM listing on Viralefy includes",
-        body: "Each BM listed on Viralefy describes the daily spend cap tier, whether the BM is already verified, how many ad accounts it ships with, and how long it has existed. Some listings also include a Page already attached, others ship with a clean BM where you create the Page yourself. The handover happens after payment confirms: credentials, recovery email, and any backup access are delivered through the support ticket that opens automatically with the order.",
-      },
-      {
-        heading: "What to do on first login",
-        body: "Change the password immediately, set your own two-factor authentication, and verify the recovery email so the BM is fully under your control. Do not load aggressive creatives in the first 24 hours; ramp gradually so the spend curve looks consistent with the BM's history. If the BM trips a review on the very first login, the replacement window described on the plan card covers a free swap.",
-      },
-      {
-        heading: "Limits of what we promise",
-        body: "We sell access to a BM with a described daily cap; we do not promise that Meta will leave the BM untouched forever. Ad accounts can be flagged, restricted or banned at any time based on creative content, landing pages, or category. The plan covers a replacement at first login if the BM is dead on arrival; ongoing operational risk after that point is the buyer's responsibility, the same as for any BM created from scratch.",
-      },
-    ],
-    relatedSlugs: ["how-to-buy", "choose-the-right-plan", "refund-policy-explained"],
   },
   {
     slug: "choose-the-right-plan",

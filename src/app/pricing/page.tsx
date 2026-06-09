@@ -244,29 +244,6 @@ export default async function PricingPage() {
           <PricingTable title="Likes" plans={plans} categoryPrefix="curtidas" />
           <PricingTable title="Views" plans={plans} categoryPrefix="visualizacoes" />
 
-          <section className="card" style={{ marginTop: "2rem" }}>
-            <h2 style={{ marginTop: 0, fontSize: "1.1rem" }}>Premium services</h2>
-            <p style={{ color: "var(--muted)", margin: "0 0 1rem" }}>
-              Beyond engagement, the marketplace ships ready-to-use digital assets with instant handover after payment.
-            </p>
-            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: "0.5rem" }}>
-              <li>
-                <strong>Facebook BMs</strong> — Verified Business Managers, daily caps $50 to $5k.
-              </li>
-              <li>
-                <strong>Aged profiles</strong> — Instagram & TikTok profiles with real followers, 30+ days aged.
-              </li>
-              <li>
-                <strong>Validated emails</strong> — Filtered email lists from 100 to 10k addresses, CSV in 24h.
-              </li>
-            </ul>
-            <p style={{ marginTop: "1rem" }}>
-              <Link href="/marketplace" className="btn btn-outline">
-                See marketplace
-              </Link>
-            </p>
-          </section>
-
           <section
             style={{
               marginTop: "2rem",

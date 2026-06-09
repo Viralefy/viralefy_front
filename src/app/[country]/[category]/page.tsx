@@ -232,10 +232,7 @@ export default async function CategoryPage({ params }: { params: Promise<Params>
 
               {/* Variante B — slider só faz sentido em categorias com ladder. */}
               {sortedPlans.length >= 2 &&
-                cat !== "servicos" &&
-                cat !== "bms_facebook" &&
-                cat !== "perfis_redes" &&
-                cat !== "emails_validados" && (
+                cat !== "servicos" && (
                   <section aria-labelledby="plans-slider" style={{ marginTop: "3rem" }}>
                     <h2 id="plans-slider" style={{ textAlign: "center", marginBottom: "1rem", fontSize: "1.25rem" }}>
                       {t.category.chooseQty}

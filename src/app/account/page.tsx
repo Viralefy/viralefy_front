@@ -78,10 +78,7 @@ export default function AccountPage() {
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
           {orders.map((o) => {
-            const isHighTouch =
-              o.plan_category === "recuperacao_perfil" ||
-              o.plan_category === "bms_facebook" ||
-              o.plan_category === "perfis_redes";
+            const isHighTouch = o.plan_category === "recuperacao_perfil";
             const hasTicket = !!o.ticket_id;
             return (
               <div

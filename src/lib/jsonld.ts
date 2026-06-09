@@ -226,9 +226,6 @@ function categorySlugEn(cat: string): string {
     visualizacoes_tiktok: "tiktok-views",
     servicos: "services",
     recuperacao_perfil: "account-recovery",
-    bms_facebook: "facebook-bms",
-    perfis_redes: "aged-profiles",
-    emails_validados: "validated-emails",
   };
   return map[cat] ?? cat;
 }

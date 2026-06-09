@@ -105,9 +105,6 @@ Account Recovery orders carry a stronger commitment: **full refund within 30 cal
 
 This guarantee covers genuine recovery attempts only. It does not apply when the cause of the suspension turns out to be unrecoverable by negotiation (e.g. confirmed CSAM, OFAC sanctions match, full-state takedown).
 
-## BMs / aged profiles / email packs
-Marketplace items (Facebook BMs, aged Instagram/TikTok profiles, validated email lists) are delivered as-is. Refunds apply only when the item never delivered or arrived materially different from the listing tier (e.g. follower count more than 20% short, BM banned at first login).
-
 ## When a refund applies (other categories)
 - The service could not be delivered (the target account or post was private, deleted or blocked at our end).
 - The order was duplicated by accident and we charged twice for the same package.
