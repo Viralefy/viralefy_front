@@ -377,6 +377,9 @@ export const userRegister = (body: {
   email: string;
   name: string;
   password: string;
+  // Pelo menos UM dos dois é obrigatório (validado server-side).
+  phone?: string;
+  telegram?: string;
   turnstile_token?: string;
   tracking?: Record<string, unknown>;
 }) =>

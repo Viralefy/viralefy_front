@@ -14,9 +14,17 @@ export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
+  const [phone, setPhone] = useState("");
+  const [telegram, setTelegram] = useState("");
+
+  const contactOk = phone.trim().length > 0 || telegram.trim().length > 0;
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (!contactOk) {
+      setError("Please provide your phone OR Telegram so we can reach you about your order.");
+      return;
+    }
     setLoading(true);
     setError(null);
     const fd = new FormData(e.currentTarget);
@@ -25,6 +33,8 @@ export default function RegisterPage() {
         name: String(fd.get("name")),
         email: String(fd.get("email")),
         password: String(fd.get("password")),
+        phone: phone.trim() || undefined,
+        telegram: telegram.trim() || undefined,
         turnstile_token: turnstileToken,
         tracking: getTracking(),
       });
@@ -55,8 +65,50 @@ export default function RegisterPage() {
             <label className="label" htmlFor="password">Password (min. 8 characters)</label>
             <input className="input" id="password" name="password" type="password" minLength={8} required />
           </div>
+
+          {/* Phone OU Telegram — pelo menos um. Front e back validam. */}
+          <div style={{ borderTop: "1px dashed rgba(255,255,255,0.08)", paddingTop: "1rem" }}>
+            <p style={{ color: "var(--muted)", fontSize: "0.8rem", margin: "0 0 0.75rem" }}>
+              We need at least one contact channel besides email so we can reach you about your order.
+            </p>
+            <div>
+              <label className="label" htmlFor="phone">Phone (with country code)</label>
+              <input
+                className="input"
+                id="phone"
+                name="phone"
+                type="tel"
+                autoComplete="tel"
+                placeholder="+55 11 98765-4321"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+              />
+            </div>
+            <div style={{ marginTop: "0.5rem" }}>
+              <label className="label" htmlFor="telegram">Telegram</label>
+              <input
+                className="input"
+                id="telegram"
+                name="telegram"
+                placeholder="@yourhandle or t.me/yourhandle"
+                value={telegram}
+                onChange={(e) => setTelegram(e.target.value)}
+              />
+            </div>
+            {!contactOk && (
+              <p style={{ color: "var(--muted)", fontSize: "0.75rem", margin: "0.4rem 0 0" }}>
+                Fill ONE of the two above. ✓ either field is enough.
+              </p>
+            )}
+            {contactOk && (
+              <p style={{ color: "#3cd87d", fontSize: "0.75rem", margin: "0.4rem 0 0" }}>
+                ✓ contact channel set
+              </p>
+            )}
+          </div>
+
           <Turnstile onToken={setTurnstileToken} />
-          <button type="submit" className="btn btn-primary" disabled={loading}>
+          <button type="submit" className="btn btn-primary" disabled={loading || !contactOk}>
             {loading ? "Creating…" : "Create account"}
           </button>
         </form>
