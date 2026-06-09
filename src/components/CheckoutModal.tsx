@@ -21,6 +21,7 @@ import {
   fetchTaxRates,
   previewCoupon,
   uploadOrderProof,
+  uploadOrderProofMultipart,
 } from "@/lib/api";
 import { getTracking } from "@/lib/tracking";
 import { priceFor, formatBalance } from "@/lib/format";
@@ -572,34 +573,52 @@ function ProofUploadSection({ orderId, onUploaded }: { orderId: string; onUpload
     const f = e.target.files?.[0];
     if (!f) return;
     setFileName(f.name);
-    if (f.size > 800 * 1024) {
-      setErr("File too large — max 800 KB (we use base64). Use a screenshot, not a full-res photo.");
+    // Multipart limita 5MB no server; base64 fallback 800KB. Validamos cedo
+    // pra mensagem clara em vez de 413 cru.
+    if (f.size > 5 * 1024 * 1024) {
+      setErr("File too large — max 5 MB. Use a compressed screenshot.");
       return;
     }
     setErr(null);
     setBusy(true);
+    const token = getToken();
+    if (!token) {
+      setErr("You need to be logged in to upload proof. Please log in and try again.");
+      setBusy(false);
+      return;
+    }
     try {
-      const dataUrl = await new Promise<string>((resolve, reject) => {
-        const r = new FileReader();
-        r.onload = () => resolve(String(r.result));
-        r.onerror = () => reject(new Error("Read failed"));
-        r.readAsDataURL(f);
-      });
-      const token = getToken();
-      if (!token) {
-        setErr("You need to be logged in to upload proof. Please log in and try again.");
+      // Multipart é o caminho preferido — backend faz PutObject no MinIO/R2.
+      await uploadOrderProofMultipart(token, orderId, f, note);
+      onUploaded();
+      return;
+    } catch (er) {
+      const msg = er instanceof Error ? er.message : "Upload failed";
+      // Storage disabled (503) → cai no fluxo legacy base64. Limite 800KB.
+      const isStorageDisabled = /storage|503|not configured/i.test(msg);
+      if (!isStorageDisabled || f.size > 800 * 1024) {
+        setErr(msg);
+        setBusy(false);
         return;
       }
-      await uploadOrderProof(token, orderId, {
-        file_url: dataUrl,
-        file_name: f.name,
-        mime_type: f.type,
-        size_bytes: f.size,
-        note: note || undefined,
-      });
-      onUploaded();
-    } catch (er) {
-      setErr(er instanceof Error ? er.message : "Upload failed");
+      try {
+        const dataUrl = await new Promise<string>((resolve, reject) => {
+          const r = new FileReader();
+          r.onload = () => resolve(String(r.result));
+          r.onerror = () => reject(new Error("Read failed"));
+          r.readAsDataURL(f);
+        });
+        await uploadOrderProof(token, orderId, {
+          file_url: dataUrl,
+          file_name: f.name,
+          mime_type: f.type,
+          size_bytes: f.size,
+          note: note || undefined,
+        });
+        onUploaded();
+      } catch (er2) {
+        setErr(er2 instanceof Error ? er2.message : "Upload failed (fallback)");
+      }
     } finally {
       setBusy(false);
     }
@@ -620,7 +639,7 @@ function ProofUploadSection({ orderId, onUploaded }: { orderId: string; onUpload
         Send a screenshot of your PIX receipt or your crypto transaction hash. We&apos;ll activate the order once we confirm the deposit.
       </p>
       {err && <div className="alert alert-error" style={{ marginBottom: "0.5rem" }}>{err}</div>}
-      <label className="label">Receipt file (image, max 800 KB)</label>
+      <label className="label">Receipt file (image or PDF, max 5 MB)</label>
       <input className="input" type="file" accept="image/*,application/pdf" onChange={onFile} disabled={busy} />
       {fileName && <p style={{ fontSize: "0.75rem", color: "var(--muted)" }}>Selected: {fileName}</p>}
       <label className="label" style={{ marginTop: "0.5rem" }}>Note (TX hash, time, etc.)</label>

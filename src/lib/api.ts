@@ -147,6 +147,38 @@ export const uploadOrderProof = (
     token,
   );
 
+// uploadOrderProofMultipart — preferido. Envia o arquivo como multipart;
+// backend faz PutObject no MinIO/R2 e guarda só a key em proof_url. Limite
+// 5MB. Fallback automático pro JSON base64 quando server retorna 503
+// (storage disabled).
+export async function uploadOrderProofMultipart(
+  token: string,
+  orderId: string,
+  file: File,
+  note?: string,
+): Promise<OrderDetail> {
+  const fd = new FormData();
+  fd.append("file", file, file.name);
+  if (note) fd.append("note", note);
+  const res = await fetch(`${API_URL}/v1/me/orders/${orderId}/proof`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Idempotency-Key": newIdempotencyKey(),
+    },
+    body: fd,
+  });
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(json?.error?.message ?? `Upload failed (${res.status})`);
+  }
+  return json.data as OrderDetail;
+}
+
+// fetchProofURL — pro user revisar o próprio comprovante (presigned 5min).
+export const fetchProofURL = (token: string, orderId: string) =>
+  request<{ url: string }>(`/v1/me/orders/${orderId}/proof-url`, undefined, token);
+
 export type CouponPreview = {
   code: string;
   discount_usd_cents: number;
