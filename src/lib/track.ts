@@ -15,8 +15,14 @@
 
 import { getVisitorId } from "./visitor";
 import { getTracking } from "./tracking";
+import { hasAnalyticsConsent } from "./gdpr";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
+
+// Header customizado lido pelo backend (UserEventRepo) pra decidir se
+// IP + user_agent vão pro user_events. Sem o header (ou "0"), backend
+// faz NULLIF e mantém só event_type + path/referrer agregados.
+const CONSENT_HEADER = "X-Analytics-Consent";
 
 export type EventType =
   | "pageview"
@@ -59,9 +65,15 @@ function ensureTimer() {
 }
 
 function postOne(body: QueuedEvent): Promise<void> {
+  // Header de consent: backend usa pra decidir se grava IP/UA ou só
+  // event_type sem PII. Default "0" (sem consent) — opt-in explícito.
+  const consent = hasAnalyticsConsent() ? "1" : "0";
   return fetch(`${API_URL}/v1/track`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      [CONSENT_HEADER]: consent,
+    },
     body: JSON.stringify(body),
     keepalive: true,
   })

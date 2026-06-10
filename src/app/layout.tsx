@@ -6,6 +6,7 @@ import { Providers } from "@/components/Providers";
 import { Header } from "@/components/Header";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { CookieBanner } from "@/components/CookieBanner";
+import { GtmLoader } from "@/components/GtmLoader";
 import { TrackingHydrator } from "@/components/TrackingHydrator";
 
 // Layout raiz. `<html lang>` é "en" (root é home global em inglês); páginas
@@ -55,7 +56,9 @@ export const metadata: Metadata = {
   },
 };
 
-const GTM_ID = "GTM-K7GQ4H32";
+// GTM ID agora vive em `components/GtmLoader.tsx` — carregado em runtime
+// SÓ após consent analytics (LGPD Art. 8 §3). Aqui no head ficou só o
+// anti-flash de tema + Twemoji.
 
 // Anti-flash inline. Executa antes do <body> aparecer.
 const ANTI_FLASH_THEME = `
@@ -113,14 +116,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* 1. Anti-flash tema — antes de tudo */}
         <script dangerouslySetInnerHTML={{ __html: ANTI_FLASH_THEME }} />
 
-        {/* 2. Google Tag Manager — inline o mais alto possível */}
-        <Script id="gtm-head" strategy="afterInteractive">{`
-(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','${GTM_ID}');
-        `}</Script>
+        {/* 2. GTM movido pra <GtmLoader /> client component (LGPD Art. 8 §3).
+            Só monta o script tag após consent analytics. Google Consent Mode
+            v2 default-denied é setado lá. */}
 
         {/* 3. Twemoji — CDN + init loop. Tag SVG via jdecked/twemoji (mantido). */}
         <Script
@@ -131,15 +129,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         <Script id="twemoji-init" strategy="afterInteractive">{TWEMOJI_INIT}</Script>
       </head>
       <body>
-        {/* GTM noscript — primeira coisa dentro do <body> */}
-        <noscript>
-          <iframe
-            src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
-            height="0"
-            width="0"
-            style={{ display: "none", visibility: "hidden" }}
-          />
-        </noscript>
+        {/* GTM noscript removido — LGPD não tem exceção pra "sem JS".
+            Visitantes sem JS simplesmente não são medidos (aceitável). */}
+        {/* GtmLoader monta o GTM em runtime SÓ após consent analytics. */}
+        <GtmLoader />
         <Providers>
           {/* TrackingHydrator — dispara pageview/landing em CADA nav do App
               Router. Suspense pq usePathname/useSearchParams precisam de

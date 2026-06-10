@@ -19,7 +19,14 @@ function WithStorage({ prime, children }: { prime: "clear" | "consented"; childr
       } else {
         window.localStorage.setItem(
           STORAGE_KEY,
-          JSON.stringify({ analytics: true, marketing: false, timestamp: Date.now() }),
+          JSON.stringify({
+            version: 2,
+            necessary: true,
+            preferences: true,
+            analytics: true,
+            marketing: false,
+            timestamp: new Date().toISOString(),
+          }),
         );
       }
     } catch {

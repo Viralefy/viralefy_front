@@ -4,10 +4,15 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Footer } from "@/components/Footer";
 import { getConsent, resetConsent, setConsent, type GdprConsent } from "@/lib/gdpr";
+import { recordConsent } from "@/lib/consent-audit";
 
 // Cookie preferences hub. Mostra o estado atual do consentimento e oferece:
-//   - Salvar mudanças nos toggles (analytics, marketing).
+//   - Salvar mudanças nos 3 toggles opt-in (preferences, analytics, marketing).
 //   - "Reset" → limpa o storage, banner reaparece no próximo carregamento.
+//
+// LGPD: defaults na primeira visita são OFF para analytics/marketing
+// (consent livre, Art. 8 §3). Esta página NÃO altera esses defaults — só
+// reflete o estado salvo no localStorage.
 //
 // Página é client-only (lê localStorage). Sem `generateMetadata` (server-only);
 // metadata vem do root layout + JSON-LD inline.
@@ -18,6 +23,7 @@ const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
 
 export default function CookiePreferencesPage() {
   const [consent, setConsentState] = useState<GdprConsent | null>(null);
+  const [preferences, setPreferences] = useState(true);
   const [analytics, setAnalytics] = useState(false);
   const [marketing, setMarketing] = useState(false);
   const [savedAt, setSavedAt] = useState<string | null>(null);
@@ -25,19 +31,30 @@ export default function CookiePreferencesPage() {
   useEffect(() => {
     const c = getConsent();
     setConsentState(c);
+    setPreferences(c?.preferences ?? true);
     setAnalytics(c?.analytics ?? false);
     setMarketing(c?.marketing ?? false);
   }, []);
 
   function save() {
-    const saved = setConsent({ analytics, marketing });
+    const saved = setConsent({ preferences, analytics, marketing });
     setConsentState(saved);
     setSavedAt(saved.timestamp);
+    void recordConsent({
+      version: saved.version,
+      necessary: saved.necessary,
+      preferences: saved.preferences,
+      analytics: saved.analytics,
+      marketing: saved.marketing,
+      timestamp: saved.timestamp,
+      source: "custom",
+    });
   }
 
   function reset() {
     resetConsent();
     setConsentState(null);
+    setPreferences(true);
     setAnalytics(false);
     setMarketing(false);
     setSavedAt(null);
@@ -52,7 +69,7 @@ export default function CookiePreferencesPage() {
         url: PAGE_URL,
         name: "Cookie preferences | Viralefy",
         description:
-          "Review and update your cookie preferences for Viralefy. Manage analytics and marketing cookies, or reset your choices.",
+          "Review and update your cookie preferences for Viralefy. Manage preferences, analytics and marketing cookies, or reset your choices.",
         inLanguage: "en",
         isPartOf: { "@id": `${SITE_URL}/#website` },
       },
@@ -105,6 +122,7 @@ export default function CookiePreferencesPage() {
           ) : (
             <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: "0.35rem", color: "var(--text)" }}>
               <li>Necessary: <strong>Always on</strong></li>
+              <li>Preferences: <strong>{consent.preferences ? "Enabled" : "Disabled"}</strong></li>
               <li>Analytics: <strong>{consent.analytics ? "Enabled" : "Disabled"}</strong></li>
               <li>Marketing: <strong>{consent.marketing ? "Enabled" : "Disabled"}</strong></li>
               <li style={{ color: "var(--muted)", fontSize: "0.85rem" }}>
@@ -122,7 +140,16 @@ export default function CookiePreferencesPage() {
           <Row label="Necessary" description="Authentication, cart, security. Always active.">
             <input type="checkbox" checked disabled aria-label="Necessary" style={{ width: 20, height: 20, accentColor: "var(--accent)" }} />
           </Row>
-          <Row label="Analytics" description="Traffic, performance and aggregated usage metrics.">
+          <Row label="Preferences" description="Language, theme, currency. We remember your choices across visits.">
+            <input
+              type="checkbox"
+              checked={preferences}
+              onChange={(e) => setPreferences(e.target.checked)}
+              aria-label="Preferences"
+              style={{ width: 20, height: 20, accentColor: "var(--accent)" }}
+            />
+          </Row>
+          <Row label="Analytics" description="Traffic, performance and aggregated usage metrics. Off by default.">
             <input
               type="checkbox"
               checked={analytics}
@@ -131,7 +158,7 @@ export default function CookiePreferencesPage() {
               style={{ width: 20, height: 20, accentColor: "var(--accent)" }}
             />
           </Row>
-          <Row label="Marketing" description="Ad measurement and remarketing audiences.">
+          <Row label="Marketing" description="Ad measurement and remarketing audiences. Off by default.">
             <input
               type="checkbox"
               checked={marketing}
