@@ -20,6 +20,7 @@
     "test:all": "npm test && npm run test:smoke && npm run test:pentest && npm run test:emulated:browse && npm run test:emulated:i18n && npm run test:emulated:contracts && npm run test:emulated:a11y",
     "e2e": "playwright test",
     "e2e:install": "playwright install --with-deps chromium",
+    "lighthouse": "lhci autorun",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
@@ -31,6 +32,7 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@lhci/cli": "^0.14.0",
     "@playwright/test": "^1.49.0",
     "@storybook/nextjs": "^8.4.0",
     "@storybook/react": "^8.4.0",
