@@ -43,6 +43,9 @@
     "storybook": "^8.4.0",
     "typescript": "^5.8.0"
   },
+  "overrides": {
+    "tmp": "^0.2.6"
+  },
   "browserslist": [
     "Chrome >= 93",
     "Firefox >= 92",
