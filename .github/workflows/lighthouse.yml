@@ -49,11 +49,6 @@ jobs:
       - name: Wait for app to be ready
         run: npx wait-on http://localhost:3000 --timeout 120000
 
-      # TODO: add a product detail page URL to lighthouserc.json once we have a
-      # known-stable plan slug or id (e.g. http://localhost:3000/pricing/<slug>
-      # or http://localhost:3000/br/<category>/<plan-id>). The dynamic route
-      # lives under src/app/[country]/[category]/. Pick a slug that won't 404
-      # in CI and append it to the `collect.url` array.
       - name: Run Lighthouse CI
         run: npx lhci autorun --upload.target=temporary-public-storage
         env:

@@ -238,6 +238,7 @@ export function CheckoutModal({
     <div
       role="dialog"
       aria-modal
+      data-testid="checkout-modal"
       style={{
         position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)",
         display: "flex", alignItems: "center", justifyContent: "center",
@@ -351,7 +352,7 @@ export function CheckoutModal({
                 </p>
               )}
 
-              <button type="submit" className="btn btn-primary" disabled={loading}>
+              <button type="submit" data-testid="checkout-submit" className="btn btn-primary" disabled={loading}>
                 {loading ? "Processing…" :
                   payMethod === "credits" ? "Pay with credits" : "Continue → choose method"}
               </button>
@@ -484,6 +485,7 @@ function MethodPicker({
       </div>
       <button
         type="button"
+        data-testid="checkout-confirm"
         className="btn btn-primary"
         disabled={!selected || loading}
         onClick={onConfirm}
@@ -516,6 +518,9 @@ function MethodCard({
   return (
     <button
       type="button"
+      data-testid="payment-method-card"
+      data-method-id={method.gateway_id}
+      data-method-kind={method.kind}
       onClick={onSelect}
       style={{
         textAlign: "left",
@@ -678,6 +683,7 @@ function CouponInput({
         <input
           className="input"
           id="coupon_code"
+          data-testid="coupon-input"
           value={code}
           onChange={(e) => { setCode(e.target.value.toUpperCase()); setError(null); }}
           placeholder="BLACK10"

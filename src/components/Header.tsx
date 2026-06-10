@@ -81,6 +81,7 @@ export function Header() {
   const CurrencySelect = (
     <select
       aria-label={t.header.currency}
+      data-testid="currency-picker"
       className="input"
       style={{ width: "auto", padding: "0.5rem 0.7rem", fontSize: "0.85rem" }}
       value={currency?.code ?? "USD"}

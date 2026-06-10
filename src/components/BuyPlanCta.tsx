@@ -31,6 +31,7 @@ export function BuyPlanCta({ plan, lang, countryCode }: { plan: Plan; lang: Lang
       <p className="plan-price" style={{ fontSize: "2.25rem", margin: "0 0 1rem" }}>{displayPrice}</p>
       <button
         type="button"
+        data-testid="buy-now-cta"
         className="btn btn-primary"
         style={{ padding: "1rem 2.5rem", fontSize: "1.05rem" }}
         onClick={() => setOpen(true)}

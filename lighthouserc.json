@@ -4,7 +4,8 @@
       "url": [
         "http://localhost:3000/",
         "http://localhost:3000/pricing",
-        "http://localhost:3000/login"
+        "http://localhost:3000/login",
+        "http://localhost:3000/us/instagram-followers"
       ],
       "numberOfRuns": 1,
       "settings": {

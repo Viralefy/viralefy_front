@@ -1,4 +1,5 @@
 import { test, expect, devices, type Page, type Route } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
 
 // E2E hardened para o fluxo de CheckoutModal.
 //
@@ -133,17 +134,11 @@ async function installApiMocks(page: Page, overrides: MockOverrides = {}) {
 
 /** Abre o modal a partir do CTA principal da página de plano. */
 async function openCheckoutModal(page: Page) {
-  // TODO: idealmente o componente expõe data-testid="buy-now-cta"; até lá,
-  // o seletor caça por texto/role conhecido do BuyPlanCta.
-  const planTrigger = page
-    .locator(
-      '[data-testid="plan-card"], [data-plan], button:has-text("Buy"), button:has-text("Order"), a:has-text("Buy"), a:has-text("Order")'
-    )
-    .first();
+  const planTrigger = page.locator('[data-testid="buy-now-cta"]').first();
   await expect(planTrigger).toBeVisible();
   await planTrigger.click();
 
-  const modal = page.locator('[role="dialog"], [data-testid="checkout-modal"]').first();
+  const modal = page.locator('[data-testid="checkout-modal"]').first();
   await expect(modal).toBeVisible();
   return modal;
 }
@@ -189,9 +184,7 @@ test.describe('checkout modal — desktop', () => {
     if (await couponToggle.isVisible().catch(() => false)) {
       await couponToggle.click();
     }
-    const couponInput = modal
-      .locator('input[name="coupon"], input[name="coupon_code"], input[placeholder*="coupon" i], input#coupon_code, [data-testid="coupon-input"]')
-      .first();
+    const couponInput = modal.locator('[data-testid="coupon-input"]').first();
     await expect(couponInput).toBeVisible();
 
     // Fecha — preferir botão Cancel/Close; fallback Escape; fallback click-outside.
@@ -214,17 +207,17 @@ test.describe('checkout modal — desktop', () => {
     await fillStepOne(modal);
 
     // Step 1 → Step 2 (Method picker)
-    const submitBtn = modal.locator('button[type="submit"]').first();
+    const submitBtn = modal.locator('[data-testid="checkout-submit"]').first();
     await expect(submitBtn).toBeEnabled();
     await submitBtn.click();
 
     // Method picker renderiza um card por gateway. Selecionamos o primeiro.
-    const methodCard = modal.locator('button:has-text("Credit card"), button:has-text("Stripe")').first();
+    const methodCard = modal.locator('[data-testid="payment-method-card"]').first();
     await expect(methodCard).toBeVisible({ timeout: 10_000 });
     await methodCard.click();
 
     // Loading state: confirm button mostra "Creating order…" enquanto fetch corre.
-    const confirmBtn = modal.locator('button:has-text("Confirm")').first();
+    const confirmBtn = modal.locator('[data-testid="checkout-confirm"]').first();
     await expect(confirmBtn).toBeEnabled();
     await confirmBtn.click();
 
@@ -266,11 +259,11 @@ test.describe('checkout modal — desktop', () => {
 
     const modal = await openCheckoutModal(page);
     await fillStepOne(modal);
-    await modal.locator('button[type="submit"]').first().click();
+    await modal.locator('[data-testid="checkout-submit"]').first().click();
 
-    const methodCard = modal.locator('button:has-text("Credit card"), button:has-text("Stripe")').first();
+    const methodCard = modal.locator('[data-testid="payment-method-card"]').first();
     await methodCard.click();
-    const confirmBtn = modal.locator('button:has-text("Confirm")').first();
+    const confirmBtn = modal.locator('[data-testid="checkout-confirm"]').first();
     await confirmBtn.click();
 
     // Enquanto o request roda, o botão deve mostrar "Creating order…".
@@ -290,10 +283,10 @@ test.describe('checkout modal — desktop', () => {
 
     const modal = await openCheckoutModal(page);
     await fillStepOne(modal);
-    await modal.locator('button[type="submit"]').first().click();
+    await modal.locator('[data-testid="checkout-submit"]').first().click();
 
-    await modal.locator('button:has-text("Credit card"), button:has-text("Stripe")').first().click();
-    await modal.locator('button:has-text("Confirm")').first().click();
+    await modal.locator('[data-testid="payment-method-card"]').first().click();
+    await modal.locator('[data-testid="checkout-confirm"]').first().click();
 
     // Volta pro step "form" e mostra alert.
     const alert = modal.locator('.alert-error, [role="alert"]').first();
@@ -315,9 +308,9 @@ test.describe('checkout modal — desktop', () => {
 
     const modal = await openCheckoutModal(page);
     await fillStepOne(modal);
-    await modal.locator('button[type="submit"]').first().click();
-    await modal.locator('button:has-text("Credit card"), button:has-text("Stripe")').first().click();
-    await modal.locator('button:has-text("Confirm")').first().click();
+    await modal.locator('[data-testid="checkout-submit"]').first().click();
+    await modal.locator('[data-testid="payment-method-card"]').first().click();
+    await modal.locator('[data-testid="checkout-confirm"]').first().click();
 
     const alert = modal.locator('.alert-error, [role="alert"]').first();
     await expect(alert).toBeVisible({ timeout: 10_000 });
@@ -337,9 +330,9 @@ test.describe('checkout modal — desktop', () => {
 
     const modal = await openCheckoutModal(page);
     await fillStepOne(modal);
-    await modal.locator('button[type="submit"]').first().click();
-    await modal.locator('button:has-text("Credit card"), button:has-text("Stripe")').first().click();
-    await modal.locator('button:has-text("Confirm")').first().click();
+    await modal.locator('[data-testid="checkout-submit"]').first().click();
+    await modal.locator('[data-testid="payment-method-card"]').first().click();
+    await modal.locator('[data-testid="checkout-confirm"]').first().click();
 
     const alert = modal.locator('.alert-error, [role="alert"]').first();
     await expect(alert).toBeVisible({ timeout: 10_000 });
@@ -359,9 +352,9 @@ test.describe('checkout modal — desktop', () => {
 
     const modal = await openCheckoutModal(page);
     await fillStepOne(modal);
-    await modal.locator('button[type="submit"]').first().click();
-    await modal.locator('button:has-text("Credit card"), button:has-text("Stripe")').first().click();
-    await modal.locator('button:has-text("Confirm")').first().click();
+    await modal.locator('[data-testid="checkout-submit"]').first().click();
+    await modal.locator('[data-testid="payment-method-card"]').first().click();
+    await modal.locator('[data-testid="checkout-confirm"]').first().click();
 
     const alert = modal.locator('.alert-error, [role="alert"]').first();
     await expect(alert).toBeVisible({ timeout: 10_000 });
@@ -380,7 +373,7 @@ test.describe('checkout modal — desktop', () => {
 
     const modal = await openCheckoutModal(page);
     await fillStepOne(modal);
-    await modal.locator('button[type="submit"]').first().click();
+    await modal.locator('[data-testid="checkout-submit"]').first().click();
 
     await expect(modal).toContainText(/No payment methods available/i, { timeout: 10_000 });
   });
@@ -389,18 +382,12 @@ test.describe('checkout modal — desktop', () => {
     await installApiMocks(page);
     await page.goto('/us/instagram-followers');
 
-    // Currency picker mora no header — não no modal. Só validamos que ele
-    // existe e abre, sem assumir o shape (não há data-testid hoje).
-    const picker = page
-      .locator(
-        '[data-testid="currency-picker"], select[name="currency"], button[aria-label*="currenc" i]'
-      )
-      .first();
+    // Currency picker mora no header — não no modal. Em desktop ele renderiza
+    // inline; em mobile fica atrás do drawer. Aqui validamos só que existe
+    // e que o modal abre normalmente depois (não há regressão).
+    const picker = page.locator('[data-testid="currency-picker"]').first();
     if (await picker.isVisible().catch(() => false)) {
       await picker.click().catch(() => undefined);
-      // TODO: adicionar data-testid="currency-picker" no header pra
-      // assert mais robusto. Por ora, basta verificar que clicar não
-      // quebra a página e o modal ainda abre depois.
     }
     const modal = await openCheckoutModal(page);
     await expect(modal).toBeVisible();
@@ -423,16 +410,16 @@ test.describe('checkout modal — mobile (Pixel 5)', () => {
 
     // O card do modal tem maxHeight: 90vh + overflowY auto. Em mobile, o
     // submit pode ficar fora do viewport — scrollIntoView garante o click.
-    const submitBtn = modal.locator('button[type="submit"]').first();
+    const submitBtn = modal.locator('[data-testid="checkout-submit"]').first();
     await submitBtn.scrollIntoViewIfNeeded();
     await submitBtn.click();
 
-    const methodCard = modal.locator('button:has-text("Credit card"), button:has-text("Stripe")').first();
+    const methodCard = modal.locator('[data-testid="payment-method-card"]').first();
     await expect(methodCard).toBeVisible({ timeout: 10_000 });
     await methodCard.scrollIntoViewIfNeeded();
     await methodCard.click();
 
-    const confirmBtn = modal.locator('button:has-text("Confirm")').first();
+    const confirmBtn = modal.locator('[data-testid="checkout-confirm"]').first();
     await confirmBtn.scrollIntoViewIfNeeded();
     await confirmBtn.click();
 
@@ -441,29 +428,28 @@ test.describe('checkout modal — mobile (Pixel 5)', () => {
 });
 
 // ---------------------------------------------------------------------------
-// Acessibilidade — axe-core/playwright (opcional, depende de dependência)
+// Acessibilidade — axe-core/playwright
 // ---------------------------------------------------------------------------
 //
-// TODO(deps): instalar @axe-core/playwright (dev-dep) e remover esse skip.
-// O front hoje não tem axe-core no package.json — pra não quebrar o CI sem
-// permissão de bumpar deps, o teste fica skipped até instalar:
-//
-//   npm i -D @axe-core/playwright
-//
-// Depois disso, trocar o skip por test() e descomentar o body.
+// Roda axe contra o subtree do modal (escopo com data-testid="checkout-modal")
+// pra não pegar ruído da página inteira. Filtra por critical/serious — esses
+// são bloqueios reais (alto-contraste, labels faltando, aria inválido). Avisos
+// minor/moderate (target-size, landmark warnings) ficam fora pra não floodar
+// o CI; o time de design absorve via review manual.
 test.describe('checkout modal — accessibility', () => {
-  test.skip('modal aberto não tem violações axe críticas/sérias', async ({ page }) => {
-    // const { default: AxeBuilder } = await import('@axe-core/playwright');
-    // await installApiMocks(page);
-    // await page.goto('/us/instagram-followers');
-    // await openCheckoutModal(page);
-    // const results = await new AxeBuilder({ page })
-    //   .include('[role="dialog"]')
-    //   .withTags(['wcag2a', 'wcag2aa'])
-    //   .analyze();
-    // const blocking = results.violations.filter(
-    //   (v) => v.impact === 'critical' || v.impact === 'serious',
-    // );
-    // expect(blocking, JSON.stringify(blocking, null, 2)).toEqual([]);
+  test('modal aberto não tem violações axe críticas/sérias', async ({ page }) => {
+    await installApiMocks(page);
+    await page.goto('/us/instagram-followers');
+    await openCheckoutModal(page);
+
+    const results = await new AxeBuilder({ page })
+      .include('[data-testid="checkout-modal"]')
+      .withTags(['wcag2a', 'wcag2aa'])
+      .analyze();
+
+    const blocking = results.violations.filter(
+      (v) => v.impact === 'critical' || v.impact === 'serious',
+    );
+    expect(blocking, JSON.stringify(blocking, null, 2)).toEqual([]);
   });
 });

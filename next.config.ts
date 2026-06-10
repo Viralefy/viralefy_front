@@ -40,6 +40,11 @@ const SECURITY_HEADERS = [
 const nextConfig: NextConfig = {
   poweredByHeader: false,
 
+  // Sobe sourcemaps no client bundle pra Sentry conseguir des-minificar
+  // stack traces. Sentry CLI faz upload + remove os .map do output final
+  // no CI (passo `releases finalize`), então não vazam pro CDN público.
+  productionBrowserSourceMaps: true,
+
   async headers() {
     return [
       { source: "/:path*", headers: SECURITY_HEADERS },

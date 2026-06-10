@@ -1,5 +1,7 @@
 name: CI
 
+# TODO(secrets): defina SENTRY_AUTH_TOKEN nos repo secrets pra ativar o
+# upload de sourcemaps. Sem ele, o passo abaixo é skipped (só roda em main).
 on:
   push:
     branches: [main]
@@ -36,6 +38,21 @@ jobs:
 
       - name: next build
         run: npm run build
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: viralefy
+          SENTRY_PROJECT_FRONT: viralefy-front
+
+      - name: Upload sourcemaps to Sentry
+        if: github.ref == 'refs/heads/main' && env.SENTRY_AUTH_TOKEN != ''
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: viralefy
+          SENTRY_PROJECT: viralefy-front
+        run: |
+          npx @sentry/cli releases new ${{ github.sha }}
+          npx @sentry/cli releases files ${{ github.sha }} upload-sourcemaps ./.next
+          npx @sentry/cli releases finalize ${{ github.sha }}
 
   gitleaks:
     runs-on: ubuntu-latest
