@@ -118,7 +118,22 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   function login(s: Session) {
     saveSession(s);
-    setUser(s.user);
+    // Login unificado: user da loja OU admin com mais permissões. Pra UI
+    // de header/account, mostramos o User no caso normal e sintetizamos
+    // um pseudo-User a partir do AdminPrincipal quando subject_kind=admin
+    // (mesmo email pode ter conta nas 2 tabelas; o admin login não invalida
+    // a presença de user data).
+    if (s.user) {
+      setUser(s.user);
+    } else if (s.admin) {
+      setUser({
+        ID: s.admin.ID,
+        Email: s.admin.Email,
+        Name: s.admin.Name ?? s.admin.Email,
+        Phone: "",
+        Telegram: "",
+      } as User);
+    }
   }
 
   function logout() {

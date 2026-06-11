@@ -254,17 +254,40 @@ export type CheckoutResult = {
   discount_usd_cents?: number;
 };
 
+// User — shape devolvido pelo auth-service (UserView Go). Campos em
+// PascalCase = default do encoding/json. Phone/Telegram podem vir vazios.
 export type User = {
-  id: string;
-  email: string;
-  name: string;
-  instagram: string;
+  ID: string;
+  Email: string;
+  Name: string;
+  Phone?: string;
+  Telegram?: string;
 };
 
+// Admin shape devolvido pelo auth no login unificado quando o email bate
+// na tabela admins. `Name` é opcional pq seeds antigos não preencheram.
+export type AdminPrincipal = {
+  ID: string;
+  Email: string;
+  Name?: string;
+  Role: string;
+};
+
+// Session — alinhado com o que /v1/auth/user/login retorna (campos
+// `access_token` / `access_expires_at`). Login agora é UNIFICADO: o mesmo
+// endpoint aceita user da loja e admin. Quando `subject_kind === "admin"`,
+// o campo `admin` é populado em vez de `user`.
+//
+// `user` permanece opcional pra cobrir admin-only login. Helpers
+// (principal(s), isAdmin(s)) abstraem a diferença pros components.
 export type Session = {
-  token: string;
-  expires_at: string;
-  user: User;
+  access_token?: string;
+  access_expires_at?: string;
+  refresh_token?: string;
+  refresh_expires_at?: string;
+  subject_kind?: "user" | "admin";
+  user?: User;
+  admin?: AdminPrincipal;
   // 2FA gate (PHASE-7 §7.2). Quando twofa_required=true, token vem vazio
   // e o cliente DEVE chamar completeUserLoginTwoFA(partial_token, code).
   twofa_required?: boolean;
@@ -314,10 +337,15 @@ async function request<T>(
   if (!res.ok) {
     throw new Error(json?.error?.message ?? "Request failed");
   }
+  // Convenção do dispatcher/core: respostas do core são envelopadas em
+  // {"data": ...}; respostas do auth (login/register/2fa) e do dispatcher
+  // raw NÃO são envelopadas — vêm os campos no top-level.
+  // Decisão: tenta `data` primeiro; se vazio, cai no payload bruto.
+  const payload = (json && typeof json === "object" && "data" in json) ? (json as { data: unknown }).data : json;
   if (schema) {
-    return parseOr(schema, json.data, path);
+    return parseOr(schema, payload, path);
   }
-  return json.data as T;
+  return payload as T;
 }
 
 export const fetchPlans = () =>

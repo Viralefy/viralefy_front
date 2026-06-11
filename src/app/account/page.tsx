@@ -42,7 +42,7 @@ export default function AccountPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", flexWrap: "wrap", gap: "1rem" }}>
         <div>
           <h1>My account</h1>
-          {user && <p style={{ color: "var(--muted)" }}>{user.name} · {user.email}</p>}
+          {user && <p style={{ color: "var(--muted)" }}>{user.Name} · {user.Email}</p>}
         </div>
         <Link href="/" className="btn btn-outline" style={{ padding: "0.5rem 1rem" }}>
           Buy more

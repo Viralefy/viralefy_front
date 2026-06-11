@@ -110,17 +110,44 @@ export const CouponPreviewSchema = z.object({
 
 // ---------- User / Session ----------
 
+// UserSchema — shape devolvido pelo auth-service Go (struct UserView). Os
+// nomes em PascalCase são o default do encoding/json em Go quando os campos
+// não têm tag explícita. `Phone` e `Telegram` podem vir vazios.
 export const UserSchema = z.object({
-  id: z.string(),
-  email: z.string(),
-  name: z.string(),
-  instagram: z.string(),
+  ID: z.string(),
+  Email: z.string(),
+  Name: z.string(),
+  Phone: z.string().optional().default(""),
+  Telegram: z.string().optional().default(""),
 });
 
+// AdminSchema — shape devolvido pelo auth quando o login bate na tabela
+// admins. `name` é opcional pq seeds antigos não preenchiam.
+export const AdminSchema = z.object({
+  ID: z.string(),
+  Email: z.string(),
+  Name: z.string().optional().default(""),
+  Role: z.string(),
+});
+
+// SessionSchema — alinhado com o que /v1/auth/user/login DE FATO retorna
+// (campos `access_token` / `access_expires_at`, não `token` / `expires_at`).
+// Agora aceita login unificado: subject_kind="user" → user populado;
+// subject_kind="admin" → admin populado (mesmo email pode autenticar nos 2
+// caminhos, login do front é o mesmo).
+//
+// 2FA gate: quando twofa_required=true, token e user/admin vêm omitidos;
+// cliente DEVE chamar completeUserLoginTwoFA(partial_token, code).
 export const SessionSchema = z.object({
-  token: z.string(),
-  expires_at: z.string(),
-  user: UserSchema,
+  access_token: z.string().optional(),
+  access_expires_at: z.string().optional(),
+  refresh_token: z.string().optional(),
+  refresh_expires_at: z.string().optional(),
+  subject_kind: z.enum(["user", "admin"]).optional(),
+  user: UserSchema.optional(),
+  admin: AdminSchema.optional(),
+  twofa_required: z.boolean().optional(),
+  partial_token: z.string().optional(),
 });
 
 // ---------- Orders ----------

@@ -150,8 +150,8 @@ export function CheckoutModal({
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     const snap = {
-      name: String(fd.get("name") ?? user?.name ?? ""),
-      email: String(fd.get("email") ?? user?.email ?? ""),
+      name: String(fd.get("name") ?? user?.Name ?? ""),
+      email: String(fd.get("email") ?? user?.Email ?? ""),
       handle: String(fd.get("handle") ?? ""),
       display_name: String(fd.get("display_name") ?? ""),
       publication_url: String(fd.get("publication_url") ?? ""),
@@ -343,7 +343,7 @@ export function CheckoutModal({
                 checking={couponChecking}
                 setChecking={setCouponChecking}
                 planId={plan.id}
-                userEmail={user?.email}
+                userEmail={user?.Email}
                 currencyCode={currency?.code}
               />
 
