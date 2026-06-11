@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { COUNTRIES, countriesByRegion, type Country, type Region } from "@/i18n/countries";
 import { tr, type LangCode } from "@/i18n/languages";
 import { Icon } from "./Icon";
+import { Flag } from "./Flag";
 
 // Mega menu de "Markets" no header. Mostra todas as 6 regiões em 2 colunas:
 //   Esquerda: Américas + SEPA (mercados históricos)
@@ -112,7 +113,7 @@ export function MegaMenuMarkets({ lang }: { lang: LangCode }) {
                   fontSize: "0.85rem",
                 }}
               >
-                <span style={{ fontSize: "1rem" }}>{c.flag}</span>
+                <Flag code={c.code} width={18} title={c.name} />
                 <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.name}</span>
               </Link>
             </li>

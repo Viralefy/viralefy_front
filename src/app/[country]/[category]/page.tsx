@@ -21,6 +21,7 @@ import { Footer } from "@/components/Footer";
 import { TrustSignals } from "@/components/TrustSignals";
 import { LiveCounter } from "@/components/LiveCounter";
 import { RecoveryForm } from "@/components/RecoveryForm";
+import { Flag } from "@/components/Flag";
 
 // Página de categoria por país. Slug aceita o nome local (`/br/seguidores`,
 // `/us/followers`, `/de/follower`). A página entrega:
@@ -180,7 +181,7 @@ export default async function CategoryPage({ params }: { params: Promise<Params>
           <ol style={{ listStyle: "none", display: "flex", gap: "0.5rem", padding: 0, flexWrap: "wrap" }}>
             <li><Link href="/">{t.category.breadcrumb}</Link></li>
             <li aria-hidden>›</li>
-            <li><Link href={`/${c.code}`}>{c.flag} {c.name}</Link></li>
+            <li><Link href={`/${c.code}`} style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem" }}><Flag code={c.code} width={16} />{c.name}</Link></li>
             <li aria-hidden>›</li>
             <li aria-current="page">{catLabel}</li>
           </ol>

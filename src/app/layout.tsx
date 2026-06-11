@@ -122,6 +122,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
+        {/* Preconnect ao CDN de bandeiras — economiza ~120ms no LCP em páginas
+            com muitas flags (header megamenu, country index, footer). */}
+        <link rel="preconnect" href="https://flagcdn.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://flagcdn.com" />
+
         {/* Anti-flash tema — antes de tudo */}
         <script dangerouslySetInnerHTML={{ __html: ANTI_FLASH_THEME }} />
 

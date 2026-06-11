@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { COUNTRIES, countriesByRegion } from "@/i18n/countries";
+import { Flag } from "@/components/Flag";
 
 export const metadata = {
   title: "Page not found | Viralefy",
@@ -71,9 +72,10 @@ export default function NotFound() {
               href={`/${c.code}`}
               hrefLang={c.htmlLang}
               className="btn btn-outline"
-              style={{ padding: "0.45rem 0.9rem", fontSize: "0.9rem" }}
+              style={{ padding: "0.45rem 0.9rem", fontSize: "0.9rem", display: "inline-flex", alignItems: "center", gap: "0.45rem" }}
             >
-              {c.flag} {c.name}
+              <Flag code={c.code} width={20} title={c.name} />
+              {c.name}
             </Link>
           ))}
         </div>
@@ -107,9 +109,13 @@ export default function NotFound() {
                   border: "1px solid var(--border)",
                   borderRadius: "0.4rem",
                   textDecoration: "none",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.4rem",
                 }}
               >
-                {c.flag} {c.name}
+                <Flag code={c.code} width={18} title={c.name} />
+                {c.name}
               </Link>
             ))}
           </div>
@@ -128,9 +134,13 @@ export default function NotFound() {
                   border: "1px solid var(--border)",
                   borderRadius: "0.4rem",
                   textDecoration: "none",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.4rem",
                 }}
               >
-                {c.flag} {c.name}
+                <Flag code={c.code} width={18} title={c.name} />
+                {c.name}
               </Link>
             ))}
           </div>

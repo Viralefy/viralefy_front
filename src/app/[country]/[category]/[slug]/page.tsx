@@ -17,6 +17,7 @@ import { Footer } from "@/components/Footer";
 import { BuyPlanCta } from "@/components/BuyPlanCta";
 import { LiveCounter } from "@/components/LiveCounter";
 import { Icon } from "@/components/Icon";
+import { Flag } from "@/components/Flag";
 
 // Página dedicada a um plano específico (`/br/seguidores/1000-seguidores`).
 // Slug do plano = `<qty>-<category-slug-local>`. SEO próprio: title/H1 com
@@ -268,7 +269,7 @@ export default async function PlanPage({ params }: { params: Promise<Params> }) 
           <ol style={{ listStyle: "none", display: "flex", gap: "0.5rem", padding: 0, flexWrap: "wrap" }}>
             <li><Link href="/">{t.category.breadcrumb}</Link></li>
             <li aria-hidden>›</li>
-            <li><Link href={`/${c.code}`}>{c.flag} {c.name}</Link></li>
+            <li><Link href={`/${c.code}`} style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem" }}><Flag code={c.code} width={16} />{c.name}</Link></li>
             <li aria-hidden>›</li>
             <li><Link href={`/${c.code}/${catSlug}`}>{catLabel}</Link></li>
             <li aria-hidden>›</li>

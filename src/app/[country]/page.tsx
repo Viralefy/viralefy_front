@@ -8,6 +8,7 @@ import { CategoryGroupedGrid } from "@/components/CategoryGroupedGrid";
 import { Footer } from "@/components/Footer";
 import { TrustSignals } from "@/components/TrustSignals";
 import { LiveCounter } from "@/components/LiveCounter";
+import { Flag } from "@/components/Flag";
 import { langOfCountry, tr } from "@/i18n/languages";
 import { CATEGORY_CODES, categoryLabel, categorySlug } from "@/i18n/categories";
 import { countryRootAlternates } from "@/lib/hreflang";
@@ -97,12 +98,18 @@ export default async function CountryPage({ params }: { params: Promise<Params> 
           <ol style={{ listStyle: "none", display: "flex", gap: "0.5rem", padding: 0 }}>
             <li><Link href="/">{t.category.breadcrumb}</Link></li>
             <li aria-hidden>›</li>
-            <li aria-current="page">{c.flag} {c.name}</li>
+            <li aria-current="page" style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem" }}>
+              <Flag code={c.code} width={20} title={c.name} />
+              {c.name}
+            </li>
           </ol>
         </nav>
 
         <header className="hero container">
-          <h1>{c.flag} {c.h1}</h1>
+          <h1 style={{ display: "inline-flex", alignItems: "center", gap: "0.6rem", flexWrap: "wrap", justifyContent: "center" }}>
+            <Flag code={c.code} width={40} title={c.name} />
+            <span>{c.h1}</span>
+          </h1>
           <p>{c.intro}</p>
           <TrustSignals lang={lang} />
         </header>
@@ -140,8 +147,9 @@ export default async function CountryPage({ params }: { params: Promise<Params> 
             </h3>
             <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
               {sameRegion.map((o) => (
-                <Link key={o.code} href={`/${o.code}`} hrefLang={o.htmlLang} style={{ fontSize: "0.85rem" }}>
-                  {o.flag} {o.name}
+                <Link key={o.code} href={`/${o.code}`} hrefLang={o.htmlLang} style={{ fontSize: "0.85rem", display: "inline-flex", alignItems: "center", gap: "0.35rem" }}>
+                  <Flag code={o.code} width={18} title={o.name} />
+                  {o.name}
                 </Link>
               ))}
             </div>
@@ -150,8 +158,9 @@ export default async function CountryPage({ params }: { params: Promise<Params> 
             </h3>
             <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
               {otherRegion.map((o) => (
-                <Link key={o.code} href={`/${o.code}`} hrefLang={o.htmlLang} style={{ fontSize: "0.85rem" }}>
-                  {o.flag} {o.name}
+                <Link key={o.code} href={`/${o.code}`} hrefLang={o.htmlLang} style={{ fontSize: "0.85rem", display: "inline-flex", alignItems: "center", gap: "0.35rem" }}>
+                  <Flag code={o.code} width={18} title={o.name} />
+                  {o.name}
                 </Link>
               ))}
             </div>

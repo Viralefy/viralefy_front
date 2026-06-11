@@ -10,6 +10,7 @@ import { getToken } from "@/lib/auth";
 import { langOfCountry, tr } from "@/i18n/languages";
 import { getCountry } from "@/i18n/countries";
 import { MegaMenuMarkets } from "./MegaMenuMarkets";
+import { MegaMenuServices } from "./MegaMenuServices";
 import { SearchBar } from "./SearchBar";
 import { ThemeToggle } from "./ThemeToggle";
 import { Icon } from "./Icon";
@@ -32,11 +33,18 @@ function langFromPath(pathname: string) {
   return "en" as const;
 }
 
+function countryFromPath(pathname: string): string {
+  const seg = pathname.split("/").filter(Boolean)[0]?.toLowerCase() ?? "";
+  if (seg && getCountry(seg)) return seg;
+  return "us";
+}
+
 export function Header() {
   const { currencies, currency, setCurrencyCode, user, logout } = useApp();
   const router = useRouter();
   const pathname = usePathname();
   const lang = langFromPath(pathname ?? "");
+  const countryCode = countryFromPath(pathname ?? "");
   const t = tr(lang);
   const [drawerOpen, setDrawerOpen] = useState(false);
   // Contagem de tickets em open/pending — alimenta o badge ao lado do 💬.
@@ -183,8 +191,9 @@ export function Header() {
           />
         </Link>
 
-        {/* Markets — visível só em desktop */}
-        <div className="site-header__hide-mobile">
+        {/* Services + Markets — visíveis só em desktop */}
+        <div className="site-header__hide-mobile" style={{ display: "inline-flex", gap: "0.5rem" }}>
+          <MegaMenuServices lang={lang} country={countryCode} />
           <MegaMenuMarkets lang={lang} />
         </div>
 
@@ -212,9 +221,12 @@ export function Header() {
         </button>
       </div>
 
-      {/* Drawer mobile — abre abaixo da row 1, com Markets + Theme + Currency + Auth */}
+      {/* Drawer mobile — abre abaixo da row 1, com Services + Markets + Theme + Currency + Auth */}
       <div className={`site-header__drawer container ${drawerOpen ? "open" : ""}`}>
-        <MegaMenuMarkets lang={lang} />
+        <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+          <MegaMenuServices lang={lang} country={countryCode} />
+          <MegaMenuMarkets lang={lang} />
+        </div>
         <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginTop: "0.4rem" }}>
           <ThemeToggle />
           <div style={{ flex: 1 }}>

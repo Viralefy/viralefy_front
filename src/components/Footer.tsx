@@ -2,6 +2,7 @@ import Link from "next/link";
 import { tr, type LangCode } from "@/i18n/languages";
 import { LEGAL_SLUGS } from "@/i18n/legal";
 import { countriesByRegion } from "@/i18n/countries";
+import { Flag } from "./Flag";
 
 // Rodapé global. Os links jurídicos vivem em `/legal/{slug}?lang=...` —
 // renderizamos um por idioma do visitante. Mercados são links de país.
@@ -87,8 +88,9 @@ export function Footer({ lang = "en", compact = false }: { lang?: LangCode; comp
                 {[...countriesByRegion("americas"), ...countriesByRegion("sepa")]
                   .slice(0, 18)
                   .map((c) => (
-                    <Link key={c.code} href={`/${c.code}`} hrefLang={c.htmlLang} style={{ color: "var(--muted)" }}>
-                      {c.flag} {c.name}
+                    <Link key={c.code} href={`/${c.code}`} hrefLang={c.htmlLang} style={{ color: "var(--muted)", display: "inline-flex", alignItems: "center", gap: "0.3rem" }}>
+                      <Flag code={c.code} width={16} title={c.name} />
+                      {c.name}
                     </Link>
                   ))}
               </div>

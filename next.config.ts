@@ -1,12 +1,16 @@
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
 
-// Headers de segurança — recomendações OWASP + relaxa o que GTM/Twemoji/SVG
-// CDN/Turnstile precisam:
-//   - Twemoji SVG: cdn.jsdelivr.net (img-src)
+// Headers de segurança — recomendações OWASP + relaxa o que GTM/Flag-CDN/
+// Turnstile precisam:
+//   - flagcdn.com: PNGs de bandeiras de país (img-src). Substituiu emoji
+//     unicode 🇺🇸 que ficava branco em Linux/Win sem fonte color emoji.
 //   - GTM JS: googletagmanager.com (script-src) + dataLayer (frame-src ns.html)
 //   - Turnstile (Cloudflare): challenges.cloudflare.com em script-src (api.js),
 //     frame-src (iframe do desafio) e connect-src (siteverify postback).
+//   - cdn.jsdelivr.net mantido em img-src/script-src por bibliotecas legacy
+//     (storybook, etc.) — pode sair depois de auditoria. NÃO está mais sendo
+//     usado pra Twemoji (removido 2026-06-11).
 //   - Próprio: 'self' pra script/style/conexão de API
 const SECURITY_HEADERS = [
   {
@@ -15,7 +19,7 @@ const SECURITY_HEADERS = [
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://cdn.jsdelivr.net https://challenges.cloudflare.com",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://cdn.jsdelivr.net https://www.googletagmanager.com https://*.google-analytics.com https://*.google.com",
+      "img-src 'self' data: blob: https://flagcdn.com https://cdn.jsdelivr.net https://www.googletagmanager.com https://*.google-analytics.com https://*.google.com",
       "font-src 'self' data:",
       "connect-src 'self' https://api.viralefy.com https://www.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://challenges.cloudflare.com",
       "frame-src https://www.googletagmanager.com https://challenges.cloudflare.com",

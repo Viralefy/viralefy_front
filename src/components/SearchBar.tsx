@@ -12,6 +12,7 @@ import {
 } from "@/i18n/categories";
 import { langOfCountry, tr, type LangCode } from "@/i18n/languages";
 import { Icon } from "./Icon";
+import { Flag } from "./Flag";
 
 // Busca tipo marketplace: digita "seguidores" e a lista mostra
 // "Seguidores Instagram & TikTok — Brasil", "Followers — United States",
@@ -30,7 +31,7 @@ type Hit = {
   url: string;
   label: string;
   market: string;
-  flag: string;
+  flagCode: string;
   keywords: string;
 };
 
@@ -77,7 +78,7 @@ function buildIndex(): Hit[] {
         url: `/${c.code}/${slug}`,
         label: `${label} Instagram & TikTok`,
         market: c.name,
-        flag: c.flag,
+        flagCode: c.code,
         keywords: [
           c.name,
           c.code,
@@ -271,7 +272,7 @@ export function SearchBar({ lang }: { lang: LangCode }) {
                   textAlign: "left",
                 }}
               >
-                <span style={{ fontSize: "1.4rem" }}>{h.flag}</span>
+                <Flag code={h.flagCode} width={20} title={h.market} />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontWeight: 600, fontSize: "0.9rem" }}>{h.label}</div>
                   <div style={{ color: "var(--muted)", fontSize: "0.8rem" }}>{h.market}</div>

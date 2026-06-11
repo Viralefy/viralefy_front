@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Footer } from "@/components/Footer";
 import { indexableMeta } from "@/lib/seo-meta";
 import { CITIES, REGION_LABEL, REGION_ORDER, citiesByRegion } from "@/lib/cities";
+import { Flag } from "@/components/Flag";
 
 // Programmatic SEO hub: lista as 50 cidades top agrupadas por região.
 
@@ -103,7 +104,7 @@ export default function CitiesHub() {
                     className="card"
                     style={{ textDecoration: "none", color: "var(--text)", display: "flex", flexDirection: "column", gap: "0.25rem", padding: "1rem" }}
                   >
-                    <span style={{ fontSize: "1.4rem", lineHeight: 1 }} aria-hidden>{city.flag}</span>
+                    <Flag code={city.country} width={40} title={city.name} />
                     <strong style={{ fontSize: "1rem" }}>{city.name}</strong>
                     <span style={{ color: "var(--muted)", fontSize: "0.85rem" }}>
                       {city.country.toUpperCase()} · {(city.population / 1_000_000).toFixed(1)}M

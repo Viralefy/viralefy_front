@@ -107,6 +107,7 @@ export type Pack = {
     logout: string;
     currency: string;
     markets: string;
+    allServices?: string;
     searchPlaceholder: string;
     searchNoResults: string;
     regionAmericas: string;
@@ -192,6 +193,7 @@ const en: Pack = {
     logout: "Sign out",
     currency: "Currency",
     markets: "Markets",
+    allServices: "Services",
     searchPlaceholder: "Search services and markets…",
     searchNoResults: "No matches.",
     regionAmericas: "Americas",
@@ -275,6 +277,7 @@ const pt: Pack = {
     logout: "Sair",
     currency: "Moeda",
     markets: "Mercados",
+    allServices: "Serviços",
     searchPlaceholder: "Buscar serviços e mercados…",
     searchNoResults: "Nenhum resultado.",
     regionAmericas: "Américas",
@@ -358,6 +361,7 @@ const es: Pack = {
     logout: "Salir",
     currency: "Moneda",
     markets: "Mercados",
+    allServices: "Servicios",
     searchPlaceholder: "Buscar servicios y mercados…",
     searchNoResults: "Sin resultados.",
     regionAmericas: "Américas",
@@ -441,6 +445,7 @@ const fr: Pack = {
     logout: "Déconnexion",
     currency: "Devise",
     markets: "Marchés",
+    allServices: "Services",
     searchPlaceholder: "Rechercher services et marchés…",
     searchNoResults: "Aucun résultat.",
     regionAmericas: "Amériques",

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Footer } from "@/components/Footer";
 import { indexableMeta } from "@/lib/seo-meta";
 import { CITIES, getCity } from "@/lib/cities";
+import { Flag } from "@/components/Flag";
 
 // Programmatic SEO city LP. 50 rotas estáticas; cada uma fala da cidade
 // com bairros/landmarks reais antes de redirecionar pro funnel do país.
@@ -169,7 +170,9 @@ export default async function CityPage({ params }: { params: Promise<{ city: str
 
       <article lang="en">
         <header className="hero container" style={{ textAlign: "center", maxWidth: 820, margin: "0 auto", padding: "3rem 1rem 1.5rem" }}>
-          <div style={{ fontSize: "3rem", lineHeight: 1, marginBottom: "0.5rem" }} aria-hidden>{city.flag}</div>
+          <div style={{ marginBottom: "0.75rem" }}>
+            <Flag code={city.country} width={80} title={city.name} style={{ borderRadius: "4px" }} />
+          </div>
           <h1 style={{ fontSize: "2.4rem", lineHeight: 1.15, margin: "0 0 1rem" }}>
             Buy Instagram followers in {city.name}
           </h1>

@@ -5,6 +5,7 @@ import { COUNTRIES, countriesByRegion, type Region } from "@/i18n/countries";
 import { CategoryGroupedGrid } from "@/components/CategoryGroupedGrid";
 import { Footer } from "@/components/Footer";
 import { TrustSignals } from "@/components/TrustSignals";
+import { Flag } from "@/components/Flag";
 import { tr } from "@/i18n/languages";
 import { homeAlternates } from "@/lib/hreflang";
 import { buildHomeJsonLd } from "@/lib/jsonld";
@@ -109,9 +110,10 @@ export default async function HomePage() {
                       key={c.code}
                       href={`/${c.code}`}
                       hrefLang={c.htmlLang}
-                      style={{ fontSize: "0.85rem", padding: "0.3rem 0.55rem", border: "1px solid var(--border)", borderRadius: "0.4rem", textDecoration: "none" }}
+                      style={{ fontSize: "0.85rem", padding: "0.3rem 0.55rem", border: "1px solid var(--border)", borderRadius: "0.4rem", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "0.4rem" }}
                     >
-                      {c.flag} {c.name}
+                      <Flag code={c.code} width={20} title={c.name} />
+                      {c.name}
                     </Link>
                   ))}
                 </div>
