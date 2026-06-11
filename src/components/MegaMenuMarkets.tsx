@@ -1,17 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { COUNTRIES, countriesByRegion, type Country, type Region } from "@/i18n/countries";
 import { tr, type LangCode } from "@/i18n/languages";
 import { Icon } from "./Icon";
 import { Flag } from "./Flag";
+import { Modal } from "./Modal";
 
-// Mega menu de "Markets" no header. Mostra todas as 6 regiões em 2 colunas:
-//   Esquerda: Américas + SEPA (mercados históricos)
-//   Direita:  Ásia + África + Oceania + Europa-fora-SEPA (expansão)
-// Tem filtro inline com autofocus pra estreitar a lista sem precisar
-// abrir a busca global.
+// Mega menu de "Markets" no header. Agora renderiza via Modal (portal) pra
+// cobrir o site todo em vez de cair preso embaixo do header sticky.
+// Mostra as 6 regiões em 2 colunas com filtro inline.
 
 const REGION_LABEL_FALLBACK: Record<Region, string> = {
   americas: "Americas",
@@ -22,8 +21,6 @@ const REGION_LABEL_FALLBACK: Record<Region, string> = {
   europe_other: "Europe (other)",
 };
 
-// Tradução compacta por idioma — apenas os nomes das 6 regiões, herdados
-// onde o pacote básico (tr) não cobre.
 const REGION_LABEL_BY_LANG: Partial<Record<LangCode, Partial<Record<Region, string>>>> = {
   pt: { americas: "Américas", sepa: "Europa / SEPA", asia: "Ásia", africa: "África", oceania: "Oceania", europe_other: "Europa (outros)" },
   es: { americas: "Américas", sepa: "Europa / SEPA", asia: "Asia", africa: "África", oceania: "Oceanía", europe_other: "Europa (otros)" },
@@ -39,30 +36,12 @@ function regionLabel(region: Region, lang: LangCode): string {
 export function MegaMenuMarkets({ lang }: { lang: LangCode }) {
   const [open, setOpen] = useState(false);
   const [filter, setFilter] = useState("");
-  const ref = useRef<HTMLDivElement>(null);
   const t = tr(lang);
 
-  useEffect(() => {
-    if (!open) return;
-    function onDoc(e: MouseEvent) {
-      if (!ref.current?.contains(e.target as Node)) {
-        setOpen(false);
-        setFilter("");
-      }
-    }
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") {
-        setOpen(false);
-        setFilter("");
-      }
-    }
-    document.addEventListener("mousedown", onDoc);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("mousedown", onDoc);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [open]);
+  function close() {
+    setOpen(false);
+    setFilter("");
+  }
 
   const f = filter.trim().toLowerCase();
   const match = (c: Country) =>
@@ -70,21 +49,20 @@ export function MegaMenuMarkets({ lang }: { lang: LangCode }) {
 
   const leftRegions: Region[] = ["americas", "sepa"];
   const rightRegions: Region[] = ["asia", "africa", "oceania", "europe_other"];
-
   const totalShown = f ? COUNTRIES.filter(match).length : COUNTRIES.length;
 
   function RegionBlock({ region }: { region: Region }) {
     const list = countriesByRegion(region).filter(match);
     if (list.length === 0) return null;
     return (
-      <section style={{ marginBottom: "1rem" }}>
+      <section style={{ marginBottom: "1.25rem" }}>
         <h4
           style={{
-            fontSize: "0.7rem",
+            fontSize: "0.72rem",
             color: "var(--muted)",
             textTransform: "uppercase",
-            letterSpacing: ".6px",
-            marginBottom: "0.4rem",
+            letterSpacing: ".06em",
+            marginBottom: "0.5rem",
             display: "flex",
             justifyContent: "space-between",
           }}
@@ -92,28 +70,28 @@ export function MegaMenuMarkets({ lang }: { lang: LangCode }) {
           <span>{regionLabel(region, lang)}</span>
           <span style={{ fontWeight: 400, opacity: 0.7 }}>{list.length}</span>
         </h4>
-        <ul style={{ listStyle: "none", padding: 0, display: "grid", gap: "0.1rem" }}>
+        <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: "0.15rem" }}>
           {list.map((c) => (
             <li key={c.code}>
               <Link
                 href={`/${c.code}`}
                 hrefLang={c.htmlLang}
-                onClick={() => {
-                  setOpen(false);
-                  setFilter("");
-                }}
+                onClick={close}
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: "0.5rem",
-                  padding: "0.25rem 0.5rem",
-                  borderRadius: "0.35rem",
+                  gap: "0.55rem",
+                  padding: "0.35rem 0.55rem",
+                  borderRadius: "0.4rem",
                   textDecoration: "none",
                   color: "var(--text)",
-                  fontSize: "0.85rem",
+                  fontSize: "0.88rem",
+                  transition: "background 120ms ease",
                 }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "var(--accent-dim, rgba(0,254,214,0.08))")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
               >
-                <Flag code={c.code} width={18} title={c.name} />
+                <Flag code={c.code} width={20} title={c.name} />
                 <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.name}</span>
               </Link>
             </li>
@@ -124,72 +102,59 @@ export function MegaMenuMarkets({ lang }: { lang: LangCode }) {
   }
 
   return (
-    <div ref={ref} style={{ position: "relative" }}>
+    <>
       <button
         type="button"
         className="btn btn-outline"
-        style={{ padding: "0.5rem 0.85rem", fontSize: "0.9rem" }}
+        style={{ padding: "0.5rem 0.85rem", fontSize: "0.9rem", display: "inline-flex", alignItems: "center" }}
+        aria-haspopup="dialog"
         aria-expanded={open}
-        aria-haspopup="true"
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => setOpen(true)}
       >
         <Icon name="globe" size={16} style={{ marginRight: "0.4rem" }} />
         {t.header.markets}
-        <Icon name={open ? "chevronUp" : "chevronDown"} size={14} style={{ marginLeft: "0.3rem" }} />
+        <Icon name="chevronDown" size={14} style={{ marginLeft: "0.3rem" }} />
       </button>
 
-      {open && (
-        <div
-          role="menu"
-          style={{
-            position: "absolute",
-            top: "calc(100% + 0.5rem)",
-            left: 0,
-            background: "var(--surface)",
-            border: "1px solid var(--border)",
-            borderRadius: "0.7rem",
-            padding: "1rem",
-            width: "min(760px, 90vw)",
-            zIndex: 100,
-            boxShadow: "0 14px 36px rgba(0,0,0,0.5)",
-          }}
-        >
-          <input
-            type="search"
-            className="input"
-            placeholder={t.header.searchPlaceholder}
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            style={{ marginBottom: "0.75rem" }}
-            autoFocus
-          />
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: "1.25rem",
-              maxHeight: "65vh",
-              overflowY: "auto",
-            }}
-          >
-            <div>
-              {leftRegions.map((r) => (
-                <RegionBlock key={r} region={r} />
-              ))}
-            </div>
-            <div>
-              {rightRegions.map((r) => (
-                <RegionBlock key={r} region={r} />
-              ))}
-            </div>
-          </div>
-
-          <p style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "0.75rem", textAlign: "right" }}>
+      <Modal
+        open={open}
+        onClose={close}
+        title={t.header.markets}
+        maxWidth={900}
+        footer={
+          <p style={{ fontSize: "0.78rem", color: "var(--muted)", margin: 0, textAlign: "right" }}>
             {totalShown} / {COUNTRIES.length}
           </p>
+        }
+      >
+        <input
+          type="search"
+          className="input"
+          placeholder={t.header.searchPlaceholder}
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          style={{ marginBottom: "1rem", width: "100%" }}
+          autoFocus
+        />
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+            gap: "1.5rem",
+          }}
+        >
+          <div>
+            {leftRegions.map((r) => (
+              <RegionBlock key={r} region={r} />
+            ))}
+          </div>
+          <div>
+            {rightRegions.map((r) => (
+              <RegionBlock key={r} region={r} />
+            ))}
+          </div>
         </div>
-      )}
-    </div>
+      </Modal>
+    </>
   );
 }

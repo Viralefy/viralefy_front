@@ -13,6 +13,7 @@ import { MegaMenuMarkets } from "./MegaMenuMarkets";
 import { MegaMenuServices } from "./MegaMenuServices";
 import { SearchBar } from "./SearchBar";
 import { ThemeToggle } from "./ThemeToggle";
+import { CurrencyPicker } from "./CurrencyPicker";
 import { Icon } from "./Icon";
 
 // Header sticky com blur. Layout responsivo:
@@ -88,20 +89,12 @@ export function Header() {
   }, [drawerOpen]);
 
   const CurrencySelect = (
-    <select
-      aria-label={t.header.currency}
-      data-testid="currency-picker"
-      className="input"
-      style={{ width: "auto", padding: "0.5rem 0.7rem", fontSize: "0.85rem" }}
-      value={currency?.code ?? "USD"}
-      onChange={(e) => setCurrencyCode(e.target.value)}
-    >
-      {currencies.map((c) => (
-        <option key={c.code} value={c.code}>
-          {c.symbol} {c.code}
-        </option>
-      ))}
-    </select>
+    <CurrencyPicker
+      currencies={currencies}
+      current={currency}
+      onChange={setCurrencyCode}
+      label={t.header.currency}
+    />
   );
 
   // Support sempre visível, com badge "💬", pra dar acesso rápido tanto
@@ -229,10 +222,7 @@ export function Header() {
         </div>
         <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginTop: "0.4rem" }}>
           <ThemeToggle />
-          <div style={{ flex: 1 }}>
-            <label className="label" style={{ marginBottom: 0 }}>{t.header.currency}</label>
-            {CurrencySelect}
-          </div>
+          {CurrencySelect}
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", marginTop: "0.6rem" }}>
           {AuthButtons}
