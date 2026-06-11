@@ -11,6 +11,7 @@ import {
   type TwoFAEnroll,
 } from "@/lib/api";
 import { getToken } from "@/lib/auth";
+import { Icon } from "@/components/Icon";
 
 // Página de security 2FA pra usuário. Mostra:
 //   - Estado atual (enrolled? since when?)
@@ -80,7 +81,10 @@ export default function UserSecurity2FAPage() {
       {enrolled === true && !enroll && (
         <>
           <div className="card" style={{ marginTop: "1rem", background: "rgba(60,216,125,0.06)", border: "1px solid rgba(60,216,125,0.3)" }}>
-            <strong style={{ color: "#3cd87d" }}>✓ 2FA is active</strong>
+            <strong style={{ color: "#3cd87d", display: "inline-flex", alignItems: "center", gap: "0.4rem" }}>
+              <Icon name="check" size={16} />
+              2FA is active
+            </strong>
             <p style={{ color: "var(--muted)", fontSize: "0.85rem", margin: "0.4rem 0 0" }}>
               You&apos;ll be asked for a 6-digit code from your authenticator app on every login.
             </p>
@@ -161,12 +165,21 @@ function EnrollWizard({ data, onDone }: { data: TwoFAEnroll; onDone: () => void 
         <input readOnly className="input" value={data.secret_base32} style={{ marginTop: "0.4rem", fontFamily: "monospace", fontSize: "0.85rem" }} />
       </details>
       <div className="card" style={{ background: "rgba(255,76,76,0.08)", border: "1px solid rgba(255,76,76,0.3)", marginBottom: "1rem" }}>
-        <strong style={{ display: "block", marginBottom: "0.4rem" }}>⚠ Backup codes (shown only once)</strong>
+        <strong style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", marginBottom: "0.4rem" }}>
+          <Icon name="warning" size={14} />
+          Backup codes (shown only once)
+        </strong>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.3rem", fontFamily: "monospace", fontSize: "0.85rem", marginBottom: "0.5rem" }}>
           {data.backup_codes.map((c) => <span key={c}>{c}</span>)}
         </div>
-        <button type="button" className="btn btn-outline" style={{ width: "100%" }} onClick={downloadBackupCodes}>
-          📥 Download backup codes
+        <button
+          type="button"
+          className="btn btn-outline"
+          style={{ width: "100%", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "0.4rem" }}
+          onClick={downloadBackupCodes}
+        >
+          <Icon name="download" size={16} />
+          Download backup codes
         </button>
         <label style={{ display: "flex", alignItems: "center", gap: "0.4rem", marginTop: "0.5rem", fontSize: "0.85rem" }}>
           <input type="checkbox" checked={savedAck} onChange={(e) => setSavedAck(e.target.checked)} />

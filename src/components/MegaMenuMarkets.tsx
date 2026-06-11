@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { COUNTRIES, countriesByRegion, type Country, type Region } from "@/i18n/countries";
 import { tr, type LangCode } from "@/i18n/languages";
+import { Icon } from "./Icon";
 
 // Mega menu de "Markets" no header. Mostra todas as 6 regiões em 2 colunas:
 //   Esquerda: Américas + SEPA (mercados históricos)
@@ -131,7 +132,9 @@ export function MegaMenuMarkets({ lang }: { lang: LangCode }) {
         aria-haspopup="true"
         onClick={() => setOpen((o) => !o)}
       >
-        🌐 {t.header.markets} {open ? "▴" : "▾"}
+        <Icon name="globe" size={16} style={{ marginRight: "0.4rem" }} />
+        {t.header.markets}
+        <Icon name={open ? "chevronUp" : "chevronDown"} size={14} style={{ marginLeft: "0.3rem" }} />
       </button>
 
       {open && (

@@ -6,6 +6,17 @@ import { useEffect, useState } from "react";
 import { fetchMyReviewForOrder, submitReview } from "@/lib/api";
 import type { Review } from "@/lib/api";
 import { getToken } from "@/lib/auth";
+import { Icon } from "@/components/Icon";
+
+function StarsRow({ rating, size = 24 }: { rating: number; size?: number }) {
+  return (
+    <span style={{ display: "inline-flex", gap: "0.15rem", color: "#f59e0b" }} aria-label={`${rating} of 5 stars`}>
+      {[1, 2, 3, 4, 5].map((n) => (
+        <Icon key={n} name={n <= rating ? "starFilled" : "star"} size={size} />
+      ))}
+    </span>
+  );
+}
 
 // Página de submissão de review pós-entrega. Trigger principal: link no
 // email "how was your order?" enviado 7d após order.paid.
@@ -108,8 +119,11 @@ export default function ReviewPage() {
 
       {!loading && submitted && (
         <div className="card" style={{ textAlign: "center", padding: "2rem 1rem" }}>
-          <p style={{ fontSize: "2rem", margin: 0 }}>{"★".repeat(submitted.rating)}{"☆".repeat(5 - submitted.rating)}</p>
-          <h2 style={{ marginTop: "0.5rem", fontSize: "1.2rem" }}>Thanks for the review! 🙌</h2>
+          <StarsRow rating={submitted.rating} size={32} />
+          <h2 style={{ marginTop: "0.5rem", fontSize: "1.2rem", display: "inline-flex", alignItems: "center", gap: "0.5rem", justifyContent: "center" }}>
+            <Icon name="applause" size={20} color="var(--accent, #00fed6)" />
+            Thanks for the review!
+          </h2>
           <p style={{ color: "var(--muted)", marginTop: "0.5rem" }}>
             Your feedback is live on the plan page. We&apos;ll keep it that way unless content terms are violated.
           </p>
@@ -121,7 +135,7 @@ export default function ReviewPage() {
 
       {!loading && !submitted && existing && (
         <div className="card" style={{ textAlign: "center", padding: "2rem 1rem" }}>
-          <p style={{ fontSize: "2rem", margin: 0 }}>{"★".repeat(existing.rating)}{"☆".repeat(5 - existing.rating)}</p>
+          <StarsRow rating={existing.rating} size={32} />
           <h2 style={{ marginTop: "0.5rem", fontSize: "1.2rem" }}>You&apos;ve already reviewed this order</h2>
           {existing.title && <p style={{ fontWeight: 600, marginTop: "0.75rem" }}>{existing.title}</p>}
           {existing.body && <p style={{ color: "var(--muted)", marginTop: "0.25rem", whiteSpace: "pre-wrap" }}>{existing.body}</p>}
@@ -177,7 +191,7 @@ export default function ReviewPage() {
 
 function StarPicker({ value, onChange }: { value: number; onChange: (n: number) => void }) {
   return (
-    <div style={{ display: "flex", gap: "0.25rem", fontSize: "2rem", lineHeight: 1, userSelect: "none" }}>
+    <div style={{ display: "flex", gap: "0.25rem", lineHeight: 1, userSelect: "none" }}>
       {[1, 2, 3, 4, 5].map((n) => (
         <button
           key={n}
@@ -190,9 +204,10 @@ function StarPicker({ value, onChange }: { value: number; onChange: (n: number) 
             cursor: "pointer",
             color: n <= value ? "#f59e0b" : "var(--muted)",
             padding: "0.1rem 0.2rem",
+            display: "inline-flex",
           }}
         >
-          {n <= value ? "★" : "☆"}
+          <Icon name={n <= value ? "starFilled" : "star"} size={28} />
         </button>
       ))}
     </div>

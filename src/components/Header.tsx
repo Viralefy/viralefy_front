@@ -12,6 +12,7 @@ import { getCountry } from "@/i18n/countries";
 import { MegaMenuMarkets } from "./MegaMenuMarkets";
 import { SearchBar } from "./SearchBar";
 import { ThemeToggle } from "./ThemeToggle";
+import { Icon } from "./Icon";
 
 // Header sticky com blur. Layout responsivo:
 //   Desktop (>= 760px):  Logo · Markets · Search · Currency · Auth (single row)
@@ -112,7 +113,7 @@ export function Header() {
         position: "relative",
       }}
     >
-      <span aria-hidden>💬</span>
+      <Icon name="chat" size={16} />
       {t.header.support}
       {openTickets != null && openTickets > 0 && (
         <span
@@ -207,7 +208,7 @@ export function Header() {
           aria-expanded={drawerOpen}
           onClick={() => setDrawerOpen((o) => !o)}
         >
-          {drawerOpen ? "✕" : "☰"}
+          <Icon name={drawerOpen ? "close" : "menu"} size={22} label={drawerOpen ? "Close menu" : "Open menu"} />
         </button>
       </div>
 

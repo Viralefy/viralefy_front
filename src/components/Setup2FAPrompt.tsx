@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { fetchTwoFAStatus, dismissTwoFAPrompt } from "@/lib/api";
 import { getToken } from "@/lib/auth";
+import { Icon } from "./Icon";
 
 // Setup2FAPrompt — nag modal pra usuário ATIVAR 2FA opcional.
 //
@@ -64,7 +65,10 @@ export function Setup2FAPrompt() {
       }}
     >
       <div className="card" style={{ maxWidth: 440, width: "100%" }}>
-        <h2 style={{ marginBottom: "0.5rem" }}>🔒 Protect your account</h2>
+        <h2 style={{ marginBottom: "0.5rem", display: "inline-flex", alignItems: "center", gap: "0.5rem" }}>
+          <Icon name="lock" size={20} color="var(--accent, #00fed6)" />
+          Protect your account
+        </h2>
         <p style={{ color: "var(--muted)", marginBottom: "1rem", fontSize: "0.9rem" }}>
           You&apos;ve completed an order with us — your account now has data worth protecting. Two-factor authentication
           (2FA) adds a 6-digit code from your phone on every login, blocking attackers even if they have your password.

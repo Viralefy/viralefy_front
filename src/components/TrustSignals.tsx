@@ -1,8 +1,9 @@
 import { tr, type LangCode } from "@/i18n/languages";
+import { Icon, type IconName } from "./Icon";
 
 // Linha de 3 selos de confiança usados abaixo do hero, no CTA de plano e no
 // header do checkout. Pure server-side — sem state, sem effect — só renderiza
-// 3 chips com emoji + texto traduzido.
+// 3 chips com ícone SVG + texto traduzido.
 //
 // `variant="compact"` reduz padding/altura pra caber no modal de checkout.
 export function TrustSignals({
@@ -15,10 +16,10 @@ export function TrustSignals({
   const t = tr(lang);
   const compact = variant === "compact";
 
-  const items: Array<{ icon: string; label: string }> = [
-    { icon: "🛡️", label: t.trust.refill },
-    { icon: "🔐", label: t.trust.password },
-    { icon: "⚡", label: t.trust.delivery },
+  const items: Array<{ icon: IconName; label: string }> = [
+    { icon: "shield", label: t.trust.refill },
+    { icon: "lock", label: t.trust.password },
+    { icon: "bolt", label: t.trust.delivery },
   ];
 
   return (
@@ -50,7 +51,7 @@ export function TrustSignals({
             whiteSpace: "nowrap",
           }}
         >
-          <span aria-hidden style={{ fontSize: compact ? "0.95rem" : "1.05rem" }}>{it.icon}</span>
+          <Icon name={it.icon} size={compact ? 15 : 17} color="var(--accent, #00fed6)" />
           <span>{it.label}</span>
         </li>
       ))}

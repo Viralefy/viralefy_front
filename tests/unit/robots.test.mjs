@@ -30,17 +30,18 @@ test("robots() declares a sitemap (Google/Bing rely on it for indexing)", () => 
   assert.equal(out.sitemap, "https://www.viralefy.com/sitemap.xml");
 });
 
-test("robots() carries one rule for User-agent *", () => {
+test("robots() carries a rule for User-agent *", () => {
   const out = robotsRoute();
   assert.ok(Array.isArray(out.rules), "rules must be array");
-  assert.equal(out.rules.length, 1);
-  assert.equal(out.rules[0].userAgent, "*");
-  assert.equal(out.rules[0].allow, "/");
+  const wildcard = out.rules.find((r) => r.userAgent === "*");
+  assert.ok(wildcard, "must include rule for User-agent *");
+  assert.equal(wildcard.allow, "/");
 });
 
 test("robots() disallows private routes (/account, /login, /api, etc.)", () => {
   const out = robotsRoute();
-  const disallow = out.rules[0].disallow;
+  const wildcard = out.rules.find((r) => r.userAgent === "*");
+  const disallow = wildcard.disallow;
   assert.ok(Array.isArray(disallow), "disallow must be array");
   for (const path of ["/account", "/tickets", "/login", "/register", "/api/"]) {
     assert.ok(disallow.includes(path), `must disallow ${path}`);
@@ -51,17 +52,24 @@ test("robots() does NOT disallow /orders (review submission landings must be cra
   // /orders/[id]/review tem noindex meta — não pode estar em Disallow no
   // robots.txt, senão o crawler nunca lê o noindex e a URL pode ficar
   // indexed-with-no-content (problema clássico de SEO).
-  // OBS: actually /orders is sometimes okay to disallow if there's no
-  // public crawlable content there. Mantemos o teste só como sanity —
-  // remove se mudar a política de noindex.
   const out = robotsRoute();
-  const disallow = out.rules[0].disallow ?? [];
-  // Esse teste é informativo — só checa que não há um Disallow EXATO
-  // pra "/orders" (que cobriria /orders/123/review e mataria o meta noindex).
-  // Se a equipe decidir mover /orders pra trás do login com gate explícito,
-  // este teste deve ser atualizado junto.
+  const wildcard = out.rules.find((r) => r.userAgent === "*");
+  const disallow = wildcard.disallow ?? [];
   assert.ok(
     !disallow.some((p) => p === "/orders" || p === "/orders/"),
     "disallow /orders exact would block /orders/[id]/review crawl + noindex read",
   );
+});
+
+test("robots() declares explicit policy for IA crawlers (GPTBot, ClaudeBot, Google-Extended)", () => {
+  // IA crawlers ignoram /robots.txt sem user-agent específico. Declarar explícito
+  // dá controle granular: hoje permitimos pra content marketing; se virar
+  // problema, mudamos pra disallow sem afetar Google/Bing.
+  const out = robotsRoute();
+  const aiRule = out.rules.find(
+    (r) => Array.isArray(r.userAgent) && r.userAgent.includes("GPTBot"),
+  );
+  assert.ok(aiRule, "must declare explicit rule for IA crawlers (GPTBot et al.)");
+  assert.ok(aiRule.userAgent.includes("ClaudeBot"), "ClaudeBot must be in IA rule");
+  assert.ok(aiRule.userAgent.includes("Google-Extended"), "Google-Extended must be in IA rule");
 });

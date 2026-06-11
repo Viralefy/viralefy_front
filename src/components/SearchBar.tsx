@@ -11,6 +11,7 @@ import {
   type CategoryCode,
 } from "@/i18n/categories";
 import { langOfCountry, tr, type LangCode } from "@/i18n/languages";
+import { Icon } from "./Icon";
 
 // Busca tipo marketplace: digita "seguidores" e a lista mostra
 // "Seguidores Instagram & TikTok — Brasil", "Followers — United States",
@@ -220,9 +221,10 @@ export function SearchBar({ lang }: { lang: LangCode }) {
           transform: "translateY(-50%)",
           pointerEvents: "none",
           opacity: 0.6,
+          display: "inline-flex",
         }}
       >
-        🔍
+        <Icon name="search" size={16} />
       </span>
 
       {open && q.trim().length >= 2 && (

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import type {
   CheckoutResult,
   Currency,
@@ -31,6 +31,7 @@ import { TrustSignals } from "./TrustSignals";
 import { CustomDataFields, hasCustomFields, type CustomData } from "./CustomDataFields";
 import type { CategoryCode } from "@/i18n/categories";
 import type { LangCode } from "@/i18n/languages";
+import { Icon, type IconName } from "./Icon";
 
 // Fluxo novo de checkout em 4 steps:
 //   1. form        — preenche dados do pedido (nome, perfil, cupom...)
@@ -59,7 +60,8 @@ export function CheckoutModal({
   const { currency, user } = useApp();
   const isProfile = plan.target_type === "profile";
   const platformLabel = plan.platform === "tiktok" ? "TikTok" : "Instagram";
-  const platformIcon = plan.platform === "tiktok" ? "🎵" : "📷";
+  const platformIconName: IconName = plan.platform === "tiktok" ? "tiktok" : "instagram";
+  const platformIcon = <Icon name={platformIconName} size={16} />;
 
   const [step, setStep] = useState<Step>("form");
   const [loading, setLoading] = useState(false);
@@ -260,7 +262,12 @@ export function CheckoutModal({
           {step === "form" && "Complete purchase"}
           {step === "method" && "Choose payment method"}
           {step === "instructions" && "Complete your payment"}
-          {step === "success" && "Order created! 🎉"}
+          {step === "success" && (
+            <span style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem" }}>
+              <Icon name="celebrate" size={22} color="var(--accent, #00fed6)" />
+              Order created!
+            </span>
+          )}
         </h2>
         <p style={{ color: "var(--muted)", fontSize: "0.85rem", marginBottom: "0.25rem" }}>
           {platformIcon} {platformLabel} · {isProfile ? "delivered to the profile" : "delivered to the post"}
@@ -504,11 +511,11 @@ function MethodCard({
   active: boolean;
   onSelect: () => void;
 }) {
-  const icon =
-    method.kind === "card" ? "💳" :
-    method.kind === "pix" ? "🇧🇷 PIX" :
-    method.kind === "crypto_manual" ? "🪙" :
-    method.kind === "crypto_auto" ? "⚡" : "💰";
+  const iconName: IconName =
+    method.kind === "card" ? "card" :
+    method.kind === "pix" ? "money" :
+    method.kind === "crypto_manual" ? "crypto" :
+    method.kind === "crypto_auto" ? "bolt" : "money";
   const subtitle =
     method.kind === "card" ? "Credit/debit card via Stripe" :
     method.kind === "pix" ? "Instant Brazilian transfer" :
@@ -536,7 +543,10 @@ function MethodCard({
       }}
     >
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-        <strong style={{ fontSize: "0.95rem" }}>{icon} {method.name}</strong>
+        <strong style={{ fontSize: "0.95rem", display: "inline-flex", alignItems: "center", gap: "0.4rem" }}>
+          <Icon name={iconName} size={16} color="var(--accent, #00fed6)" />
+          {method.kind === "pix" ? <span>PIX · {method.name}</span> : method.name}
+        </strong>
         <span style={{ fontWeight: 700 }}>
           {method.charged_symbol} {method.charged_amount} {method.charged_currency}
         </span>
@@ -548,8 +558,9 @@ function MethodCard({
         </span>
       )}
       {method.network_warning && (
-        <span style={{ fontSize: "0.75rem", color: "var(--danger)" }}>
-          ⚠ {method.network_warning}
+        <span style={{ fontSize: "0.75rem", color: "var(--danger)", display: "inline-flex", alignItems: "center", gap: "0.35rem" }}>
+          <Icon name="warning" size={12} />
+          {method.network_warning}
         </span>
       )}
     </button>
@@ -722,8 +733,9 @@ function CouponInput({
         <p style={{ color: "var(--danger)", fontSize: "0.8rem", marginTop: "0.3rem" }}>{error}</p>
       )}
       {preview && (
-        <p style={{ color: "#3cd87d", fontSize: "0.85rem", marginTop: "0.3rem" }}>
-          ✓ {preview.code}: −${(preview.discount_usd_cents / 100).toFixed(2)} off
+        <p style={{ color: "#3cd87d", fontSize: "0.85rem", marginTop: "0.3rem", display: "inline-flex", alignItems: "center", gap: "0.4rem" }}>
+          <Icon name="check" size={14} />
+          {preview.code}: −${(preview.discount_usd_cents / 100).toFixed(2)} off
           {preview.description && ` (${preview.description})`}
         </p>
       )}
@@ -739,7 +751,7 @@ function ProfileSection({
   profiles: Profile[] | null;
   platform: Platform;
   platformLabel: string;
-  platformIcon: string;
+  platformIcon: ReactNode;
   selectedProfileId: string;
   setSelectedProfileId: (s: string) => void;
   useNewProfile: boolean;
@@ -786,7 +798,7 @@ function ProfileSection({
   );
 }
 
-function PublicationSection({ platform, platformLabel, platformIcon }: { platform: Platform; platformLabel: string; platformIcon: string }) {
+function PublicationSection({ platform, platformLabel, platformIcon }: { platform: Platform; platformLabel: string; platformIcon: ReactNode }) {
   const placeholder =
     platform === "tiktok"
       ? "https://www.tiktok.com/@user/video/123…"
@@ -816,8 +828,14 @@ function PaymentMethodSection({
     <div>
       <label className="label">Pay with</label>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
-        <button type="button" className={payMethod === "gateway" ? "btn btn-primary" : "btn btn-outline"} onClick={() => setPayMethod("gateway")}>
-          💳 External payment
+        <button
+          type="button"
+          className={payMethod === "gateway" ? "btn btn-primary" : "btn btn-outline"}
+          onClick={() => setPayMethod("gateway")}
+          style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "0.4rem" }}
+        >
+          <Icon name="card" size={16} />
+          External payment
         </button>
         <button
           type="button"
@@ -825,8 +843,10 @@ function PaymentMethodSection({
           onClick={() => enough && setPayMethod("credits")}
           disabled={!enough}
           title={enough ? "" : "Insufficient balance"}
+          style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "0.4rem" }}
         >
-          💎 Credits
+          <Icon name="diamond" size={16} />
+          Credits
         </button>
       </div>
       <p style={{ color: enough ? "var(--muted)" : "var(--danger)", fontSize: "0.78rem", marginTop: "0.4rem" }}>
@@ -848,7 +868,10 @@ function CheckoutSuccess({ result, onClose, currency }: { result: CheckoutResult
         <li>Amount: <strong>{result.display_symbol} {result.display_amount}</strong></li>
         {result.payment_method === "credits" ? (
           <>
-            <li style={{ color: "var(--success)" }}>✓ Paid with credits</li>
+            <li style={{ color: "var(--success)", display: "inline-flex", alignItems: "center", gap: "0.35rem" }}>
+              <Icon name="check" size={14} />
+              Paid with credits
+            </li>
             <li style={{ color: "var(--muted)", fontSize: "0.85rem" }}>
               Remaining balance: {formatBalance(result.credit_balance_cents ?? 0, currency)}
             </li>
@@ -989,9 +1012,13 @@ function PaymentInstructions({ result }: { result: CheckoutResult }) {
             fontSize: "0.85rem",
             marginBottom: "0.75rem",
             fontWeight: 600,
+            display: "flex",
+            alignItems: "flex-start",
+            gap: "0.5rem",
           }}
         >
-          ⚠ {networkWarning || `Send ONLY on the ${network || "shown"} network. Deposits on any other network will be lost forever.`}
+          <Icon name="warning" size={16} style={{ flexShrink: 0, marginTop: "0.1rem" }} />
+          <span>{networkWarning || `Send ONLY on the ${network || "shown"} network. Deposits on any other network will be lost forever.`}</span>
         </div>
         <label className="label">Wallet address</label>
         <textarea readOnly className="input" rows={2} style={{ fontFamily: "monospace", fontSize: "0.8rem" }} value={wallet} />
@@ -1008,7 +1035,10 @@ function PaymentInstructions({ result }: { result: CheckoutResult }) {
             <label className="label">Memo / tag (required)</label>
             <input readOnly className="input" style={{ fontFamily: "monospace" }} value={memo} />
             {memoWarning && (
-              <p style={{ color: "var(--danger)", fontSize: "0.8rem", marginTop: "0.25rem" }}>⚠ {memoWarning}</p>
+              <p style={{ color: "var(--danger)", fontSize: "0.8rem", marginTop: "0.25rem", display: "inline-flex", alignItems: "center", gap: "0.35rem" }}>
+                <Icon name="warning" size={12} />
+                {memoWarning}
+              </p>
             )}
           </div>
         )}

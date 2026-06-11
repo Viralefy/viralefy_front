@@ -8,6 +8,7 @@ import { fetchMyOrders } from "@/lib/api";
 import { getToken } from "@/lib/auth";
 import { useApp } from "@/components/Providers";
 import { Setup2FAPrompt } from "@/components/Setup2FAPrompt";
+import { Icon } from "@/components/Icon";
 
 const statusLabel: Record<string, string> = {
   pending: "Pending",
@@ -50,16 +51,25 @@ export default function AccountPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "0.75rem", marginBottom: "2rem" }}>
         <Link href="/account/profiles" className="card" style={{ textDecoration: "none", color: "var(--text)" }}>
-          <strong style={{ display: "block", marginBottom: "0.25rem" }}>👤 Profiles</strong>
-          <span style={{ color: "var(--muted)", fontSize: "0.85rem" }}>Register your IG/TikTok profiles</span>
+          <strong style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.25rem" }}>
+            <Icon name="profile" size={18} color="var(--accent, #00fed6)" />
+            Profiles
+          </strong>
+          <span style={{ display: "block", color: "var(--muted)", fontSize: "0.85rem" }}>Register your IG/TikTok profiles</span>
         </Link>
         <Link href="/account/credits" className="card" style={{ textDecoration: "none", color: "var(--text)" }}>
-          <strong style={{ display: "block", marginBottom: "0.25rem" }}>💳 Credits</strong>
-          <span style={{ color: "var(--muted)", fontSize: "0.85rem" }}>Balance + top-up + ledger</span>
+          <strong style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.25rem" }}>
+            <Icon name="credits" size={18} color="var(--accent, #00fed6)" />
+            Credits
+          </strong>
+          <span style={{ display: "block", color: "var(--muted)", fontSize: "0.85rem" }}>Balance + top-up + ledger</span>
         </Link>
         <Link href="/tickets" className="card" style={{ textDecoration: "none", color: "var(--text)" }}>
-          <strong style={{ display: "block", marginBottom: "0.25rem" }}>🎫 Support</strong>
-          <span style={{ color: "var(--muted)", fontSize: "0.85rem" }}>Support tickets</span>
+          <strong style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.25rem" }}>
+            <Icon name="ticket" size={18} color="var(--accent, #00fed6)" />
+            Support
+          </strong>
+          <span style={{ display: "block", color: "var(--muted)", fontSize: "0.85rem" }}>Support tickets</span>
         </Link>
       </div>
 
@@ -111,7 +121,9 @@ export default function AccountPage() {
                         textDecoration: "underline",
                       }}
                     >
-                      💬 Open support ticket →
+                      <Icon name="chat" size={14} style={{ marginRight: "0.35rem" }} />
+                      Open support ticket
+                      <Icon name="arrowRight" size={14} style={{ marginLeft: "0.35rem" }} />
                     </Link>
                   )}
                   {isHighTouch && !hasTicket && o.status === "pending" && (

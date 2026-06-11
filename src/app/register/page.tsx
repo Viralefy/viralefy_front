@@ -7,6 +7,7 @@ import { userRegister } from "@/lib/api";
 import { useApp } from "@/components/Providers";
 import { Turnstile } from "@/components/Turnstile";
 import { getTracking } from "@/lib/tracking";
+import { Icon } from "@/components/Icon";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -110,12 +111,13 @@ export default function RegisterPage() {
             </div>
             {!contactOk && (
               <p style={{ color: "var(--muted)", fontSize: "0.75rem", margin: "0.4rem 0 0" }}>
-                Fill ONE of the two above. ✓ either field is enough.
+                Fill ONE of the two above. Either field is enough.
               </p>
             )}
             {contactOk && (
-              <p style={{ color: "#3cd87d", fontSize: "0.75rem", margin: "0.4rem 0 0" }}>
-                ✓ contact channel set
+              <p style={{ color: "#3cd87d", fontSize: "0.75rem", margin: "0.4rem 0 0", display: "inline-flex", alignItems: "center", gap: "0.3rem" }}>
+                <Icon name="check" size={12} />
+                contact channel set
               </p>
             )}
           </div>

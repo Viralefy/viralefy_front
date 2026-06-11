@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getTheme, toggleTheme, type Theme } from "@/lib/theme";
+import { Icon } from "./Icon";
 
 // Botão de switcher claro/escuro. Lê o estado de localStorage no mount,
 // muda via toggleTheme() (que escreve no <html data-theme> e localStorage).
@@ -39,7 +40,7 @@ export function ThemeToggle() {
       }}
       title={theme === "dark" ? "Switch to light" : "Switch to dark"}
     >
-      {mounted ? (theme === "dark" ? "☀" : "🌙") : "◐"}
+      {mounted ? <Icon name={theme === "dark" ? "sun" : "moon"} size={18} label={theme === "dark" ? "Switch to light" : "Switch to dark"} /> : <Icon name="moon" size={18} />}
     </button>
   );
 }

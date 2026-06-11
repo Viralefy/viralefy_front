@@ -10,6 +10,7 @@ import { useApp } from "./Providers";
 import { CheckoutModal } from "./CheckoutModal";
 import { tr, type LangCode } from "@/i18n/languages";
 import { categorySlug, type CategoryCode } from "@/i18n/categories";
+import { Icon } from "./Icon";
 import Link from "next/link";
 
 // Variante "cards" da página de categoria. Cada plano vira um card com link
@@ -111,7 +112,12 @@ export function CategoryCardGrid({
                   onClick={() => onSubscribeClick(plan.id)}
                   disabled={subBusy === plan.id || subOk === plan.id}
                 >
-                  {subOk === plan.id ? "✓ Subscribed" : subBusy === plan.id ? "Subscribing…" : "Subscribe monthly"}
+                  {subOk === plan.id ? (
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem" }}>
+                      <Icon name="check" size={14} color="var(--accent, #00fed6)" />
+                      Subscribed
+                    </span>
+                  ) : subBusy === plan.id ? "Subscribing…" : "Subscribe monthly"}
                 </button>
               )}
             </article>

@@ -6,10 +6,11 @@ import { useEffect, useState } from "react";
 import type { Platform, Profile } from "@/lib/api";
 import { addProfile, deleteProfile, fetchMyProfiles } from "@/lib/api";
 import { getToken } from "@/lib/auth";
+import { Icon, type IconName } from "@/components/Icon";
 
-const PLATFORMS: { code: Platform; label: string; icon: string }[] = [
-  { code: "instagram", label: "Instagram", icon: "📷" },
-  { code: "tiktok", label: "TikTok", icon: "🎵" },
+const PLATFORMS: { code: Platform; label: string; icon: IconName }[] = [
+  { code: "instagram", label: "Instagram", icon: "instagram" },
+  { code: "tiktok", label: "TikTok", icon: "tiktok" },
 ];
 
 export default function ProfilesPage() {
@@ -95,7 +96,7 @@ export default function ProfilesPage() {
             <label className="label" htmlFor="platform">Platform</label>
             <select className="input" name="platform" id="platform" defaultValue="instagram">
               {PLATFORMS.map((p) => (
-                <option key={p.code} value={p.code}>{p.icon} {p.label}</option>
+                <option key={p.code} value={p.code}>{p.label}</option>
               ))}
             </select>
           </div>
@@ -125,8 +126,9 @@ export default function ProfilesPage() {
           if (list.length === 0) return null;
           return (
             <section key={pl.code} style={{ marginBottom: "1.5rem" }}>
-              <h3 style={{ fontSize: "0.95rem", color: "var(--muted)", marginBottom: "0.5rem" }}>
-                {pl.icon} {pl.label}
+              <h3 style={{ fontSize: "0.95rem", color: "var(--muted)", marginBottom: "0.5rem", display: "inline-flex", alignItems: "center", gap: "0.4rem" }}>
+                <Icon name={pl.icon} size={16} />
+                {pl.label}
               </h3>
               <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
                 {list.map((p) => (
@@ -141,7 +143,10 @@ export default function ProfilesPage() {
                         <span style={{ color: "var(--muted)", fontSize: "0.85rem" }}> — {p.display_name}</span>
                       )}
                       {p.verified && (
-                        <span style={{ marginLeft: "0.5rem", fontSize: "0.75rem", color: "var(--success)" }}>✓ verified</span>
+                        <span style={{ marginLeft: "0.5rem", fontSize: "0.75rem", color: "var(--success)", display: "inline-flex", alignItems: "center", gap: "0.25rem" }}>
+                          <Icon name="check" size={12} />
+                          verified
+                        </span>
                       )}
                     </div>
                     <button

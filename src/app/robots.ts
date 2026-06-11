@@ -10,9 +10,27 @@ import type { MetadataRoute } from "next";
 // resolver host preferido, então `Host:` virou ruído puro.
 export default function robots(): MetadataRoute.Robots {
   const base = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  // Private surfaces (user account, auth flows, internal APIs, OG renderer,
+  // build assets) são exclusos.
+  const disallow = [
+    "/account",
+    "/tickets",
+    "/login",
+    "/register",
+    "/api/",
+    "/og/",
+    "/_next/",
+  ];
   return {
     rules: [
-      { userAgent: "*", allow: "/", disallow: ["/account", "/tickets", "/login", "/register", "/api/"] },
+      { userAgent: "*", allow: "/", disallow },
+      // IA crawlers — permitidos pelo default (content marketing). Se virar
+      // problema de banda ou apropriação não-citada, mover pra disallow.
+      {
+        userAgent: ["GPTBot", "ChatGPT-User", "anthropic-ai", "ClaudeBot", "Google-Extended", "CCBot"],
+        allow: "/",
+        disallow,
+      },
     ],
     sitemap: `${base}/sitemap.xml`,
   };

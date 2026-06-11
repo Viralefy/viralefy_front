@@ -16,6 +16,7 @@ import {
 import { Footer } from "@/components/Footer";
 import { BuyPlanCta } from "@/components/BuyPlanCta";
 import { LiveCounter } from "@/components/LiveCounter";
+import { Icon } from "@/components/Icon";
 
 // Página dedicada a um plano específico (`/br/seguidores/1000-seguidores`).
 // Slug do plano = `<qty>-<category-slug-local>`. SEO próprio: title/H1 com
@@ -346,7 +347,6 @@ export default async function PlanPage({ params }: { params: Promise<Params> }) 
 // Server-component puro, sem JS no cliente.
 function ReviewStars({ aggregate }: { aggregate: AggregateRating }) {
   const filled = Math.round(aggregate.rating_value);
-  const stars = "★".repeat(filled) + "☆".repeat(5 - filled);
   return (
     <p
       style={{
@@ -359,7 +359,11 @@ function ReviewStars({ aggregate }: { aggregate: AggregateRating }) {
       }}
       aria-label={`Average rating ${aggregate.rating_value.toFixed(1)} out of 5 based on ${aggregate.review_count} customer reviews`}
     >
-      <span style={{ color: "#f59e0b", letterSpacing: "0.1em" }} aria-hidden>{stars}</span>
+      <span style={{ color: "#f59e0b", display: "inline-flex", gap: "0.1rem" }} aria-hidden>
+        {[1, 2, 3, 4, 5].map((n) => (
+          <Icon key={n} name={n <= filled ? "starFilled" : "star"} size={16} />
+        ))}
+      </span>
       <span>
         <strong style={{ color: "var(--text)" }}>{aggregate.rating_value.toFixed(1)}</strong>
         {" · "}
@@ -400,7 +404,6 @@ function ReviewsSection({ reviews, aggregate }: { reviews: PublicReview[]; aggre
 
 function ReviewCard({ review }: { review: PublicReview }) {
   const filled = Math.max(0, Math.min(5, review.rating));
-  const stars = "★".repeat(filled) + "☆".repeat(5 - filled);
   const date = new Date(review.created_at);
   return (
     <article className="card" style={{ padding: "1rem" }}>
@@ -413,8 +416,13 @@ function ReviewCard({ review }: { review: PublicReview }) {
           {date.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
         </time>
       </header>
-      <p style={{ color: "#f59e0b", letterSpacing: "0.05em", margin: "0 0 0.5rem", fontSize: "1rem" }} aria-label={`${filled} out of 5 stars`}>
-        <span aria-hidden>{stars}</span>
+      <p
+        style={{ color: "#f59e0b", margin: "0 0 0.5rem", display: "inline-flex", gap: "0.1rem" }}
+        aria-label={`${filled} out of 5 stars`}
+      >
+        {[1, 2, 3, 4, 5].map((n) => (
+          <Icon key={n} name={n <= filled ? "starFilled" : "star"} size={14} />
+        ))}
       </p>
       {review.title && <p style={{ fontWeight: 600, margin: "0 0 0.25rem" }}>{review.title}</p>}
       {review.body && (

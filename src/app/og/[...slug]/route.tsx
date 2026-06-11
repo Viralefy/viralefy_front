@@ -90,7 +90,6 @@ export async function GET(
   // Renderizamos sempre em inglês: nome do país via Intl.DisplayNames (en),
   // label da categoria via `en` no CATEGORY_LABEL. Vê comentário em
   // `englishCountryName` pro motivo.
-  const flag = country?.flag ?? "🌎";
   const countryName = country
     ? englishCountryName(country.code, country.name)
     : "the world";
@@ -106,14 +105,14 @@ export async function GET(
     if (planSlug) {
       const qty = qtyFromSlug(planSlug);
       const plan = qty != null ? catPlans.find((p) => p.followers_qty === qty) : undefined;
-      title = plan ? `${plan.name} ${flag}` : `${catLabel} in ${countryName} ${flag}`;
+      title = plan ? `${plan.name}` : `${catLabel} in ${countryName}`;
       priceLabel = exactPriceLabel(plan) ?? fromPriceLabel(catPlans);
     } else {
-      title = `${catLabel} in ${countryName} ${flag}`;
+      title = `${catLabel} in ${countryName}`;
       priceLabel = fromPriceLabel(catPlans);
     }
   } else if (country) {
-    title = `Grow in ${countryName} ${flag}`;
+    title = `Grow in ${countryName}`;
   } else {
     title = "Instagram & TikTok growth worldwide";
   }
