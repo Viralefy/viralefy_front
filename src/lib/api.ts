@@ -13,6 +13,11 @@ import {
 } from "./schemas";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
+// AUTH_URL — host dedicado pra identity (auth.viralefy.com). Fallback no
+// API_URL pra continuar funcionando mesmo se o DNS de auth.* não estiver
+// pronto ainda. Quando NEXT_PUBLIC_AUTH_URL existe, todas as rotas
+// /v1/auth/* + /v1/me/2fa/* + jwks são roteadas pra esse host.
+const AUTH_URL = process.env.NEXT_PUBLIC_AUTH_URL ?? API_URL;
 
 export type Platform = "instagram" | "tiktok";
 export type TargetType = "profile" | "publication";
@@ -319,13 +324,22 @@ export type Order = {
 // com mensagem específica do path — esse é o caminho preferido nos boundaries
 // (todo endpoint com payload estruturado deveria passar). Quando não passamos
 // schema (ex.: respostas vazias / void), caímos no cast `as T` legado.
+// Decide qual base URL usar pra um path. Auth flows e .well-known caem no
+// AUTH_URL quando configurado; restante vai em API_URL. Funciona como
+// fallback transparente se NEXT_PUBLIC_AUTH_URL não existir (cai no
+// API_URL).
+function baseFor(path: string): string {
+  if (path.startsWith("/v1/auth/") || path.startsWith("/.well-known/")) return AUTH_URL;
+  return API_URL;
+}
+
 async function request<T>(
   path: string,
   init?: RequestInit,
   token?: string,
   schema?: ZodType<T>,
 ): Promise<T> {
-  const res = await fetch(`${API_URL}${path}`, {
+  const res = await fetch(`${baseFor(path)}${path}`, {
     ...init,
     headers: {
       "Content-Type": "application/json",

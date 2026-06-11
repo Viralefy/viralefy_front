@@ -21,7 +21,7 @@ const SECURITY_HEADERS = [
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https://flagcdn.com https://cdn.jsdelivr.net https://www.googletagmanager.com https://*.google-analytics.com https://*.google.com",
       "font-src 'self' data:",
-      "connect-src 'self' https://api.viralefy.com https://www.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://challenges.cloudflare.com",
+      "connect-src 'self' https://api.viralefy.com https://auth.viralefy.com https://www.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://challenges.cloudflare.com",
       "frame-src https://www.googletagmanager.com https://challenges.cloudflare.com",
       "frame-ancestors 'none'",
       "base-uri 'self'",
