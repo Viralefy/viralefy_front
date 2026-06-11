@@ -6,6 +6,7 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { completeUserLoginTwoFA, userLogin, type Session } from "@/lib/api";
 import { useApp } from "@/components/Providers";
 import { Turnstile } from "@/components/Turnstile";
+import { AuthLayout } from "@/components/AuthLayout";
 
 const AUTH_UI_URL = process.env.NEXT_PUBLIC_AUTH_UI_URL || "https://auth.viralefy.com";
 
@@ -178,67 +179,90 @@ function LoginPageInner() {
   }
 
   return (
-    <main className="container" style={{ maxWidth: 420, paddingTop: "3rem" }}>
-      <div className="card">
-        <h1 style={{ marginBottom: "1.25rem" }}>{partialToken ? "Two-factor code" : "Sign in"}</h1>
+    <AuthLayout
+      brandHeading={partialToken ? "One last check" : "Welcome back"}
+      brandLead={
+        partialToken
+          ? "Enter the 6-digit code from your authenticator (or a backup code) to finish signing in."
+          : "Track every order, manage your profiles, and stay close to your growth — all in one account."
+      }
+      altCta={partialToken ? undefined : { label: "Don't have an account?", href: "/register" }}
+    >
+      <header style={{ marginBottom: "0.5rem" }}>
+        <h1 style={{ margin: 0, fontSize: "1.55rem", fontWeight: 700 }}>
+          {partialToken ? "Two-factor code" : "Sign in"}
+        </h1>
+        <p style={{ color: "var(--muted)", fontSize: "0.9rem", margin: "0.35rem 0 0" }}>
+          {partialToken
+            ? "Stay on this device — codes are time-sensitive."
+            : "Use the email and password from your Viralefy account."}
+        </p>
+      </header>
 
-        {partialToken ? (
-          <form onSubmit={onSubmitCode} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-            {error && <div className="alert alert-error">{error}</div>}
-            <div>
-              <label className="label" htmlFor="code">6-digit code or backup code</label>
-              <input
-                className="input"
-                id="code"
-                name="code"
-                autoComplete="one-time-code"
-                inputMode="numeric"
-                placeholder="123456 or BACKUPCODE"
-                autoFocus
-                required
-              />
-            </div>
-            <button type="submit" className="btn btn-primary" disabled={loading}>
-              {loading ? "Verifying…" : "Continue"}
-            </button>
-            <button
-              type="button"
-              className="btn btn-outline"
-              onClick={() => { setPartialToken(""); setError(null); }}
-            >
-              ← Use a different account
-            </button>
-          </form>
-        ) : (
-          <form onSubmit={onSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-            {error && <div className="alert alert-error">{error}</div>}
-            <div>
-              <label className="label" htmlFor="email">Email</label>
-              <input className="input" id="email" name="email" type="email" required />
-            </div>
-            <div>
-              <label className="label" htmlFor="password">Password</label>
-              <input className="input" id="password" name="password" type="password" required />
-            </div>
-            <Turnstile onToken={handleTurnstileToken} />
-            <button type="submit" className="btn btn-primary" disabled={loading}>
-              {loading ? "Signing in…" : "Sign in"}
-            </button>
-            <p style={{ color: "var(--muted)", fontSize: "0.75rem", margin: "0.5rem 0 0", textAlign: "center" }}>
-              {turnstileToken ? "" : "Aguarde 2-3s para a verificação anti-bot."}
-            </p>
-          </form>
-        )}
-
-        {!partialToken && (
-          <p style={{ color: "var(--muted)", marginTop: "1.25rem", fontSize: "0.9rem" }}>
-            Don&apos;t have an account?{" "}
-            <Link href="/register" style={{ textDecoration: "underline" }}>
-              Create account
-            </Link>
+      {partialToken ? (
+        <form onSubmit={onSubmitCode} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          {error && <div className="alert alert-error">{error}</div>}
+          <div>
+            <label className="label" htmlFor="code">6-digit code or backup code</label>
+            <input
+              className="input"
+              id="code"
+              name="code"
+              autoComplete="one-time-code"
+              inputMode="numeric"
+              placeholder="123456 or BACKUPCODE"
+              autoFocus
+              required
+            />
+          </div>
+          <button type="submit" className="btn btn-primary" disabled={loading}>
+            {loading ? "Verifying…" : "Continue"}
+          </button>
+          <button
+            type="button"
+            className="btn btn-ghost"
+            style={{ fontSize: "0.85rem" }}
+            onClick={() => { setPartialToken(""); setError(null); }}
+          >
+            Use a different account
+          </button>
+        </form>
+      ) : (
+        <form onSubmit={onSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          {error && <div className="alert alert-error">{error}</div>}
+          <div>
+            <label className="label" htmlFor="email">Email</label>
+            <input
+              className="input"
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              placeholder="you@example.com"
+              required
+            />
+          </div>
+          <div>
+            <label className="label" htmlFor="password">Password</label>
+            <input
+              className="input"
+              id="password"
+              name="password"
+              type="password"
+              autoComplete="current-password"
+              placeholder="••••••••"
+              required
+            />
+          </div>
+          <Turnstile onToken={handleTurnstileToken} />
+          <button type="submit" className="btn btn-primary" disabled={loading}>
+            {loading ? "Signing in…" : "Sign in"}
+          </button>
+          <p style={{ color: "var(--muted)", fontSize: "0.75rem", margin: "0.25rem 0 0", textAlign: "center" }}>
+            {turnstileToken ? "" : "Aguarde 2-3s para a verificação anti-bot."}
           </p>
-        )}
-      </div>
-    </main>
+        </form>
+      )}
+    </AuthLayout>
   );
 }

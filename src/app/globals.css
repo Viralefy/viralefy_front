@@ -527,3 +527,28 @@ input[type="range"] {
   color: var(--muted-strong);
 }
 
+/* Quando AuthLayout monta, marca body[data-auth-page] — ocultamos
+   Header, WhatsApp FAB e CookieBanner pra deixar a tela de login/register
+   100% limpa, sem nav distraindo. */
+body[data-auth-page] .site-header,
+body[data-auth-page] [aria-label="WhatsApp"] {
+  display: none !important;
+}
+body[data-auth-page] {
+  background: var(--bg);
+}
+
+/* Auth pages (login/register em auth.viralefy.com) — split layout 2/3+1/3
+   no desktop; brand pane some no mobile pra economizar viewport. */
+@media (max-width: 900px) {
+  .auth-layout {
+    grid-template-columns: 1fr !important;
+  }
+  .auth-layout__brand {
+    display: none !important;
+  }
+  .auth-layout__form {
+    padding: 2rem 1.25rem !important;
+    min-height: 100vh;
+  }
+}
