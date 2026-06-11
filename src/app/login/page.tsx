@@ -169,7 +169,7 @@ function LoginPageInner() {
     setError(null);
     const fd = new FormData(e.currentTarget);
     try {
-      const session = await completeUserLoginTwoFA(partialToken, String(fd.get("code")));
+      const session = await completeUserLoginTwoFA(partialToken, String(fd.get("otp_code") ?? fd.get("code") ?? ""));
       completeFlow(session);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Invalid code");
@@ -200,17 +200,59 @@ function LoginPageInner() {
       </header>
 
       {partialToken ? (
-        <form onSubmit={onSubmitCode} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+        // O <form> aqui é INDEPENDENTE do form de credenciais. Password
+        // managers (Bitwarden, 1Password, browser autofill) tendem a achar
+        // que o primeiro input visível é "username/email" e injetam o email
+        // ali, ignorando autoComplete="one-time-code". Atributos defensivos:
+        //   data-bwignore, data-1p-ignore, data-lpignore, data-form-type
+        //   "other" + name="otp_code" (não "code", muito genérico) +
+        //   readOnly inicial → onFocus remove (truque que confunde o
+        //   heurístico de autofill MAS preserva keyboard input).
+        <form
+          onSubmit={onSubmitCode}
+          autoComplete="off"
+          data-form-type="other"
+          style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+        >
           {error && <div className="alert alert-error">{error}</div>}
           <div>
-            <label className="label" htmlFor="code">6-digit code or backup code</label>
+            <label className="label" htmlFor="otp_code">6-digit code or backup code</label>
+            {/* honeypot field — sumidouro do autofill: nasce escondido mas
+                visível pro heurístico, então o password manager preenche
+                ESTE em vez do real. Mantemos display:none com tabIndex=-1
+                pra que screen readers e Tab navigation ignorem. */}
+            <input
+              type="email"
+              name="autofill_sink_email"
+              autoComplete="email"
+              tabIndex={-1}
+              aria-hidden="true"
+              style={{ display: "none" }}
+              readOnly
+            />
+            <input
+              type="password"
+              name="autofill_sink_password"
+              autoComplete="current-password"
+              tabIndex={-1}
+              aria-hidden="true"
+              style={{ display: "none" }}
+              readOnly
+            />
             <input
               className="input"
-              id="code"
-              name="code"
+              id="otp_code"
+              name="otp_code"
+              type="text"
               autoComplete="one-time-code"
               inputMode="numeric"
+              pattern="[0-9A-Za-z]{6,10}"
               placeholder="123456 or BACKUPCODE"
+              maxLength={10}
+              data-bwignore="true"
+              data-1p-ignore="true"
+              data-lpignore="true"
+              data-form-type="other"
               autoFocus
               required
             />
