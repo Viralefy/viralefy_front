@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { completeUserLoginTwoFA, userLogin, type Session } from "@/lib/api";
 import { useApp } from "@/components/Providers";
 import { Turnstile } from "@/components/Turnstile";
@@ -52,7 +52,29 @@ function buildReturnURL(returnTo: string, session: Session): string {
   return `${returnTo}#${params.toString()}`;
 }
 
+// Next.js 15 exige Suspense boundary em volta de useSearchParams pra
+// permitir o prerender estático. Embrulhamos com Suspense + um fallback
+// invisível — o useSearchParams resolve client-side.
 export default function LoginPage() {
+  return (
+    <Suspense fallback={<LoginShell />}>
+      <LoginPageInner />
+    </Suspense>
+  );
+}
+
+function LoginShell() {
+  return (
+    <main className="container" style={{ maxWidth: 420, paddingTop: "3rem" }}>
+      <div className="card">
+        <h1 style={{ marginBottom: "1.25rem" }}>Sign in</h1>
+        <p style={{ color: "var(--muted)", fontSize: "0.9rem" }}>Loading…</p>
+      </div>
+    </main>
+  );
+}
+
+function LoginPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { login } = useApp();
