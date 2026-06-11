@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { getConsent, setConsent, type GdprConsent } from "@/lib/gdpr";
+import { getConsent, isConsentExpired, setConsent, type GdprConsent } from "@/lib/gdpr";
 import { recordConsent } from "@/lib/consent-audit";
 
 // Banner LGPD/GDPR. Aparece quando `getConsent()` devolve null (sem decisão,
@@ -33,12 +33,18 @@ export function CookieBanner() {
   const [analytics, setAnalytics] = useState(false);
   const [marketing, setMarketing] = useState(false);
   const [lang, setLang] = useState<"pt" | "en">("pt");
+  // `renewing` distingue o banner de "primeira visita" do banner de
+  // "re-prompt anual" (consent prévio expirou >365d). LGPD ANPD recomenda
+  // que o usuário reconsente periodicamente — quando esse for o caso
+  // mostramos uma copy adicional explicando o motivo.
+  const [renewing, setRenewing] = useState(false);
 
   // Decide on mount: se já houver consent válido, fica hidden; caso contrário banner.
   // Detecta idioma do navegador — default PT-BR (mercado primário), fallback EN.
   useEffect(() => {
     const current = getConsent();
     setMode(current === null ? "banner" : "hidden");
+    setRenewing(isConsentExpired());
     if (typeof navigator !== "undefined") {
       const nl = (navigator.language || "pt").toLowerCase();
       setLang(nl.startsWith("pt") ? "pt" : "en");
@@ -100,8 +106,21 @@ export function CookieBanner() {
           >
             <div style={{ flex: "1 1 280px", minWidth: 0 }}>
               <p style={{ fontWeight: 700, marginBottom: "0.25rem", color: "var(--text)" }}>
-                {t.banner_title}
+                {renewing ? t.banner_title_renewal : t.banner_title}
               </p>
+              {renewing && (
+                <p
+                  data-testid="cookie-renewal-notice"
+                  style={{
+                    color: "var(--accent)",
+                    fontSize: "0.85rem",
+                    fontWeight: 500,
+                    marginBottom: "0.35rem",
+                  }}
+                >
+                  {t.banner_renewal_notice}
+                </p>
+              )}
               <p style={{ color: "var(--muted)", fontSize: "0.9rem", lineHeight: 1.4 }}>
                 {t.banner_body}{" "}
                 <Link href="/legal/privacy" style={{ color: "var(--accent)" }}>
@@ -302,6 +321,9 @@ const TEXTS = {
   pt: {
     banner_aria: "Aviso de cookies",
     banner_title: "Sua privacidade",
+    banner_title_renewal: "Renovação anual de consentimento",
+    banner_renewal_notice:
+      "Por LGPD, atualizamos sua preferência de cookies. Confirme novamente.",
     banner_body:
       "Usamos cookies essenciais para o site funcionar e — somente com seu consentimento — cookies analíticos e de marketing. Você pode revogar a qualquer momento.",
     link_privacy: "política de privacidade",
@@ -330,6 +352,9 @@ const TEXTS = {
   en: {
     banner_aria: "Cookie consent",
     banner_title: "Your privacy",
+    banner_title_renewal: "Annual consent renewal",
+    banner_renewal_notice:
+      "Under privacy law we refresh your cookie preferences once a year. Please confirm again.",
     banner_body:
       "We use essential cookies to make the site work and — only with your consent — analytics and marketing cookies. You can revoke anytime.",
     link_privacy: "privacy policy",

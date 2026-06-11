@@ -1,0 +1,372 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { legalDoc, legalMetaDescription } from "@/i18n/legal";
+import { PACKS, type LangCode } from "@/i18n/languages";
+import { renderLegalBody } from "@/lib/legal-render";
+import { Footer } from "@/components/Footer";
+
+// Página estática `/legal/cookies` — shadow do dynamic `[doc]` para este slug.
+//
+// PORQUÊ EXISTE
+// -------------
+// LGPD (Resolução CD/ANPD 4/2020 + Guia ANPD de Cookies 2022) recomenda
+// transparência exaustiva: a Política de Cookies textual NÃO basta — é
+// preciso lista pública, item-a-item, do que é setado, por quem, pra
+// que e por quanto tempo. Esta página agrega:
+//
+//   1. O texto narrativo da Política de Cookies (i18n preservado via
+//      `legalDoc(lang, "cookies")` — mesma fonte do dynamic `[doc]`).
+//   2. Uma tabela exaustiva de cada cookie/storage que o stack pode
+//      setar — auditada manualmente contra o que CookieBanner, GTM
+//      loader, Cloudflare Turnstile e Sentry config realmente fazem.
+//   3. Atalhos pra `/legal/cookie-preferences` (gerenciar consent) e
+//      pra Política de Privacidade.
+//
+// O slug `cookies` permanece registrado em `LEGAL_SLUGS` (footer +
+// hreflang continuam funcionando) — Next.js dá precedência ao segmento
+// estático sobre `[doc]`, então esta página atende toda a requisição
+// pra `/legal/cookies?lang=xx`. As traduções não regridem: o body
+// narrativo continua vindo do `i18n/legal.ts`; só a tabela é EN+PT.
+//
+// CONTEÚDO DA TABELA — REGRA DE OURO
+// ----------------------------------
+// SE você adicionar um novo cookie / localStorage / sessionStorage / SDK
+// que persista qualquer coisa no browser, ATUALIZE esta tabela ANTES de
+// shippar. Caso contrário viramos não-conformes com a recomendação ANPD.
+
+export const dynamic = "force-dynamic";
+
+type Search = { lang?: string };
+
+function siteUrl(): string {
+  return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+}
+
+function resolveLang(raw: string | undefined): LangCode {
+  const code = (raw ?? "en") as LangCode;
+  return code in PACKS ? code : "en";
+}
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<Search>;
+}): Promise<Metadata> {
+  const { lang: rawLang } = await searchParams;
+  const lang = resolveLang(rawLang);
+  const d = legalDoc(lang, "cookies");
+
+  // Mesmo padrão do dynamic `[doc]/page.tsx`: hreflang completo,
+  // self-canonical por idioma, x-default no EN.
+  const languages: Record<string, string> = { "x-default": `/legal/cookies?lang=en` };
+  for (const code of Object.keys(PACKS) as LangCode[]) {
+    languages[code] = `/legal/cookies?lang=${code}`;
+  }
+
+  return {
+    title: { absolute: `${d.title} | Viralefy` },
+    description: legalMetaDescription(lang, "cookies"),
+    openGraph: {
+      title: `${d.title} | Viralefy`,
+      description: legalMetaDescription(lang, "cookies"),
+      url: `${siteUrl()}/legal/cookies?lang=${lang}`,
+      type: "article",
+    },
+    alternates: {
+      canonical: `/legal/cookies?lang=${lang}`,
+      languages,
+    },
+  };
+}
+
+// Linha da tabela de cookies. `category` é o mesmo enum do CookieBanner —
+// se você adicionar uma categoria nova lá, espelhe aqui.
+type CookieRow = {
+  name: string;
+  provider: "Viralefy" | "Cloudflare" | "Google Tag Manager" | "Sentry";
+  party: "1st" | "3rd";
+  purpose: { en: string; pt: string };
+  category: "necessary" | "preferences" | "analytics" | "marketing";
+  duration: { en: string; pt: string };
+  type: "cookie" | "localStorage" | "sessionStorage";
+};
+
+// Inventário audited 2026-06-11. Próxima revisão sempre que mudar:
+//   - components/CookieBanner.tsx
+//   - components/GtmLoader.tsx
+//   - sentry.client.config.ts
+//   - middleware.ts (auth cookie)
+//   - lib/geo-currency.ts (currency preference)
+//   - lib/gdpr.ts (storage key)
+const COOKIES: CookieRow[] = [
+  {
+    name: "viralefy_token",
+    provider: "Viralefy",
+    party: "1st",
+    purpose: {
+      en: "Authenticated session — keeps you signed in across pages and API requests. Required for any logged-in feature.",
+      pt: "Sessão autenticada — mantém você logado entre páginas e requisições à API. Necessário para qualquer recurso autenticado.",
+    },
+    category: "necessary",
+    duration: { en: "30 days", pt: "30 dias" },
+    type: "cookie",
+  },
+  {
+    name: "viralefy_currency",
+    provider: "Viralefy",
+    party: "1st",
+    purpose: {
+      en: "Remembers the currency you selected (USD, BRL, EUR…) so prices render the same on every visit.",
+      pt: "Lembra a moeda escolhida (USD, BRL, EUR…) para que os preços apareçam iguais a cada visita.",
+    },
+    category: "preferences",
+    duration: { en: "1 year", pt: "1 ano" },
+    type: "cookie",
+  },
+  {
+    name: "viralefy_gdpr_consent",
+    provider: "Viralefy",
+    party: "1st",
+    purpose: {
+      en: "Stores your cookie consent choices (preferences, analytics, marketing). Without it the banner cannot remember your decision.",
+      pt: "Armazena suas escolhas de consentimento de cookies (preferências, analytics, marketing). Sem ele o banner não consegue lembrar sua decisão.",
+    },
+    category: "necessary",
+    duration: { en: "12 months (re-prompt)", pt: "12 meses (re-prompt)" },
+    type: "localStorage",
+  },
+  {
+    name: "__cf_bm",
+    provider: "Cloudflare",
+    party: "3rd",
+    purpose: {
+      en: "Cloudflare Bot Management — distinguishes humans from automated traffic to keep the site online during DDoS or scraping.",
+      pt: "Cloudflare Bot Management — distingue humanos de tráfego automatizado para manter o site no ar durante DDoS ou scraping.",
+    },
+    category: "necessary",
+    duration: { en: "30 minutes", pt: "30 minutos" },
+    type: "cookie",
+  },
+  {
+    name: "cf_clearance",
+    provider: "Cloudflare",
+    party: "3rd",
+    purpose: {
+      en: "Cloudflare challenge clearance — set after you pass a Turnstile/managed challenge, prevents repeated challenges in the same session.",
+      pt: "Cleareance de desafio Cloudflare — definido depois de passar um Turnstile/managed challenge, evita repetição do desafio na mesma sessão.",
+    },
+    category: "necessary",
+    duration: { en: "30 days", pt: "30 dias" },
+    type: "cookie",
+  },
+  {
+    name: "_ga / _ga_*",
+    provider: "Google Tag Manager",
+    party: "3rd",
+    purpose: {
+      en: "Google Analytics 4 — aggregated traffic and product usage metrics. ONLY loaded if you opt in to analytics in the cookie banner.",
+      pt: "Google Analytics 4 — métricas agregadas de tráfego e uso do produto. Carregado APENAS se você optar por analytics no banner.",
+    },
+    category: "analytics",
+    duration: { en: "Up to 2 years", pt: "Até 2 anos" },
+    type: "cookie",
+  },
+  {
+    name: "_gid",
+    provider: "Google Tag Manager",
+    party: "3rd",
+    purpose: {
+      en: "Google Analytics session identifier. ONLY set if analytics consent is given.",
+      pt: "Identificador de sessão do Google Analytics. Definido APENAS se houver consent de analytics.",
+    },
+    category: "analytics",
+    duration: { en: "24 hours", pt: "24 horas" },
+    type: "cookie",
+  },
+  {
+    name: "sentry-trace / baggage",
+    provider: "Sentry",
+    party: "3rd",
+    purpose: {
+      en: "Distributed-tracing request headers used for error monitoring. Currently disabled in production (DSN not configured). Will be gated by analytics consent if enabled.",
+      pt: "Cabeçalhos de tracing distribuído usados para monitoramento de erros. Atualmente desabilitado em produção (DSN não configurado). Será gateado por consent de analytics quando ativado.",
+    },
+    category: "analytics",
+    duration: { en: "Session", pt: "Sessão" },
+    type: "sessionStorage",
+  },
+];
+
+function CategoryBadge({ category }: { category: CookieRow["category"] }) {
+  // Cores acompanham o CookieBanner pra criar reconhecimento visual com
+  // os toggles que o usuário vê lá.
+  const palette: Record<CookieRow["category"], { bg: string; fg: string; label: string }> = {
+    necessary: { bg: "#1f4f2a", fg: "#a7f3c1", label: "Necessary" },
+    preferences: { bg: "#1f3a4f", fg: "#a7d2f3", label: "Preferences" },
+    analytics: { bg: "#4f3a1f", fg: "#f3d2a7", label: "Analytics" },
+    marketing: { bg: "#4f1f3a", fg: "#f3a7d2", label: "Marketing" },
+  };
+  const c = palette[category];
+  return (
+    <span
+      style={{
+        display: "inline-block",
+        padding: "0.15rem 0.5rem",
+        background: c.bg,
+        color: c.fg,
+        borderRadius: "999px",
+        fontSize: "0.7rem",
+        fontWeight: 600,
+        textTransform: "uppercase",
+        letterSpacing: "0.5px",
+      }}
+    >
+      {c.label}
+    </span>
+  );
+}
+
+export default async function CookiesLegalPage({
+  searchParams,
+}: {
+  searchParams: Promise<Search>;
+}) {
+  const { lang: rawLang } = await searchParams;
+  const lang = resolveLang(rawLang);
+  const isPT = lang === "pt";
+  const d = legalDoc(lang, "cookies");
+
+  // SEO + estrutura: JSON-LD WebPage + Breadcrumb. Igual padrão do
+  // `/legal/cookie-preferences/page.tsx` — Google entende essa relação.
+  const pageUrl = `${siteUrl()}/legal/cookies?lang=${lang}`;
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": `${pageUrl}#webpage`,
+        url: pageUrl,
+        name: `${d.title} | Viralefy`,
+        description: legalMetaDescription(lang, "cookies"),
+        inLanguage: lang,
+        isPartOf: { "@id": `${siteUrl()}/#website` },
+        dateModified: d.updatedAt,
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: siteUrl() },
+          { "@type": "ListItem", position: 2, name: "Legal", item: `${siteUrl()}/legal/privacy?lang=${lang}` },
+          { "@type": "ListItem", position: 3, name: d.title, item: pageUrl },
+        ],
+      },
+    ],
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <article className="container" style={{ paddingTop: "2rem", paddingBottom: "3rem", maxWidth: 880 }}>
+        <p style={{ fontSize: "0.85rem", color: "var(--muted)", marginBottom: "0.5rem" }}>
+          <Link href="/">← {isPT ? "Voltar" : "Back to home"}</Link>
+        </p>
+        <h1 style={{ marginBottom: "0.25rem" }}>{d.title}</h1>
+        <p style={{ fontSize: "0.8rem", color: "var(--muted)" }}>
+          {isPT ? "Atualizado em" : "Updated"} {d.updatedAt}
+        </p>
+
+        {/* Corpo narrativo — mesma fonte i18n do dynamic [doc]. */}
+        <div style={{ marginTop: "1.5rem" }}>{renderLegalBody(d.body)}</div>
+
+        {/* === Tabela detalhada === */}
+        <section style={{ marginTop: "2.5rem" }}>
+          <h2 style={{ fontSize: "1.1rem", marginBottom: "0.75rem" }}>
+            {isPT ? "Lista completa de cookies e armazenamento" : "Complete cookie and storage list"}
+          </h2>
+          <p style={{ color: "var(--muted)", marginBottom: "1rem" }}>
+            {isPT
+              ? "Esta tabela cobre 100% do que o stack Viralefy pode persistir no seu navegador. Cookies de analytics e marketing só são carregados após consent explícito. Para gerenciar, use as suas "
+              : "This table covers 100% of what the Viralefy stack may persist in your browser. Analytics and marketing cookies are only loaded after explicit consent. Manage your "}
+            <Link href="/legal/cookie-preferences" style={{ color: "var(--accent)" }}>
+              {isPT ? "preferências de cookies" : "cookie preferences"}
+            </Link>
+            .
+          </p>
+
+          <div style={{ overflowX: "auto", border: "1px solid var(--border)", borderRadius: "0.5rem" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.85rem", minWidth: 720 }}>
+              <thead>
+                <tr style={{ background: "rgba(20, 20, 31, 0.5)", textAlign: "left" }}>
+                  <th style={{ padding: "0.6rem 0.8rem" }}>{isPT ? "Nome" : "Name"}</th>
+                  <th style={{ padding: "0.6rem 0.8rem" }}>{isPT ? "Provedor" : "Provider"}</th>
+                  <th style={{ padding: "0.6rem 0.8rem" }}>{isPT ? "Origem" : "Party"}</th>
+                  <th style={{ padding: "0.6rem 0.8rem" }}>{isPT ? "Categoria" : "Category"}</th>
+                  <th style={{ padding: "0.6rem 0.8rem" }}>{isPT ? "Propósito" : "Purpose"}</th>
+                  <th style={{ padding: "0.6rem 0.8rem" }}>{isPT ? "Duração" : "Duration"}</th>
+                  <th style={{ padding: "0.6rem 0.8rem" }}>{isPT ? "Tipo" : "Type"}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {COOKIES.map((c) => (
+                  <tr key={c.name} style={{ borderTop: "1px solid var(--border)" }}>
+                    <td style={{ padding: "0.6rem 0.8rem", fontFamily: "var(--font-mono, monospace)", whiteSpace: "nowrap" }}>
+                      {c.name}
+                    </td>
+                    <td style={{ padding: "0.6rem 0.8rem", color: "var(--muted)" }}>{c.provider}</td>
+                    <td style={{ padding: "0.6rem 0.8rem", color: "var(--muted)" }}>{c.party === "1st" ? (isPT ? "Próprio" : "First") : (isPT ? "Terceiro" : "Third")}</td>
+                    <td style={{ padding: "0.6rem 0.8rem" }}>
+                      <CategoryBadge category={c.category} />
+                    </td>
+                    <td style={{ padding: "0.6rem 0.8rem", color: "var(--muted)" }}>
+                      {isPT ? c.purpose.pt : c.purpose.en}
+                    </td>
+                    <td style={{ padding: "0.6rem 0.8rem", color: "var(--muted)", whiteSpace: "nowrap" }}>
+                      {isPT ? c.duration.pt : c.duration.en}
+                    </td>
+                    <td style={{ padding: "0.6rem 0.8rem", color: "var(--muted)" }}>{c.type}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <p style={{ color: "var(--muted)", fontSize: "0.8rem", marginTop: "0.75rem" }}>
+            {isPT
+              ? "Esta lista é auditada manualmente a cada release. Se você notar discrepância entre o que está aqui e o que o seu navegador mostra, escreva para o suporte."
+              : "This list is manually audited every release. If you notice a discrepancy between this list and what your browser shows, please contact support."}
+          </p>
+        </section>
+
+        {/* CTAs */}
+        <div style={{ marginTop: "2rem", display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+          <Link href="/legal/cookie-preferences" className="btn btn-primary">
+            {isPT ? "Gerenciar preferências" : "Manage preferences"}
+          </Link>
+          <Link href={`/legal/privacy?lang=${lang}`} className="btn btn-outline">
+            {isPT ? "Política de Privacidade" : "Privacy Policy"}
+          </Link>
+        </div>
+
+        {/* Idiomas — espelha o dynamic [doc]/page.tsx pra não regredir hreflang UX. */}
+        <div style={{ marginTop: "2rem", borderTop: "1px solid var(--border)", paddingTop: "1rem" }}>
+          <p style={{ fontSize: "0.85rem", color: "var(--muted)", marginBottom: "0.5rem" }}>Other languages:</p>
+          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+            {(Object.keys(PACKS) as LangCode[]).map((code) => (
+              <Link
+                key={code}
+                href={`/legal/cookies?lang=${code}`}
+                style={{ fontSize: "0.85rem", padding: "0.25rem 0.5rem", border: "1px solid var(--border)", borderRadius: "0.3rem" }}
+              >
+                {code}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </article>
+      <Footer lang={lang} />
+    </>
+  );
+}

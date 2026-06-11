@@ -76,6 +76,37 @@ export function getConsent(): GdprConsent | null {
   }
 }
 
+/**
+ * Detecta se há um consent SALVO no storage que EXPIROU (>365d) — usado
+ * pelo `CookieBanner` pra distinguir "primeira visita" de "renovação anual".
+ * Quando renovação, o banner exibe uma mensagem explicativa adicional.
+ *
+ * Diferença de `getConsent()`:
+ *   - `getConsent()` aplica TTL e devolve null pra ambos os casos
+ *     (sem decisão / expirado).
+ *   - `isConsentExpired()` ignora as outras formas de `null` (storage
+ *     vazio, versão antiga) e retorna `true` SOMENTE quando a única
+ *     razão pra rejeitar foi a idade.
+ *
+ * SSR-safe (devolve `false` no server).
+ */
+export function isConsentExpired(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    const raw = window.localStorage.getItem(GDPR_STORAGE_KEY);
+    if (!raw) return false;
+    const parsed = JSON.parse(raw) as Partial<GdprConsent>;
+    if (typeof parsed !== "object" || parsed === null) return false;
+    if (parsed.version !== GDPR_VERSION) return false;
+    if (typeof parsed.timestamp !== "string") return false;
+    const at = Date.parse(parsed.timestamp);
+    if (!Number.isFinite(at)) return false;
+    return Date.now() - at > GDPR_MAX_AGE_MS;
+  } catch {
+    return false;
+  }
+}
+
 /** Helper específico pro tracking layer — true só se analytics OK. */
 export function hasAnalyticsConsent(): boolean {
   const c = getConsent();
