@@ -1,8 +1,8 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
-import { userRegister } from "@/lib/api";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useRef, useState } from "react";
+import { userRegister, type Session } from "@/lib/api";
 import { useApp } from "@/components/Providers";
 import { Turnstile } from "@/components/Turnstile";
 import { getTracking } from "@/lib/tracking";
@@ -11,18 +11,70 @@ import { AuthLayout } from "@/components/AuthLayout";
 
 const AUTH_UI_URL = process.env.NEXT_PUBLIC_AUTH_UI_URL || "https://auth.viralefy.com";
 
+const ALLOWED_RETURN_HOSTS = new Set<string>([
+  "www.viralefy.com",
+  "viralefy.com",
+  "admin.viralefy.com",
+  "localhost",
+  "127.0.0.1",
+]);
+
 function isAuthHost(): boolean {
   if (typeof window === "undefined") return false;
   return window.location.hostname === "auth.viralefy.com" ||
          window.location.hostname.startsWith("auth.");
 }
 
+function sanitizeReturnTo(raw: string | null): string | null {
+  if (!raw) return null;
+  try {
+    const url = new URL(raw);
+    if (!ALLOWED_RETURN_HOSTS.has(url.hostname)) return null;
+    if (url.protocol !== "https:" && url.hostname !== "localhost" && url.hostname !== "127.0.0.1") return null;
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
+function buildReturnURL(returnTo: string, session: Session): string {
+  const params = new URLSearchParams();
+  if (session.access_token) params.set("access_token", session.access_token);
+  if (session.access_expires_at) params.set("access_expires_at", session.access_expires_at);
+  if (session.refresh_token) params.set("refresh_token", session.refresh_token);
+  if (session.refresh_expires_at) params.set("refresh_expires_at", session.refresh_expires_at);
+  if (session.subject_kind) params.set("subject_kind", session.subject_kind);
+  if (session.user) params.set("user", JSON.stringify(session.user));
+  if (session.admin) params.set("admin", JSON.stringify(session.admin));
+  return `${returnTo}#${params.toString()}`;
+}
+
 export default function RegisterPage() {
+  return (
+    <Suspense fallback={<RegisterShell />}>
+      <RegisterPageInner />
+    </Suspense>
+  );
+}
+
+function RegisterShell() {
+  return (
+    <main className="container" style={{ maxWidth: 420, paddingTop: "3rem" }}>
+      <div className="card">
+        <h1 style={{ marginBottom: "1.25rem" }}>Create account</h1>
+        <p style={{ color: "var(--muted)", fontSize: "0.9rem" }}>Loading…</p>
+      </div>
+    </main>
+  );
+}
+
+function RegisterPageInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login } = useApp();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  // Ref espelha o state pra leitura sem stale closure (vide /login).
+  const returnTo = sanitizeReturnTo(searchParams?.get("return_to") ?? null);
   const turnstileTokenRef = useRef<string>("");
   const [, setTurnstileToken] = useState("");
   const [phone, setPhone] = useState("");
@@ -30,18 +82,31 @@ export default function RegisterPage() {
 
   const contactOk = phone.trim().length > 0 || telegram.trim().length > 0;
 
-  // Mesma política do /login: registros fora do auth host caem em
-  // auth.viralefy.com pra unificar UX. Voltam pelo /sso/callback.
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (isAuthHost()) return;
-    const returnTo = `${window.location.origin}/sso/callback`;
-    window.location.replace(`${AUTH_UI_URL}/register?return_to=${encodeURIComponent(returnTo)}`);
+    const ret = `${window.location.origin}/sso/callback`;
+    window.location.replace(`${AUTH_UI_URL}/register?return_to=${encodeURIComponent(ret)}`);
   }, []);
 
   function handleTurnstileToken(t: string) {
     turnstileTokenRef.current = t;
     setTurnstileToken(t);
+  }
+
+  function completeFlow(session: Session) {
+    if (isAuthHost() && returnTo) {
+      window.location.replace(buildReturnURL(returnTo, session));
+      return;
+    }
+    if (isAuthHost() && !returnTo) {
+      // Cadastro feito direto em auth.viralefy.com sem return_to — manda pro front padrão.
+      login(session);
+      window.location.href = "https://www.viralefy.com/account";
+      return;
+    }
+    login(session);
+    router.push("/account");
   }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -53,7 +118,6 @@ export default function RegisterPage() {
     setLoading(true);
     setError(null);
     const fd = new FormData(e.currentTarget);
-    // Aguarda até 3s pelo Turnstile token — evita 422 na 1ª tentativa.
     let tok = turnstileTokenRef.current;
     for (let i = 0; i < 30 && !tok; i++) {
       await new Promise((r) => setTimeout(r, 100));
@@ -69,8 +133,7 @@ export default function RegisterPage() {
         turnstile_token: tok,
         tracking: getTracking(),
       });
-      login(session);
-      router.push("/account");
+      completeFlow(session);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create account");
     } finally {
@@ -124,7 +187,6 @@ export default function RegisterPage() {
           />
         </div>
 
-        {/* Phone OU Telegram — pelo menos um. Front e back validam. */}
         <div style={{ borderTop: "1px dashed var(--border)", paddingTop: "0.85rem", marginTop: "0.25rem" }}>
           <p style={{ color: "var(--muted)", fontSize: "0.8rem", margin: "0 0 0.6rem" }}>
             One quick way to reach you about your order — pick whichever you prefer.
