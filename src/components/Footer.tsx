@@ -45,22 +45,22 @@ export function Footer({ lang = "en", compact = false }: { lang?: LangCode; comp
           </div>
 
           {/* Discover — hub p/ as 5 verticais Tier 4: pricing, help, cities,
-              vs-competitors, case studies. Cada uma é um pillar SEO próprio. */}
-          <nav aria-label="Discover">
+              vs-competitors, case studies. Labels via i18n (BUG-51/80/144 do QA). */}
+          <nav aria-label={t.footer.sections.discover}>
             <h3 style={{ fontSize: "0.85rem", color: "var(--muted)", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: "0.5rem" }}>
-              Discover
+              {t.footer.sections.discover}
             </h3>
             <ul style={{ listStyle: "none", padding: 0, display: "grid", gap: "0.35rem", fontSize: "0.9rem" }}>
-              <li><Link href="/pricing" style={{ color: "var(--text)" }}>Pricing</Link></li>
-              <li><Link href="/cities" style={{ color: "var(--text)" }}>Cities</Link></li>
-              <li><Link href="/vs" style={{ color: "var(--text)" }}>Compare Viralefy</Link></li>
-              <li><Link href="/help" style={{ color: "var(--text)" }}>Help center</Link></li>
-              <li><Link href="/case-studies" style={{ color: "var(--text)" }}>Case studies</Link></li>
-              <li><Link href="/status" style={{ color: "var(--text)" }}>System status</Link></li>
-              <li><Link href="/legal/cookie-preferences" style={{ color: "var(--text)" }}>Cookie preferences</Link></li>
-              <li><Link href="/account/referral" style={{ color: "var(--text)" }}>Refer &amp; earn</Link></li>
-              <li><Link href="/account/subscriptions" style={{ color: "var(--text)" }}>Subscriptions</Link></li>
-              <li><Link href="/account/api-keys" style={{ color: "var(--text)" }}>Developer API</Link></li>
+              <li><Link href="/pricing" style={{ color: "var(--text)" }}>{t.footer.discover.pricing}</Link></li>
+              <li><Link href="/cities" style={{ color: "var(--text)" }}>{t.footer.discover.cities}</Link></li>
+              <li><Link href="/vs" style={{ color: "var(--text)" }}>{t.footer.discover.compare}</Link></li>
+              <li><Link href="/help" style={{ color: "var(--text)" }}>{t.footer.discover.helpCenter}</Link></li>
+              <li><Link href="/case-studies" style={{ color: "var(--text)" }}>{t.footer.discover.caseStudies}</Link></li>
+              <li><Link href="/status" style={{ color: "var(--text)" }}>{t.footer.discover.systemStatus}</Link></li>
+              <li><Link href={`/legal/cookie-preferences?lang=${lang}`} style={{ color: "var(--text)" }}>{t.footer.discover.cookiePreferences}</Link></li>
+              <li><Link href="/account/referral" style={{ color: "var(--text)" }}>{t.footer.discover.referAndEarn}</Link></li>
+              <li><Link href="/account/subscriptions" style={{ color: "var(--text)" }}>{t.footer.discover.subscriptions}</Link></li>
+              <li><Link href="/account/api-keys" style={{ color: "var(--text)" }}>{t.footer.discover.developerApi}</Link></li>
             </ul>
           </nav>
 

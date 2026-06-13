@@ -1221,6 +1221,119 @@ const COPY_ENG_RU: LongCopy = {
   ],
 };
 
+// -------- comentários (en) --------
+// BUG-40/107/132 do QA: comentários reutilizavam o COPY_ENG_* (curtidas),
+// fazendo o H1 e os bullets falarem de curtidas em página de comentários.
+// COPY dedicado em EN+PT; outros idiomas caem em fallback en.
+const COPY_COMMENTS_EN: LongCopy = {
+  h1: (c) => `Buy Instagram & TikTok comments in ${c}`,
+  metaTitle: (c) => `Buy real Instagram & TikTok comments in ${c} | Viralefy`,
+  metaDescription: (c) =>
+    `Real, on-topic comments for Instagram and TikTok posts in ${c}. Boost early engagement and ranking signals. No password required.`,
+  paragraphs: (c) => [
+    `A post with five comments looks abandoned. The same post with fifty looks like a conversation worth joining. That gap is where the algorithm lives: comment density in the first hour is one of the strongest ranking signals on Instagram and TikTok, and it's the social proof that nudges casual viewers into engaging too. Buying comments in ${c} is the most direct way to land that initial weight.`,
+    `Viralefy delivers comments from active profiles — accounts with photos, history and prior engagement, not throwaway bots that get swept out on the next platform cleanup. Each comment is written in language and tone that matches the audience for ${c}: short, on-topic, in the local idiom. Generic strings like "great post!" don't work anymore — Meta's filters catch them and the rest of your audience can spot them.`,
+    `Comments are paced over the first 30–90 minutes after the order is placed, never dumped all at once. This pattern keeps the engagement ratio (comments per impression) inside the natural band that the algorithm expects from organic posts. Where it helps, comments are stacked with replies and reactions to build a thread depth that feels lived-in.`,
+    `Pricing is flat per package. You point at the post URL, pick a quantity, and we deliver. We don't ask for your password, we don't post on your behalf, and we don't touch your DMs. A 30-day refill guarantee covers any drop in the first month. For ${c}, comments are routed to profiles in your time zone so the wave lands during local peak hours.`,
+    `Below you can pick from preset packages or use the slider to dial the exact comment count. Comments mix questions, opinions and short reactions to look like a real thread.`,
+  ],
+  bullets: () => [
+    { title: "Real, on-topic comments", body: "Written for the post in the local idiom — not generic emoji strings." },
+    { title: "First-hour pacing", body: "Comments land across 30–90 minutes to mirror an organic thread." },
+    { title: "Active profiles", body: "Comments come from accounts with photo, bio and prior activity." },
+    { title: "30-day refill", body: "Any drop in the first 30 days gets topped up at no cost." },
+    { title: "No password required", body: "We only need the public post URL." },
+  ],
+  faq: () => [
+    { q: "Will the platform detect the comments?", a: "Pacing across 30–90 minutes and using profiles with prior history keeps the pattern inside the natural band the algorithm expects." },
+    { q: "Can I choose what the comments say?", a: "By default we mix questions, opinions and short reactions. Custom comment lists are available on the larger packages — contact support before checkout." },
+    { q: "Do you need my password?", a: "Never. We only need the public post URL." },
+    { q: "How fast does delivery start?", a: "Most orders begin within the first hour after payment confirmation." },
+  ],
+};
+
+const COPY_COMMENTS_PT: LongCopy = {
+  h1: (c) => `Comprar comentários para Instagram e TikTok em ${c}`,
+  metaTitle: (c) => `Comprar comentários reais para Instagram e TikTok em ${c} | Viralefy`,
+  metaDescription: (c) =>
+    `Comentários reais e contextualizados para posts de Instagram e TikTok em ${c}. Acelere o sinal de engajamento inicial. Sem precisar de senha.`,
+  paragraphs: (c) => [
+    `Um post com cinco comentários parece esquecido. O mesmo post com cinquenta parece uma conversa que vale entrar. É exatamente nesse intervalo que o algoritmo opera: densidade de comentário na primeira hora é um dos sinais de ranqueamento mais fortes no Instagram e no TikTok, e é a prova social que empurra o visitante casual a também comentar. Comprar comentários em ${c} é o jeito mais direto de cravar esse peso inicial.`,
+    `A Viralefy entrega comentários de perfis ativos — contas com foto, histórico e engajamento prévio, não bots descartáveis que somem na próxima varredura. Cada comentário é escrito no tom certo pro público de ${c}: curto, no contexto, com gíria local. Strings genéricas tipo "ótimo post!" já não funcionam mais — o filtro da Meta pega, e o resto da sua audiência também percebe.`,
+    `Os comentários são distribuídos ao longo dos primeiros 30 a 90 minutos depois do pedido, nunca tudo de uma vez. Esse padrão mantém a razão de engajamento (comentários por impressão) dentro da faixa natural que o algoritmo espera de posts orgânicos. Onde faz sentido, os comentários ganham respostas e reações pra criar uma profundidade de thread que parece habitada.`,
+    `Preço fixo por pacote. Você cola a URL do post, escolhe a quantidade, e a gente entrega. Não pede senha, não posta no seu lugar, não toca em DM. Reposição de 30 dias cobre qualquer queda no primeiro mês. Pra ${c}, os comentários são roteados pra perfis no seu fuso pra cair no horário de pico local.`,
+    `Embaixo dá pra escolher pacotes pré-definidos ou usar o slider pra mirar a contagem exata. Os comentários misturam perguntas, opiniões e reações curtas pra parecer uma thread real.`,
+  ],
+  bullets: () => [
+    { title: "Comentários reais no contexto", body: "Escritos no idioma local — nada de string genérica com emoji." },
+    { title: "Cadência da primeira hora", body: "Comentários caem ao longo de 30 a 90 minutos, como thread orgânica." },
+    { title: "Perfis ativos", body: "Vêm de contas com foto, bio e atividade anterior." },
+    { title: "Reposição em 30 dias", body: "Qualquer queda no primeiro mês é reposta sem custo." },
+    { title: "Sem senha", body: "Só precisamos da URL pública do post." },
+  ],
+  faq: () => [
+    { q: "A plataforma vai detectar?", a: "A cadência distribuída em 30–90 minutos e o uso de perfis com histórico mantém o padrão dentro da faixa natural que o algoritmo espera." },
+    { q: "Posso escolher o que vai escrito?", a: "Por padrão a gente mistura perguntas, opiniões e reações curtas. Lista customizada está disponível nos pacotes maiores — manda mensagem pro suporte antes do checkout." },
+    { q: "Vocês precisam de senha?", a: "Nunca. Só precisamos da URL pública do post." },
+    { q: "Em quanto tempo começa?", a: "A maioria dos pedidos começa em até 1 hora após confirmar o pagamento." },
+  ],
+};
+
+// -------- compartilhamentos / saves (en) --------
+const COPY_SHARES_EN: LongCopy = {
+  h1: (c) => `Buy Instagram & TikTok shares and saves in ${c}`,
+  metaTitle: (c) => `Buy shares and saves for Instagram & TikTok in ${c} | Viralefy`,
+  metaDescription: (c) =>
+    `Boost the strongest ranking signals on Instagram and TikTok — shares and saves — for posts in ${c}. Fast delivery, no password.`,
+  paragraphs: (c) => [
+    `Shares and saves are the heaviest engagement signals on Instagram and TikTok in 2026. A like takes a thumb tap; a share or save requires the viewer to value the content enough to either send it to someone or keep it for later. Both platforms weigh these actions far more than likes when deciding how widely to distribute a post. For creators in ${c}, hitting a baseline of shares and saves in the first hour is one of the fastest ways to push a post into a wider reach pool.`,
+    `Viralefy delivers shares (Instagram DM forwards / TikTok native share) and saves (bookmark to user profiles) from active accounts. Each action is anonymous from your followers' point of view — they don't see who shared or saved. The accounts have history and prior activity, so the action pattern looks indistinguishable from organic. Routing to profiles in the ${c} time zone means the action lands during local active hours.`,
+    `Shares and saves are paced over the first hour, mixed in alongside any organic activity the post is getting. Stacking a small shares/saves package on a launch post is one of the cheapest high-leverage moves on Reels and TikTok — and unlike likes or follows, the platform never visibly shows the count to your audience, so there's no social-proof tradeoff if you under-shoot.`,
+    `Pricing is flat per quantity. We don't ask for your password. We need the public post URL. Refill of 30 days covers any drop. You can stack shares + saves into the same order — they're priced independently.`,
+    `Below you can pick a preset package or use the slider to dial the exact count.`,
+  ],
+  bullets: () => [
+    { title: "Heaviest ranking signal", body: "Shares and saves carry more weight than likes in both Instagram and TikTok ranking." },
+    { title: "Invisible to audience", body: "The count never shows publicly — pure algorithmic lift without social-proof tradeoff." },
+    { title: "Active profiles", body: "Actions come from accounts with photo, history and prior engagement." },
+    { title: "30-day refill", body: "Any drop in the first 30 days is topped up at no cost." },
+    { title: "No password required", body: "Public post URL is all we need." },
+  ],
+  faq: () => [
+    { q: "What's the difference between shares and saves?", a: "Share = the action of sending the post to someone via DM (Instagram) or native share (TikTok). Save = bookmarking the post for later. Both are top-tier ranking signals." },
+    { q: "Will my followers see who shared/saved?", a: "No. Shares and saves are not publicly attributed — the platform shows aggregate counts only, and only to the post owner." },
+    { q: "Should I buy shares or saves?", a: "If you're optimizing for reach right now, shares win. If you're optimizing for the algorithm to keep recommending the post over weeks, saves carry slightly more weight. Doing both is the strongest combo." },
+    { q: "How fast?", a: "Most orders begin within 1 hour of payment confirmation." },
+  ],
+};
+
+const COPY_SHARES_PT: LongCopy = {
+  h1: (c) => `Comprar compartilhamentos e salvamentos para Instagram e TikTok em ${c}`,
+  metaTitle: (c) => `Comprar compartilhamentos e salvamentos para Instagram e TikTok em ${c} | Viralefy`,
+  metaDescription: (c) =>
+    `Reforce os sinais de ranqueamento mais pesados do Instagram e TikTok — compartilhamentos e salvamentos — para posts em ${c}. Sem senha.`,
+  paragraphs: (c) => [
+    `Compartilhamento e salvamento são os sinais de engajamento mais pesados do Instagram e do TikTok em 2026. Curtir é um toque no polegar; compartilhar ou salvar exige que o espectador valorize o conteúdo o suficiente pra mandar pra alguém ou guardar pra depois. Os dois algoritmos pesam essas ações muito mais que curtida na hora de decidir o quanto distribuir o post. Pra criadores em ${c}, garantir uma base de compartilhamentos e salvamentos na primeira hora é um dos caminhos mais rápidos pra empurrar o post pra um pool de alcance maior.`,
+    `A Viralefy entrega compartilhamentos (forward via DM no Instagram / share nativo do TikTok) e salvamentos (bookmark no perfil do usuário) vindos de contas ativas. A ação é anônima pra sua audiência — eles não veem quem compartilhou ou salvou. As contas têm histórico e atividade anterior, então o padrão fica indistinguível de orgânico. Direcionamos pra perfis no fuso de ${c} pra cair em horário ativo local.`,
+    `Compartilhamentos e salvamentos saem distribuídos ao longo da primeira hora, misturados a qualquer atividade orgânica do post. Empilhar um pacote pequeno num post de lançamento é uma das jogadas de maior alavancagem em Reels e TikTok — e diferente de curtida e seguidor, a plataforma nunca exibe a contagem pra sua audiência, então não tem o trade-off de "perdeu a graça do número".`,
+    `Preço fixo por quantidade. Não pedimos senha. Precisamos da URL pública do post. Reposição de 30 dias cobre qualquer queda. Dá pra empilhar compartilhamento + salvamento no mesmo pedido — são preçados separado.`,
+    `Embaixo dá pra pegar um pacote pré-definido ou usar o slider pra mirar a contagem exata.`,
+  ],
+  bullets: () => [
+    { title: "Sinal mais pesado de ranqueamento", body: "Compartilhamento e salvamento pesam mais que curtida nos dois algoritmos." },
+    { title: "Invisível pra audiência", body: "A contagem nunca aparece em público — pura alavanca algorítmica sem trade-off de prova social." },
+    { title: "Perfis ativos", body: "Ações vêm de contas com foto, histórico e engajamento anterior." },
+    { title: "Reposição em 30 dias", body: "Qualquer queda no primeiro mês é reposta sem custo." },
+    { title: "Sem senha", body: "Só a URL pública do post é necessária." },
+  ],
+  faq: () => [
+    { q: "Qual a diferença entre compartilhar e salvar?", a: "Compartilhar = mandar o post pra alguém via DM (Instagram) ou share nativo (TikTok). Salvar = guardar o post pra ver depois. Os dois são sinais de ranqueamento top." },
+    { q: "Meus seguidores vão ver quem compartilhou/salvou?", a: "Não. As ações não são atribuídas em público — a plataforma mostra só contagem agregada, e só pro dono do post." },
+    { q: "Compro compartilhamento ou salvamento?", a: "Se está mirando alcance agora, compartilhamento ganha. Se quer que o algoritmo continue recomendando o post ao longo de semanas, salvamento tem peso ligeiramente maior. Fazer os dois é o combo mais forte." },
+    { q: "Em quanto tempo começa?", a: "A maioria começa em até 1 hora após confirmar o pagamento." },
+  ],
+};
+
 // -------- visualizacoes (ru) --------
 const COPY_VIEWS_RU: LongCopy = {
   h1: (c) => `Купить просмотры Reels, TikTok и Stories в ${c}`,
@@ -1277,6 +1390,233 @@ const COPY_SERV_RU: LongCopy = {
   ],
 };
 
+// -------- account recovery (recuperação de perfil) --------
+// Categoria dedicada a contas banidas/restritas/desativadas — fluxo
+// totalmente distinto de "premium services". Copy próprio em cada idioma.
+const COPY_RECUP_EN: LongCopy = {
+  h1: (c) => `Instagram & TikTok account recovery in ${c}`,
+  metaTitle: (c) => `Recover banned, restricted or disabled accounts in ${c} | Viralefy`,
+  metaDescription: (c) =>
+    `Recover Instagram and TikTok accounts that were banned, shadowbanned or disabled in ${c}. Diagnosis, appeal package, support in your language. Pay only on success.`,
+  paragraphs: (c) => [
+    `Losing an Instagram or TikTok account in ${c} is brutal — years of content, audience and momentum gone overnight, often without a clear reason. Most cases come from a few recurring causes: hashtag/comment patterns that tripped the spam filter, a wave of mass-reports from competitors, a name/face mismatch flagged during a community-standards review, or a soft shadowban that quietly cut your reach to zero. Each of these has a different playbook — and "submit the form and pray" almost never works.`,
+    `Viralefy's recovery team has run hundreds of appeals on Meta and TikTok across ${c} and Latin America. We start with a diagnosis: you send the @ handle, the date of the ban or restriction, what you were doing right before it happened, and any screenshots of the platform's notice. Within 24 hours you get back a written report that says exactly which case yours falls under and what the realistic recovery odds are. If the odds are zero, we say so — no chasing fees on a dead account.`,
+    `When a case has a path forward, we package the appeal for you: rewritten justification, the right documents in the right order, the correct submission channel (in-app form vs. the lesser-known support email vs. the trusted-partner queue), and follow-up cadence. Most banned-account cases settle within 7 to 14 days. Shadowban cases need a content-pattern reset on top of the appeal — usually 21 days of careful posting before reach normalizes.`,
+    `Pricing is success-based for ban appeals: you pay only if the account comes back. Shadowban removal and profile-name disputes are flat-priced because the work is fixed. We don't ask for your password. We don't post on your behalf. The account stays yours the whole time — we only build and submit the appeal documents.`,
+    `If you're in ${c} and just got hit, the first 48 hours matter most. Use the form below to send the @ and the basics, and we'll come back with the diagnosis. If you need to talk to a human first, message support and ask for the recovery team.`,
+  ],
+  bullets: () => [
+    { title: "Free diagnosis", body: "We tell you the realistic odds before you pay anything." },
+    { title: "Success-based pricing", body: "Pay only when the banned account is restored." },
+    { title: "Shadowban included", body: "Reach-loss cases get the appeal + a 21-day content reset plan." },
+    { title: "No password required", body: "We only build and submit the appeal — the account stays yours." },
+    { title: "7–14 day turnaround", body: "Most cases settle inside two weeks. We tell you upfront if yours won't." },
+  ],
+  faq: () => [
+    { q: "What's your success rate?", a: "About 60% for ban appeals when there's still a path forward — and we tell you upfront when there isn't. Shadowban removal is over 90%." },
+    { q: "Do I have to give you my password?", a: "Never. We only build the appeal documents — you submit or we submit on a public channel. The account stays in your hands." },
+    { q: "How fast?", a: "Diagnosis in 24 hours. Most ban appeals close in 7–14 days. Shadowban resets need ~21 days of careful posting after the appeal lands." },
+    { q: "What if my account is permanently disabled?", a: "We say so in the diagnosis — you don't pay. Some \"permanent\" cases still have a path; many genuinely don't." },
+    { q: "Can you guarantee recovery?", a: "No serious recovery service can. We charge on success precisely because the platform decides. That's why we run the free diagnosis first." },
+  ],
+};
+
+const COPY_RECUP_PT: LongCopy = {
+  h1: (c) => `Recuperação de perfil Instagram e TikTok em ${c}`,
+  metaTitle: (c) => `Recuperar conta banida, restrita ou desativada em ${c} | Viralefy`,
+  metaDescription: (c) =>
+    `Recuperação de Instagram e TikTok em ${c} — contas banidas, com shadowban ou desativadas. Diagnóstico inicial, pacote de recurso e suporte no seu idioma. Você só paga se a conta voltar.`,
+  paragraphs: (c) => [
+    `Perder uma conta de Instagram ou TikTok em ${c} é brutal — anos de conteúdo, audiência e tração que somem da noite pro dia, muitas vezes sem motivo claro. A maioria dos casos vem de algumas causas recorrentes: padrão de hashtag ou comentário que disparou o filtro de spam, onda de denúncias em massa de concorrentes, divergência de nome/foto sinalizada num review de community standards, ou um shadowban silencioso que cortou seu alcance pra zero. Cada caso tem um playbook diferente — "envia o formulário e reza" quase nunca resolve.`,
+    `O time de recuperação da Viralefy já rodou centenas de recursos no Meta e no TikTok em ${c} e na América Latina. A gente começa com um diagnóstico: você manda o @, a data do banimento ou restrição, o que você estava fazendo antes de cair, e qualquer print da notificação da plataforma. Em até 24 horas você recebe um relatório escrito dizendo exatamente em qual caso o seu se encaixa e qual a chance real de voltar. Se a chance for zero, a gente fala — sem cobrar taxa em cima de conta perdida.`,
+    `Quando o caso tem caminho, a gente monta o recurso pra você: justificativa reescrita, documentos certos na ordem certa, canal correto (formulário in-app vs. e-mail de suporte menos conhecido vs. fila de trusted-partner), e a cadência de follow-up. Maior parte dos casos de banimento resolve em 7 a 14 dias. Shadowban precisa do recurso + um reset de padrão de conteúdo — em geral 21 dias de postagem cuidadosa antes do alcance normalizar.`,
+    `Pra recurso de banimento o pagamento é por sucesso: só paga se a conta voltar. Remoção de shadowban e disputa de nome têm preço fixo porque o trabalho é fixo. A gente não pede senha. A gente não posta no seu lugar. A conta continua sua o tempo todo — só monta e protocola os documentos.`,
+    `Se você tá em ${c} e acabou de tomar, as primeiras 48 horas são as que mais importam. Usa o formulário abaixo pra mandar o @ e o básico — a gente volta com o diagnóstico. Se preferir falar com alguém primeiro, manda mensagem pro suporte e pede o time de recuperação.`,
+  ],
+  bullets: () => [
+    { title: "Diagnóstico grátis", body: "A gente fala a chance real antes de você pagar qualquer coisa." },
+    { title: "Pagamento por sucesso", body: "Você só paga se a conta banida voltar." },
+    { title: "Shadowban incluído", body: "Casos de queda de alcance ganham recurso + plano de 21 dias de reset." },
+    { title: "Sem senha", body: "A gente só monta e protocola — a conta nunca sai da sua mão." },
+    { title: "Resolução em 7–14 dias", body: "Maioria fecha em duas semanas. Se o seu não vai, a gente fala no diagnóstico." },
+  ],
+  faq: () => [
+    { q: "Qual a taxa de sucesso?", a: "Cerca de 60% pra recurso de banimento quando ainda tem caminho — e a gente fala quando não tem. Remoção de shadowban passa de 90%." },
+    { q: "Preciso entregar minha senha?", a: "Nunca. A gente só monta os documentos do recurso — você protocola ou a gente protocola por canal público. A conta fica com você." },
+    { q: "Quanto tempo demora?", a: "Diagnóstico em 24 horas. Maioria dos recursos fecha em 7–14 dias. Shadowban reset precisa de ~21 dias de postagem cuidadosa depois do recurso." },
+    { q: "E se minha conta foi desativada de forma permanente?", a: "Se for o caso, a gente fala no diagnóstico — você não paga. Algumas \"permanentes\" ainda têm caminho; muitas realmente não têm." },
+    { q: "Vocês garantem que recupera?", a: "Nenhum serviço sério garante. A gente cobra por sucesso justamente porque quem decide é a plataforma. Por isso fazemos o diagnóstico grátis primeiro." },
+  ],
+};
+
+const COPY_RECUP_ES: LongCopy = {
+  h1: (c) => `Recuperación de cuenta Instagram y TikTok en ${c}`,
+  metaTitle: (c) => `Recuperar cuenta baneada o restringida en ${c} | Viralefy`,
+  metaDescription: (c) =>
+    `Recuperación de Instagram y TikTok en ${c} — cuentas baneadas, con shadowban o deshabilitadas. Diagnóstico inicial, paquete de apelación y soporte en tu idioma. Pagas solo si la cuenta vuelve.`,
+  paragraphs: (c) => [
+    `Perder una cuenta de Instagram o TikTok en ${c} es brutal — años de contenido, audiencia y tracción que desaparecen de un día para otro, muchas veces sin razón clara. La mayoría de los casos vienen de causas recurrentes: patrones de hashtag o comentario que dispararon el filtro de spam, ola de reportes en masa, divergencia de nombre/foto en una revisión de community standards, o un shadowban silencioso que cortó tu alcance a cero.`,
+    `El equipo de recuperación de Viralefy ha llevado cientos de apelaciones en Meta y TikTok. Empezamos con un diagnóstico: nos envías el @, la fecha del baneo y qué estabas haciendo justo antes. En 24 horas recibes un informe escrito con tu caso y las probabilidades reales. Si son cero, lo decimos — sin cobrar.`,
+    `Cuando hay camino, armamos la apelación: justificación reescrita, documentos en el orden correcto, canal correcto, y la cadencia de seguimiento. La mayoría de los casos de baneo se resuelve en 7 a 14 días. Para shadowban hace falta apelación + reset de patrón de contenido — unos 21 días de publicación cuidadosa antes de que el alcance se normalice.`,
+    `El pago de apelaciones de baneo es por éxito: solo pagas si la cuenta vuelve. La remoción de shadowban y disputas de nombre tienen precio fijo. No pedimos tu contraseña. No publicamos por ti.`,
+    `Si estás en ${c} y acabaron de bloquearte, las primeras 48 horas son las que más importan. Usa el formulario para enviar el @ y lo básico — volvemos con el diagnóstico.`,
+  ],
+  bullets: () => [
+    { title: "Diagnóstico gratis", body: "Decimos las probabilidades reales antes de cobrar nada." },
+    { title: "Pago por éxito", body: "Pagas solo si la cuenta baneada vuelve." },
+    { title: "Shadowban incluido", body: "Casos de pérdida de alcance: apelación + plan de 21 días de reset." },
+    { title: "Sin contraseña", body: "Solo armamos los documentos — la cuenta sigue en tus manos." },
+    { title: "7–14 días", body: "La mayoría se cierra en dos semanas. Decimos arriba si el tuyo no va." },
+  ],
+  faq: () => [
+    { q: "¿Cuál es la tasa de éxito?", a: "~60% en apelaciones de baneo cuando hay camino. Shadowban supera el 90%." },
+    { q: "¿Necesitan mi contraseña?", a: "Nunca. Solo armamos los documentos." },
+    { q: "¿Cuánto demora?", a: "Diagnóstico en 24 horas. Apelaciones en 7–14 días. Reset de shadowban ~21 días después." },
+    { q: "¿Y si la cuenta es permanente?", a: "Lo decimos en el diagnóstico — no pagas." },
+    { q: "¿Garantizan recuperación?", a: "Ningún servicio serio puede. Por eso cobramos por éxito." },
+  ],
+};
+
+const COPY_RECUP_FR: LongCopy = {
+  h1: (c) => `Récupération de compte Instagram et TikTok en ${c}`,
+  metaTitle: (c) => `Récupérer un compte banni ou restreint en ${c} | Viralefy`,
+  metaDescription: (c) =>
+    `Récupération de comptes Instagram et TikTok bannis ou désactivés en ${c}. Diagnostic gratuit, dossier d'appel, support dans votre langue. Vous payez uniquement si le compte revient.`,
+  paragraphs: (c) => [
+    `Perdre un compte Instagram ou TikTok en ${c} est brutal — des années de contenu et d'audience disparaissent du jour au lendemain, souvent sans raison claire. La plupart des cas viennent de quelques causes récurrentes : motifs de hashtag/commentaire qui ont déclenché le filtre anti-spam, vague de signalements groupés, divergence de nom/photo lors d'une revue community standards, ou un shadowban silencieux qui a coupé votre portée.`,
+    `L'équipe de récupération de Viralefy a piloté des centaines d'appels chez Meta et TikTok. Nous commençons par un diagnostic : vous envoyez le @, la date du bannissement et le contexte. Sous 24 heures, vous recevez un rapport écrit avec les chances réelles. Si elles sont nulles, nous le disons — sans facturer.`,
+    `Quand il y a une voie, nous montons le dossier : justification réécrite, documents dans le bon ordre, bon canal, cadence de relance. La plupart des cas de bannissement se règlent en 7 à 14 jours. Pour le shadowban il faut l'appel + un reset de pattern de contenu — environ 21 jours de publication soignée avant que la portée se normalise.`,
+    `Tarification au succès pour les appels de bannissement : vous payez seulement si le compte revient. La levée de shadowban et les litiges de nom sont à prix fixe. Nous ne demandons jamais votre mot de passe.`,
+    `Si vous êtes en ${c} et que ça vient d'arriver, les 48 premières heures comptent le plus. Utilisez le formulaire ci-dessous pour envoyer le @ et les bases — nous revenons avec le diagnostic.`,
+  ],
+  bullets: () => [
+    { title: "Diagnostic gratuit", body: "Nous disons les vraies chances avant tout paiement." },
+    { title: "Paiement au succès", body: "Vous payez seulement si le compte banni revient." },
+    { title: "Shadowban inclus", body: "Cas de perte de portée : appel + plan reset 21 jours." },
+    { title: "Sans mot de passe", body: "Nous montons et soumettons — le compte reste à vous." },
+    { title: "7–14 jours", body: "La plupart se règle en deux semaines. Nous le disons en amont sinon." },
+  ],
+  faq: () => [
+    { q: "Quel est votre taux de succès ?", a: "Environ 60% sur les appels de bannissement quand il y a une voie. Shadowban dépasse 90%." },
+    { q: "Devez-vous avoir mon mot de passe ?", a: "Jamais. Nous montons uniquement les documents." },
+    { q: "Combien de temps ?", a: "Diagnostic en 24 h. Appels en 7–14 jours. Reset shadowban ~21 jours après." },
+    { q: "Et si mon compte est définitivement désactivé ?", a: "Nous le disons dans le diagnostic — vous ne payez pas." },
+    { q: "Garantissez-vous la récupération ?", a: "Aucun service sérieux ne peut. C'est pour ça que nous facturons au succès." },
+  ],
+};
+
+const COPY_RECUP_DE: LongCopy = {
+  h1: (c) => `Instagram- und TikTok-Konto-Wiederherstellung in ${c}`,
+  metaTitle: (c) => `Gesperrtes oder eingeschränktes Konto wiederherstellen in ${c} | Viralefy`,
+  metaDescription: (c) =>
+    `Wiederherstellung gesperrter Instagram- und TikTok-Konten in ${c}. Kostenlose Diagnose, Einspruchspaket, Support in Ihrer Sprache. Sie zahlen nur, wenn das Konto zurückkommt.`,
+  paragraphs: (c) => [
+    `Ein Instagram- oder TikTok-Konto in ${c} zu verlieren ist brutal — jahrelange Inhalte und Reichweite verschwinden über Nacht, oft ohne klaren Grund. Die meisten Fälle haben wenige wiederkehrende Ursachen: Hashtag-/Kommentar-Muster, die den Spam-Filter ausgelöst haben, Massen-Reports von Konkurrenten, Namen/Foto-Diskrepanzen in einer Community-Standards-Prüfung, oder ein stiller Shadowban, der die Reichweite auf null gesetzt hat.`,
+    `Das Recovery-Team von Viralefy hat hunderte Einsprüche bei Meta und TikTok bearbeitet. Wir starten mit einer Diagnose: Du sendest das @, das Datum der Sperre und den Kontext. Innerhalb von 24 Stunden bekommst du einen schriftlichen Bericht mit den realen Chancen. Sind sie null, sagen wir das — ohne Gebühr.`,
+    `Wenn ein Weg existiert, bauen wir den Einspruch: neu formulierte Begründung, richtige Dokumente in richtiger Reihenfolge, der korrekte Kanal, Follow-up-Kadenz. Die meisten Sperr-Fälle werden in 7 bis 14 Tagen geklärt. Shadowban braucht Einspruch + Content-Pattern-Reset — meist 21 Tage sorgfältiges Posten, bis die Reichweite sich normalisiert.`,
+    `Preisgestaltung erfolgsbasiert bei Sperr-Einsprüchen: du zahlst nur, wenn das Konto zurückkommt. Shadowban-Entfernung und Namens-Streitigkeiten sind Festpreis. Wir fragen niemals nach deinem Passwort.`,
+    `Wenn du in ${c} bist und es gerade passiert ist, zählen die ersten 48 Stunden am meisten. Nutze das Formular unten, um das @ und die Basics zu senden — wir kommen mit der Diagnose zurück.`,
+  ],
+  bullets: () => [
+    { title: "Kostenlose Diagnose", body: "Wir nennen die realen Chancen, bevor du zahlst." },
+    { title: "Erfolgsbasiert", body: "Du zahlst nur, wenn das gesperrte Konto zurückkommt." },
+    { title: "Shadowban inklusive", body: "Reichweiten-Verlust: Einspruch + 21-Tage-Reset-Plan." },
+    { title: "Ohne Passwort", body: "Wir bauen und reichen ein — das Konto bleibt bei dir." },
+    { title: "7–14 Tage", body: "Die meisten Fälle in zwei Wochen. Sonst sagen wir es vorher." },
+  ],
+  faq: () => [
+    { q: "Wie hoch ist eure Erfolgsquote?", a: "Etwa 60% bei Sperr-Einsprüchen, wenn ein Weg existiert. Shadowban über 90%." },
+    { q: "Braucht ihr mein Passwort?", a: "Niemals. Wir bauen nur die Einspruchsdokumente." },
+    { q: "Wie schnell?", a: "Diagnose in 24 Stunden. Einsprüche in 7–14 Tagen. Shadowban-Reset ~21 Tage." },
+    { q: "Was, wenn dauerhaft gesperrt?", a: "Wir sagen es in der Diagnose — du zahlst nicht." },
+    { q: "Garantiert ihr Wiederherstellung?", a: "Kein seriöser Dienst kann. Deshalb erfolgsbasiert." },
+  ],
+};
+
+const COPY_RECUP_IT: LongCopy = {
+  h1: (c) => `Recupero account Instagram e TikTok in ${c}`,
+  metaTitle: (c) => `Recuperare account bannato o limitato in ${c} | Viralefy`,
+  metaDescription: (c) =>
+    `Recupero di account Instagram e TikTok bannati o disabilitati in ${c}. Diagnosi gratuita, pacchetto di ricorso, supporto nella tua lingua. Paghi solo se l'account torna.`,
+  paragraphs: (c) => [
+    `Perdere un account Instagram o TikTok in ${c} è brutale — anni di contenuti e audience svaniscono dall'oggi al domani, spesso senza una ragione chiara. La maggior parte dei casi viene da poche cause ricorrenti: pattern di hashtag/commenti che hanno fatto scattare il filtro anti-spam, ondata di segnalazioni di massa, discrepanza nome/foto in una verifica community standards, o un shadowban silenzioso che ha ridotto a zero la portata.`,
+    `Il team recovery di Viralefy ha gestito centinaia di ricorsi su Meta e TikTok. Iniziamo con una diagnosi: ci mandi l'@, la data del ban e il contesto. Entro 24 ore ricevi un rapporto scritto con le probabilità reali. Se sono zero, lo diciamo — senza addebito.`,
+    `Quando esiste una strada, montiamo il ricorso: giustificazione riscritta, documenti nell'ordine giusto, canale corretto, cadenza di follow-up. La maggior parte dei casi di ban si risolve in 7–14 giorni. Per shadowban serve ricorso + reset di pattern di contenuto — circa 21 giorni di pubblicazione attenta.`,
+    `Pagamento a successo per i ricorsi di ban: paghi solo se l'account torna. Rimozione shadowban e dispute sul nome sono a prezzo fisso. Non chiediamo mai la password.`,
+    `Se sei in ${c} e ti è appena successo, le prime 48 ore contano di più. Usa il modulo qui sotto per inviare l'@ e l'essenziale.`,
+  ],
+  bullets: () => [
+    { title: "Diagnosi gratis", body: "Diciamo le probabilità reali prima di farti pagare." },
+    { title: "A successo", body: "Paghi solo se l'account bannato torna." },
+    { title: "Shadowban incluso", body: "Casi di perdita portata: ricorso + reset 21 giorni." },
+    { title: "Senza password", body: "Montiamo e inoltriamo — l'account resta tuo." },
+    { title: "7–14 giorni", body: "La maggior parte in due settimane." },
+  ],
+  faq: () => [
+    { q: "Tasso di successo?", a: "~60% sui ricorsi di ban quando c'è una strada. Shadowban supera il 90%." },
+    { q: "Vi serve la password?", a: "Mai." },
+    { q: "Quanto tempo?", a: "Diagnosi in 24 h. Ricorsi in 7–14 giorni. Reset shadowban ~21 giorni dopo." },
+    { q: "E se l'account è permanente?", a: "Lo diciamo in diagnosi — non paghi." },
+    { q: "Garantite il recupero?", a: "Nessun servizio serio può. Per questo a successo." },
+  ],
+};
+
+const COPY_RECUP_NL: LongCopy = {
+  h1: (c) => `Instagram- en TikTok-accountherstel in ${c}`,
+  metaTitle: (c) => `Geblokkeerd of beperkt account herstellen in ${c} | Viralefy`,
+  metaDescription: (c) =>
+    `Herstel van geblokkeerde Instagram- en TikTok-accounts in ${c}. Gratis diagnose, bezwaarpakket, support in jouw taal. Je betaalt alleen als het account terugkomt.`,
+  paragraphs: (c) => [
+    `Een Instagram- of TikTok-account in ${c} verliezen is bruut — jaren van content en publiek verdwijnen van de ene op de andere dag, vaak zonder duidelijke reden. De meeste gevallen komen van een paar terugkerende oorzaken: hashtag-/comment-patronen die het spamfilter activeerden, een golf van massa-meldingen, een naam/foto-mismatch in een community-standards-review, of een stille shadowban die je bereik op nul zette.`,
+    `Het herstelteam van Viralefy heeft honderden bezwaarprocedures bij Meta en TikTok gedaan. We starten met een diagnose: je stuurt de @, de datum van de blokkade en de context. Binnen 24 uur krijg je een schriftelijk rapport met de werkelijke kansen. Zijn die nul, dan zeggen we dat — zonder kosten.`,
+    `Als er een weg is, bouwen we het bezwaar: herschreven onderbouwing, juiste documenten in juiste volgorde, juist kanaal, follow-up-cadans. De meeste blokkeercases lossen in 7–14 dagen op. Shadowban heeft bezwaar + content-pattern-reset nodig — meestal 21 dagen van zorgvuldig posten.`,
+    `Prijzen voor blokkeerbezwaren zijn op succes: je betaalt alleen als het account terugkomt. Shadowban-verwijdering en naamsgeschillen zijn vaste prijs. We vragen nooit om je wachtwoord.`,
+    `Als je in ${c} bent en het is net gebeurd, tellen de eerste 48 uur het zwaarst. Gebruik het formulier hieronder.`,
+  ],
+  bullets: () => [
+    { title: "Gratis diagnose", body: "We vertellen de echte kansen voordat je iets betaalt." },
+    { title: "Op succes", body: "Je betaalt alleen als het geblokkeerde account terugkomt." },
+    { title: "Shadowban inbegrepen", body: "Bereikverlies: bezwaar + 21-dagen-resetplan." },
+    { title: "Zonder wachtwoord", body: "Wij bouwen en dienen in — het account blijft van jou." },
+    { title: "7–14 dagen", body: "Meeste binnen twee weken. Anders zeggen we het vooraf." },
+  ],
+  faq: () => [
+    { q: "Wat is jullie succesratio?", a: "~60% bij blokkeerbezwaren wanneer er een weg is. Shadowban boven 90%." },
+    { q: "Hebben jullie mijn wachtwoord nodig?", a: "Nooit." },
+    { q: "Hoe snel?", a: "Diagnose binnen 24 uur. Bezwaren in 7–14 dagen. Shadowban-reset ~21 dagen erna." },
+    { q: "Wat als het account permanent is?", a: "We zeggen het in de diagnose — je betaalt niet." },
+    { q: "Garanderen jullie herstel?", a: "Geen serieuze dienst kan dat. Daarom op succes." },
+  ],
+};
+
+const COPY_RECUP_RU: LongCopy = {
+  h1: (c) => `Восстановление аккаунта Instagram и TikTok в ${c}`,
+  metaTitle: (c) => `Восстановить заблокированный аккаунт в ${c} | Viralefy`,
+  metaDescription: (c) =>
+    `Восстановление заблокированных, ограниченных или отключённых аккаунтов Instagram и TikTok в ${c}. Бесплатная диагностика, пакет апелляции, поддержка на вашем языке. Оплата только при возврате аккаунта.`,
+  paragraphs: (c) => [
+    `Потерять аккаунт Instagram или TikTok в ${c} — это удар: годы контента и аудитории исчезают за ночь, часто без ясной причины. Большинство случаев — несколько повторяющихся причин: паттерны хештегов/комментариев, сработавшие на спам-фильтр; волна массовых жалоб конкурентов; расхождение имени и фото при ревью community-standards; или тихий shadowban, который обнулил охват.`,
+    `Команда восстановления Viralefy провела сотни апелляций в Meta и TikTok. Мы начинаем с диагностики: вы присылаете @, дату блокировки и контекст. В течение 24 часов вы получаете письменный отчёт с реальными шансами. Если шансов нет — мы это говорим, без оплаты.`,
+    `Когда путь есть, мы готовим апелляцию: переписанное обоснование, нужные документы в правильном порядке, правильный канал и каденс follow-up. Большинство случаев блокировки закрывается за 7–14 дней. Shadowban требует апелляции + сброса паттерна контента — около 21 дня аккуратных публикаций.`,
+    `Оплата за апелляции по блокировкам — за результат: вы платите только при возврате аккаунта. Снятие shadowban и споры по имени — фиксированная цена. Мы никогда не просим пароль.`,
+    `Если вы в ${c} и это только что произошло — первые 48 часов важнее всего. Используйте форму ниже, чтобы отправить @ и основное.`,
+  ],
+  bullets: () => [
+    { title: "Бесплатная диагностика", body: "Говорим реальные шансы до оплаты." },
+    { title: "Оплата за результат", body: "Платите только при возврате заблокированного аккаунта." },
+    { title: "Shadowban включён", body: "Потеря охвата: апелляция + план сброса на 21 день." },
+    { title: "Без пароля", body: "Мы только готовим и подаём — аккаунт остаётся у вас." },
+    { title: "7–14 дней", body: "Большинство — за две недели. Иначе говорим заранее." },
+  ],
+  faq: () => [
+    { q: "Какова успешность?", a: "Около 60% по апелляциям блокировок, когда есть путь. Shadowban — выше 90%." },
+    { q: "Нужен ли пароль?", a: "Никогда." },
+    { q: "Как быстро?", a: "Диагностика — 24 ч. Апелляции — 7–14 дней. Reset shadowban — ~21 день после." },
+    { q: "Если перманентно отключён?", a: "Скажем при диагностике — без оплаты." },
+    { q: "Гарантируете возврат?", a: "Ни один серьёзный сервис не гарантирует. Поэтому оплата за результат." },
+  ],
+};
+
 // Tabela final — categoria × idioma → cópia. Fallback: en.
 // As 6 categorias por plataforma reaproveitam o mesmo LongCopy do tipo de
 // produto (a cópia já menciona Instagram e TikTok juntos), evitando duplicação.
@@ -1305,25 +1645,21 @@ export const COPY: Record<CategoryCode, Partial<Record<LangCode, LongCopy>>> = {
     fr: COPY_ENG_FR, de: COPY_ENG_DE, it: COPY_ENG_IT, nl: COPY_ENG_NL,
     ru: COPY_ENG_RU,
   },
+  // Comentários — copy próprio em EN/PT; outros idiomas caem em EN (fallback).
+  // Fix BUG-40/107/132 do QA 2026-06-12.
   comentarios_instagram: {
-    en: COPY_ENG_EN, pt: COPY_ENG_PT, es: COPY_ENG_ES, es_AR: COPY_ENG_ES,
-    fr: COPY_ENG_FR, de: COPY_ENG_DE, it: COPY_ENG_IT, nl: COPY_ENG_NL,
-    ru: COPY_ENG_RU,
+    en: COPY_COMMENTS_EN, pt: COPY_COMMENTS_PT,
   },
   comentarios_tiktok: {
-    en: COPY_ENG_EN, pt: COPY_ENG_PT, es: COPY_ENG_ES, es_AR: COPY_ENG_ES,
-    fr: COPY_ENG_FR, de: COPY_ENG_DE, it: COPY_ENG_IT, nl: COPY_ENG_NL,
-    ru: COPY_ENG_RU,
+    en: COPY_COMMENTS_EN, pt: COPY_COMMENTS_PT,
   },
+  // Compartilhamentos + saves — copy próprio em EN/PT.
+  // Fix BUG-40/83/131/133 do QA.
   compartilhamentos_instagram: {
-    en: COPY_ENG_EN, pt: COPY_ENG_PT, es: COPY_ENG_ES, es_AR: COPY_ENG_ES,
-    fr: COPY_ENG_FR, de: COPY_ENG_DE, it: COPY_ENG_IT, nl: COPY_ENG_NL,
-    ru: COPY_ENG_RU,
+    en: COPY_SHARES_EN, pt: COPY_SHARES_PT,
   },
   compartilhamentos_tiktok: {
-    en: COPY_ENG_EN, pt: COPY_ENG_PT, es: COPY_ENG_ES, es_AR: COPY_ENG_ES,
-    fr: COPY_ENG_FR, de: COPY_ENG_DE, it: COPY_ENG_IT, nl: COPY_ENG_NL,
-    ru: COPY_ENG_RU,
+    en: COPY_SHARES_EN, pt: COPY_SHARES_PT,
   },
   visualizacoes_instagram: {
     en: COPY_VIEWS_EN, pt: COPY_VIEWS_PT, es: COPY_VIEWS_ES, es_AR: COPY_VIEWS_ES,
@@ -1340,14 +1676,13 @@ export const COPY: Record<CategoryCode, Partial<Record<LangCode, LongCopy>>> = {
     fr: COPY_SERV_FR, de: COPY_SERV_DE, it: COPY_SERV_IT, nl: COPY_SERV_NL,
     ru: COPY_SERV_RU,
   },
-  // 4 categorias novas reaproveitam o COPY de serviços premium como base —
-  // são produtos de alto-toque que se beneficiam do mesmo gancho copy
-  // ("hands-on growth"). Os labels (CATEGORY_LABEL) já carregam a
-  // identidade visual da categoria.
+  // Recuperação de perfil — fluxo próprio (apelação de banimento/shadowban),
+  // copy dedicado por idioma. Antes reaproveitava o COPY_SERV_* mas o conteúdo
+  // ficava errado (BUG-3/96/101 do QA 2026-06-12).
   recuperacao_perfil: {
-    en: COPY_SERV_EN, pt: COPY_SERV_PT, es: COPY_SERV_ES, es_AR: COPY_SERV_ES,
-    fr: COPY_SERV_FR, de: COPY_SERV_DE, it: COPY_SERV_IT, nl: COPY_SERV_NL,
-    ru: COPY_SERV_RU,
+    en: COPY_RECUP_EN, pt: COPY_RECUP_PT, es: COPY_RECUP_ES, es_AR: COPY_RECUP_ES,
+    fr: COPY_RECUP_FR, de: COPY_RECUP_DE, it: COPY_RECUP_IT, nl: COPY_RECUP_NL,
+    ru: COPY_RECUP_RU,
   },
 };
 

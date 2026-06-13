@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
+import { headers } from "next/headers";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
 import { Header } from "@/components/Header";
@@ -8,8 +9,10 @@ import { CookieBanner } from "@/components/CookieBanner";
 import { GtmLoader } from "@/components/GtmLoader";
 import { TrackingHydrator } from "@/components/TrackingHydrator";
 
-// Layout raiz. `<html lang>` é "en" (root é home global em inglês); páginas
-// de país sobrescrevem o lang no `<article lang>` interno.
+// Layout raiz. `<html lang>` é resolvido por request via header `x-locale`
+// que o middleware seta a partir do primeiro segmento do path:
+//   /br/...  → "pt-BR"  ;  /jp/... → "ja-JP"  ;  /...  (root global) → "en"
+// Fix BUG-39 / BUG-122 / BUG-180 do QA 2026-06-12 (WCAG 3.1.1 + SEO).
 //
 // Scripts no <head>:
 //   1. Anti-flash de tema — inline, executa antes do React hidratar. Lê
@@ -118,9 +121,11 @@ const ANTI_FLASH_THEME = `
 // no <head> global causaria nó duplicado @type Organization que validadores
 // reportam como "multiple Organization entities" warning.
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const h = await headers();
+  const lang = h.get("x-locale") || "en";
   return (
-    <html lang="en">
+    <html lang={lang}>
       <head>
         {/* Preconnect ao CDN de bandeiras — economiza ~120ms no LCP em páginas
             com muitas flags (header megamenu, country index, footer). */}

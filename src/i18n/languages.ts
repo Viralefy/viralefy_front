@@ -113,9 +113,21 @@ export type Pack = {
     regionAmericas: string;
     regionSepa: string;
   };
+  notFound: {
+    title: string;            // big hero
+    description: string;      // sub-line
+    browseAll: string;
+    myAccount: string;
+    signIn: string;
+    createAccount: string;
+    popularMarkets: string;
+    viewAllMarkets: string;
+    regionAmericas: string;
+    regionSepa: string;
+  };
   footer: {
     tagline: string;
-    sections: { legal: string; site: string; markets: string };
+    sections: { legal: string; site: string; markets: string; discover: string };
     links: {
       privacy: string;
       terms: string;
@@ -123,6 +135,18 @@ export type Pack = {
       refund: string;
       contact: string;
       about: string;
+    };
+    discover: {
+      pricing: string;
+      cities: string;
+      compare: string;
+      helpCenter: string;
+      caseStudies: string;
+      systemStatus: string;
+      cookiePreferences: string;
+      referAndEarn: string;
+      subscriptions: string;
+      developerApi: string;
     };
     copyright: string;
     disclaimer: string;
@@ -199,9 +223,21 @@ const en: Pack = {
     regionAmericas: "Americas",
     regionSepa: "Europe / SEPA",
   },
+  notFound: {
+    title: "This page doesn't exist — but your next follower does.",
+    description: "The content you were looking for is gone or never existed. Continue where most customers start:",
+    browseAll: "Browse all services",
+    myAccount: "My account",
+    signIn: "Sign in",
+    createAccount: "Create account",
+    popularMarkets: "Popular markets",
+    viewAllMarkets: "View all markets",
+    regionAmericas: "Americas",
+    regionSepa: "Europe / SEPA",
+  },
   footer: {
     tagline: "Responsible social media growth.",
-    sections: { legal: "Legal", site: "Site", markets: "Markets" },
+    sections: { legal: "Legal", site: "Site", markets: "Markets", discover: "Discover" },
     links: {
       privacy: "Privacy Policy",
       terms: "Terms of Service",
@@ -209,6 +245,18 @@ const en: Pack = {
       refund: "Refund Policy",
       contact: "Contact support",
       about: "About Viralefy",
+    },
+    discover: {
+      pricing: "Pricing",
+      cities: "Cities",
+      compare: "Compare Viralefy",
+      helpCenter: "Help center",
+      caseStudies: "Case studies",
+      systemStatus: "System status",
+      cookiePreferences: "Cookie preferences",
+      referAndEarn: "Refer & earn",
+      subscriptions: "Subscriptions",
+      developerApi: "Developer API",
     },
     copyright: "All rights reserved.",
     disclaimer: "Viralefy is not affiliated with Instagram, TikTok or Meta Platforms.",
@@ -283,9 +331,21 @@ const pt: Pack = {
     regionAmericas: "Américas",
     regionSepa: "Europa / SEPA",
   },
+  notFound: {
+    title: "Essa página não existe — mas o seu próximo seguidor existe.",
+    description: "O que você procurava saiu do ar ou nunca existiu. Continue pelos caminhos onde a maioria começa:",
+    browseAll: "Ver todos os serviços",
+    myAccount: "Minha conta",
+    signIn: "Entrar",
+    createAccount: "Criar conta",
+    popularMarkets: "Mercados populares",
+    viewAllMarkets: "Ver todos os mercados",
+    regionAmericas: "Américas",
+    regionSepa: "Europa / SEPA",
+  },
   footer: {
     tagline: "Crescimento responsável em redes sociais.",
-    sections: { legal: "Jurídico", site: "Site", markets: "Mercados" },
+    sections: { legal: "Jurídico", site: "Site", markets: "Mercados", discover: "Descubra" },
     links: {
       privacy: "Política de Privacidade",
       terms: "Termos de Serviço",
@@ -293,6 +353,18 @@ const pt: Pack = {
       refund: "Política de Reembolso",
       contact: "Contato",
       about: "Sobre a Viralefy",
+    },
+    discover: {
+      pricing: "Preços",
+      cities: "Cidades",
+      compare: "Comparar Viralefy",
+      helpCenter: "Central de ajuda",
+      caseStudies: "Estudos de caso",
+      systemStatus: "Status do sistema",
+      cookiePreferences: "Preferências de cookies",
+      referAndEarn: "Indique e ganhe",
+      subscriptions: "Assinaturas",
+      developerApi: "API para desenvolvedor",
     },
     copyright: "Todos os direitos reservados.",
     disclaimer: "Viralefy não é afiliada ao Instagram, TikTok ou Meta Platforms.",
@@ -367,9 +439,21 @@ const es: Pack = {
     regionAmericas: "Américas",
     regionSepa: "Europa / SEPA",
   },
+  notFound: {
+    title: "Esta página no existe — pero tu próximo seguidor sí.",
+    description: "Lo que buscabas no está o nunca existió. Sigue por donde la mayoría empieza:",
+    browseAll: "Ver todos los servicios",
+    myAccount: "Mi cuenta",
+    signIn: "Iniciar sesión",
+    createAccount: "Crear cuenta",
+    popularMarkets: "Mercados populares",
+    viewAllMarkets: "Ver todos los mercados",
+    regionAmericas: "Américas",
+    regionSepa: "Europa / SEPA",
+  },
   footer: {
     tagline: "Crecimiento responsable en redes sociales.",
-    sections: { legal: "Legal", site: "Sitio", markets: "Mercados" },
+    sections: { legal: "Legal", site: "Sitio", markets: "Mercados", discover: "Descubre" },
     links: {
       privacy: "Política de Privacidad",
       terms: "Términos de Servicio",
@@ -377,6 +461,18 @@ const es: Pack = {
       refund: "Política de Reembolso",
       contact: "Contacto",
       about: "Acerca de Viralefy",
+    },
+    discover: {
+      pricing: "Precios",
+      cities: "Ciudades",
+      compare: "Comparar Viralefy",
+      helpCenter: "Centro de ayuda",
+      caseStudies: "Casos de éxito",
+      systemStatus: "Estado del sistema",
+      cookiePreferences: "Preferencias de cookies",
+      referAndEarn: "Refiere y gana",
+      subscriptions: "Suscripciones",
+      developerApi: "API para desarrolladores",
     },
     copyright: "Todos los derechos reservados.",
     disclaimer: "Viralefy no está afiliada a Instagram, TikTok ni Meta Platforms.",
@@ -451,9 +547,21 @@ const fr: Pack = {
     regionAmericas: "Amériques",
     regionSepa: "Europe / SEPA",
   },
+  notFound: {
+    title: "Cette page n'existe pas — mais ton prochain abonné, si.",
+    description: "Le contenu recherché n'est plus là ou n'a jamais existé. Continue par où la plupart commence :",
+    browseAll: "Voir tous les services",
+    myAccount: "Mon compte",
+    signIn: "Connexion",
+    createAccount: "Créer un compte",
+    popularMarkets: "Marchés populaires",
+    viewAllMarkets: "Voir tous les marchés",
+    regionAmericas: "Amériques",
+    regionSepa: "Europe / SEPA",
+  },
   footer: {
     tagline: "Croissance responsable des réseaux sociaux.",
-    sections: { legal: "Mentions", site: "Site", markets: "Marchés" },
+    sections: { legal: "Mentions", site: "Site", markets: "Marchés", discover: "Découvrir" },
     links: {
       privacy: "Politique de confidentialité",
       terms: "Conditions générales",
@@ -461,6 +569,18 @@ const fr: Pack = {
       refund: "Politique de remboursement",
       contact: "Nous contacter",
       about: "À propos de Viralefy",
+    },
+    discover: {
+      pricing: "Tarifs",
+      cities: "Villes",
+      compare: "Comparer Viralefy",
+      helpCenter: "Centre d'aide",
+      caseStudies: "Études de cas",
+      systemStatus: "État du système",
+      cookiePreferences: "Préférences cookies",
+      referAndEarn: "Parrainez et gagnez",
+      subscriptions: "Abonnements",
+      developerApi: "API développeur",
     },
     copyright: "Tous droits réservés.",
     disclaimer: "Viralefy n'est pas affilié à Instagram, TikTok ou Meta Platforms.",
@@ -534,9 +654,21 @@ const de: Pack = {
     regionAmericas: "Amerika",
     regionSepa: "Europa / SEPA",
   },
+  notFound: {
+    title: "Diese Seite gibt es nicht — deinen nächsten Follower aber schon.",
+    description: "Der gesuchte Inhalt ist weg oder existierte nie. Mach da weiter, wo die meisten anfangen:",
+    browseAll: "Alle Services ansehen",
+    myAccount: "Mein Konto",
+    signIn: "Anmelden",
+    createAccount: "Konto erstellen",
+    popularMarkets: "Beliebte Märkte",
+    viewAllMarkets: "Alle Märkte ansehen",
+    regionAmericas: "Amerika",
+    regionSepa: "Europa / SEPA",
+  },
   footer: {
     tagline: "Verantwortungsvolles Social-Media-Wachstum.",
-    sections: { legal: "Rechtliches", site: "Website", markets: "Märkte" },
+    sections: { legal: "Rechtliches", site: "Website", markets: "Märkte", discover: "Entdecken" },
     links: {
       privacy: "Datenschutzerklärung",
       terms: "AGB",
@@ -544,6 +676,18 @@ const de: Pack = {
       refund: "Rückerstattungsrichtlinie",
       contact: "Kontakt",
       about: "Über Viralefy",
+    },
+    discover: {
+      pricing: "Preise",
+      cities: "Städte",
+      compare: "Viralefy vergleichen",
+      helpCenter: "Hilfe-Center",
+      caseStudies: "Fallstudien",
+      systemStatus: "Systemstatus",
+      cookiePreferences: "Cookie-Einstellungen",
+      referAndEarn: "Empfehlen & verdienen",
+      subscriptions: "Abonnements",
+      developerApi: "Entwickler-API",
     },
     copyright: "Alle Rechte vorbehalten.",
     disclaimer: "Viralefy ist nicht mit Instagram, TikTok oder Meta Platforms verbunden.",
@@ -617,9 +761,21 @@ const it: Pack = {
     regionAmericas: "Americhe",
     regionSepa: "Europa / SEPA",
   },
+  notFound: {
+    title: "Questa pagina non esiste — ma il tuo prossimo follower sì.",
+    description: "Il contenuto cercato non c'è più o non è mai esistito. Continua da dove inizia la maggior parte:",
+    browseAll: "Tutti i servizi",
+    myAccount: "Il mio account",
+    signIn: "Accedi",
+    createAccount: "Crea account",
+    popularMarkets: "Mercati popolari",
+    viewAllMarkets: "Tutti i mercati",
+    regionAmericas: "Americhe",
+    regionSepa: "Europa / SEPA",
+  },
   footer: {
     tagline: "Crescita responsabile sui social.",
-    sections: { legal: "Legale", site: "Sito", markets: "Mercati" },
+    sections: { legal: "Legale", site: "Sito", markets: "Mercati", discover: "Scopri" },
     links: {
       privacy: "Informativa sulla privacy",
       terms: "Termini di servizio",
@@ -627,6 +783,18 @@ const it: Pack = {
       refund: "Politica di rimborso",
       contact: "Contattaci",
       about: "Su Viralefy",
+    },
+    discover: {
+      pricing: "Prezzi",
+      cities: "Città",
+      compare: "Confronta Viralefy",
+      helpCenter: "Centro assistenza",
+      caseStudies: "Casi studio",
+      systemStatus: "Stato del sistema",
+      cookiePreferences: "Preferenze cookie",
+      referAndEarn: "Invita e guadagna",
+      subscriptions: "Abbonamenti",
+      developerApi: "API per sviluppatori",
     },
     copyright: "Tutti i diritti riservati.",
     disclaimer: "Viralefy non è affiliata a Instagram, TikTok o Meta Platforms.",
@@ -769,9 +937,21 @@ export const PACKS: Record<LangCode, Pack> = {
       regionAmericas: "Америка",
       regionSepa: "Европа / SEPA",
     },
+    notFound: {
+      title: "Этой страницы нет — но ваш следующий подписчик есть.",
+      description: "Контент, который вы искали, исчез или никогда не существовал. Продолжите там, где начинает большинство:",
+      browseAll: "Все услуги",
+      myAccount: "Мой аккаунт",
+      signIn: "Войти",
+      createAccount: "Создать аккаунт",
+      popularMarkets: "Популярные рынки",
+      viewAllMarkets: "Все рынки",
+      regionAmericas: "Америка",
+      regionSepa: "Европа / SEPA",
+    },
     footer: {
       tagline: "Ответственный рост в социальных сетях.",
-      sections: { legal: "Правовое", site: "Сайт", markets: "Рынки" },
+      sections: { legal: "Правовое", site: "Сайт", markets: "Рынки", discover: "Откройте" },
       links: {
         privacy: "Политика конфиденциальности",
         terms: "Условия использования",
@@ -779,6 +959,18 @@ export const PACKS: Record<LangCode, Pack> = {
         refund: "Политика возврата",
         contact: "Поддержка",
         about: "О Viralefy",
+      },
+      discover: {
+        pricing: "Цены",
+        cities: "Города",
+        compare: "Сравнить Viralefy",
+        helpCenter: "Центр помощи",
+        caseStudies: "Кейсы",
+        systemStatus: "Статус системы",
+        cookiePreferences: "Настройки cookie",
+        referAndEarn: "Реферал — зарабатывайте",
+        subscriptions: "Подписки",
+        developerApi: "API для разработчиков",
       },
       copyright: "Все права защищены.",
       disclaimer: "Viralefy не аффилирована с Instagram, TikTok или Meta Platforms.",

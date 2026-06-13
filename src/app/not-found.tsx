@@ -1,15 +1,45 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 import { COUNTRIES, countriesByRegion } from "@/i18n/countries";
 import { Flag } from "@/components/Flag";
+import { tr, type LangCode } from "@/i18n/languages";
 
 export const metadata = {
   title: "Page not found | Viralefy",
-  robots: { index: false, follow: true },
+  // BUG-186/201 do QA: 404 NÃO deve ser index + canonical pra "/" engana
+  // o Google. Marca noindex/nofollow + sem canonical (deixa o crawler tratar
+  // como soft-404 / drop).
+  robots: { index: false, follow: false },
+  alternates: { canonical: undefined },
 };
 
 const FEATURED = ["br", "pt", "us", "es", "ar", "mx", "de", "fr", "it", "gb"];
 
-export default function NotFound() {
+// Resolve o LangCode a partir do segmento de país detectado pelo middleware
+// (header x-locale = "pt-BR", "ja-JP", "en"...). Fallback: "en".
+function langFromLocale(locale: string): LangCode {
+  const base = locale.split("-")[0] as LangCode;
+  // tr() valida e devolve fallback se LangCode for desconhecido, então
+  // basta tentar a base e deixar o tr cuidar.
+  return base;
+}
+
+// Resolve país atual do pathname pra manter contexto no "Browse all services".
+// BUG-188 do QA: cair em "/" perde o mercado.
+function countryFromPathname(path: string): string | null {
+  const seg = path.split("/")[1] ?? "";
+  return COUNTRIES.some((c) => c.code === seg) ? seg : null;
+}
+
+export default async function NotFound() {
+  const h = await headers();
+  const locale = h.get("x-locale") || "en";
+  const path = h.get("x-pathname") || "/";
+  const lang = langFromLocale(locale);
+  const t = tr(lang);
+  const country = countryFromPathname(path);
+  const browseHref = country ? `/${country}` : "/";
+
   const featured = FEATURED.map((code) => COUNTRIES.find((c) => c.code === code))
     .filter((c): c is NonNullable<typeof c> => Boolean(c));
 
@@ -31,10 +61,10 @@ export default function NotFound() {
           404
         </p>
         <h1 style={{ fontSize: "clamp(1.4rem, 3vw, 2rem)", marginBottom: "0.75rem" }}>
-          This page doesn&apos;t exist — but your next follower does.
+          {t.notFound.title}
         </h1>
         <p style={{ color: "var(--muted)", maxWidth: 560, margin: "0 auto" }}>
-          The content you were looking for is gone or never existed. Continue where most customers start:
+          {t.notFound.description}
         </p>
       </section>
 
@@ -47,23 +77,23 @@ export default function NotFound() {
           marginBottom: "3rem",
         }}
       >
-        <Link href="/" className="btn btn-primary">
-          Browse all services
+        <Link href={browseHref} className="btn btn-primary">
+          {t.notFound.browseAll}
         </Link>
         <Link href="/account" className="btn btn-outline">
-          My account
+          {t.notFound.myAccount}
         </Link>
         <Link href="/login" className="btn btn-outline">
-          Sign in
+          {t.notFound.signIn}
         </Link>
         <Link href="/register" className="btn btn-outline">
-          Create account
+          {t.notFound.createAccount}
         </Link>
       </div>
 
       <section aria-labelledby="popular-markets">
         <h2 id="popular-markets" style={{ fontSize: "1.05rem", marginBottom: "0.75rem", textAlign: "center" }}>
-          Popular markets
+          {t.notFound.popularMarkets}
         </h2>
         <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", justifyContent: "center", marginBottom: "2.5rem" }}>
           {featured.map((c) => (
@@ -91,11 +121,11 @@ export default function NotFound() {
             marginBottom: "1rem",
           }}
         >
-          View all markets
+          {t.notFound.viewAllMarkets}
         </summary>
         <div style={{ marginTop: "1rem" }}>
           <h3 style={{ fontSize: "0.85rem", color: "var(--muted)", textAlign: "center", marginBottom: "0.5rem" }}>
-            Americas
+            {t.notFound.regionAmericas}
           </h3>
           <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", justifyContent: "center", marginBottom: "1.5rem" }}>
             {countriesByRegion("americas").map((c) => (
@@ -120,7 +150,7 @@ export default function NotFound() {
             ))}
           </div>
           <h3 style={{ fontSize: "0.85rem", color: "var(--muted)", textAlign: "center", marginBottom: "0.5rem" }}>
-            Europe / SEPA
+            {t.notFound.regionSepa}
           </h3>
           <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", justifyContent: "center" }}>
             {countriesByRegion("sepa").map((c) => (
