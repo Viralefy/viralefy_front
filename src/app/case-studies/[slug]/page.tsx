@@ -5,6 +5,16 @@ import { Footer } from "@/components/Footer";
 import { indexableMeta } from "@/lib/seo-meta";
 import { CASE_STUDIES, CASE_STUDY_DISCLAIMER, getCaseStudy } from "@/lib/case-studies";
 
+// BUG-153/165 do QA 2026-06-12: meta description cortada no meio da frase
+// (slice(0, 150)) terminava em "Pay i". Agora cortamos no último espaço
+// dentro do limite e sufixamos com "…" — frase legível em qualquer SERP.
+function smartTrim(s: string, max: number): string {
+  if (s.length <= max) return s;
+  const cut = s.slice(0, max);
+  const lastSpace = cut.lastIndexOf(" ");
+  return (lastSpace > max * 0.6 ? cut.slice(0, lastSpace) : cut).trimEnd() + "…";
+}
+
 type Params = { slug: string };
 
 function siteUrl() {
@@ -21,7 +31,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   if (!c) return { title: "Not found" };
   const canonical = `/case-studies/${slug}`;
   const title = `${c.title} | Viralefy case study`;
-  const description = `${c.industry} case study: ${c.challenge.slice(0, 150)}`;
+  const description = smartTrim(`${c.industry} case study: ${c.challenge}`, 158);
   const meta = indexableMeta({ publishedAt: c.publishedAt, modifiedAt: c.updatedAt });
   const og = `/og/case-studies/${slug}`;
   return {
@@ -74,7 +84,7 @@ export default async function CaseStudyDetailPage({ params }: { params: Promise<
       "@context": "https://schema.org",
       "@type": "Article",
       headline: c.title,
-      description: c.challenge.slice(0, 200),
+      description: smartTrim(c.challenge, 200),
       datePublished: c.publishedAt,
       dateModified: c.updatedAt,
       mainEntityOfPage: pageUrl,
@@ -97,12 +107,15 @@ export default async function CaseStudyDetailPage({ params }: { params: Promise<
 
       <article lang="en">
         <nav aria-label="Breadcrumb" className="container" style={{ paddingTop: "0.5rem", fontSize: "0.85rem", color: "var(--muted)" }}>
+          {/* BUG-152 do QA 2026-06-12: breadcrumb final mostrava categoria
+              (industry) — agora mostra título do case study pra refletir a
+              página atual. */}
           <ol style={{ listStyle: "none", display: "flex", gap: "0.5rem", padding: 0, flexWrap: "wrap" }}>
             <li><Link href="/">Home</Link></li>
             <li aria-hidden>›</li>
             <li><Link href="/case-studies">Case studies</Link></li>
             <li aria-hidden>›</li>
-            <li aria-current="page">{c.industry}</li>
+            <li aria-current="page">{c.title}</li>
           </ol>
         </nav>
 

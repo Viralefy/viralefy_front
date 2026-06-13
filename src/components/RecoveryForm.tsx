@@ -41,6 +41,29 @@ const EMPTY: FormState = {
   contactName: "",
 };
 
+// BUG-97 do QA 2026-06-12: o botão de submit do RecoveryForm tinha o preço
+// $10.000 hardcoded por idioma com símbolo errado em PT/ES (mostrava "$"
+// em vez de "R$" ou "MX$" mesmo com BRL/MXN selecionado). Agora derivamos
+// o label do botão a partir da moeda atual.
+const RECOVERY_USD_PRICE = 10000;
+
+function recoveryPriceLabel(symbol: string, rate: number, lang: LangCode): string {
+  const amount = RECOVERY_USD_PRICE * (rate || 1);
+  // Locale por LangCode pra formatação numérica adequada.
+  const loc = lang === "pt" ? "pt-BR"
+    : lang === "es" || lang === "es_AR" ? "es"
+    : lang === "fr" ? "fr"
+    : lang === "de" ? "de"
+    : lang === "it" ? "it"
+    : lang === "ru" ? "ru"
+    : "en-US";
+  try {
+    return `${symbol} ${new Intl.NumberFormat(loc, { maximumFractionDigits: 2 }).format(amount)}`;
+  } catch {
+    return `${symbol} ${amount.toFixed(2)}`;
+  }
+}
+
 const COPY: Record<string, Record<string, string>> = {
   en: {
     title: "Account recovery request",
@@ -57,7 +80,7 @@ const COPY: Record<string, Record<string, string>> = {
     descriptionPh: "Free text. Anything that helps us understand the case.",
     email: "Contact email",
     name: "Your name",
-    submit: "Continue to payment ($10,000)",
+    submitPrefix: "Continue to payment",
     sending: "Submitting…",
     success: "Order created. Redirecting to payment…",
     error: "Could not submit. Please retry.",
@@ -77,7 +100,7 @@ const COPY: Record<string, Record<string, string>> = {
     descriptionPh: "Texto livre. Qualquer coisa que ajude a entender o caso.",
     email: "E-mail de contato",
     name: "Seu nome",
-    submit: "Continuar para pagamento ($10.000)",
+    submitPrefix: "Continuar para pagamento",
     sending: "Enviando…",
     success: "Pedido criado. Redirecionando para o pagamento…",
     error: "Não conseguimos enviar. Tente novamente.",
@@ -97,7 +120,7 @@ const COPY: Record<string, Record<string, string>> = {
     descriptionPh: "Texto libre.",
     email: "E-mail de contacto",
     name: "Tu nombre",
-    submit: "Continuar al pago ($10.000)",
+    submitPrefix: "Continuar al pago",
     sending: "Enviando…",
     success: "Pedido creado. Redirigiendo al pago…",
     error: "No pudimos enviar. Intenta de nuevo.",
@@ -294,7 +317,13 @@ export function RecoveryForm({ lang }: { lang: LangCode }) {
           style={{ padding: "1rem", fontSize: "1.05rem" }}
           disabled={loading}
         >
-          {loading ? t.sending : t.submit}
+          {loading
+            ? t.sending
+            : `${t.submitPrefix} (${recoveryPriceLabel(
+                currency?.symbol ?? "$",
+                Number(currency?.rate ?? 1),
+                lang,
+              )})`}
         </button>
       </div>
     </form>

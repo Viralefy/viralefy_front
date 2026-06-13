@@ -58,7 +58,7 @@ export const CASE_STUDIES: CaseStudy[] = [
   },
   {
     slug: "agency-client-delivery-pipeline",
-    title: "Boutique agency standardised engagement delivery for 14 clients",
+    title: "Boutique agency standardized engagement delivery for 14 clients",
     industry: "Marketing agency",
     clientPersona: "Five-person social agency managing 14 active retainers across fashion, F&B and wellness.",
     challenge:

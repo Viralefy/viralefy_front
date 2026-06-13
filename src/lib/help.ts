@@ -272,7 +272,7 @@ export const HELP_TOPICS: HelpTopic[] = [
     category: "buying",
     updatedAt: UPDATED,
     intro:
-      "TikTok plans share most of the mechanics of Instagram plans but the platform behaviour is different enough to deserve its own guide. Delivery curves are typically faster because TikTok engagement settles quickly, and the For You feed reacts to early signals on a video more than to profile-level metrics. This guide explains what a TikTok follower plan does, what it does not do, and how to combine it with your posting strategy.",
+      "TikTok plans share most of the mechanics of Instagram plans but the platform behavior is different enough to deserve its own guide. Delivery curves are typically faster because TikTok engagement settles quickly, and the For You feed reacts to early signals on a video more than to profile-level metrics. This guide explains what a TikTok follower plan does, what it does not do, and how to combine it with your posting strategy.",
     sections: [
       {
         heading: "TikTok versus Instagram, in one paragraph",

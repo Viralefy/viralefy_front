@@ -106,10 +106,11 @@ function normalize(s: string): string {
   return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 }
 
-function search(query: string, limit = 12): Hit[] {
+function search(query: string, currentCountry: string, limit = 12): Hit[] {
   const q = normalize(query.trim());
   if (q.length < 2) return [];
   const tokens = q.split(/\s+/).filter(Boolean);
+  const cc = currentCountry.toLowerCase();
   const scored: Array<{ hit: Hit; score: number }> = [];
   for (const item of INDEX) {
     let score = 0;
@@ -125,13 +126,21 @@ function search(query: string, limit = 12): Hit[] {
       // Bônus quando o token bate diretamente no nome do mercado
       if (item.market.toLowerCase().includes(tok)) score += 4;
     }
-    if (allMatched) scored.push({ hit: item, score });
+    if (allMatched) {
+      // BUG-36/37/45/123/145/150 do QA 2026-06-12: busca não priorizava
+      // o mercado atual do visitante. Buscar "seguidores" em /br levava
+      // pra US como primeiro resultado. Damos peso 50 pro country atual
+      // pra ele sempre aparecer no topo, e bônus 8 pra outros países que
+      // falam o mesmo idioma (UX próxima).
+      if (cc && item.flagCode === cc) score += 50;
+      scored.push({ hit: item, score });
+    }
   }
   scored.sort((a, b) => b.score - a.score);
   return scored.slice(0, limit).map((s) => s.hit);
 }
 
-export function SearchBar({ lang }: { lang: LangCode }) {
+export function SearchBar({ lang, currentCountry = "" }: { lang: LangCode; currentCountry?: string }) {
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
@@ -140,7 +149,7 @@ export function SearchBar({ lang }: { lang: LangCode }) {
   const router = useRouter();
   const t = tr(lang);
 
-  const hits = useMemo(() => search(q), [q]);
+  const hits = useMemo(() => search(q, currentCountry), [q, currentCountry]);
 
   useEffect(() => {
     if (!open) return;

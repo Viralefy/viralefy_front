@@ -243,7 +243,7 @@ export function Header() {
 
         {/* Search — sempre visível; em mobile vai pra row 2 via CSS order/flex */}
         <div className="site-header__search">
-          <SearchBar lang={lang} />
+          <SearchBar lang={lang} currentCountry={countryCode} />
         </div>
 
         {/* Theme toggle + Currency + auth — só desktop */}
