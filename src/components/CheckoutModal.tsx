@@ -31,6 +31,7 @@ import { TrustSignals } from "./TrustSignals";
 import { CustomDataFields, hasCustomFields, type CustomData } from "./CustomDataFields";
 import type { CategoryCode } from "@/i18n/categories";
 import type { LangCode } from "@/i18n/languages";
+import { localizedPlanName } from "@/lib/plan-labels";
 import { Icon, type IconName } from "./Icon";
 
 // Fluxo novo de checkout em 4 steps:
@@ -273,7 +274,7 @@ export function CheckoutModal({
           {platformIcon} {platformLabel} · {isProfile ? "delivered to the profile" : "delivered to the post"}
         </p>
         <p style={{ marginBottom: "0.5rem" }}>
-          <strong>{plan.name}</strong> — {priceFor(plan, currency)}
+          <strong>{localizedPlanName(plan, lang)}</strong> — {priceFor(plan, currency)}
         </p>
 
         {step === "form" && (

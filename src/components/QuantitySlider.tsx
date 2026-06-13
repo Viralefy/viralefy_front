@@ -6,6 +6,7 @@ import { priceFor, priceForCountry } from "@/lib/format";
 import { useApp } from "./Providers";
 import { CheckoutModal } from "./CheckoutModal";
 import { tr, type LangCode } from "@/i18n/languages";
+import { localizedPlanName, localizedPlanDescription } from "@/lib/plan-labels";
 
 // Variante "calculadora" reutilizável (antes era apenas LandingCalculator pra
 // /v2). Recebe uma lista de planos JÁ filtrada pela categoria e um idioma; o
@@ -84,7 +85,7 @@ export function QuantitySlider({
             <p style={{ fontSize: "0.75rem", color: "var(--muted)", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: "0.25rem" }}>
               {t.category.suggested}
             </p>
-            <p style={{ fontSize: "1.1rem", fontWeight: 600, margin: 0 }}>{matched?.name ?? "—"}</p>
+            <p style={{ fontSize: "1.1rem", fontWeight: 600, margin: 0 }}>{matched ? localizedPlanName(matched, lang) : "—"}</p>
           </div>
           <div style={{ textAlign: "right" }}>
             <p style={{ fontSize: "0.75rem", color: "var(--muted)", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: "0.25rem" }}>
@@ -102,7 +103,7 @@ export function QuantitySlider({
           onClick={() => matched && setSelected(matched)}
           disabled={!matched}
         >
-          {t.cta.buyNow} — {matched?.name ?? ""}
+          {t.cta.buyNow} — {matched ? localizedPlanName(matched, lang) : ""}
         </button>
       </section>
 
@@ -130,8 +131,8 @@ export function QuantitySlider({
             {sorted.map((p) => (
               <tr key={p.id} style={{ borderBottom: "1px solid var(--border)" }}>
                 <td style={{ padding: "0.75rem 1rem" }}>
-                  <strong>{p.name}</strong>
-                  <div style={{ color: "var(--muted)", fontSize: "0.8rem" }}>{p.description}</div>
+                  <strong>{localizedPlanName(p, lang)}</strong>
+                  <div style={{ color: "var(--muted)", fontSize: "0.8rem" }}>{localizedPlanDescription(p, lang)}</div>
                 </td>
                 <td style={{ padding: "0.75rem 1rem", textAlign: "right", fontVariantNumeric: "tabular-nums" }}>
                   {p.followers_qty.toLocaleString()}

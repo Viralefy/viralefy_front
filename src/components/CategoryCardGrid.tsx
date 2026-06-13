@@ -10,6 +10,7 @@ import { useApp } from "./Providers";
 import { CheckoutModal } from "./CheckoutModal";
 import { tr, type LangCode } from "@/i18n/languages";
 import { categorySlug, type CategoryCode } from "@/i18n/categories";
+import { localizedPlanName, localizedPlanDescription } from "@/lib/plan-labels";
 import { Icon } from "./Icon";
 import Link from "next/link";
 
@@ -77,12 +78,12 @@ export function CategoryCardGrid({
           const planSlug = `${plan.followers_qty}-${catSlug}`;
           return (
             <article key={plan.id} className={`card plan-card ${i === Math.floor(sorted.length / 2) ? "featured" : ""}`}>
-              <h3>{plan.name}</h3>
-              <p style={{ color: "var(--muted)", fontSize: "0.9rem" }}>{plan.description}</p>
+              <h3>{localizedPlanName(plan, lang)}</h3>
+              <p style={{ color: "var(--muted)", fontSize: "0.9rem" }}>{localizedPlanDescription(plan, lang)}</p>
               <p className="plan-price">{priceForCountry(plan, currency, countryCode, pppMap)}</p>
               {pppActive && (
                 <p style={{ fontSize: "0.7rem", color: "var(--accent)", margin: 0, fontWeight: 600 }}>
-                  Local pricing applied
+                  {t.category.localPricing}
                 </p>
               )}
               {category !== "servicos" && (

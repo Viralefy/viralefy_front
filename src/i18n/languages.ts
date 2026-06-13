@@ -171,6 +171,7 @@ export type Pack = {
     faq: string;              // "Perguntas frequentes"
     breadcrumb: string;       // "Início"
     in: string;               // "em" — usado em "em <País>"
+    localPricing: string;     // "Preço local aplicado" badge PPP
   };
   plan: {
     delivery: string;         // "Entrega rápida"
@@ -281,6 +282,7 @@ const en: Pack = {
     faq: "FAQ",
     breadcrumb: "Home",
     in: "in",
+    localPricing: "Local pricing applied",
   },
   plan: {
     delivery: "Fast delivery",
@@ -389,6 +391,7 @@ const pt: Pack = {
     faq: "Perguntas frequentes",
     breadcrumb: "Início",
     in: "em",
+    localPricing: "Preço local aplicado",
   },
   plan: {
     delivery: "Entrega rápida",
@@ -497,6 +500,7 @@ const es: Pack = {
     faq: "Preguntas frecuentes",
     breadcrumb: "Inicio",
     in: "en",
+    localPricing: "Precio local aplicado",
   },
   plan: {
     delivery: "Entrega rápida",
@@ -605,6 +609,7 @@ const fr: Pack = {
     faq: "FAQ",
     breadcrumb: "Accueil",
     in: "en",
+    localPricing: "Tarif local appliqué",
   },
   plan: {
     delivery: "Livraison rapide",
@@ -712,6 +717,7 @@ const de: Pack = {
     faq: "FAQ",
     breadcrumb: "Start",
     in: "in",
+    localPricing: "Lokaler Preis angewendet",
   },
   plan: {
     delivery: "Schnelle Lieferung",
@@ -818,6 +824,7 @@ const it: Pack = {
     table: { plan: "Pacchetto", qty: "Quantità", price: "Prezzo" },
     faq: "FAQ",
     breadcrumb: "Home",
+    localPricing: "Prezzo locale applicato",
     in: "in",
   },
   plan: {
@@ -995,6 +1002,7 @@ export const PACKS: Record<LangCode, Pack> = {
       faq: "Часто задаваемые вопросы",
       breadcrumb: "Главная",
       in: "в",
+      localPricing: "Локальная цена применена",
     },
     plan: {
       delivery: "Быстрая доставка",

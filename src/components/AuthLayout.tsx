@@ -39,8 +39,11 @@ const PILLARS: Pillar[] = [
     copy: "Most plans start in minutes — large orders pace organically.",
   },
   {
+    // Important: o pillar fala sobre NÃO precisar da senha do Instagram/TikTok
+    // do cliente (BUG-43 do QA — antes parecia contradizer o campo senha do
+    // registro do próprio Viralefy).
     icon: "lock",
-    title: "No password required",
+    title: "We never ask for your IG / TikTok password",
     copy: "Pay first, claim your delivery later — no platform credentials shared.",
   },
 ];

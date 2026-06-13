@@ -8,6 +8,7 @@ import { useApp } from "./Providers";
 import { CheckoutModal } from "./CheckoutModal";
 import { CATEGORY_CODES, categoryLabel, categorySlug, categoryUnit } from "@/i18n/categories";
 import { tr, type LangCode } from "@/i18n/languages";
+import { localizedPlanName, localizedPlanDescription } from "@/lib/plan-labels";
 
 // Grid usado em /<country> e em / (global). Agrupa os planos por categoria
 // na ordem canônica (seguidores → likes → comments → shares → views →
@@ -69,8 +70,8 @@ export function CategoryGroupedGrid({
             <div className="grid-plans">
               {g.items.map((plan) => (
                 <article key={plan.id} className="card plan-card">
-                  <h4 style={{ fontSize: "1rem" }}>{plan.name}</h4>
-                  <p style={{ color: "var(--muted)", fontSize: "0.85rem" }}>{plan.description}</p>
+                  <h4 style={{ fontSize: "1rem" }}>{localizedPlanName(plan, lang)}</h4>
+                  <p style={{ color: "var(--muted)", fontSize: "0.85rem" }}>{localizedPlanDescription(plan, lang)}</p>
                   <p className="plan-price">{priceFor(plan, currency)}</p>
                   {g.code !== "servicos" && (
                     <p style={{ fontSize: "0.9rem" }}>

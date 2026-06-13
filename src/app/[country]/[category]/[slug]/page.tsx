@@ -5,6 +5,7 @@ import type { AggregateRating, Plan, PublicReview } from "@/lib/api";
 import { buildAggregateRating, buildOfferEnhancements } from "@/lib/jsonld";
 import { slugAlternates } from "@/lib/hreflang";
 import { indexableMeta } from "@/lib/seo-meta";
+import { localizedPlanName } from "@/lib/plan-labels";
 import { COUNTRIES, getCountry } from "@/i18n/countries";
 import { langOfCountry, tr } from "@/i18n/languages";
 import {
@@ -273,12 +274,12 @@ export default async function PlanPage({ params }: { params: Promise<Params> }) 
             <li aria-hidden>›</li>
             <li><Link href={`/${c.code}/${catSlug}`}>{catLabel}</Link></li>
             <li aria-hidden>›</li>
-            <li aria-current="page">{plan.name}</li>
+            <li aria-current="page">{localizedPlanName(plan, lang)}</li>
           </ol>
         </nav>
 
         <header className="hero container" style={{ paddingBottom: "1.5rem" }}>
-          <h1>{plan.name} — {c.name}</h1>
+          <h1>{localizedPlanName(plan, lang)} — {c.name}</h1>
           <p>{narrative[0]}</p>
           {aggregate && aggregate.review_count > 0 && (
             <ReviewStars aggregate={aggregate} />
