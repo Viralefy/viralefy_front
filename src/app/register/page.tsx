@@ -80,7 +80,21 @@ function RegisterPageInner() {
   const [phone, setPhone] = useState("");
   const [telegram, setTelegram] = useState("");
 
-  const contactOk = phone.trim().length > 0 || telegram.trim().length > 0;
+  // BUG-147 do QA: phone aceitava qualquer texto. Validamos formato
+  // permissivo (E.164-ish: dígitos, espaço, hifen, parêntese, prefixo +).
+  // Tamanho mín. 8 cobre 99% dos planos numéricos sem rejeitar formatos.
+  const phoneOk =
+    phone.trim() === "" ||
+    /^\+?[\d\s().-]{8,20}$/.test(phone.trim());
+
+  // BUG-148: Telegram aceitava qualquer texto. Validamos "@handle" (>=5
+  // chars Telegram) ou URL t.me/username.
+  const telegramOk =
+    telegram.trim() === "" ||
+    /^@?[a-zA-Z][a-zA-Z0-9_]{4,31}$/.test(telegram.trim()) ||
+    /^https?:\/\/(t\.me|telegram\.me)\/[a-zA-Z][a-zA-Z0-9_]{4,31}$/i.test(telegram.trim());
+
+  const contactOk = (phone.trim().length > 0 && phoneOk) || (telegram.trim().length > 0 && telegramOk);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -129,6 +143,14 @@ function RegisterPageInner() {
     }
     if (!password || password.length < 8) {
       setError("Password must be at least 8 characters.");
+      return;
+    }
+    if (phone.trim() && !phoneOk) {
+      setError("Phone number doesn't look valid. Use format like +55 11 98765-4321.");
+      return;
+    }
+    if (telegram.trim() && !telegramOk) {
+      setError("Telegram should be @yourhandle or t.me/yourhandle.");
       return;
     }
     if (!contactOk) {

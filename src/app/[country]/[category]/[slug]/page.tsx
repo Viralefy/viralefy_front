@@ -211,7 +211,13 @@ export default async function PlanPage({ params }: { params: Promise<Params> }) 
   const { reviews, aggregate } = await getReviews(plan.id);
 
   const idx = catPlans.findIndex((p) => p.id === plan.id);
-  const related = [catPlans[idx - 1], catPlans[idx + 1]].filter(Boolean) as Plan[];
+  // BUG-21 do QA 2026-06-12: antes mostrava só 2 vizinhos imediatos (e
+  // virava 1 quando o plan estava na borda). Agora pega até 5 outros
+  // ordenados por proximidade, garantindo grid cheio em qualquer posição.
+  const related = catPlans
+    .filter((p) => p.id !== plan.id)
+    .sort((a, b) => Math.abs(a.followers_qty - plan.followers_qty) - Math.abs(b.followers_qty - plan.followers_qty))
+    .slice(0, 5) as Plan[];
   const url = siteUrl();
   const pageUrl = `${url}/${c.code}/${catSlug}/${qty}-${catSlug}`;
   const narrative = planNarrative(lang, cat, catLabel, qty, c.name);

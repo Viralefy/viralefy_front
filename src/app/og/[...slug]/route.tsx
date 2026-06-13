@@ -14,7 +14,21 @@ import {
   categoryFromSlug,
   categoryLabel,
 } from "@/i18n/categories";
+import { langOfCountry, type LangCode } from "@/i18n/languages";
 import type { Plan } from "@/lib/api";
+
+// Idiomas que satori (renderer next/og) sabe renderizar bem. Scripts RTL
+// (árabe, hebraico) + alguns indianos quebram com "lookupType is not yet
+// supported". Pra esses ficamos em inglês na OG image (o título HTML da
+// página continua localizado — só a imagem usa inglês). BUG-46/100 do QA.
+const OG_SAFE_LANGS = new Set<LangCode>([
+  "en", "pt", "es", "es_AR", "fr", "de", "it", "nl", "ru", "uk",
+  "pl", "sv", "da", "no", "fi", "is", "et", "lv", "lt", "cs",
+  "sk", "hu", "ro", "bg", "el", "hr", "sl", "ca", "tr", "id", "vi",
+]);
+function isOgSafeLang(lang: LangCode): boolean {
+  return OG_SAFE_LANGS.has(lang);
+}
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -87,13 +101,30 @@ export async function GET(
 
   // Defaults seguros pra qualquer combinação inválida — devolvemos uma
   // imagem genérica em vez de 404 (Twitter/Facebook insistem em retentar).
-  // Renderizamos sempre em inglês: nome do país via Intl.DisplayNames (en),
-  // label da categoria via `en` no CATEGORY_LABEL. Vê comentário em
-  // `englishCountryName` pro motivo.
+  // Renderiza no idioma do país QUANDO o idioma é safe pro satori. Países
+  // com script Arabic/Hebrew/Devanagari complexo continuam em inglês pra
+  // evitar 502. Fix BUG-46/100 do QA — antes era sempre inglês.
+  const lang: LangCode = country ? langOfCountry(country.code) : "en";
+  const safe = isOgSafeLang(lang);
   const countryName = country
-    ? englishCountryName(country.code, country.name)
+    ? (safe
+        ? country.name
+        : englishCountryName(country.code, country.name))
     : "the world";
-  const catLabel = cat ? categoryLabel(cat, "en") : "social growth";
+  const catLabel = cat ? categoryLabel(cat, safe ? lang : "en") : "social growth";
+
+  // Preposição "in/em/en/in/dans/in/v" minúscula. Pra idiomas safe usamos
+  // a tradução local — pra idiomas RTL não-safe cai em "in" inglês.
+  const inWord: string = safe
+    ? (lang === "pt" ? "em"
+      : lang === "es" || lang === "es_AR" || lang === "ca" ? "en"
+      : lang === "fr" ? "en"
+      : lang === "de" ? "in"
+      : lang === "it" ? "in"
+      : lang === "nl" ? "in"
+      : lang === "ru" || lang === "uk" ? "в"
+      : "in")
+    : "in";
 
   let title: string;
   let priceLabel: string | null = null;
@@ -105,14 +136,24 @@ export async function GET(
     if (planSlug) {
       const qty = qtyFromSlug(planSlug);
       const plan = qty != null ? catPlans.find((p) => p.followers_qty === qty) : undefined;
-      title = plan ? `${plan.name}` : `${catLabel} in ${countryName}`;
+      title = plan ? `${plan.name}` : `${catLabel} ${inWord} ${countryName}`;
       priceLabel = exactPriceLabel(plan) ?? fromPriceLabel(catPlans);
     } else {
-      title = `${catLabel} in ${countryName}`;
+      title = `${catLabel} ${inWord} ${countryName}`;
       priceLabel = fromPriceLabel(catPlans);
     }
   } else if (country) {
-    title = `Grow in ${countryName}`;
+    title = safe && lang === "pt"
+      ? `Cresça em ${countryName}`
+      : safe && (lang === "es" || lang === "es_AR")
+      ? `Crece en ${countryName}`
+      : safe && lang === "fr"
+      ? `Grandissez en ${countryName}`
+      : safe && lang === "de"
+      ? `Wachsen in ${countryName}`
+      : safe && lang === "it"
+      ? `Cresci in ${countryName}`
+      : `Grow in ${countryName}`;
   } else {
     title = "Instagram & TikTok growth worldwide";
   }

@@ -30,7 +30,7 @@ import { useApp } from "./Providers";
 import { TrustSignals } from "./TrustSignals";
 import { CustomDataFields, hasCustomFields, type CustomData } from "./CustomDataFields";
 import type { CategoryCode } from "@/i18n/categories";
-import type { LangCode } from "@/i18n/languages";
+import { tr, type LangCode } from "@/i18n/languages";
 import { localizedPlanName } from "@/lib/plan-labels";
 import { Icon, type IconName } from "./Icon";
 
@@ -59,6 +59,10 @@ export function CheckoutModal({
   targetCountry?: string;
 }) {
   const { currency, user } = useApp();
+  const t = tr(lang);
+  // checkout-section vem do bloco i18n. Nunca undefined porque tr() faz
+  // fallback pra en quando o idioma não tem cópia própria.
+  const tc = t.checkout!;
   const isProfile = plan.target_type === "profile";
   const platformLabel = plan.platform === "tiktok" ? "TikTok" : "Instagram";
   const platformIconName: IconName = plan.platform === "tiktok" ? "tiktok" : "instagram";
@@ -260,9 +264,9 @@ export function CheckoutModal({
           null
         } />
         <h2 style={{ marginBottom: "0.25rem" }}>
-          {step === "form" && "Complete purchase"}
-          {step === "method" && "Choose payment method"}
-          {step === "instructions" && "Complete your payment"}
+          {step === "form" && tc.completePurchase}
+          {step === "method" && tc.choosePaymentMethod}
+          {step === "instructions" && tc.completePayment}
           {step === "success" && (
             <span style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem" }}>
               <Icon name="celebrate" size={22} color="var(--accent, #00fed6)" />
@@ -286,11 +290,11 @@ export function CheckoutModal({
               {!user && (
                 <>
                   <div>
-                    <label className="label" htmlFor="name">Full name</label>
+                    <label className="label" htmlFor="name">{tc.fullName}</label>
                     <input className="input" id="name" name="name" required />
                   </div>
                   <div>
-                    <label className="label" htmlFor="email">Email</label>
+                    <label className="label" htmlFor="email">{tc.email}</label>
                     <input className="input" id="email" name="email" type="email" required />
                   </div>
                   <p style={{ color: "var(--muted)", fontSize: "0.8rem", margin: 0 }}>
@@ -361,12 +365,12 @@ export function CheckoutModal({
               )}
 
               <button type="submit" data-testid="checkout-submit" className="btn btn-primary" disabled={loading}>
-                {loading ? "Processing…" :
-                  payMethod === "credits" ? "Pay with credits" : "Continue → choose method"}
+                {loading ? tc.creatingOrder :
+                  payMethod === "credits" ? tc.payWithCredits : tc.continueChooseMethod}
               </button>
             </form>
             <button type="button" className="btn btn-outline" style={{ marginTop: "1rem", width: "100%" }} onClick={onClose}>
-              Cancel
+              {tc.cancel}
             </button>
           </>
         )}
@@ -758,11 +762,27 @@ function ProfileSection({
   useNewProfile: boolean;
   setUseNewProfile: (b: boolean) => void;
 }) {
+  // BUG-16 do QA 2026-06-12: handle Instagram aceitava "usuario invalido!"
+  // até passar pra step de pagamento. Validamos client-side: letras, números,
+  // underscore e ponto, 1-30 chars. TikTok permite a mesma faixa. Permite
+  // @ opcional no início pra UX.
+  const HANDLE_PATTERN = "^@?[A-Za-z0-9._]{1,30}$";
   if (!user) {
     return (
       <div>
         <label className="label" htmlFor="handle">{platformIcon} @ on {platformLabel}</label>
-        <input className="input" id="handle" name="handle" placeholder="yourhandle" required />
+        <input
+          className="input"
+          id="handle"
+          name="handle"
+          placeholder="yourhandle"
+          pattern={HANDLE_PATTERN}
+          title="Letters, numbers, dot and underscore. No spaces or special chars."
+          autoCapitalize="off"
+          autoCorrect="off"
+          spellCheck={false}
+          required
+        />
       </div>
     );
   }
@@ -785,7 +805,17 @@ function ProfileSection({
       ) : (
         <>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
-            <input className="input" name="handle" placeholder="@ handle" required />
+            <input
+              className="input"
+              name="handle"
+              placeholder="@ handle"
+              pattern={HANDLE_PATTERN}
+              title="Letters, numbers, dot and underscore. No spaces or special chars."
+              autoCapitalize="off"
+              autoCorrect="off"
+              spellCheck={false}
+              required
+            />
             <input className="input" name="display_name" placeholder="Nickname (optional)" />
           </div>
           {profiles && profiles.length > 0 && (

@@ -113,6 +113,42 @@ export type Pack = {
     regionAmericas: string;
     regionSepa: string;
   };
+  // Opcional: idiomas que ainda não receberam tradução do checkout caem
+  // no fallback de en automaticamente via tr(). Render usa
+  // t.checkout?.x ?? englishFallback. Permite shipear tradução por idioma
+  // sem precisar travar build até cobrir os 25 idiomas.
+  checkout?: {
+    completePurchase: string;
+    choosePaymentMethod: string;
+    completePayment: string;
+    pickHowYouPay: string;
+    pickAMethod: string;
+    confirmPay: string;
+    payWithCredits: string;
+    continueChooseMethod: string;
+    cancel: string;
+    back: string;
+    fullName: string;
+    email: string;
+    instagramHandle: string;
+    tiktokHandle: string;
+    promoCode: string;
+    apply: string;
+    checking: string;
+    creatingOrder: string;
+    couponNotFound: string;
+    couponApplied: string;
+    payWithCard: string;
+    payWithPix: string;
+    payWithCrypto: string;
+    openStripe: string;
+    alreadyPaid: string;
+    receiptFile: string;
+    receiptNote: string;
+    skipUpload: string;
+    pixCodeCopy: string;
+    pixCodeCopied: string;
+  };
   notFound: {
     title: string;            // big hero
     description: string;      // sub-line
@@ -224,6 +260,38 @@ const en: Pack = {
     regionAmericas: "Americas",
     regionSepa: "Europe / SEPA",
   },
+  checkout: {
+    completePurchase: "Complete purchase",
+    choosePaymentMethod: "Choose payment method",
+    completePayment: "Complete payment",
+    pickHowYouPay: "Pick how you want to pay. The amount in your chosen method is shown below.",
+    pickAMethod: "Pick a method first",
+    confirmPay: "Confirm — pay",
+    payWithCredits: "Pay with credits",
+    continueChooseMethod: "Continue → choose method",
+    cancel: "Cancel",
+    back: "← Back",
+    fullName: "Full name",
+    email: "Email",
+    instagramHandle: "@ on Instagram",
+    tiktokHandle: "@ on TikTok",
+    promoCode: "Promo code (optional)",
+    apply: "Apply",
+    checking: "Checking…",
+    creatingOrder: "Creating order…",
+    couponNotFound: "Coupon not found",
+    couponApplied: "Coupon applied",
+    payWithCard: "Pay with card",
+    payWithPix: "Pay with Pix",
+    payWithCrypto: "Pay with crypto",
+    openStripe: "Open Stripe checkout →",
+    alreadyPaid: "Already paid? Upload your proof",
+    receiptFile: "Receipt file (image or PDF, max 5 MB)",
+    receiptNote: "Note (transaction reference, time, etc.)",
+    skipUpload: "Skip — I'll upload later",
+    pixCodeCopy: "Copy Pix code",
+    pixCodeCopied: "Copied!",
+  },
   notFound: {
     title: "This page doesn't exist — but your next follower does.",
     description: "The content you were looking for is gone or never existed. Continue where most customers start:",
@@ -332,6 +400,38 @@ const pt: Pack = {
     searchNoResults: "Nenhum resultado.",
     regionAmericas: "Américas",
     regionSepa: "Europa / SEPA",
+  },
+  checkout: {
+    completePurchase: "Finalizar compra",
+    choosePaymentMethod: "Escolha o método de pagamento",
+    completePayment: "Conclua o pagamento",
+    pickHowYouPay: "Escolha como quer pagar. O valor no método escolhido aparece abaixo.",
+    pickAMethod: "Selecione um método primeiro",
+    confirmPay: "Confirmar — pagar",
+    payWithCredits: "Pagar com créditos",
+    continueChooseMethod: "Continuar → escolher método",
+    cancel: "Cancelar",
+    back: "← Voltar",
+    fullName: "Nome completo",
+    email: "E-mail",
+    instagramHandle: "@ do Instagram",
+    tiktokHandle: "@ do TikTok",
+    promoCode: "Cupom (opcional)",
+    apply: "Aplicar",
+    checking: "Verificando…",
+    creatingOrder: "Criando pedido…",
+    couponNotFound: "Cupom não encontrado",
+    couponApplied: "Cupom aplicado",
+    payWithCard: "Pagar com cartão",
+    payWithPix: "Pagar com Pix",
+    payWithCrypto: "Pagar com cripto",
+    openStripe: "Abrir checkout Stripe →",
+    alreadyPaid: "Já pagou? Envie o comprovante",
+    receiptFile: "Comprovante (imagem ou PDF, até 5 MB)",
+    receiptNote: "Observação (ID da transação, horário, etc.)",
+    skipUpload: "Pular — envio depois",
+    pixCodeCopy: "Copiar código Pix",
+    pixCodeCopied: "Copiado!",
   },
   notFound: {
     title: "Essa página não existe — mas o seu próximo seguidor existe.",
@@ -524,6 +624,38 @@ const es: Pack = {
   live: {
     ordersToday: "pedidos hoy",
     lastHour: "en la última hora",
+  },
+  checkout: {
+    completePurchase: "Completar compra",
+    choosePaymentMethod: "Elige método de pago",
+    completePayment: "Completa el pago",
+    pickHowYouPay: "Elige cómo quieres pagar. El importe en el método elegido aparece debajo.",
+    pickAMethod: "Primero elige un método",
+    confirmPay: "Confirmar — pagar",
+    payWithCredits: "Pagar con créditos",
+    continueChooseMethod: "Continuar → elegir método",
+    cancel: "Cancelar",
+    back: "← Volver",
+    fullName: "Nombre completo",
+    email: "Email",
+    instagramHandle: "@ en Instagram",
+    tiktokHandle: "@ en TikTok",
+    promoCode: "Cupón (opcional)",
+    apply: "Aplicar",
+    checking: "Comprobando…",
+    creatingOrder: "Creando pedido…",
+    couponNotFound: "Cupón no encontrado",
+    couponApplied: "Cupón aplicado",
+    payWithCard: "Pagar con tarjeta",
+    payWithPix: "Pagar con Pix",
+    payWithCrypto: "Pagar con cripto",
+    openStripe: "Abrir checkout Stripe →",
+    alreadyPaid: "¿Ya pagaste? Sube tu comprobante",
+    receiptFile: "Comprobante (imagen o PDF, máx. 5 MB)",
+    receiptNote: "Nota (ID de transacción, hora, etc.)",
+    skipUpload: "Omitir — lo subo después",
+    pixCodeCopy: "Copiar código Pix",
+    pixCodeCopied: "¡Copiado!",
   },
 };
 
@@ -1031,5 +1163,11 @@ export const PACKS: Record<LangCode, Pack> = {
 };
 
 export function tr(lang: LangCode): Pack {
-  return PACKS[lang] ?? en;
+  const pack = PACKS[lang] ?? en;
+  // Subbloco `checkout` é opcional por idioma (rolling translation). Se o
+  // pack atual não tem, usa o de en pra que o consumer nunca veja undefined.
+  if (!pack.checkout) {
+    return { ...pack, checkout: en.checkout };
+  }
+  return pack;
 }
