@@ -132,7 +132,7 @@ const COOKIES: CookieRow[] = [
       pt: "Armazena suas escolhas de consentimento de cookies (preferências, analytics, marketing). Sem ele o banner não consegue lembrar sua decisão.",
     },
     category: "necessary",
-    duration: { en: "12 months (re-prompt)", pt: "12 meses (re-prompt)" },
+    duration: { en: "12 months (re-prompt)", pt: "12 meses (reconfirmação)" },
     type: "localStorage",
   },
   {
@@ -197,16 +197,30 @@ const COOKIES: CookieRow[] = [
   },
 ];
 
-function CategoryBadge({ category }: { category: CookieRow["category"] }) {
-  // Cores acompanham o CookieBanner pra criar reconhecimento visual com
-  // os toggles que o usuário vê lá.
-  const palette: Record<CookieRow["category"], { bg: string; fg: string; label: string }> = {
-    necessary: { bg: "#1f4f2a", fg: "#a7f3c1", label: "Necessary" },
-    preferences: { bg: "#1f3a4f", fg: "#a7d2f3", label: "Preferences" },
-    analytics: { bg: "#4f3a1f", fg: "#f3d2a7", label: "Analytics" },
-    marketing: { bg: "#4f1f3a", fg: "#f3a7d2", label: "Marketing" },
+// BUG-142 do QA 2026-06-12: badges da tabela de cookies estavam fixas em
+// EN ("NECESSARY", "PREFERENCES"…) mesmo no documento PT. Agora aceitam
+// `lang` e renderizam no idioma do documento.
+function CategoryBadge({
+  category,
+  lang,
+}: {
+  category: CookieRow["category"];
+  lang: "en" | "pt" | "es";
+}) {
+  const labels: Record<CookieRow["category"], { en: string; pt: string; es: string }> = {
+    necessary:   { en: "Necessary",   pt: "Essenciais",  es: "Necesarias" },
+    preferences: { en: "Preferences", pt: "Preferências", es: "Preferencias" },
+    analytics:   { en: "Analytics",   pt: "Analíticos",  es: "Analíticas" },
+    marketing:   { en: "Marketing",   pt: "Marketing",   es: "Marketing" },
+  };
+  const palette: Record<CookieRow["category"], { bg: string; fg: string }> = {
+    necessary:   { bg: "#1f4f2a", fg: "#a7f3c1" },
+    preferences: { bg: "#1f3a4f", fg: "#a7d2f3" },
+    analytics:   { bg: "#4f3a1f", fg: "#f3d2a7" },
+    marketing:   { bg: "#4f1f3a", fg: "#f3a7d2" },
   };
   const c = palette[category];
+  const label = labels[category][lang];
   return (
     <span
       style={{
@@ -221,7 +235,7 @@ function CategoryBadge({ category }: { category: CookieRow["category"] }) {
         letterSpacing: "0.5px",
       }}
     >
-      {c.label}
+      {label}
     </span>
   );
 }
@@ -318,7 +332,7 @@ export default async function CookiesLegalPage({
                     <td style={{ padding: "0.6rem 0.8rem", color: "var(--muted)" }}>{c.provider}</td>
                     <td style={{ padding: "0.6rem 0.8rem", color: "var(--muted)" }}>{c.party === "1st" ? (isPT ? "Próprio" : "First") : (isPT ? "Terceiro" : "Third")}</td>
                     <td style={{ padding: "0.6rem 0.8rem" }}>
-                      <CategoryBadge category={c.category} />
+                      <CategoryBadge category={c.category} lang={isPT ? "pt" : lang === "es" ? "es" : "en"} />
                     </td>
                     <td style={{ padding: "0.6rem 0.8rem", color: "var(--muted)" }}>
                       {isPT ? c.purpose.pt : c.purpose.en}

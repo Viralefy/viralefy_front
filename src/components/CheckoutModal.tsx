@@ -30,9 +30,11 @@ import { useApp } from "./Providers";
 import { TrustSignals } from "./TrustSignals";
 import { CustomDataFields, hasCustomFields, type CustomData } from "./CustomDataFields";
 import type { CategoryCode } from "@/i18n/categories";
-import { tr, type LangCode } from "@/i18n/languages";
+import { tr, type LangCode, type Pack } from "@/i18n/languages";
 import { localizedPlanName } from "@/lib/plan-labels";
 import { Icon, type IconName } from "./Icon";
+
+type CheckoutT = NonNullable<Pack["checkout"]>;
 
 // Fluxo novo de checkout em 4 steps:
 //   1. form        — preenche dados do pedido (nome, perfil, cupom...)
@@ -398,11 +400,12 @@ export function CheckoutModal({
             onSelect={setSelectedMethod}
             onConfirm={confirmSelectedMethod}
             onBack={() => setStep("form")}
+            tc={tc}
           />
         )}
 
         {step === "instructions" && result && (
-          <Instructions result={result} onDone={() => setStep("success")} />
+          <Instructions result={result} onDone={() => setStep("success")} tc={tc} />
         )}
 
         {step === "success" && result && (
@@ -451,7 +454,7 @@ function StepHeader({ step, onBack }: { step: Step; onBack: (() => void) | null 
 }
 
 function MethodPicker({
-  methods, error, loading, selected, onSelect, onConfirm, onBack,
+  methods, error, loading, selected, onSelect, onConfirm, onBack, tc,
 }: {
   methods: PaymentMethodOption[] | null;
   error: string | null;
@@ -460,15 +463,16 @@ function MethodPicker({
   onSelect: (m: PaymentMethodOption) => void;
   onConfirm: () => void;
   onBack: () => void;
+  tc: CheckoutT;
 }) {
   if (loading && !methods) {
-    return <p style={{ color: "var(--muted)" }}>Loading payment options…</p>;
+    return <p style={{ color: "var(--muted)" }}>{tc.checking}</p>;
   }
   if (error) {
     return (
       <>
         <div className="alert alert-error">{error}</div>
-        <button type="button" className="btn btn-outline" onClick={onBack} style={{ width: "100%" }}>← Back</button>
+        <button type="button" className="btn btn-outline" onClick={onBack} style={{ width: "100%" }}>{tc.back}</button>
       </>
     );
   }
@@ -490,14 +494,14 @@ function MethodPicker({
             We don&apos;t currently support a payment method for your country and selected display currency. Switch to USD/USDT in the top-right currency picker, or contact support.
           </p>
         </div>
-        <button type="button" className="btn btn-outline" onClick={onBack} style={{ width: "100%" }}>← Back</button>
+        <button type="button" className="btn btn-outline" onClick={onBack} style={{ width: "100%" }}>{tc.back}</button>
       </>
     );
   }
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
       <p style={{ fontSize: "0.85rem", color: "var(--muted)", margin: 0 }}>
-        Pick how you want to pay. The amount in your chosen method is shown below.
+        {tc.pickHowYouPay}
       </p>
       <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
         {methods.map((m) => (
@@ -518,14 +522,14 @@ function MethodPicker({
         style={{ width: "100%" }}
       >
         {loading
-          ? "Creating order…"
+          ? tc.creatingOrder
           : selected
             // BUG-93 do QA 2026-06-12: o botão mostrava "Confirm — pay 13.53 BRL"
             // sem símbolo R$. Backend retorna charged_symbol (R$/€/£/$ ou
             // ₿/Ξ…); usamos no formato "Confirm — pay R$ 13,53" pra ficar
             // intuitivo no contexto BR.
-            ? `Confirm — pay ${selected.charged_symbol ?? ""} ${selected.charged_amount} ${selected.charged_currency}`.trim()
-            : "Pick a method first"}
+            ? `${tc.confirmPay} ${selected.charged_symbol ?? ""} ${selected.charged_amount} ${selected.charged_currency}`.trim()
+            : tc.pickAMethod}
       </button>
     </div>
   );
@@ -594,7 +598,7 @@ function MethodCard({
   );
 }
 
-function Instructions({ result, onDone }: { result: CheckoutResult; onDone: () => void }) {
+function Instructions({ result, onDone, tc }: { result: CheckoutResult; onDone: () => void; tc: CheckoutT }) {
   // BUG-61 do QA 2026-06-12: Stripe / cartão NÃO precisa de comprovante —
   // o gateway confirma a captura automaticamente. Antes mostrava "Upload
   // your proof" mesmo em fluxo de cartão, confundindo o usuário. PIX/cripto
@@ -606,15 +610,15 @@ function Instructions({ result, onDone }: { result: CheckoutResult; onDone: () =
   return (
     <>
       <PaymentInstructions result={result} />
-      {!isCard && <ProofUploadSection orderId={result.order_id} onUploaded={onDone} />}
+      {!isCard && <ProofUploadSection orderId={result.order_id} onUploaded={onDone} tc={tc} />}
       <button type="button" className="btn btn-outline" style={{ marginTop: "0.75rem", width: "100%" }} onClick={onDone}>
-        {isCard ? "Done" : "Skip — I'll upload later"}
+        {isCard ? "Done" : tc.skipUpload}
       </button>
     </>
   );
 }
 
-function ProofUploadSection({ orderId, onUploaded }: { orderId: string; onUploaded: () => void }) {
+function ProofUploadSection({ orderId, onUploaded, tc }: { orderId: string; onUploaded: () => void; tc: CheckoutT }) {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [note, setNote] = useState("");
@@ -684,24 +688,24 @@ function ProofUploadSection({ orderId, onUploaded }: { orderId: string; onUpload
       }}
     >
       <h3 style={{ fontSize: "1rem", marginBottom: "0.4rem" }}>
-        Already paid? Upload your proof
+        {tc.alreadyPaid}
       </h3>
-      <p style={{ color: "var(--muted)", fontSize: "0.8rem", marginBottom: "0.5rem" }}>
-        Send a screenshot of your PIX receipt or your crypto transaction hash. We&apos;ll activate the order once we confirm the deposit.
-      </p>
       {err && <div className="alert alert-error" style={{ marginBottom: "0.5rem" }}>{err}</div>}
-      <label className="label">Receipt file (image or PDF, max 5 MB)</label>
+      <label className="label">{tc.receiptFile}</label>
       <input className="input" type="file" accept="image/*,application/pdf" onChange={onFile} disabled={busy} />
-      {fileName && <p style={{ fontSize: "0.75rem", color: "var(--muted)" }}>Selected: {fileName}</p>}
-      <label className="label" style={{ marginTop: "0.5rem" }}>Note (TX hash, time, etc.)</label>
+      {fileName && <p style={{ fontSize: "0.75rem", color: "var(--muted)" }}>{fileName}</p>}
+      <label className="label" style={{ marginTop: "0.5rem" }}>{tc.receiptNote}</label>
       <textarea
         className="input"
         rows={2}
         value={note}
         onChange={(e) => setNote(e.target.value)}
-        placeholder="ex.: 0x1234abcd… at 14:32 BRT"
+        // BUG-98 do QA 2026-06-12: placeholder antigo mostrava hash hex
+        // (0x1234abcd) num campo de comprovante PIX, confundindo o
+        // usuário BR. Agora deixamos placeholder vazio.
+        placeholder=""
       />
-      {busy && <p style={{ fontSize: "0.8rem", color: "var(--muted)" }}>Uploading…</p>}
+      {busy && <p style={{ fontSize: "0.8rem", color: "var(--muted)" }}>{tc.checking}</p>}
     </div>
   );
 }
