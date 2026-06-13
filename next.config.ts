@@ -63,6 +63,18 @@ const nextConfig: NextConfig = {
       { source: "/fr/abonnes-instagram", destination: "/fr", permanent: true },
       { source: "/de/instagram-follower-kaufen", destination: "/de", permanent: true },
       { source: "/it/follower-instagram", destination: "/it", permanent: true },
+      // Aliases comuns que viraram 404 — backups pra usuários que adivinham
+      // a URL e bookmarks de marketing externos (BUG-78/38 do QA 2026-06-12).
+      // "saves" e "salvamentos" são tratados como categoria de
+      // compartilhamentos no DB; servicos-premium é o antigo slug de /servicos.
+      { source: "/:country/salvamentos-instagram", destination: "/:country/compartilhamentos-instagram", permanent: true },
+      { source: "/:country/salvamentos-instagram/:slug", destination: "/:country/compartilhamentos-instagram/:slug", permanent: true },
+      { source: "/:country/saves-instagram", destination: "/:country/compartilhamentos-instagram", permanent: true },
+      { source: "/:country/saves-tiktok", destination: "/:country/compartilhamentos-tiktok", permanent: true },
+      { source: "/:country/servicos-premium", destination: "/:country/servicos", permanent: true },
+      { source: "/:country/servicos-premium/:slug", destination: "/:country/servicos/:slug", permanent: true },
+      // Link clássico de rodapé que ainda aparece em emails antigos.
+      { source: "/system-status", destination: "/status", permanent: true },
     ];
   },
 };

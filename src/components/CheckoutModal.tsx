@@ -517,7 +517,15 @@ function MethodPicker({
         onClick={onConfirm}
         style={{ width: "100%" }}
       >
-        {loading ? "Creating order…" : selected ? `Confirm — pay ${selected.charged_amount} ${selected.charged_currency}` : "Pick a method first"}
+        {loading
+          ? "Creating order…"
+          : selected
+            // BUG-93 do QA 2026-06-12: o botão mostrava "Confirm — pay 13.53 BRL"
+            // sem símbolo R$. Backend retorna charged_symbol (R$/€/£/$ ou
+            // ₿/Ξ…); usamos no formato "Confirm — pay R$ 13,53" pra ficar
+            // intuitivo no contexto BR.
+            ? `Confirm — pay ${selected.charged_symbol ?? ""} ${selected.charged_amount} ${selected.charged_currency}`.trim()
+            : "Pick a method first"}
       </button>
     </div>
   );

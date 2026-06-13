@@ -124,6 +124,22 @@ export function RecoveryForm({ lang }: { lang: LangCode }) {
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
+    // BUG-116 do QA 2026-06-12: validação inline antes de submit pra
+    // garantir handle/email/name preenchidos mesmo se autofill burlar o
+    // required nativo. Sem isso o backend retorna erro genérico depois
+    // que o usuário já clicou submit e perdeu o feedback inline.
+    if (!form.handle.trim()) {
+      setError(t.error);
+      return;
+    }
+    if (!form.contactEmail.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(form.contactEmail.trim())) {
+      setError(t.error);
+      return;
+    }
+    if (!form.contactName.trim()) {
+      setError(t.error);
+      return;
+    }
     setLoading(true);
     try {
       const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";

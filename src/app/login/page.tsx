@@ -319,7 +319,7 @@ function LoginPageInner() {
             {loading ? "Signing in…" : "Sign in"}
           </button>
           <p style={{ color: "var(--muted)", fontSize: "0.75rem", margin: "0.25rem 0 0", textAlign: "center" }}>
-            {turnstileToken ? "" : "Aguarde 2-3s para a verificação anti-bot."}
+            {turnstileToken ? "" : "Waiting 2-3s for the anti-bot check…"}
           </p>
         </form>
       )}
