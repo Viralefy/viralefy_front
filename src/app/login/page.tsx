@@ -133,9 +133,23 @@ function LoginPageInner() {
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    const email = String(fd.get("email") ?? "").trim();
+    const password = String(fd.get("password") ?? "");
+    // Validação client-side explícita antes de bater no backend — a checagem
+    // nativa do type="email" pode ser bypassada por autofill em alguns
+    // browsers (BUG-6/158 do QA 2026-06-12). Mostra erro inline sem ir pro
+    // server.
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+      setError("Enter a valid email address.");
+      return;
+    }
+    if (!password) {
+      setError("Enter your password.");
+      return;
+    }
     setLoading(true);
     setError(null);
-    const fd = new FormData(e.currentTarget);
     // Espera até 3s pelo Turnstile token (lê do ref, vê updates async).
     // Sem isso, usuário que clica antes do widget carregar pega 422.
     let tok = turnstileTokenRef.current;
@@ -144,11 +158,7 @@ function LoginPageInner() {
       tok = turnstileTokenRef.current;
     }
     try {
-      const session = await userLogin(
-        String(fd.get("email")),
-        String(fd.get("password")),
-        tok,
-      );
+      const session = await userLogin(email, password, tok);
       // 2FA gate (opt-in pro user): backend retorna twofa_required quando
       // user fez enroll prévio. Token vem vazio; cliente precisa do código.
       if (session.twofa_required && session.partial_token) {
@@ -285,7 +295,15 @@ function LoginPageInner() {
             />
           </div>
           <div>
-            <label className="label" htmlFor="password">Password</label>
+            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
+              <label className="label" htmlFor="password">Password</label>
+              {/* BUG-7/168 do QA 2026-06-12: faltava link de recuperação de
+                  senha. Caminho via support ticket porque o sistema ainda
+                  não tem fluxo self-serve de reset; pelo menos dá saída. */}
+              <Link href="/tickets/new?topic=password-reset" style={{ fontSize: "0.75rem", color: "var(--muted)" }}>
+                Forgot password?
+              </Link>
+            </div>
             <input
               className="input"
               id="password"

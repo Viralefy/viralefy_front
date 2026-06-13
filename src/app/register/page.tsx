@@ -111,13 +111,32 @@ function RegisterPageInner() {
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    const name = String(fd.get("name") ?? "").trim();
+    const email = String(fd.get("email") ?? "").trim();
+    const password = String(fd.get("password") ?? "");
+
+    // Validação client-side explícita (BUG-42/158 do QA 2026-06-12):
+    // browser native validation pode ser bypassada por autofill em alguns
+    // navegadores. Damos feedback inline antes de bater no backend.
+    if (!name) {
+      setError("Enter your full name.");
+      return;
+    }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+      setError("Enter a valid email address.");
+      return;
+    }
+    if (!password || password.length < 8) {
+      setError("Password must be at least 8 characters.");
+      return;
+    }
     if (!contactOk) {
       setError("Please provide your phone OR Telegram so we can reach you about your order.");
       return;
     }
     setLoading(true);
     setError(null);
-    const fd = new FormData(e.currentTarget);
     let tok = turnstileTokenRef.current;
     for (let i = 0; i < 30 && !tok; i++) {
       await new Promise((r) => setTimeout(r, 100));
@@ -125,9 +144,9 @@ function RegisterPageInner() {
     }
     try {
       const session = await userRegister({
-        name: String(fd.get("name")),
-        email: String(fd.get("email")),
-        password: String(fd.get("password")),
+        name,
+        email,
+        password,
         phone: phone.trim() || undefined,
         telegram: telegram.trim() || undefined,
         turnstile_token: tok,
@@ -229,6 +248,30 @@ function RegisterPageInner() {
         </div>
 
         <Turnstile onToken={handleTurnstileToken} />
+
+        {/* Aceite de Termos + Política — exigência LGPD Art. 8º §1
+            (consentimento manifestado de forma livre, expressa, informada).
+            BUG-35 do QA 2026-06-12. */}
+        <label
+          className="label"
+          htmlFor="terms_accept"
+          style={{ display: "flex", gap: "0.5rem", alignItems: "flex-start", fontSize: "0.78rem", color: "var(--muted)", lineHeight: 1.45, fontWeight: 400 }}
+        >
+          <input
+            id="terms_accept"
+            name="terms_accept"
+            type="checkbox"
+            required
+            style={{ marginTop: "0.2rem", accentColor: "var(--accent)" }}
+          />
+          <span>
+            I&apos;ve read and agree to the{" "}
+            <a href="/legal/terms" target="_blank" rel="noopener noreferrer" style={{ color: "var(--accent)" }}>Terms of Service</a>
+            {" "}and{" "}
+            <a href="/legal/privacy" target="_blank" rel="noopener noreferrer" style={{ color: "var(--accent)" }}>Privacy Policy</a>.
+          </span>
+        </label>
+
         <button type="submit" className="btn btn-primary" disabled={loading || !contactOk}>
           {loading ? "Creating…" : "Create account"}
         </button>

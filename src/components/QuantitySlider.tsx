@@ -67,12 +67,21 @@ export function QuantitySlider({
           <strong style={{ fontSize: "2rem" }}>{qty.toLocaleString()}</strong>
         </div>
         <input
+          // a11y BUG-65 do QA 2026-06-12: input range sem aria-* não é
+          // descrito por NVDA/JAWS/VoiceOver. WCAG 1.3.1 + 4.1.2.
+          id="quantity-slider"
+          name="quantity"
           type="range"
           min={minQty}
           max={maxQty}
           step={Math.max(50, Math.floor(minQty))}
           value={qty}
           onChange={(e) => setQty(parseInt(e.target.value, 10))}
+          aria-label={t.category.chooseQty}
+          aria-valuemin={minQty}
+          aria-valuemax={maxQty}
+          aria-valuenow={qty}
+          aria-valuetext={`${qty.toLocaleString()} ${unitLabel}`}
           style={{ width: "100%", accentColor: "var(--accent)" }}
         />
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.75rem", color: "var(--muted)", marginTop: "0.25rem" }}>

@@ -61,13 +61,19 @@ export function Flag({ code, width = 20, title, style, className }: FlagProps) {
   const height = Math.round((width / 3) * 2);
   const x1 = nearestTier(width);
   const x2 = nearestTier(width * 2);
+  // a11y BUG-66 do QA 2026-06-12: leitores de tela ignoravam todas as flags
+  // (alt=""). Agora usa o `title` (nome do país) como alt quando fornecido —
+  // mesmo redundante com o texto adjacente, é melhor que mudo. Quando não
+  // há title (uso decorativo puro), mantém alt="" + aria-hidden.
+  const hasName = typeof title === "string" && title.length > 0;
   return (
     <img
       src={`${FLAG_CDN_BASE}/w${x1}/${c}.png`}
       srcSet={`${FLAG_CDN_BASE}/w${x1}/${c}.png 1x, ${FLAG_CDN_BASE}/w${x2}/${c}.png 2x`}
       width={width}
       height={height}
-      alt=""
+      alt={hasName ? title! : ""}
+      aria-hidden={hasName ? undefined : true}
       title={title}
       loading="lazy"
       decoding="async"

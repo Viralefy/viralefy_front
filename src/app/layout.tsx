@@ -140,6 +140,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             v2 default-denied é setado lá. */}
       </head>
       <body>
+        {/* Skip-to-content — pula pra <main id="main"> evitando que usuários
+            de teclado tenham que tabular por todos os items do header.
+            WCAG 2.4.1 Bypass Blocks. BUG-206 do QA 2026-06-12.
+            Esconde visualmente mas reaparece com :focus (CSS .skip-link). */}
+        <a href="#main" className="skip-link">Skip to content</a>
         {/* GTM noscript removido — LGPD não tem exceção pra "sem JS".
             Visitantes sem JS simplesmente não são medidos (aceitável). */}
         {/* GtmLoader monta o GTM em runtime SÓ após consent analytics. */}
@@ -152,7 +157,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <TrackingHydrator />
           </Suspense>
           <Header />
-          {children}
+          {/* Wrapper com id=main pra ser o destino do skip-link. tabIndex=-1
+              permite que o foco caia aqui via #main mesmo que o filho não
+              seja focável. As páginas filhas continuam podendo ter seus
+              próprios <main> internos. */}
+          <div id="main" tabIndex={-1} style={{ outline: "none" }}>
+            {children}
+          </div>
           {/* WhatsApp flutuante — só renderiza se NEXT_PUBLIC_WHATSAPP_NUMBER
               estiver setado E o idioma do país atual for pt/es/es_AR. */}
           <WhatsAppButton />
