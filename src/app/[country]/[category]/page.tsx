@@ -69,7 +69,8 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
       url: `${siteUrl()}${canonical}`,
       locale: c.htmlLang.replace("-", "_"),
       type: "website",
-      images: [{ url: ogUrl, width: 1200, height: 630 }],
+      siteName: "Viralefy",
+      images: [{ url: ogUrl, width: 1200, height: 630, alt: copy.metaTitle(c.name) }],
     },
     twitter: { card: "summary_large_image", site: "@viralefy", creator: "@viralefy", images: [ogUrl] },
   };

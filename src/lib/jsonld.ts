@@ -176,7 +176,9 @@ export function buildHomeJsonLd(plans: Plan[], siteUrl: string) {
     name: "Viralefy",
     url: siteUrl,
     publisher: { "@id": `${siteUrl}/#organization` },
-    inLanguage: "en",
+    // BUG-203 do QA 2026-06-12: inLanguage="en" num site multilingue.
+    // Listamos os idiomas em que temos cópia editorial completa.
+    inLanguage: ["en", "pt", "es", "fr", "de", "it", "nl", "ru", "ja", "ar"],
     potentialAction: {
       "@type": "SearchAction",
       target: { "@type": "EntryPoint", urlTemplate: `${siteUrl}/{country_code}` },

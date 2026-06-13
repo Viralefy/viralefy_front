@@ -418,7 +418,7 @@ const COPY_SEGUIDORES_PT: LongCopy = {
     `Crescer do zero em ${c} é difícil. Os algoritmos do Instagram e do TikTok favorecem perfis que já parecem "vivos" — contas com base estável de seguidores, curtidas recorrentes e um mínimo de visualizações. Perfis novos caem num beco circular: ninguém te descobre porque você não tem tração, e você não ganha tração porque ninguém te descobre. Comprar um pacote inicial de seguidores é o caminho mais direto para sair desse ciclo e colocar seu conteúdo num pool de alcance maior.`,
     `A Viralefy entrega seguidores que ficam: perfis de alta qualidade, distribuídos em ritmo natural para que a plataforma nunca marque sua conta como compradora. Todo pacote vem com garantia de reposição — se alguém deixar de te seguir nos próximos 30 dias, repomos sem custo. Pedidos para ${c} começam em até 1 hora depois da confirmação do pagamento e finalizam em 24 a 72 horas, dependendo do volume, sem precisar da sua senha. Pedimos só o seu @ público.`,
     `Diferente das lojas duvidosas que jogam milhares de bots de uma vez, a Viralefy trabalha em janelas de pacing que imitam o crescimento orgânico. Um pedido de 1.000 seguidores é dividido ao longo de algumas horas; um de 10.000 roda durante dois dias. Esse padrão mantém sua proporção de engajamento saudável e protege o alcance que você já conquistou. Para criadores em ${c} que dependem do algoritmo para distribuir o conteúdo, essa diferença é tudo.`,
-    `O preço é direto e fixo por quantidade. Não tem assinatura, não tem renovação automática, não tem upsell escondido no checkout. Você paga uma vez pelo pacote, a gente entrega. As formas de pagamento cobrem boleto, cartão, Pix (no Brasil) e cripto (USDT, BTC). Os recibos chegam automáticos no e-mail e o histórico fica salvo na sua conta para você refazer o pedido com um clique.`,
+    `O preço é direto e fixo por quantidade. Não tem assinatura, não tem renovação automática, não tem upsell escondido no checkout. Você paga uma vez pelo pacote, a gente entrega. As formas de pagamento cobrem cartão, Pix (no Brasil) e cripto (USDT, BTC). Os recibos chegam automáticos no e-mail e o histórico fica salvo na sua conta para você refazer o pedido com um clique.`,
     `Se você nunca usou um serviço de crescimento, o pacote mais barato é a melhor forma de testar a água. Pegue um starter de 100 ou 250 seguidores, observe o resultado, e só escale quando estiver confortável com o que vê. Logo abaixo você escolhe entre pacotes pré-definidos ou usa o slider para definir a quantidade exata que quer.`,
   ],
   bullets: () => [
@@ -426,14 +426,14 @@ const COPY_SEGUIDORES_PT: LongCopy = {
     { title: "Entrega gradual", body: "Distribuído em horas/dias para imitar crescimento orgânico e evitar bandeiras da plataforma." },
     { title: "Reposição por 30 dias", body: "Se alguém te deixar de seguir nos primeiros 30 dias, repomos automaticamente." },
     { title: "Nunca pedimos senha", body: "Só precisamos do seu @ público. Nenhum serviço sério pede a sua senha." },
-    { title: "Pague como quiser", body: "Cartão, Pix, boleto e cripto (USDT, BTC)." },
+    { title: "Pague como quiser", body: "Cartão, Pix e cripto (USDT, BTC)." },
   ],
   faq: () => [
     { q: "É seguro comprar seguidores para o meu Instagram ou TikTok?", a: "Sim, quando feito em ritmo natural. A Viralefy distribui o pedido ao longo de horas ou dias para a plataforma ver uma curva orgânica. Nunca pedimos sua senha — só o seu @ público." },
     { q: "Quanto tempo leva a entrega?", a: "Pedidos pequenos (até 500) costumam terminar em até 6 horas. Pedidos maiores são divididos entre 24 e 72 horas para manter o ritmo natural." },
     { q: "Posso perder os seguidores depois?", a: "Quedas acontecem em qualquer plataforma. Por isso incluímos garantia de reposição por 30 dias — repomos sem custo." },
     { q: "Precisam da minha senha?", a: "Nunca. Não pedimos credencial nenhuma. Se alguém pedir, fuja correndo." },
-    { q: "Quais pagamentos vocês aceitam?", a: "Cartão, Pix, boleto e cripto (USDT e BTC). O recibo chega automático no e-mail." },
+    { q: "Quais pagamentos vocês aceitam?", a: "Cartão (Stripe), Pix (Abacate Pay) e cripto USDT/BTC (Heleket). O recibo chega automático no e-mail." },
   ],
 };
 

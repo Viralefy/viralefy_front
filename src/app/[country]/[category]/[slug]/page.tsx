@@ -119,8 +119,12 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
       description,
       url: `${siteUrl()}${canonical}`,
       locale: c.htmlLang.replace("-", "_"),
+      // BUG-175 do QA: produto vai como "website" (Next OG type-system não
+      // aceita "product"). Schema.org Product já é exposto via JSON-LD
+      // (lib/jsonld.ts buildCategoryJsonLd), então o lado bot fica coberto.
       type: "website",
-      images: [{ url: ogUrl, width: 1200, height: 630 }],
+      siteName: "Viralefy",
+      images: [{ url: ogUrl, width: 1200, height: 630, alt: title }],
     },
     twitter: { card: "summary_large_image", site: "@viralefy", creator: "@viralefy", images: [ogUrl] },
   };

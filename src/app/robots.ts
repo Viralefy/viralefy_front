@@ -12,13 +12,16 @@ export default function robots(): MetadataRoute.Robots {
   const base = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   // Private surfaces (user account, auth flows, internal APIs, OG renderer,
   // build assets) são exclusos.
+  // /og/ NÃO entra em disallow: a maioria dos crawlers (Googlebot-Image,
+  // Twitterbot, Facebook scraper) precisa acessar /og/* pra renderizar a
+  // preview de share. Bloquear quebra o card no Twitter/LinkedIn/WhatsApp
+  // (BUG-56 do QA 2026-06-12).
   const disallow = [
     "/account",
     "/tickets",
     "/login",
     "/register",
     "/api/",
-    "/og/",
     "/_next/",
   ];
   return {
