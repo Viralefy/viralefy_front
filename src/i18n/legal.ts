@@ -32,7 +32,7 @@ We collect the data you give us at checkout (name, email, the public @ handle of
 The personal data is used to (a) deliver the service you bought, (b) issue invoices and receipts, (c) answer support tickets, and (d) send transactional emails (order confirmation, refund notice). We do not sell or share your data with third parties for marketing.
 
 ## Sub-processors
-We use: a payment processor (Woovi for BRL, Heleket for crypto), a transactional email provider (Resend), a hosting provider (Hetzner) and a CDN (Cloudflare). Each sub-processor processes data strictly for the technical purpose listed.
+We use: payment processors (**Abacate Pay** for PIX in BRL, **Heleket** for crypto USDT/BTC, **Stripe** for international card payments), a transactional email provider (Resend), a hosting provider (Hetzner) and a CDN (Cloudflare). Each sub-processor processes data strictly for the technical purpose listed.
 
 ## Your rights
 You can request export or deletion of your data at any time by writing to support. Deletion is honored within 30 days. Some records (invoices) must be retained for legal accounting periods.
@@ -92,7 +92,7 @@ The session cookie lasts 30 days. The currency cookie lasts 1 year. Both can be 
 The payment gateways (Woovi, Heleket) may set their own cookies on their own pages when you complete a payment. Those are governed by the gateway's privacy policy, not ours.
 
 ## Consent
-The cookies we use are strictly functional and exempt from the EU/UK consent banner requirement. We do not run a banner for that reason.`,
+We show a cookie banner on first visit that lets you accept, customize or limit your choice to essential cookies only. Essential cookies (session, anti-CSRF, language preference) load with no consent required because they're necessary for the site to function. Analytics and marketing cookies — when used — only load after explicit opt-in. You can revisit and change your decision at any time at /legal/cookie-preferences.`,
   },
   refund: {
     title: "Refund Policy",
@@ -169,7 +169,10 @@ Coletamos os dados que você nos fornece no checkout (nome, e-mail, o @ público
 Os dados pessoais são usados para (a) entregar o serviço comprado, (b) emitir faturas e recibos, (c) responder tickets de suporte e (d) enviar e-mails transacionais (confirmação de pedido, aviso de reembolso). Não vendemos nem compartilhamos seus dados com terceiros para fins de marketing.
 
 ## Subprocessadores
-Usamos: processador de pagamento (Woovi para BRL, Heleket para cripto), provedor de e-mail transacional (Resend), provedor de hospedagem (Hetzner) e CDN (Cloudflare). Cada subprocessador trata dados estritamente para a finalidade técnica descrita.
+Usamos: processadores de pagamento (**Abacate Pay** para PIX em BRL, **Heleket** para cripto USDT/BTC, **Stripe** para cartão internacional), provedor de e-mail transacional (Resend), provedor de hospedagem (Hetzner) e CDN (Cloudflare). Cada subprocessador trata dados estritamente para a finalidade técnica descrita.
+
+## LGPD — Lei Geral de Proteção de Dados (Brasil)
+Como controladora dos dados pessoais que você nos fornece, atendemos a Lei nº 13.709/2018 (LGPD). Você tem direito a confirmação de tratamento, acesso, correção, anonimização, portabilidade, eliminação dos dados e revogação do consentimento a qualquer momento — via suporte. As bases legais que usamos são: (a) execução de contrato (Art. 7º V), (b) cumprimento de obrigação legal (Art. 7º II, p.ex. retenção de faturas), e (c) consentimento (Art. 8º) para cookies analíticos e de marketing. O encarregado de dados (DPO) pode ser contatado pelo e-mail no rodapé.
 
 ## Seus direitos
 Você pode pedir exportação ou exclusão dos seus dados a qualquer momento via suporte. Exclusões são honradas em até 30 dias. Alguns registros (faturas) precisam ser mantidos por períodos legais de escrituração.
@@ -226,10 +229,10 @@ O cookie de sessão é necessário para manter o login ativo entre páginas. O c
 O cookie de sessão dura 30 dias. O cookie de moeda dura 1 ano. Ambos podem ser limpos pelas configurações do navegador.
 
 ## Terceiros
-Os gateways de pagamento (Woovi, Heleket) podem definir seus próprios cookies nas próprias páginas deles quando você conclui um pagamento. Esses cookies seguem a política do gateway.
+Os gateways de pagamento (Abacate Pay para PIX BRL, Heleket para cripto, Stripe para cartão) podem definir seus próprios cookies nas próprias páginas deles quando você conclui um pagamento. Esses cookies seguem a política do gateway.
 
 ## Consentimento
-Os cookies que usamos são estritamente funcionais e dispensados do banner de consentimento da UE/Reino Unido. Por isso não exibimos banner.`,
+Exibimos um banner de cookies na primeira visita com três opções: aceitar tudo, customizar por categoria, ou aceitar apenas os essenciais. Os essenciais (sessão, anti-CSRF, preferência de idioma) carregam sem consentimento porque são necessários pro site funcionar. Cookies analíticos e de marketing — quando usados — só carregam após opt-in explícito. Você pode rever e alterar sua decisão a qualquer momento em /legal/cookie-preferences.`,
   },
   refund: {
     title: "Política de Reembolso",

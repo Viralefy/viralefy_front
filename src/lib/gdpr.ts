@@ -22,9 +22,71 @@ export const GDPR_STORAGE_KEY = "viralefy_gdpr_consent";
 export const GDPR_EVENT = "viralefy:gdpr-update";
 export const GDPR_VERSION = 2;
 
+// Cookie cross-subdomain — sem isso, www / admin / auth não compartilham
+// a decisão e o banner reaparece em cada host (BUG-10/50 do QA 2026-06-12).
+// Em dev (localhost / 127.0.0.1) deixamos Domain vazio.
+const GDPR_COOKIE_NAME = "vf_gdpr_consent";
+
 // Re-prompt automático: 12 meses (recomendação ANPD). Consents antigos
 // expiram e o banner reaparece — usuário precisa confirmar de novo.
 export const GDPR_MAX_AGE_MS = 365 * 24 * 60 * 60 * 1000;
+const GDPR_COOKIE_MAX_AGE_S = Math.floor(GDPR_MAX_AGE_MS / 1000);
+
+function cookieDomain(): string {
+  if (typeof window === "undefined") return "";
+  const host = window.location.hostname;
+  // localhost / 127.0.0.1 / *.local — sem Domain (cookie host-only).
+  if (host === "localhost" || host === "127.0.0.1" || host.endsWith(".local")) return "";
+  // www.viralefy.com → .viralefy.com  ;  app.viralefy.com.br → .viralefy.com.br
+  const parts = host.split(".");
+  if (parts.length < 2) return "";
+  return "." + parts.slice(-2).join(".");
+}
+
+function writeGdprCookie(payload: GdprConsent): void {
+  if (typeof document === "undefined") return;
+  try {
+    const value = encodeURIComponent(JSON.stringify(payload));
+    const domain = cookieDomain();
+    const secure = typeof window !== "undefined" && window.location.protocol === "https:" ? "; Secure" : "";
+    const domainPart = domain ? `; Domain=${domain}` : "";
+    document.cookie = `${GDPR_COOKIE_NAME}=${value}; Path=/; Max-Age=${GDPR_COOKIE_MAX_AGE_S}; SameSite=Lax${domainPart}${secure}`;
+  } catch { /* ignora */ }
+}
+
+function readGdprCookie(): GdprConsent | null {
+  if (typeof document === "undefined") return null;
+  try {
+    const raw = document.cookie
+      .split(";")
+      .map((s) => s.trim())
+      .find((s) => s.startsWith(`${GDPR_COOKIE_NAME}=`));
+    if (!raw) return null;
+    const value = decodeURIComponent(raw.slice(GDPR_COOKIE_NAME.length + 1));
+    const parsed = JSON.parse(value) as Partial<GdprConsent>;
+    if (typeof parsed !== "object" || parsed === null) return null;
+    if (parsed.version !== GDPR_VERSION) return null;
+    return {
+      version: GDPR_VERSION,
+      necessary: true,
+      preferences: parsed.preferences === false ? false : true,
+      analytics: Boolean(parsed.analytics),
+      marketing: Boolean(parsed.marketing),
+      timestamp: typeof parsed.timestamp === "string" ? parsed.timestamp : new Date().toISOString(),
+    };
+  } catch {
+    return null;
+  }
+}
+
+function deleteGdprCookie(): void {
+  if (typeof document === "undefined") return;
+  try {
+    const domain = cookieDomain();
+    const domainPart = domain ? `; Domain=${domain}` : "";
+    document.cookie = `${GDPR_COOKIE_NAME}=; Path=/; Max-Age=0; SameSite=Lax${domainPart}`;
+  } catch { /* ignora */ }
+}
 
 export type GdprConsent = {
   /** Versão do shape — bump invalida storage antigo. */
@@ -49,6 +111,14 @@ export type GdprConsent = {
  */
 export function getConsent(): GdprConsent | null {
   if (typeof window === "undefined") return null;
+  // Cookie cross-subdomain primeiro — é a fonte autoritativa quando o usuário
+  // já tomou a decisão em outro host (www / auth / admin).
+  const fromCookie = readGdprCookie();
+  if (fromCookie) {
+    const at = Date.parse(fromCookie.timestamp);
+    if (Number.isFinite(at) && Date.now() - at > GDPR_MAX_AGE_MS) return null;
+    return fromCookie;
+  }
   try {
     const raw = window.localStorage.getItem(GDPR_STORAGE_KEY);
     if (!raw) return null;
@@ -142,6 +212,7 @@ export function setConsent(
   if (typeof window !== "undefined") {
     try {
       window.localStorage.setItem(GDPR_STORAGE_KEY, JSON.stringify(payload));
+      writeGdprCookie(payload);
       window.dispatchEvent(new CustomEvent(GDPR_EVENT, { detail: payload }));
     } catch {
       // Storage cheio / Safari private mode: silenciosamente ignora; o banner
@@ -159,6 +230,7 @@ export function resetConsent(): void {
   if (typeof window === "undefined") return;
   try {
     window.localStorage.removeItem(GDPR_STORAGE_KEY);
+    deleteGdprCookie();
     window.dispatchEvent(new CustomEvent(GDPR_EVENT, { detail: null }));
   } catch {
     // Ignora — mesmo motivo do setConsent.

@@ -153,7 +153,10 @@ export function CookieBanner() {
                 type="button"
                 className="btn btn-outline"
                 onClick={() =>
-                  commit({ preferences: true, analytics: false, marketing: false }, "essential_only")
+                  // "Apenas essenciais" significa SÓ essenciais — preferences
+                  // (idioma/tema) também é opt-in. BUG-44 do QA 2026-06-12:
+                  // antes ficava preferences=true contradizendo a intenção.
+                  commit({ preferences: false, analytics: false, marketing: false }, "essential_only")
                 }
                 data-testid="cookie-essential-only"
               >

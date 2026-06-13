@@ -27,16 +27,33 @@ import { Icon } from "./Icon";
 // `drawerOpen` controla o estado quando ☰ é clicado. Drawer fecha em cada
 // mudança de rota.
 
-function langFromPath(pathname: string) {
+// `viralefy_last_country` é a memória entre navegações pra páginas globais
+// (/legal, /vs, /case-studies, /pricing). Sem ela, ao sair de /br pra
+// /legal/terms o Header voltava pra inglês e perdia o mercado — BUG-119
+// do QA 2026-06-12.
+const LAST_COUNTRY_KEY = "viralefy_last_country";
+
+function readLastCountry(): string | null {
+  try {
+    if (typeof window === "undefined") return null;
+    const v = window.localStorage.getItem(LAST_COUNTRY_KEY);
+    return v && getCountry(v) ? v : null;
+  } catch {
+    return null;
+  }
+}
+
+function langFromPath(pathname: string, fallbackCountry: string | null) {
   const seg = pathname.split("/").filter(Boolean)[0]?.toLowerCase() ?? "";
-  if (!seg) return "en" as const;
-  if (getCountry(seg)) return langOfCountry(seg);
+  if (seg && getCountry(seg)) return langOfCountry(seg);
+  if (fallbackCountry) return langOfCountry(fallbackCountry);
   return "en" as const;
 }
 
-function countryFromPath(pathname: string): string {
+function countryFromPath(pathname: string, fallbackCountry: string | null): string {
   const seg = pathname.split("/").filter(Boolean)[0]?.toLowerCase() ?? "";
   if (seg && getCountry(seg)) return seg;
+  if (fallbackCountry) return fallbackCountry;
   return "us";
 }
 
@@ -44,8 +61,11 @@ export function Header() {
   const { currencies, currency, setCurrencyCode, user, logout } = useApp();
   const router = useRouter();
   const pathname = usePathname();
-  const lang = langFromPath(pathname ?? "");
-  const countryCode = countryFromPath(pathname ?? "");
+  // Memória do último país visitado, pra Header continuar localizado quando
+  // o usuário sai pra /legal, /vs, /pricing. Hidratado no client após mount.
+  const [lastCountry, setLastCountry] = useState<string | null>(null);
+  const lang = langFromPath(pathname ?? "", lastCountry);
+  const countryCode = countryFromPath(pathname ?? "", lastCountry);
   const t = tr(lang);
   const [drawerOpen, setDrawerOpen] = useState(false);
   // Contagem de tickets em open/pending — alimenta o badge ao lado do 💬.
@@ -56,6 +76,18 @@ export function Header() {
   useEffect(() => {
     setDrawerOpen(false);
   }, [pathname]);
+
+  // Hidrata o último country no client + grava quando estamos numa rota de país.
+  useEffect(() => {
+    const fromPath = (pathname ?? "").split("/").filter(Boolean)[0]?.toLowerCase() ?? "";
+    if (fromPath && getCountry(fromPath)) {
+      setLastCountry(fromPath);
+      try { window.localStorage.setItem(LAST_COUNTRY_KEY, fromPath); } catch { /* ignora */ }
+    } else if (!lastCountry) {
+      const saved = readLastCountry();
+      if (saved) setLastCountry(saved);
+    }
+  }, [pathname, lastCountry]);
 
   // Polling do badge de tickets — só quando logado. Refresh manual
   // dispara re-fetch ao mudar de rota (pra refletir respostas recentes
