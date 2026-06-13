@@ -5,6 +5,8 @@ import { Footer } from "@/components/Footer";
 import { indexableMeta } from "@/lib/seo-meta";
 import { CITIES, getCity } from "@/lib/cities";
 import { Flag } from "@/components/Flag";
+import { categorySlug } from "@/i18n/categories";
+import type { LangCode } from "@/i18n/languages";
 
 // Programmatic SEO city LP. 50 rotas estáticas; cada uma fala da cidade
 // com bairros/landmarks reais antes de redirecionar pro funnel do país.
@@ -120,7 +122,13 @@ export default async function CityPage({ params }: { params: Promise<{ city: str
 
   const url = siteUrl();
   const pageUrl = `${url}/cities/${city.slug}`;
-  const ctaHref = `/${city.country}/instagram-followers`;
+  // BUG-90/163 do QA 2026-06-12: ctaHref apontava pra alias EN
+  // (/br/instagram-followers) que gerava conteúdo duplicado sem 301 — o
+  // canonical próprio mascarava o problema. Agora gera o slug localizado
+  // a partir do htmlLang da cidade.
+  const cityLang = (city.htmlLang.split("-")[0] || "en") as LangCode;
+  const ctaSlug = categorySlug("seguidores_instagram", cityLang);
+  const ctaHref = `/${city.country}/${ctaSlug}`;
   const { hoods, landmark } = neighborhoodsText(city.slug, city.name);
 
   const jsonld: object[] = [

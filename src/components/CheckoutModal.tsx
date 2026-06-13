@@ -241,6 +241,17 @@ export function CheckoutModal({
     }
   }
 
+  // ESC fecha o modal em qualquer step (BUG-60 do QA 2026-06-12: no step
+  // instructions o ESC era ignorado). WCAG 2.1.2 — provê uma forma de
+  // sair do trap focal sem precisar do mouse no botão Close.
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
   return (
     <div
       role="dialog"
@@ -260,7 +271,10 @@ export function CheckoutModal({
       >
         <StepHeader step={step} onBack={
           step === "method" ? () => setStep("form") :
-          step === "instructions" ? null :
+          // BUG-62 do QA: step instructions sem botão de voltar — usuário
+          // não conseguia trocar de método sem fechar tudo. Agora volta pro
+          // method picker preservando os dados do form (snapshot já salvo).
+          step === "instructions" ? () => setStep("method") :
           null
         } />
         <h2 style={{ marginBottom: "0.25rem" }}>
@@ -573,12 +587,20 @@ function MethodCard({
 }
 
 function Instructions({ result, onDone }: { result: CheckoutResult; onDone: () => void }) {
+  // BUG-61 do QA 2026-06-12: Stripe / cartão NÃO precisa de comprovante —
+  // o gateway confirma a captura automaticamente. Antes mostrava "Upload
+  // your proof" mesmo em fluxo de cartão, confundindo o usuário. PIX/cripto
+  // continuam mostrando porque exigem comprovante manual em alguns gateways.
+  const extra = result.payment_extra ?? {};
+  const isCard =
+    extra["method_kind"] === "card" ||
+    (result.gateway_provider ?? "").toLowerCase() === "stripe";
   return (
     <>
       <PaymentInstructions result={result} />
-      <ProofUploadSection orderId={result.order_id} onUploaded={onDone} />
+      {!isCard && <ProofUploadSection orderId={result.order_id} onUploaded={onDone} />}
       <button type="button" className="btn btn-outline" style={{ marginTop: "0.75rem", width: "100%" }} onClick={onDone}>
-        Skip — I&apos;ll upload later
+        {isCard ? "Done" : "Skip — I'll upload later"}
       </button>
     </>
   );
@@ -935,7 +957,13 @@ function CheckoutSuccess({ result, onClose, currency }: { result: CheckoutResult
 // por configuração errada do gateway, NÃO renderiza UI de PIX se o
 // provider não for um dos abaixo. Cliente internacional não deve ver
 // PIX em hipótese alguma; backend já bloqueia, mas defesa em profundidade.
-const PIX_PROVIDERS = new Set(["manual_pix", "woovi"]);
+//
+// BUG-91 do QA 2026-06-12: PIX checkout não exibia QR / chave Pix. A
+// causa era o provider mudou pra AbacatePay (key "abacatepay") e o front
+// continuava só aceitando "manual_pix" e "woovi", então o branch de UI
+// de PIX nunca era entrado e o usuário caía direto no upload de
+// comprovante sem nenhuma instrução de pagamento.
+const PIX_PROVIDERS = new Set(["manual_pix", "woovi", "abacatepay"]);
 
 function PaymentInstructions({ result }: { result: CheckoutResult }) {
   const extra = result.payment_extra ?? {};

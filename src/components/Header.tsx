@@ -71,6 +71,13 @@ export function Header() {
   // Contagem de tickets em open/pending — alimenta o badge ao lado do 💬.
   // null = ainda não buscado; 0 = sem tickets ativos; >0 = mostra badge.
   const [openTickets, setOpenTickets] = useState<number | null>(null);
+  // Mounted gate — SSR não tem localStorage nem user (Providers só hidrata
+  // depois). Renderizar AuthButtons / CurrencySelect dependentes desses
+  // valores no SSR causa hydration mismatch (React #418 — BUG-105/109 do
+  // QA 2026-06-12, causa raiz do "flash de tela preta" no scroll). Antes
+  // do mount, gate render dessas ilhas com null/skeleton.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
 
   // Fecha drawer quando navega
   useEffect(() => {
@@ -120,14 +127,21 @@ export function Header() {
     return () => document.removeEventListener("keydown", onKey);
   }, [drawerOpen]);
 
-  const CurrencySelect = (
+  // Gated atrás de `mounted` pra evitar mismatch SSR/CSR — o catálogo de
+  // moedas vem por fetch async (Providers) e currency começa null no SSR.
+  const pickerLang: "pt" | "en" | "es" =
+    lang === "pt" ? "pt"
+    : lang === "es" || lang === "es_AR" ? "es"
+    : "en";
+  const CurrencySelect = mounted ? (
     <CurrencyPicker
       currencies={currencies}
       current={currency}
       onChange={setCurrencyCode}
       label={t.header.currency}
+      lang={pickerLang}
     />
-  );
+  ) : null;
 
   // Support sempre visível, com badge "💬", pra dar acesso rápido tanto
   // pra logado (vai pros tickets dele) quanto pra anônimo (cai em /login
@@ -169,7 +183,12 @@ export function Header() {
     </Link>
   );
 
-  const AuthButtons = user ? (
+  // AuthButtons depende de `user` que vem do localStorage — só popula
+  // depois do mount. Antes do mount mostramos só o SupportButton (mesma
+  // estrutura em SSR e CSR), evitando mismatch.
+  const AuthButtons = !mounted ? (
+    SupportButton
+  ) : user ? (
     <>
       {SupportButton}
       <Link href="/account" className="btn btn-outline" style={{ padding: "0.5rem 0.85rem", fontSize: "0.85rem" }}>
