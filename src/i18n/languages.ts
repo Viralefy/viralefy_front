@@ -148,6 +148,16 @@ export type Pack = {
     skipUpload: string;
     pixCodeCopy: string;
     pixCodeCopied: string;
+    // BUG-69 do QA: step de revisão entre form e method picker. Mostra
+    // handle/quantidade/total/método antes do usuário avançar pro pagamento
+    // pra eliminar cliques acidentais no submit.
+    review: {
+      title: string;
+      handleLabel: string;
+      totalLabel: string;
+      confirmAndPay: string;
+      back: string;
+    };
   };
   notFound: {
     title: string;            // big hero
@@ -291,6 +301,13 @@ const en: Pack = {
     skipUpload: "Skip — I'll upload later",
     pixCodeCopy: "Copy Pix code",
     pixCodeCopied: "Copied!",
+    review: {
+      title: "Review your order",
+      handleLabel: "Recipient",
+      totalLabel: "Total",
+      confirmAndPay: "Confirm and pay",
+      back: "← Back",
+    },
   },
   notFound: {
     title: "This page doesn't exist — but your next follower does.",
@@ -432,6 +449,13 @@ const pt: Pack = {
     skipUpload: "Pular — envio depois",
     pixCodeCopy: "Copiar código Pix",
     pixCodeCopied: "Copiado!",
+    review: {
+      title: "Confira seu pedido",
+      handleLabel: "Destinatário",
+      totalLabel: "Total",
+      confirmAndPay: "Confirmar e pagar",
+      back: "← Voltar",
+    },
   },
   notFound: {
     title: "Essa página não existe — mas o seu próximo seguidor existe.",
@@ -656,6 +680,13 @@ const es: Pack = {
     skipUpload: "Omitir — lo subo después",
     pixCodeCopy: "Copiar código Pix",
     pixCodeCopied: "¡Copiado!",
+    review: {
+      title: "Revisa tu pedido",
+      handleLabel: "Destinatario",
+      totalLabel: "Total",
+      confirmAndPay: "Confirmar y pagar",
+      back: "← Volver",
+    },
   },
 };
 

@@ -36,18 +36,23 @@ import { Icon, type IconName } from "./Icon";
 
 type CheckoutT = NonNullable<Pack["checkout"]>;
 
-// Fluxo novo de checkout em 4 steps:
+// Fluxo novo de checkout em 5 steps:
 //   1. form        — preenche dados do pedido (nome, perfil, cupom...)
-//   2. method      — mostra todos os métodos de pagamento elegíveis com
+//   2. review      — BUG-69 do QA 2026-06-14: confirmação visual de
+//                    handle/quantidade/total/método antes de avançar. Evita
+//                    submit acidental de dados errados (handle digitado
+//                    errado, quantidade trocada). ESC nesse step volta pro
+//                    form em vez de fechar o modal pra preservar o snapshot.
+//   3. method      — mostra todos os métodos de pagamento elegíveis com
 //                    transparência de conversão (X em BRL → Y em USDT)
-//   3. instructions — após criar o pedido com gateway_id escolhido, mostra
+//   4. instructions — após criar o pedido com gateway_id escolhido, mostra
 //                    QR/wallet/Stripe URL e área pra upload de comprovante
-//   4. success     — confirma e linka pra "Meus pedidos"
+//   5. success     — confirma e linka pra "Meus pedidos"
 //
 // "credits" continua sendo método paralelo (pula direto pro step success
 // porque não precisa de instruções externas).
 
-type Step = "form" | "method" | "instructions" | "success";
+type Step = "form" | "review" | "method" | "instructions" | "success";
 
 export function CheckoutModal({
   plan,
@@ -152,8 +157,11 @@ export function CheckoutModal({
   const taxUsdCents = vatRate > 0 ? Math.round((netCents * vatRate) / 100) : 0;
   const enoughCredits = credit ? credit.balance_cents >= plan.price_cents : false;
 
-  // Step 1 → Step 2: valida campos básicos, captura snapshot, busca métodos
-  async function advanceToMethod(e: React.FormEvent<HTMLFormElement>) {
+  // Step 1 → Step 2 (review): valida campos básicos, captura snapshot.
+  // BUG-69: NÃO avança direto pro method picker — mostra primeiro o resumo
+  // pra confirmação visual. Form HTML continua sendo o gate de validação
+  // client-side (pattern do handle, required, etc).
+  function advanceToReview(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     const snap = {
@@ -164,8 +172,16 @@ export function CheckoutModal({
       publication_url: String(fd.get("publication_url") ?? ""),
     };
     setFormSnapshot(snap);
+    setError(null);
+    setStep("review");
+  }
+
+  // Step 2 (review) → Step 3 (method): após confirmação, busca métodos.
+  // Pra crédito, pula method picker e cria o pedido direto.
+  async function confirmReview() {
+    if (!formSnapshot) return;
     if (payMethod === "credits") {
-      await submitCheckout(snap, null);
+      await submitCheckout(formSnapshot, null);
       return;
     }
     setMethodsError(null);
@@ -246,13 +262,22 @@ export function CheckoutModal({
   // ESC fecha o modal em qualquer step (BUG-60 do QA 2026-06-12: no step
   // instructions o ESC era ignorado). WCAG 2.1.2 — provê uma forma de
   // sair do trap focal sem precisar do mouse no botão Close.
+  //
+  // BUG-69 do QA 2026-06-14: exceção pro step "review" — ESC volta pro
+  // form em vez de fechar tudo. Se o usuário só quer revisar uma vez mais
+  // o handle/quantidade, fechar e perder o snapshot seria hostil.
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
+      if (e.key !== "Escape") return;
+      if (step === "review") {
+        setStep("form");
+        return;
+      }
+      onClose();
     }
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  }, [onClose, step]);
 
   return (
     <div
@@ -272,7 +297,8 @@ export function CheckoutModal({
         onClick={(e) => e.stopPropagation()}
       >
         <StepHeader step={step} onBack={
-          step === "method" ? () => setStep("form") :
+          step === "review" ? () => setStep("form") :
+          step === "method" ? () => setStep("review") :
           // BUG-62 do QA: step instructions sem botão de voltar — usuário
           // não conseguia trocar de método sem fechar tudo. Agora volta pro
           // method picker preservando os dados do form (snapshot já salvo).
@@ -281,6 +307,7 @@ export function CheckoutModal({
         } />
         <h2 style={{ marginBottom: "0.25rem" }}>
           {step === "form" && tc.completePurchase}
+          {step === "review" && (tc.review?.title ?? "Review your order")}
           {step === "method" && tc.choosePaymentMethod}
           {step === "instructions" && tc.completePayment}
           {step === "success" && (
@@ -300,7 +327,7 @@ export function CheckoutModal({
         {step === "form" && (
           <>
             <TrustSignals lang={lang} variant="compact" />
-            <form onSubmit={advanceToMethod} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+            <form onSubmit={advanceToReview} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               {error && <div className="alert alert-error">{error}</div>}
 
               {!user && (
@@ -391,6 +418,25 @@ export function CheckoutModal({
           </>
         )}
 
+        {step === "review" && formSnapshot && (
+          <ReviewStep
+            tc={tc}
+            plan={plan}
+            lang={lang}
+            currency={currency}
+            isProfile={isProfile}
+            payMethod={payMethod}
+            snapshot={formSnapshot}
+            selectedProfileId={selectedProfileId}
+            profiles={profiles}
+            useNewProfile={useNewProfile}
+            error={error}
+            loading={loading}
+            onConfirm={confirmReview}
+            onBack={() => setStep("form")}
+          />
+        )}
+
         {step === "method" && (
           <MethodPicker
             methods={methods}
@@ -419,11 +465,12 @@ export function CheckoutModal({
 function StepHeader({ step, onBack }: { step: Step; onBack: (() => void) | null }) {
   const labels: Record<Step, string> = {
     form: "1. Details",
-    method: "2. Payment method",
-    instructions: "3. Complete payment",
-    success: "4. Done",
+    review: "2. Review",
+    method: "3. Payment method",
+    instructions: "4. Complete payment",
+    success: "5. Done",
   };
-  const order: Step[] = ["form", "method", "instructions", "success"];
+  const order: Step[] = ["form", "review", "method", "instructions", "success"];
   const currentIdx = order.indexOf(step);
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.5rem" }}>
@@ -449,6 +496,103 @@ function StepHeader({ step, onBack }: { step: Step; onBack: (() => void) | null 
           ← Back
         </button>
       )}
+    </div>
+  );
+}
+
+function ReviewStep({
+  tc, plan, lang, currency, isProfile, payMethod, snapshot, selectedProfileId,
+  profiles, useNewProfile, error, loading, onConfirm, onBack,
+}: {
+  tc: CheckoutT;
+  plan: Plan;
+  lang: LangCode;
+  currency: Currency | null;
+  isProfile: boolean;
+  payMethod: "gateway" | "credits";
+  snapshot: { name: string; email: string; handle: string; display_name: string; publication_url: string };
+  selectedProfileId: string;
+  profiles: Profile[] | null;
+  useNewProfile: boolean;
+  error: string | null;
+  loading: boolean;
+  onConfirm: () => void;
+  onBack: () => void;
+}) {
+  // BUG-69: i18n com fallback inline porque review.* só foi traduzido em
+  // en/pt/es por ora — outros idiomas caem no objeto en via tr() global,
+  // mas mantemos `??` defensivo caso algum pack venha sem o subbloco.
+  const r = tc.review ?? {
+    title: "Review your order",
+    handleLabel: "Recipient",
+    totalLabel: "Total",
+    confirmAndPay: "Confirm and pay",
+    back: "← Back",
+  };
+
+  // Identifica o "recipient" pra exibição. Pra profile, mostra o handle
+  // (existente ou novo). Pra post, mostra a URL.
+  let recipientValue = "";
+  if (isProfile) {
+    if (profiles && !useNewProfile && selectedProfileId) {
+      const p = profiles.find((x) => x.id === selectedProfileId);
+      recipientValue = p ? `@${p.handle}${p.display_name ? ` — ${p.display_name}` : ""}` : "";
+    } else {
+      const h = snapshot.handle.replace(/^@/, "");
+      recipientValue = h ? `@${h}` : "";
+    }
+  } else {
+    recipientValue = snapshot.publication_url;
+  }
+
+  const methodLabel = payMethod === "credits"
+    ? tc.payWithCredits
+    : tc.continueChooseMethod;
+
+  return (
+    <div data-testid="checkout-review" style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+      {error && <div className="alert alert-error">{error}</div>}
+      <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+        <li style={{ display: "flex", justifyContent: "space-between", gap: "1rem" }}>
+          <span style={{ color: "var(--muted)" }}>{r.handleLabel}</span>
+          <strong style={{ textAlign: "right", wordBreak: "break-all" }}>{recipientValue || "—"}</strong>
+        </li>
+        <li style={{ display: "flex", justifyContent: "space-between", gap: "1rem" }}>
+          <span style={{ color: "var(--muted)" }}>Plan</span>
+          <strong style={{ textAlign: "right" }}>
+            {localizedPlanName(plan, lang)}
+          </strong>
+        </li>
+        <li style={{ display: "flex", justifyContent: "space-between", gap: "1rem" }}>
+          <span style={{ color: "var(--muted)" }}>{r.totalLabel}</span>
+          <strong style={{ textAlign: "right" }} data-testid="checkout-review-total">
+            {priceFor(plan, currency)}
+          </strong>
+        </li>
+        <li style={{ display: "flex", justifyContent: "space-between", gap: "1rem" }}>
+          <span style={{ color: "var(--muted)" }}>Payment</span>
+          <strong style={{ textAlign: "right" }}>{methodLabel}</strong>
+        </li>
+      </ul>
+      <button
+        type="button"
+        data-testid="checkout-review-confirm"
+        className="btn btn-primary"
+        onClick={onConfirm}
+        disabled={loading}
+        style={{ width: "100%" }}
+      >
+        {loading ? tc.creatingOrder : r.confirmAndPay}
+      </button>
+      <button
+        type="button"
+        className="btn btn-outline"
+        onClick={onBack}
+        disabled={loading}
+        style={{ width: "100%" }}
+      >
+        {r.back}
+      </button>
     </div>
   );
 }
