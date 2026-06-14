@@ -50,8 +50,21 @@ const nextConfig: NextConfig = {
   productionBrowserSourceMaps: true,
 
   async headers() {
+    // Vary: Accept-Language em rotas globais (sem country prefix). O
+    // middleware seta x-locale baseado em Accept-Language nessas rotas;
+    // pra cache (CDN, browser) saber que a resposta varia por idioma,
+    // o Vary precisa estar explícito. O middleware tenta setar mas o
+    // pipeline interno do Next sobrescreve com o Vary do RSC; aqui
+    // entra no compose final via config (ordem de precedência maior).
+    const VARY_ACCEPT_LANG = [
+      { key: "Vary", value: "Accept-Language, RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch, Accept-Encoding" },
+    ];
     return [
       { source: "/:path*", headers: SECURITY_HEADERS },
+      { source: "/pricing", headers: VARY_ACCEPT_LANG },
+      { source: "/vs/:competitor*", headers: VARY_ACCEPT_LANG },
+      { source: "/cities/:city*", headers: VARY_ACCEPT_LANG },
+      { source: "/case-studies/:path*", headers: VARY_ACCEPT_LANG },
     ];
   },
 
