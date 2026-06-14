@@ -49,9 +49,10 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
       url: `${siteUrl()}${canonical}`,
       locale: "en_US",
       type: "article",
+      siteName: "Viralefy",
       publishedTime: c.publishedAt,
       modifiedTime: c.updatedAt,
-      images: [{ url: og, width: 1200, height: 630 }],
+      images: [{ url: og, width: 1200, height: 630, alt: title }],
     },
     twitter: {
       card: "summary_large_image",

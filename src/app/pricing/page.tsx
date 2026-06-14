@@ -28,7 +28,7 @@ function siteUrl() {
 // Como só estamos suportando PT vs EN nesta página por enquanto,
 // qualquer locale começando com "pt" cai em "pt"; o resto cai em "en".
 // Tipo local PageLang (subset de LangCode) garante index seguro no PRICING.
-type PageLang = "pt" | "en" | "es" | "fr" | "de" | "ja";
+type PageLang = "pt" | "en" | "es" | "fr" | "de" | "ja" | "it" | "ru" | "nl" | "ko";
 
 async function resolveLang(): Promise<PageLang> {
   const h = await headers();
@@ -38,6 +38,10 @@ async function resolveLang(): Promise<PageLang> {
   if (locale.startsWith("fr")) return "fr";
   if (locale.startsWith("de")) return "de";
   if (locale.startsWith("ja")) return "ja";
+  if (locale.startsWith("it")) return "it";
+  if (locale.startsWith("ru")) return "ru";
+  if (locale.startsWith("nl")) return "nl";
+  if (locale.startsWith("ko")) return "ko";
   return "en";
 }
 
@@ -219,6 +223,106 @@ const PRICING: Record<PageLang, PricingPack> = {
     breadcrumbHome: "ホーム",
     breadcrumbPricing: "価格",
   },
+  it: {
+    metaTitle: "Prezzi trasparenti in USDT — Viralefy",
+    metaDescription:
+      "Confronta i prezzi Viralefy per follower, like e visualizzazioni su Instagram e TikTok. Prezzi in USDT/USD, senza password, con garanzia di reintegro.",
+    heroTitle: "Prezzi trasparenti in USDT",
+    heroSubtitle:
+      "Un unico listino canonico in USD/USDT per 130 mercati. Le valute locali sono solo a scopo di visualizzazione — l'addebito avviene sempre in USD stabile.",
+    tableFollowers: "Follower",
+    tableLikes: "Like",
+    tableViews: "Visualizzazioni",
+    thPlatform: "Piattaforma",
+    uspRefillTitle: "Garanzia di reintegro",
+    uspRefillBody: "I cali entro 30 giorni vengono reintegrati automaticamente, senza costi aggiuntivi.",
+    uspPasswordTitle: "Nessuna password richiesta",
+    uspPasswordBody: "Ci serve solo il profilo pubblico o il link al post — mai le Sue credenziali.",
+    uspCryptoTitle: "Crypto al primo posto",
+    uspCryptoBody: "Paghi in USDT, BTC, ETH o oltre 50 asset. Prezzi stabili in USD su tutto il catalogo.",
+    uspSupportTitle: "Supporto 24/7",
+    uspSupportBody: "Ticket gestiti da persone reali ogni giorno. Risposta media entro 2 ore.",
+    browseAll: "Esplora tutti i 130 mercati",
+    schemaPageName: "Prezzi Viralefy",
+    schemaPageDesc: "Prezzi trasparenti in USDT per i piani di engagement su Instagram e TikTok.",
+    breadcrumbHome: "Home",
+    breadcrumbPricing: "Prezzi",
+  },
+  ru: {
+    metaTitle: "Прозрачные цены в USDT — Viralefy",
+    metaDescription:
+      "Сравните цены Viralefy на подписчиков, лайки и просмотры в Instagram и TikTok. Цены в USDT/USD, без пароля, с гарантией восполнения.",
+    heroTitle: "Прозрачные цены в USDT",
+    heroSubtitle:
+      "Единый канонический прайс в USD/USDT для 130 рынков. Локальные валюты показываются только для удобства — списание всегда в стабильных USD.",
+    tableFollowers: "Подписчики",
+    tableLikes: "Лайки",
+    tableViews: "Просмотры",
+    thPlatform: "Платформа",
+    uspRefillTitle: "Гарантия восполнения",
+    uspRefillBody: "Отписки в течение 30 дней восполняются автоматически и без доплат.",
+    uspPasswordTitle: "Без пароля",
+    uspPasswordBody: "Нам нужен только публичный профиль или ссылка на пост — никаких учётных данных.",
+    uspCryptoTitle: "Сначала крипта",
+    uspCryptoBody: "Оплата в USDT, BTC, ETH и более 50 активах. Стабильные цены в USD по всему каталогу.",
+    uspSupportTitle: "Поддержка 24/7",
+    uspSupportBody: "Тикеты обрабатываются людьми каждый день. Средний ответ — менее 2 часов.",
+    browseAll: "Посмотреть все 130 рынков",
+    schemaPageName: "Цены Viralefy",
+    schemaPageDesc: "Прозрачные цены в USDT на пакеты вовлечения для Instagram и TikTok.",
+    breadcrumbHome: "Главная",
+    breadcrumbPricing: "Цены",
+  },
+  nl: {
+    metaTitle: "Transparante prijzen in USDT — Viralefy",
+    metaDescription:
+      "Vergelijk Viralefy-prijzen voor Instagram- en TikTok-volgers, likes en views. Prijzen in USDT/USD, geen wachtwoord nodig, met aanvulgarantie.",
+    heroTitle: "Transparante prijzen in USDT",
+    heroSubtitle:
+      "Eén canonieke prijslijst in USD/USDT voor 130 markten. Lokale valuta's zijn alleen ter weergave — afrekenen gebeurt altijd in stabiele USD.",
+    tableFollowers: "Volgers",
+    tableLikes: "Likes",
+    tableViews: "Views",
+    thPlatform: "Platform",
+    uspRefillTitle: "Aanvulgarantie",
+    uspRefillBody: "Uitval binnen 30 dagen wordt automatisch en zonder extra kosten aangevuld.",
+    uspPasswordTitle: "Geen wachtwoord nodig",
+    uspPasswordBody: "We hebben alleen je openbare @ of post-link nodig — nooit je inloggegevens.",
+    uspCryptoTitle: "Crypto eerst",
+    uspCryptoBody: "Betaal in USDT, BTC, ETH of 50+ assets. Stabiele USD-prijzen in de hele catalogus.",
+    uspSupportTitle: "24/7-support",
+    uspSupportBody: "Elke dag tickets beantwoord door mensen. Gemiddelde reactietijd onder 2 uur.",
+    browseAll: "Bekijk alle 130 markten",
+    schemaPageName: "Viralefy-prijzen",
+    schemaPageDesc: "Transparante prijzen in USDT voor engagement-pakketten op Instagram en TikTok.",
+    breadcrumbHome: "Home",
+    breadcrumbPricing: "Prijzen",
+  },
+  ko: {
+    metaTitle: "USDT 기반 투명한 가격 — Viralefy",
+    metaDescription:
+      "Instagram 및 TikTok 팔로워, 좋아요, 조회수에 대한 Viralefy 가격을 비교하세요. USDT/USD 기준, 비밀번호 불필요, 리필 보장 제공.",
+    heroTitle: "USDT 기반 투명한 가격",
+    heroSubtitle:
+      "130개 시장을 아우르는 USD/USDT 단일 가격표입니다. 현지 통화는 표시용일 뿐이며 결제는 항상 안정적인 USD로 진행됩니다.",
+    tableFollowers: "팔로워",
+    tableLikes: "좋아요",
+    tableViews: "조회수",
+    thPlatform: "플랫폼",
+    uspRefillTitle: "리필 보장",
+    uspRefillBody: "30일 이내 이탈은 추가 비용 없이 자동으로 리필됩니다.",
+    uspPasswordTitle: "비밀번호 불필요",
+    uspPasswordBody: "공개 프로필 또는 게시물 URL만 있으면 됩니다 — 인증 정보는 절대 요구하지 않습니다.",
+    uspCryptoTitle: "크립토 우선",
+    uspCryptoBody: "USDT, BTC, ETH 등 50개 이상의 자산으로 결제할 수 있습니다. 전체 카탈로그에서 안정적인 USD 가격을 유지합니다.",
+    uspSupportTitle: "24시간 연중무휴 지원",
+    uspSupportBody: "매일 사람이 직접 티켓에 응대합니다. 평균 응답 시간은 2시간 이내입니다.",
+    browseAll: "130개 시장 모두 보기",
+    schemaPageName: "Viralefy 가격",
+    schemaPageDesc: "Instagram 및 TikTok 인게이지먼트 플랜을 위한 USDT 기반 투명한 가격.",
+    breadcrumbHome: "홈",
+    breadcrumbPricing: "가격",
+  },
 };
 
 function ogLocale(lang: PageLang): string {
@@ -228,6 +332,10 @@ function ogLocale(lang: PageLang): string {
     case "fr": return "fr_FR";
     case "de": return "de_DE";
     case "ja": return "ja_JP";
+    case "it": return "it_IT";
+    case "ru": return "ru_RU";
+    case "nl": return "nl_NL";
+    case "ko": return "ko_KR";
     default:   return "en_US";
   }
 }
@@ -239,6 +347,10 @@ function schemaLang(lang: PageLang): string {
     case "fr": return "fr-FR";
     case "de": return "de-DE";
     case "ja": return "ja-JP";
+    case "it": return "it-IT";
+    case "ru": return "ru-RU";
+    case "nl": return "nl-NL";
+    case "ko": return "ko-KR";
     default:   return "en";
   }
 }
@@ -265,6 +377,10 @@ export async function generateMetadata(): Promise<Metadata> {
         "fr-FR": canonical,
         "de-DE": canonical,
         "ja-JP": canonical,
+        "it-IT": canonical,
+        "ru-RU": canonical,
+        "nl-NL": canonical,
+        "ko-KR": canonical,
       },
     },
     openGraph: {

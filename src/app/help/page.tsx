@@ -30,6 +30,7 @@ export async function generateMetadata(): Promise<Metadata> {
       url: `${siteUrl()}/help`,
       locale: "en_US",
       type: "website",
+      siteName: "Viralefy",
     },
     twitter: { card: "summary_large_image", site: "@viralefy", creator: "@viralefy" },
   };

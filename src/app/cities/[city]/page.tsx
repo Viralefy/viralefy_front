@@ -17,7 +17,7 @@ import type { LangCode } from "@/i18n/languages";
 // landmarks locais em PT, etc.) — encerrar isso em PT é trivial mas merece
 // QA dedicado.
 
-type PageLang = "pt" | "en" | "es" | "fr" | "de" | "ja";
+type PageLang = "pt" | "en" | "es" | "fr" | "de" | "ja" | "it" | "ru" | "nl" | "ko";
 
 async function resolveLang(): Promise<PageLang> {
   const h = await headers();
@@ -27,6 +27,10 @@ async function resolveLang(): Promise<PageLang> {
   if (locale.startsWith("fr")) return "fr";
   if (locale.startsWith("de")) return "de";
   if (locale.startsWith("ja")) return "ja";
+  if (locale.startsWith("it")) return "it";
+  if (locale.startsWith("ru")) return "ru";
+  if (locale.startsWith("nl")) return "nl";
+  if (locale.startsWith("ko")) return "ko";
   return "en";
 }
 
@@ -37,6 +41,10 @@ function schemaLang(lang: PageLang): string {
     case "fr": return "fr-FR";
     case "de": return "de-DE";
     case "ja": return "ja-JP";
+    case "it": return "it-IT";
+    case "ru": return "ru-RU";
+    case "nl": return "nl-NL";
+    case "ko": return "ko-KR";
     default:   return "en";
   }
 }
@@ -47,6 +55,10 @@ function ogLocale(lang: PageLang): string {
     case "fr": return "fr_FR";
     case "de": return "de_DE";
     case "ja": return "ja_JP";
+    case "it": return "it_IT";
+    case "ru": return "ru_RU";
+    case "nl": return "nl_NL";
+    case "ko": return "ko_KR";
     default:   return "en_US";
   }
 }
@@ -285,6 +297,146 @@ const CITY_T: Record<PageLang, CityPack> = {
     schemaWebPageName: (city) => `${city}で Instagram フォロワーを購入`,
     schemaServiceName: (city) => `${city}での Instagram と TikTok のグロース`,
   },
+  it: {
+    metaTitle: (city) => `Comprare follower Instagram a ${city} — crescita locale | Viralefy`,
+    metaDescription: (city) =>
+      `Faccia crescere il Suo Instagram e TikTok a ${city}. Follower, like e visualizzazioni reali con consegna allineata al fuso orario locale. Paghi in USDT/USD e parta in pochi minuti.`,
+    heroTitle: (city) => `Comprare follower Instagram a ${city}`,
+    heroSubtitle: (city) =>
+      `Pubblico locale, engagement reale, consegna immediata — pensato per creator e brand a ${city}.`,
+    ctaSeePlans: (city) => `Vedi i piani per ${city}`,
+    ctaAllCities: "Tutte le città",
+    breadcrumbHome: "Home",
+    breadcrumbCities: "Città",
+    whyHeading: (city) => `Perché i creator a ${city} scelgono Viralefy`,
+    bullets: (city) => [
+      "Account dall'aspetto reale — foto profilo, bio e cronologia post. Nessuna firma da bot.",
+      `Consegna a goccia allineata al fuso orario di ${city}, nelle ore di punta locali.`,
+      "Prezzi in USDT/USD — niente sorprese sul cambio, niente dati di carta, niente chargeback.",
+      "Garanzia di reintegro 30 giorni contro i cali su ogni pacchetto di follower.",
+      "Stessa dashboard per Instagram, TikTok e richieste di reintegro.",
+      `Supporto in inglese e nella principale lingua locale di ${city}.`,
+    ],
+    readyHeading: (city) => `Pronto a crescere a ${city}?`,
+    readyBody: (country) =>
+      `Scelga un piano calibrato sul mercato ${country} — follower, like o visualizzazioni, consegnati oggi.`,
+    readyCta: "Vedi i piani follower Instagram",
+    bodyP1: (city, hoods, landmark) =>
+      `Che Lei sia un creator che gira intorno a ${landmark}, un piccolo brand che spinge pop-up per ${hoods} o un'agenzia che scala account clienti a ${city}, il collo di bottiglia è la densità di pubblico. Viralefy consegna follower, like e commenti su Instagram e visualizzazioni TikTok con finestre di consegna allineate al Suo fuso orario locale — così la nuova social proof arriva quando il Suo pubblico locale è davvero online.`,
+    bodyP2: (city, population) =>
+      `${city} è uno dei feed più competitivi al mondo. Con oltre ${population} abitanti e un'economia creator densa, rompere la fase di riscaldamento dell'algoritmo senza una spinta iniziale è brutale. I nostri pacchetti starter coprono quel vuoto: una salita misurata di account dall'aspetto reale che porta il Suo post negli esplora, e da lì l'engagement organico si moltiplica.`,
+    bodyP3:
+      "Ogni ordine è pagato in USDT o USD, regolato on-chain — niente chargeback e nessun dato di carta esposto. La consegna parte in pochi minuti dalla conferma e termina in ore o giorni a seconda della dimensione del pacchetto. Il drip lento è voluto: imita pattern organici perché i sistemi di sicurezza della piattaforma trattino la crescita come normale. Monitora la consegna dalla dashboard e può mettere in pausa o aggiungere in qualsiasi momento.",
+    bodyP4: (city, hoods) =>
+      `Il mercato di ${city} si muove sull'estetica — ciò che vince a ${hoods} non vincerà in un feed di periferia due città più in là. Non promettiamo di sistemare i Suoi contenuti. Quello che facciamo è rimuovere il dazio del cold start perché i contenuti che già produce abbiano la superficie di esposizione che meritano. Se ha dubbi su quale pacchetto sia adatto al Suo momento, il nostro team risponde ai ticket in inglese e nella lingua principale della città.`,
+    schemaWebPageName: (city) => `Comprare follower Instagram a ${city}`,
+    schemaServiceName: (city) => `Crescita Instagram e TikTok a ${city}`,
+  },
+  ru: {
+    metaTitle: (city) => `Купить подписчиков Instagram в ${city} — локальный рост | Viralefy`,
+    metaDescription: (city) =>
+      `Развивайте Instagram и TikTok в ${city}. Реальные подписчики, лайки и просмотры с доставкой по местному часовому поясу. Оплата в USDT/USD, старт за минуты.`,
+    heroTitle: (city) => `Купить подписчиков Instagram в ${city}`,
+    heroSubtitle: (city) =>
+      `Локальная аудитория, реальное вовлечение, мгновенный старт — сделано для авторов и брендов в ${city}.`,
+    ctaSeePlans: (city) => `Тарифы для ${city}`,
+    ctaAllCities: "Все города",
+    breadcrumbHome: "Главная",
+    breadcrumbCities: "Города",
+    whyHeading: (city) => `Почему авторы в ${city} выбирают Viralefy`,
+    bullets: (city) => [
+      "Аккаунты с реальным видом — фото профиля, био и история постов. Без следов ботов.",
+      `Капельная доставка с привязкой к часовому поясу города ${city}, в часы пика местной аудитории.`,
+      "Цены в USDT/USD — без сюрпризов курса, без данных карты, без чарджбэков.",
+      "Гарантия восполнения 30 дней при отписках на каждом пакете подписчиков.",
+      "Единая панель для Instagram, TikTok и заявок на восполнение.",
+      `Поддержка на английском и основном местном языке города ${city}.`,
+    ],
+    readyHeading: (city) => `Готовы расти в городе ${city}?`,
+    readyBody: (country) =>
+      `Выберите тариф под рынок ${country} — подписчики, лайки или просмотры, доставка сегодня.`,
+    readyCta: "Смотреть тарифы на подписчиков Instagram",
+    bodyP1: (city, hoods, landmark) =>
+      `Будь Вы автор, снимающий у ${landmark}, маленький бренд, продвигающий поп-апы по ${hoods}, или агентство, масштабирующее клиентские аккаунты по городу ${city}, узкое место — плотность аудитории. Viralefy доставляет подписчиков, лайки и комментарии в Instagram и просмотры в TikTok в окнах, привязанных к Вашему местному часовому поясу — чтобы новый социальный сигнал приходил тогда, когда Ваша аудитория действительно онлайн.`,
+    bodyP2: (city, population) =>
+      `${city} — один из самых конкурентных лент в мире. При более чем ${population} жителях и плотной экономике авторов пробить разогрев алгоритма без стартового толчка крайне сложно. Наши стартовые пакеты закрывают этот разрыв: дозированный прирост аккаунтов с реальным видом, который выводит пост в рекомендации, а дальше органика разгоняется сама.`,
+    bodyP3:
+      "Каждый заказ оплачивается в USDT или USD и проводится в блокчейне — никаких чарджбэков и раскрытия данных карты. Доставка стартует за минуты после подтверждения и завершается за часы или дни в зависимости от размера пакета. Медленный дрип — это намеренно: он повторяет органические паттерны, чтобы системы безопасности платформы воспринимали рост как естественный. Вы видите доставку в панели и можете в любой момент поставить на паузу или докупить.",
+    bodyP4: (city, hoods) =>
+      `Рынок города ${city} живёт эстетикой — то, что выигрывает в ${hoods}, не выиграет в пригородной ленте через два города. Мы не обещаем починить Ваш контент. Что мы делаем — снимаем налог холодного старта, чтобы контент, который Вы уже создаёте, получал ту площадь показа, которую заслуживает. Если не уверены, какой пакет подходит Вашему этапу, наша команда отвечает на тикеты на английском и основном языке города.`,
+    schemaWebPageName: (city) => `Купить подписчиков Instagram в ${city}`,
+    schemaServiceName: (city) => `Рост в Instagram и TikTok в ${city}`,
+  },
+  nl: {
+    metaTitle: (city) => `Instagram-volgers kopen in ${city} — lokale groei | Viralefy`,
+    metaDescription: (city) =>
+      `Laat je Instagram en TikTok groeien in ${city}. Echte volgers, likes en views met levering afgestemd op de lokale tijdzone. Betaal in USDT/USD en start binnen minuten.`,
+    heroTitle: (city) => `Instagram-volgers kopen in ${city}`,
+    heroSubtitle: (city) =>
+      `Lokaal publiek, echte engagement, directe levering — gemaakt voor creators en merken in ${city}.`,
+    ctaSeePlans: (city) => `Bekijk ${city}-pakketten`,
+    ctaAllCities: "Alle steden",
+    breadcrumbHome: "Home",
+    breadcrumbCities: "Steden",
+    whyHeading: (city) => `Waarom creators in ${city} voor Viralefy kiezen`,
+    bullets: (city) => [
+      "Accounts die er echt uitzien — profielfoto, bio en posting-historie. Geen bot-signaturen.",
+      `Gespreide levering afgestemd op de tijdzone van ${city}, op de lokale piekuren.`,
+      "Prijzen in USDT/USD — geen valutaverrassingen, geen kaartgegevens, geen chargebacks.",
+      "30 dagen aanvulgarantie tegen uitval op elk volgerspakket.",
+      "Hetzelfde dashboard voor Instagram, TikTok en aanvulverzoeken.",
+      `Support in het Engels en in de belangrijkste lokale taal van ${city}.`,
+    ],
+    readyHeading: (city) => `Klaar om te groeien in ${city}?`,
+    readyBody: (country) =>
+      `Kies een pakket afgestemd op de markt ${country} — volgers, likes of views, vandaag geleverd.`,
+    readyCta: "Bekijk Instagram-volgerspakketten",
+    bodyP1: (city, hoods, landmark) =>
+      `Of je nu een creator bent die rond ${landmark} filmt, een klein merk dat pop-ups pusht door ${hoods}, of een agency dat klantaccounts opschaalt door ${city} — publieksdichtheid is de bottleneck. Viralefy levert Instagram-volgers, -likes, -comments en TikTok-views met leverwindows afgestemd op jouw lokale tijdzone — zodat nieuwe social proof binnenkomt wanneer jouw lokale publiek écht online is.`,
+    bodyP2: (city, population) =>
+      `${city} is een van de meest competitieve feeds ter wereld. Met meer dan ${population} inwoners en een dichte creator-economie is de opwarmfase van het algoritme breken zonder eerste duwtje brute. Onze starterpakketten dichten dat gat: een gedoseerde opbouw van echt ogende accounts die je post de explore-tab in tilt, waarna organische engagement vanzelf doorbouwt.`,
+    bodyP3:
+      "Elke order wordt betaald in USDT of USD en on-chain afgerekend — geen chargebacks en geen blootgestelde kaartgegevens. Levering start binnen minuten na bevestiging en eindigt over uren of dagen, afhankelijk van pakketgrootte. De langzame drip is bewust: hij imiteert organische patronen zodat de veiligheidssystemen van het platform de groei als normaal behandelen. Je volgt de levering vanuit je dashboard en kunt op elk moment pauzeren of bijbestellen.",
+    bodyP4: (city, hoods) =>
+      `De markt in ${city} draait op esthetiek — wat wint in ${hoods}, wint niet in een buitenwijk-feed twee steden verderop. We doen niet alsof we jouw content gaan repareren. Wat we wél doen: de cold-start-tol weghalen zodat de content die je al maakt het podium krijgt dat het verdient. Twijfel je welk pakket bij jouw fase past, dan beantwoordt ons team tickets in het Engels en in de hoofdtaal van de stad.`,
+    schemaWebPageName: (city) => `Instagram-volgers kopen in ${city}`,
+    schemaServiceName: (city) => `Instagram- en TikTok-groei in ${city}`,
+  },
+  ko: {
+    metaTitle: (city) => `${city}에서 Instagram 팔로워 구매 — 현지 성장 | Viralefy`,
+    metaDescription: (city) =>
+      `${city}에서 Instagram과 TikTok을 성장시키십시오. 현지 시간대에 맞춘 실제 팔로워, 좋아요, 조회수를 제공합니다. USDT/USD로 결제하며 몇 분 안에 시작됩니다.`,
+    heroTitle: (city) => `${city}에서 Instagram 팔로워 구매`,
+    heroSubtitle: (city) =>
+      `현지 오디언스, 실제 인게이지먼트, 즉시 배송 — ${city}의 크리에이터와 브랜드를 위해 설계되었습니다.`,
+    ctaSeePlans: (city) => `${city} 플랜 보기`,
+    ctaAllCities: "모든 도시",
+    breadcrumbHome: "홈",
+    breadcrumbCities: "도시",
+    whyHeading: (city) => `${city}의 크리에이터가 Viralefy를 선택하는 이유`,
+    bullets: (city) => [
+      "프로필 사진, 자기소개, 게시 이력을 갖춘 실제 같은 계정 — 봇 흔적이 없습니다.",
+      `${city}의 시간대에 맞춘 단계적 배송으로 현지 피크 시간에 도달합니다.`,
+      "USDT/USD 가격 — 환율로 인한 예상치 못한 비용, 카드 정보, 차지백이 없습니다.",
+      "모든 팔로워 패키지에 대해 30일 이탈 보장 리필을 제공합니다.",
+      "Instagram, TikTok, 리필 요청을 동일한 대시보드에서 관리합니다.",
+      `영어 및 ${city}의 주요 현지 언어로 지원합니다.`,
+    ],
+    readyHeading: (city) => `${city}에서 성장할 준비가 되셨습니까?`,
+    readyBody: (country) =>
+      `${country} 시장에 맞춘 플랜을 선택하십시오 — 팔로워, 좋아요, 조회수를 오늘 안에 전달합니다.`,
+    readyCta: "Instagram 팔로워 플랜 보기",
+    bodyP1: (city, hoods, landmark) =>
+      `${landmark} 주변에서 촬영하는 크리에이터든, ${hoods}에서 팝업을 진행하는 작은 브랜드든, ${city} 전역의 클라이언트 계정을 확장하는 에이전시든 병목은 오디언스 밀도입니다. Viralefy는 Instagram 팔로워, 좋아요, 댓글과 TikTok 조회수를 귀하의 현지 시간대에 맞춘 배송 윈도우로 제공합니다 — 새로운 소셜 프루프가 현지 오디언스가 실제로 온라인일 때 도달하도록 합니다.`,
+    bodyP2: (city, population) =>
+      `${city}는 세계에서 가장 경쟁이 치열한 피드 중 하나입니다. ${population}명 이상의 주민과 밀도 높은 크리에이터 경제 속에서 초기 추진력 없이 알고리즘의 워밍업 단계를 돌파하는 것은 매우 어렵습니다. 당사의 스타터 패키지는 그 공백을 메웁니다: 실제 같은 계정의 측정된 증가가 게시물을 탐색 탭으로 끌어올리고, 그 이후 오가닉 인게이지먼트가 누적됩니다.`,
+    bodyP3:
+      "모든 주문은 USDT 또는 USD로 결제되며 온체인에서 정산됩니다 — 차지백도, 노출되는 카드 정보도 없습니다. 배송은 결제 확인 후 몇 분 안에 시작되며 패키지 규모에 따라 몇 시간에서 며칠에 걸쳐 완료됩니다. 느린 드립은 의도된 것으로, 오가닉 패턴을 모방하여 플랫폼 보안 시스템이 성장을 정상으로 인식하도록 합니다. 대시보드에서 배송을 모니터링하고 언제든지 일시 중지하거나 추가 주문하실 수 있습니다.",
+    bodyP4: (city, hoods) =>
+      `${city} 시장은 미적 감각에 의해 움직입니다 — ${hoods}에서 통하는 것이 두 도시 떨어진 교외 피드에서는 통하지 않습니다. 저희는 귀하의 콘텐츠를 고쳐드리겠다고 약속하지 않습니다. 저희가 하는 일은 콜드 스타트 비용을 제거하여 귀하가 이미 만들고 있는 콘텐츠가 마땅한 노출 면적을 얻도록 하는 것입니다. 어떤 패키지가 현재 단계에 맞는지 확신이 서지 않으신다면, 저희 팀이 영어와 도시의 주요 언어로 티켓에 응답합니다.`,
+    schemaWebPageName: (city) => `${city}에서 Instagram 팔로워 구매`,
+    schemaServiceName: (city) => `${city}의 Instagram 및 TikTok 성장`,
+  },
 };
 
 // Programmatic SEO city LP. 50 rotas estáticas; cada uma fala da cidade
@@ -377,6 +529,10 @@ export async function generateMetadata({ params }: { params: Promise<{ city: str
         "fr-FR": `/cities/${city.slug}`,
         "de-DE": `/cities/${city.slug}`,
         "ja-JP": `/cities/${city.slug}`,
+        "it-IT": `/cities/${city.slug}`,
+        "ru-RU": `/cities/${city.slug}`,
+        "nl-NL": `/cities/${city.slug}`,
+        "ko-KR": `/cities/${city.slug}`,
       },
     },
     robots: meta.robots,
@@ -410,6 +566,10 @@ function neighborhoodsText(
       fr: `le centre de ${city}`,
       de: `das Zentrum von ${city}`,
       ja: `${city}の中心部`,
+      it: `il centro di ${city}`,
+      ru: `центр города ${city}`,
+      nl: `het centrum van ${city}`,
+      ko: `${city}의 중심부`,
     };
     return { hoods: fallbackHoods[lang], landmark: `${city}` };
   }
@@ -423,6 +583,10 @@ function neighborhoodsText(
     fr: " et ",
     de: " und ",
     ja: "、",
+    it: " e ",
+    ru: " и ",
+    nl: " en ",
+    ko: ", ",
   };
   return {
     hoods: list.length > 1 ? `${head}${connector[lang]}${last}` : last,
@@ -447,6 +611,10 @@ export default async function CityPage({ params }: { params: Promise<{ city: str
     fr: "fr-FR",
     de: "de-DE",
     ja: "ja-JP",
+    it: "it-IT",
+    ru: "ru-RU",
+    nl: "nl-NL",
+    ko: "ko-KR",
   };
   const populationFmt = city.population.toLocaleString(localeFmtByLang[lang]);
   // BUG-90/163 do QA 2026-06-12: ctaHref apontava pra alias EN

@@ -20,7 +20,7 @@ function siteUrl() {
   return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 }
 
-type PageLang = "pt" | "en" | "es" | "fr" | "de" | "ja";
+type PageLang = "pt" | "en" | "es" | "fr" | "de" | "ja" | "it" | "ru" | "nl" | "ko";
 
 async function resolveLang(): Promise<PageLang> {
   const h = await headers();
@@ -30,6 +30,10 @@ async function resolveLang(): Promise<PageLang> {
   if (locale.startsWith("fr")) return "fr";
   if (locale.startsWith("de")) return "de";
   if (locale.startsWith("ja")) return "ja";
+  if (locale.startsWith("it")) return "it";
+  if (locale.startsWith("ru")) return "ru";
+  if (locale.startsWith("nl")) return "nl";
+  if (locale.startsWith("ko")) return "ko";
   return "en";
 }
 
@@ -40,6 +44,10 @@ function schemaLang(lang: PageLang): string {
     case "fr": return "fr-FR";
     case "de": return "de-DE";
     case "ja": return "ja-JP";
+    case "it": return "it-IT";
+    case "ru": return "ru-RU";
+    case "nl": return "nl-NL";
+    case "ko": return "ko-KR";
     default:   return "en";
   }
 }
@@ -50,6 +58,10 @@ function ogLocale(lang: PageLang): string {
     case "fr": return "fr_FR";
     case "de": return "de_DE";
     case "ja": return "ja_JP";
+    case "it": return "it_IT";
+    case "ru": return "ru_RU";
+    case "nl": return "nl_NL";
+    case "ko": return "ko_KR";
     default:   return "en_US";
   }
 }
@@ -342,6 +354,170 @@ const VS: Record<PageLang, VsPack> = {
       competitorWindowSuffix: (h) => `${h}時間ウィンドウ`,
     },
   },
+  it: {
+    metaTitle: (name) => `Viralefy vs ${name} — confronto fianco a fianco`,
+    metaDescription: (name) =>
+      `Confronti Viralefy e ${name} su prezzo iniziale (USDT), tempi di consegna, reintegro, pagamenti in crypto e supporto umano 24/7.`,
+    heroSubtitleSuffix: " Di seguito un confronto fattuale basato su informazioni pubblicamente disponibili.",
+    breadcrumbHome: "Home",
+    breadcrumbComparisons: "Confronti",
+    thFeature: "Caratteristica",
+    thViralefy: "Viralefy",
+    ctaHeadline: "Provi Viralefy a partire da 1,00 $",
+    ctaSubtitle: "Scelga un mercato, scelga un piano, paghi in USD, EUR, BRL o crypto. La consegna parte in pochi minuti.",
+    ctaBrowse: "Vedi i piani",
+    dataAsOf: (d) =>
+      `Dati basati su informazioni pubbliche al ${d}. Invii eventuali correzioni al supporto e aggiorneremo questa pagina.`,
+    schemaArticleDesc: (name) => `Confronto fattuale fianco a fianco tra Viralefy e ${name}.`,
+    rows: {
+      startingPrice: "Prezzo iniziale",
+      viralefyStartingPrice: "da 1,00 $ USD (100 like Instagram)",
+      avgDelivery: "Tempo medio di consegna",
+      viralefyAvgDelivery: "0–6 ore (la maggior parte parte in pochi minuti)",
+      refill: "Garanzia di reintegro",
+      viralefyRefill: "Reintegro 30 giorni in caso di calo",
+      refillNo: "Non offerto",
+      support: "Canale di supporto",
+      viralefySupport: "Ticket in-account (gratuito, asincrono)",
+      supportNone: "Non comunicato",
+      crypto: "Pagamenti in crypto",
+      viralefyCrypto: "Sì — USDT, BTC tramite Heleket",
+      cryptoNo: "Non offerto",
+      cardPix: "Carta + PIX",
+      viralefyCardPix: "Stripe (carta) + Abacate Pay (PIX BRL)",
+      competitorCard: "Carta (variabile)",
+      hreflang: "Hreflang + 130 mercati",
+      viralefyHreflang: "Sì — matrice hreflang completa su 130 paesi",
+      competitorHreflang: "Limitato o mercato singolo",
+      multicurrency: "Visualizzazione multivaluta",
+      viralefyMulticurrency: "Sì — USD canonico + visualizzazione locale in 6 valute",
+      competitorMulticurrency: "Solo USD o una sola valuta fiat",
+      competitorWindowSuffix: (h) => `finestra di ${h}h`,
+    },
+  },
+  ru: {
+    metaTitle: (name) => `Viralefy vs ${name} — сравнение бок о бок`,
+    metaDescription: (name) =>
+      `Сравните Viralefy и ${name} по стартовой цене (USDT), времени доставки, восполнению, оплате криптой и поддержке 24/7.`,
+    heroSubtitleSuffix: " Ниже — фактологическое сравнение на основе общедоступной информации.",
+    breadcrumbHome: "Главная",
+    breadcrumbComparisons: "Сравнения",
+    thFeature: "Параметр",
+    thViralefy: "Viralefy",
+    ctaHeadline: "Попробуйте Viralefy от 1,00 $",
+    ctaSubtitle: "Выберите рынок, выберите тариф, платите в USD, EUR, BRL или крипте. Доставка стартует за считаные минуты.",
+    ctaBrowse: "Посмотреть тарифы",
+    dataAsOf: (d) =>
+      `Данные основаны на общедоступной информации по состоянию на ${d}. Присылайте правки в поддержку — мы обновим эту страницу.`,
+    schemaArticleDesc: (name) => `Фактологическое сравнение Viralefy и ${name} бок о бок.`,
+    rows: {
+      startingPrice: "Стартовая цена",
+      viralefyStartingPrice: "от 1,00 $ USD (за 100 лайков в Instagram)",
+      avgDelivery: "Среднее время доставки",
+      viralefyAvgDelivery: "0–6 часов (большинство заказов стартуют за минуты)",
+      refill: "Гарантия восполнения",
+      viralefyRefill: "Восполнение в течение 30 дней при отписках",
+      refillNo: "Не предлагается",
+      support: "Канал поддержки",
+      viralefySupport: "Тикеты внутри аккаунта (бесплатно, асинхронно)",
+      supportNone: "Не раскрыто",
+      crypto: "Оплата криптой",
+      viralefyCrypto: "Да — USDT, BTC через Heleket",
+      cryptoNo: "Не предлагается",
+      cardPix: "Карта + PIX",
+      viralefyCardPix: "Stripe (карта) + Abacate Pay (PIX BRL)",
+      competitorCard: "Карта (варьируется)",
+      hreflang: "Hreflang + 130 рынков",
+      viralefyHreflang: "Да — полная матрица hreflang по 130 странам",
+      competitorHreflang: "Ограничено или один рынок",
+      multicurrency: "Мультивалютное отображение",
+      viralefyMulticurrency: "Да — USD как канон + локальное отображение в 6 валютах",
+      competitorMulticurrency: "Только USD или одна фиатная валюта",
+      competitorWindowSuffix: (h) => `окно ${h} ч`,
+    },
+  },
+  nl: {
+    metaTitle: (name) => `Viralefy vs ${name} — directe vergelijking`,
+    metaDescription: (name) =>
+      `Vergelijk Viralefy en ${name} op startprijs (USDT), levertijd, aanvulling, crypto-betalingen en 24/7 menselijke support.`,
+    heroSubtitleSuffix: " Hieronder een feitelijke vergelijking op basis van openbaar beschikbare informatie.",
+    breadcrumbHome: "Home",
+    breadcrumbComparisons: "Vergelijkingen",
+    thFeature: "Kenmerk",
+    thViralefy: "Viralefy",
+    ctaHeadline: "Probeer Viralefy vanaf $ 1,00",
+    ctaSubtitle: "Kies een markt, kies een pakket, betaal in USD, EUR, BRL of crypto. De levering start binnen enkele minuten.",
+    ctaBrowse: "Bekijk pakketten",
+    dataAsOf: (d) =>
+      `Gegevens gebaseerd op openbare informatie per ${d}. Stuur correcties naar support en we werken deze pagina bij.`,
+    schemaArticleDesc: (name) => `Feitelijke directe vergelijking tussen Viralefy en ${name}.`,
+    rows: {
+      startingPrice: "Startprijs",
+      viralefyStartingPrice: "vanaf $ 1,00 USD (100 Instagram-likes)",
+      avgDelivery: "Gemiddelde levertijd",
+      viralefyAvgDelivery: "0–6 uur (de meeste orders starten binnen minuten)",
+      refill: "Aanvulgarantie",
+      viralefyRefill: "30 dagen aanvulling bij uitval",
+      refillNo: "Niet aangeboden",
+      support: "Supportkanaal",
+      viralefySupport: "Tickets in het account (gratis, asynchroon)",
+      supportNone: "Niet vermeld",
+      crypto: "Crypto-betalingen",
+      viralefyCrypto: "Ja — USDT, BTC via Heleket",
+      cryptoNo: "Niet aangeboden",
+      cardPix: "Kaart + PIX",
+      viralefyCardPix: "Stripe (kaart) + Abacate Pay (PIX BRL)",
+      competitorCard: "Kaart (wisselt)",
+      hreflang: "Hreflang + 130 markten",
+      viralefyHreflang: "Ja — volledige hreflang-matrix over 130 landen",
+      competitorHreflang: "Beperkt of één markt",
+      multicurrency: "Multivaluta-weergave",
+      viralefyMulticurrency: "Ja — USD als canon + lokale weergave in 6 valuta's",
+      competitorMulticurrency: "Alleen USD of één fiatvaluta",
+      competitorWindowSuffix: (h) => `venster van ${h} u`,
+    },
+  },
+  ko: {
+    metaTitle: (name) => `Viralefy vs ${name} — 나란히 비교`,
+    metaDescription: (name) =>
+      `Viralefy와 ${name}를 시작 가격(USDT), 배송 시간, 리필, 암호화폐 결제, 24시간 사람 지원 측면에서 비교합니다.`,
+    heroSubtitleSuffix: " 공개된 정보를 바탕으로 한 사실 기반의 나란히 비교입니다.",
+    breadcrumbHome: "홈",
+    breadcrumbComparisons: "비교",
+    thFeature: "항목",
+    thViralefy: "Viralefy",
+    ctaHeadline: "$1.00부터 Viralefy를 사용해 보십시오",
+    ctaSubtitle: "시장을 선택하고 플랜을 선택한 뒤 USD, EUR, BRL 또는 암호화폐로 결제하십시오. 배송은 몇 분 안에 시작됩니다.",
+    ctaBrowse: "플랜 보기",
+    dataAsOf: (d) =>
+      `${d} 기준 공개 정보를 바탕으로 한 데이터입니다. 수정 사항은 지원팀으로 보내 주시면 페이지를 업데이트하겠습니다.`,
+    schemaArticleDesc: (name) => `Viralefy와 ${name}의 사실 기반 나란히 비교입니다.`,
+    rows: {
+      startingPrice: "시작 가격",
+      viralefyStartingPrice: "$1.00 USD부터 (Instagram 좋아요 100개)",
+      avgDelivery: "평균 배송 시간",
+      viralefyAvgDelivery: "0–6시간 (대부분의 주문은 몇 분 안에 시작됩니다)",
+      refill: "리필 보장",
+      viralefyRefill: "이탈 시 30일 리필 제공",
+      refillNo: "제공되지 않습니다",
+      support: "지원 채널",
+      viralefySupport: "계정 내 지원 티켓 (무료, 비동기)",
+      supportNone: "공개되지 않았습니다",
+      crypto: "암호화폐 결제",
+      viralefyCrypto: "지원합니다 — Heleket을 통해 USDT, BTC",
+      cryptoNo: "제공되지 않습니다",
+      cardPix: "카드 + PIX",
+      viralefyCardPix: "Stripe (카드) + Abacate Pay (PIX BRL)",
+      competitorCard: "카드 (상이함)",
+      hreflang: "Hreflang + 130개 시장",
+      viralefyHreflang: "지원합니다 — 130개국 전체 hreflang 매트릭스",
+      competitorHreflang: "제한적이거나 단일 시장",
+      multicurrency: "다중 통화 표시",
+      viralefyMulticurrency: "지원합니다 — USD 기준 + 6개 통화 현지 표시",
+      competitorMulticurrency: "USD 또는 단일 법정 통화만",
+      competitorWindowSuffix: (h) => `${h}시간 윈도우`,
+    },
+  },
 };
 
 export function generateStaticParams(): Params[] {
@@ -372,6 +548,10 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
         "fr-FR": canonical,
         "de-DE": canonical,
         "ja-JP": canonical,
+        "it-IT": canonical,
+        "ru-RU": canonical,
+        "nl-NL": canonical,
+        "ko-KR": canonical,
       },
     },
     robots: meta.robots,
@@ -406,6 +586,10 @@ function buildRows(c: Competitor, lang: PageLang): Row[] {
     fr: "Oui",
     de: "Ja",
     ja: "あり",
+    it: "Sì",
+    ru: "Да",
+    nl: "Ja",
+    ko: "지원",
   };
   const yes = yesByLang[lang];
   return [

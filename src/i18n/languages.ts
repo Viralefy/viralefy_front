@@ -1088,45 +1088,60 @@ export const PACKS: Record<LangCode, Pack> = {
   sl: { ...en },
   ca: { ...es, home: { ...es.home, heroTitle: "Fes créixer el teu Instagram i TikTok" } },
   // ---------- Ásia ----------
+  // BUG-193/194 do QA 2026-06-14: páginas /jp e /kr mostravam 109+ botões
+  // "Buy now" em inglês mesmo com toda nav e categorias em japonês/coreano.
+  // O override `...en` herdava cta.buyNow="Buy now" porque só home/header
+  // tinham overrides; cta caía no fallback EN. Adicionamos cta completo
+  // (buyNow, buy, seeAll, backToHome, backToCategory) em jp/kr/ar/hi/id/vi/
+  // th/tr/uk para que os CTAs do CategoryCardGrid/CategoryGroupedGrid/
+  // QuantitySlider/BuyPlanCta saiam no idioma local.
   ja: {
     ...en,
     home: { ...en.home, heroTitle: "Instagram と TikTok を成長させる", heroSubtitle: "本物のフォロワー、エンゲージメント、ビューを高速配信。USD、EUR、暗号通貨で支払い可能。", plansByService: "サービス", pickService: "サービスを選択", viewService: "詳細を見る" },
     header: { ...en.header, login: "ログイン", register: "アカウント作成", account: "マイアカウント", support: "サポート", logout: "ログアウト", currency: "通貨", markets: "市場", allServices: "サービス", searchPlaceholder: "サービスや市場を検索…", searchNoResults: "結果なし。" },
+    cta: { ...en.cta, buy: "購入", buyNow: "今すぐ購入", seeAll: "すべてのプランを見る", backToHome: "ホームに戻る", backToCategory: "カテゴリーに戻る" },
   },
   ko: {
     ...en,
     home: { ...en.home, heroTitle: "Instagram과 TikTok 성장시키기", heroSubtitle: "진짜 팔로워, 좋아요, 조회수를 빠르게 배송. USD, EUR 또는 암호화폐로 결제.", plansByService: "서비스", pickService: "서비스 선택", viewService: "상세 보기" },
     header: { ...en.header, login: "로그인", register: "계정 만들기", account: "내 계정", support: "지원", logout: "로그아웃", currency: "통화", markets: "마켓", allServices: "서비스", searchPlaceholder: "서비스 및 시장 검색…", searchNoResults: "결과 없음." },
+    cta: { ...en.cta, buy: "구매", buyNow: "지금 구매", seeAll: "모든 플랜 보기", backToHome: "홈으로", backToCategory: "카테고리로" },
   },
   ar: {
     ...en,
-    home: { ...en.home, heroTitle: "نمِّ حساب Instagram و TikTok", heroSubtitle: "متابعين حقيقيون، تفاعل ومشاهدات بتسليم سريع. ادفع بالدولار الأمريكي أو اليورو أو العملات المشفرة.", plansByService: "الخدمات" },
+    home: { ...en.home, heroTitle: "نمِّ حساب Instagram و TikTok", heroSubtitle: "متابعين حقيقيون، تفاعل ومشاهدات بتسليم سريع. ادفع بالدولار الأمريكي أو اليورو أو العملات المشفرة.", plansByService: "الخدمات", pickService: "اختر خدمة", viewService: "عرض التفاصيل" },
     header: { ...en.header, login: "تسجيل الدخول", register: "إنشاء حساب", account: "حسابي", support: "الدعم", logout: "تسجيل الخروج", currency: "العملة", markets: "الأسواق", allServices: "الخدمات", searchPlaceholder: "ابحث عن الخدمات والأسواق…", searchNoResults: "لا توجد نتائج." },
+    cta: { ...en.cta, buy: "شراء", buyNow: "اشترِ الآن", seeAll: "عرض كل الباقات", backToHome: "العودة للرئيسية", backToCategory: "العودة للفئة" },
   },
   hi: {
     ...en,
-    home: { ...en.home, heroTitle: "अपना Instagram और TikTok बढ़ाएं", heroSubtitle: "असली फॉलोअर्स, एंगेजमेंट और व्यूज़ — तेज़ डिलीवरी। USD, EUR या क्रिप्टो से भुगतान करें।", plansByService: "सेवाएँ" },
+    home: { ...en.home, heroTitle: "अपना Instagram और TikTok बढ़ाएं", heroSubtitle: "असली फॉलोअर्स, एंगेजमेंट और व्यूज़ — तेज़ डिलीवरी। USD, EUR या क्रिप्टो से भुगतान करें।", plansByService: "सेवाएँ", pickService: "सेवा चुनें", viewService: "विवरण देखें" },
     header: { ...en.header, login: "लॉग इन", register: "खाता बनाएँ", account: "मेरा खाता", support: "सहायता", logout: "लॉग आउट", currency: "मुद्रा", markets: "बाज़ार", allServices: "सेवाएँ", searchPlaceholder: "सेवाएँ और बाज़ार खोजें…", searchNoResults: "कोई परिणाम नहीं।" },
+    cta: { ...en.cta, buy: "खरीदें", buyNow: "अभी खरीदें", seeAll: "सभी प्लान देखें", backToHome: "होम पर वापस", backToCategory: "श्रेणी पर वापस" },
   },
   id: {
     ...en,
-    home: { ...en.home, heroTitle: "Kembangkan Instagram dan TikTok Anda", heroSubtitle: "Pengikut asli, engagement, dan tayangan dengan pengiriman cepat. Bayar dalam USD, EUR, atau kripto.", plansByService: "Layanan" },
+    home: { ...en.home, heroTitle: "Kembangkan Instagram dan TikTok Anda", heroSubtitle: "Pengikut asli, engagement, dan tayangan dengan pengiriman cepat. Bayar dalam USD, EUR, atau kripto.", plansByService: "Layanan", pickService: "Pilih layanan", viewService: "Lihat detail" },
     header: { ...en.header, login: "Masuk", register: "Buat akun", account: "Akun saya", support: "Dukungan", logout: "Keluar", currency: "Mata uang", markets: "Pasar", allServices: "Layanan", searchPlaceholder: "Cari layanan dan pasar…", searchNoResults: "Tidak ada hasil." },
+    cta: { ...en.cta, buy: "Beli", buyNow: "Beli sekarang", seeAll: "Lihat semua paket", backToHome: "Kembali ke beranda", backToCategory: "Kembali ke kategori" },
   },
   vi: {
     ...en,
-    home: { ...en.home, heroTitle: "Phát triển Instagram và TikTok của bạn", heroSubtitle: "Người theo dõi thật, tương tác và lượt xem giao nhanh. Thanh toán bằng USD, EUR hoặc tiền điện tử.", plansByService: "Dịch vụ" },
+    home: { ...en.home, heroTitle: "Phát triển Instagram và TikTok của bạn", heroSubtitle: "Người theo dõi thật, tương tác và lượt xem giao nhanh. Thanh toán bằng USD, EUR hoặc tiền điện tử.", plansByService: "Dịch vụ", pickService: "Chọn dịch vụ", viewService: "Xem chi tiết" },
     header: { ...en.header, login: "Đăng nhập", register: "Tạo tài khoản", account: "Tài khoản", support: "Hỗ trợ", logout: "Đăng xuất", currency: "Tiền tệ", markets: "Thị trường", allServices: "Dịch vụ", searchPlaceholder: "Tìm dịch vụ và thị trường…", searchNoResults: "Không có kết quả." },
+    cta: { ...en.cta, buy: "Mua", buyNow: "Mua ngay", seeAll: "Xem tất cả gói", backToHome: "Về trang chủ", backToCategory: "Về danh mục" },
   },
   th: {
     ...en,
-    home: { ...en.home, heroTitle: "เติบโตบน Instagram และ TikTok", heroSubtitle: "ผู้ติดตามจริง การมีส่วนร่วม และการดูที่ส่งมอบเร็ว ชำระด้วย USD, EUR หรือคริปโต", plansByService: "บริการ" },
+    home: { ...en.home, heroTitle: "เติบโตบน Instagram และ TikTok", heroSubtitle: "ผู้ติดตามจริง การมีส่วนร่วม และการดูที่ส่งมอบเร็ว ชำระด้วย USD, EUR หรือคริปโต", plansByService: "บริการ", pickService: "เลือกบริการ", viewService: "ดูรายละเอียด" },
     header: { ...en.header, login: "เข้าสู่ระบบ", register: "สร้างบัญชี", account: "บัญชีของฉัน", support: "ฝ่ายสนับสนุน", logout: "ออกจากระบบ", currency: "สกุลเงิน", markets: "ตลาด", allServices: "บริการ", searchPlaceholder: "ค้นหาบริการและตลาด…", searchNoResults: "ไม่พบผลลัพธ์" },
+    cta: { ...en.cta, buy: "ซื้อ", buyNow: "ซื้อตอนนี้", seeAll: "ดูแพ็กเกจทั้งหมด", backToHome: "กลับหน้าแรก", backToCategory: "กลับหมวดหมู่" },
   },
   tr: {
     ...en,
-    home: { ...en.home, heroTitle: "Instagram ve TikTok'unu büyüt", heroSubtitle: "Gerçek takipçi, etkileşim ve görüntüleme hızlı teslimat ile. USD, EUR veya kripto ile öde.", plansByService: "Hizmetler" },
+    home: { ...en.home, heroTitle: "Instagram ve TikTok'unu büyüt", heroSubtitle: "Gerçek takipçi, etkileşim ve görüntüleme hızlı teslimat ile. USD, EUR veya kripto ile öde.", plansByService: "Hizmetler", pickService: "Bir hizmet seç", viewService: "Detayları gör" },
     header: { ...en.header, login: "Giriş yap", register: "Hesap oluştur", account: "Hesabım", support: "Destek", logout: "Çıkış", currency: "Para birimi", markets: "Pazarlar", allServices: "Hizmetler", searchPlaceholder: "Hizmet ve pazar ara…", searchNoResults: "Sonuç yok." },
+    cta: { ...en.cta, buy: "Satın al", buyNow: "Şimdi satın al", seeAll: "Tüm paketleri gör", backToHome: "Ana sayfaya dön", backToCategory: "Kategoriye dön" },
   },
   // ---------- Europa-fora-SEPA ----------
   uk: {

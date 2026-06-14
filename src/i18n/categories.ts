@@ -1688,6 +1688,50 @@ export const COPY: Record<CategoryCode, Partial<Record<LangCode, LongCopy>>> = {
   },
 };
 
+// Overrides por plataforma — quando o COPY base é compartilhado entre
+// Instagram e TikTok (ex.: views), mas há frases plataforma-específicas
+// que precisam de wording diferente.
+//
+// BUG-134 do QA 2026-06-14: /br/visualizacoes-tiktok mencionava "Reels e
+// Stories" (formatos do Instagram) no H1, metaTitle e metaDescription.
+// Reels e Stories são produtos do Instagram; o TikTok tem feeds próprios.
+// Aqui sobrescrevemos só essas 3 strings em EN/PT/ES — o resto do COPY
+// (parágrafos/bullets/faq) permanece compartilhado, já que descreve
+// princípios genéricos de view-count.
+type CopyOverride = Partial<Pick<LongCopy, "h1" | "metaTitle" | "metaDescription">>;
+
+const VIEWS_TIKTOK_OVERRIDES: Partial<Record<LangCode, CopyOverride>> = {
+  en: {
+    h1: (c) => `Buy TikTok video views in ${c}`,
+    metaTitle: (c) => `Buy TikTok video views in ${c} | Viralefy`,
+    metaDescription: (c) =>
+      `Boost your TikTok videos with real-looking views in ${c}. Delivery starts from 1 hour.`,
+  },
+  pt: {
+    h1: (c) => `Comprar visualizações de TikTok em ${c}`,
+    metaTitle: (c) => `Comprar visualizações para TikTok em ${c} | Viralefy`,
+    metaDescription: (c) =>
+      `Impulsione seus vídeos do TikTok com visualizações reais em ${c}. Início em 1 hora.`,
+  },
+  es: {
+    h1: (c) => `Comprar visualizaciones de TikTok en ${c}`,
+    metaTitle: (c) => `Comprar visualizaciones para TikTok en ${c} | Viralefy`,
+    metaDescription: (c) =>
+      `Impulsa tus vídeos de TikTok con visualizaciones reales en ${c}. Inicio en 1 hora.`,
+  },
+  es_AR: {
+    h1: (c) => `Comprar visualizaciones de TikTok en ${c}`,
+    metaTitle: (c) => `Comprar visualizaciones para TikTok en ${c} | Viralefy`,
+    metaDescription: (c) =>
+      `Impulsa tus vídeos de TikTok con visualizaciones reales en ${c}. Inicio en 1 hora.`,
+  },
+};
+
 export function copyFor(category: CategoryCode, lang: LangCode): LongCopy {
-  return COPY[category][lang] ?? COPY[category].en ?? COPY_SEGUIDORES_EN;
+  const base = COPY[category][lang] ?? COPY[category].en ?? COPY_SEGUIDORES_EN;
+  if (category === "visualizacoes_tiktok") {
+    const ov = VIEWS_TIKTOK_OVERRIDES[lang] ?? VIEWS_TIKTOK_OVERRIDES.en;
+    if (ov) return { ...base, ...ov };
+  }
+  return base;
 }

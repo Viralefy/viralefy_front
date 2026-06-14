@@ -70,11 +70,66 @@ const UNIT_ES: UnitMap = {
   visualizacoes_instagram: "vistas Instagram",
   visualizacoes_tiktok: "vistas TikTok",
 };
+// BUG-198/211: cobrir FR/DE/IT/NL pra que cards/breadcrumb/H1 saiam no
+// idioma local em /fr, /de, /it, /nl. Antes caíam em UNIT_EN ("followers
+// Instagram").
+const UNIT_FR: UnitMap = {
+  seguidores_instagram: "abonnés Instagram",
+  seguidores_tiktok: "abonnés TikTok",
+  curtidas_instagram: "j'aime Instagram",
+  curtidas_tiktok: "j'aime TikTok",
+  comentarios_instagram: "commentaires Instagram",
+  comentarios_tiktok: "commentaires TikTok",
+  compartilhamentos_instagram: "partages Instagram",
+  compartilhamentos_tiktok: "partages TikTok",
+  visualizacoes_instagram: "vues Instagram",
+  visualizacoes_tiktok: "vues TikTok",
+};
+const UNIT_DE: UnitMap = {
+  seguidores_instagram: "Instagram-Follower",
+  seguidores_tiktok: "TikTok-Follower",
+  curtidas_instagram: "Instagram-Likes",
+  curtidas_tiktok: "TikTok-Likes",
+  comentarios_instagram: "Instagram-Kommentare",
+  comentarios_tiktok: "TikTok-Kommentare",
+  compartilhamentos_instagram: "Instagram-Shares",
+  compartilhamentos_tiktok: "TikTok-Shares",
+  visualizacoes_instagram: "Instagram-Aufrufe",
+  visualizacoes_tiktok: "TikTok-Aufrufe",
+};
+const UNIT_IT: UnitMap = {
+  seguidores_instagram: "follower Instagram",
+  seguidores_tiktok: "follower TikTok",
+  curtidas_instagram: "mi piace Instagram",
+  curtidas_tiktok: "mi piace TikTok",
+  comentarios_instagram: "commenti Instagram",
+  comentarios_tiktok: "commenti TikTok",
+  compartilhamentos_instagram: "condivisioni Instagram",
+  compartilhamentos_tiktok: "condivisioni TikTok",
+  visualizacoes_instagram: "visualizzazioni Instagram",
+  visualizacoes_tiktok: "visualizzazioni TikTok",
+};
+const UNIT_NL: UnitMap = {
+  seguidores_instagram: "Instagram-volgers",
+  seguidores_tiktok: "TikTok-volgers",
+  curtidas_instagram: "Instagram-likes",
+  curtidas_tiktok: "TikTok-likes",
+  comentarios_instagram: "Instagram-reacties",
+  comentarios_tiktok: "TikTok-reacties",
+  compartilhamentos_instagram: "Instagram-shares",
+  compartilhamentos_tiktok: "TikTok-shares",
+  visualizacoes_instagram: "Instagram-weergaven",
+  visualizacoes_tiktok: "TikTok-weergaven",
+};
 
 function unitMap(lang: LangCode): UnitMap {
   switch (lang) {
     case "pt": return UNIT_PT;
     case "es": case "es_AR": return UNIT_ES;
+    case "fr": return UNIT_FR;
+    case "de": return UNIT_DE;
+    case "it": return UNIT_IT;
+    case "nl": return UNIT_NL;
     default: return UNIT_EN;
   }
 }
@@ -101,43 +156,47 @@ export function localizedPlanName(plan: Plan, lang: LangCode): string {
 // inteira sem precisar de strings por plano. Match aproximado ao que o
 // catálogo gravava em EN: "Ideal for testing", "First push", "Initial
 // growth", "Steady boost", "Real audience", "Scale".
-type Tier = { upTo: number; pt: string; en: string; es: string };
+// BUG-198/211 do QA 2026-06-14: subtítulos "Ideal for testing", "First push"
+// continuavam em inglês em /fr/seguidores-instagram, /de, /it. Antes a tier
+// só tinha pt/en/es; outros idiomas caíam no fallback EN. Adicionamos
+// fr/de/it/nl. Traduções idiomáticas (não literais).
+type Tier = { upTo: number; pt: string; en: string; es: string; fr: string; de: string; it: string; nl: string };
 const FOLLOWERS_TIERS: Tier[] = [
-  { upTo: 100,    pt: "Ideal pra testar",     en: "Ideal for testing",   es: "Ideal para probar" },
-  { upTo: 500,    pt: "Empurrão inicial",     en: "First push",          es: "Impulso inicial" },
-  { upTo: 1000,   pt: "Decolagem",            en: "Takeoff",             es: "Despegue" },
-  { upTo: 2500,   pt: "Crescimento inicial",  en: "Initial growth",      es: "Crecimiento inicial" },
-  { upTo: 5000,   pt: "Tração",               en: "Traction",            es: "Tracción" },
-  { upTo: 10000,  pt: "Comunidade",           en: "Community",           es: "Comunidad" },
-  { upTo: 25000,  pt: "Micro-influenciador",  en: "Micro-influencer",    es: "Micro-influencer" },
-  { upTo: 50000,  pt: "Audiência real",       en: "Real audience",       es: "Audiencia real" },
-  { upTo: 100000, pt: "Escala",               en: "Scale",               es: "Escala" },
-  { upTo: 250000, pt: "Mega",                 en: "Mega",                es: "Mega" },
-  { upTo: 1000000,pt: "Massa",                en: "Mass",                es: "Masa" },
-  { upTo: Infinity, pt: "Gigante",            en: "Giant",               es: "Gigante" },
+  { upTo: 100,    pt: "Ideal pra testar",     en: "Ideal for testing",   es: "Ideal para probar",    fr: "Idéal pour tester",     de: "Ideal zum Testen",       it: "Ideale per testare",     nl: "Ideaal om te testen" },
+  { upTo: 500,    pt: "Empurrão inicial",     en: "First push",          es: "Impulso inicial",      fr: "Premier coup de pouce", de: "Erster Schub",           it: "Prima spinta",           nl: "Eerste duwtje" },
+  { upTo: 1000,   pt: "Decolagem",            en: "Takeoff",             es: "Despegue",             fr: "Décollage",             de: "Abheben",                it: "Decollo",                nl: "Lift-off" },
+  { upTo: 2500,   pt: "Crescimento inicial",  en: "Initial growth",      es: "Crecimiento inicial",  fr: "Croissance initiale",   de: "Erstes Wachstum",        it: "Crescita iniziale",      nl: "Initiële groei" },
+  { upTo: 5000,   pt: "Tração",               en: "Traction",            es: "Tracción",             fr: "Traction",              de: "Traktion",               it: "Trazione",               nl: "Tractie" },
+  { upTo: 10000,  pt: "Comunidade",           en: "Community",           es: "Comunidad",            fr: "Communauté",            de: "Community",              it: "Comunità",               nl: "Community" },
+  { upTo: 25000,  pt: "Micro-influenciador",  en: "Micro-influencer",    es: "Micro-influencer",     fr: "Micro-influenceur",     de: "Micro-Influencer",       it: "Micro-influencer",       nl: "Micro-influencer" },
+  { upTo: 50000,  pt: "Audiência real",       en: "Real audience",       es: "Audiencia real",       fr: "Vraie audience",        de: "Echtes Publikum",        it: "Pubblico reale",         nl: "Echt publiek" },
+  { upTo: 100000, pt: "Escala",               en: "Scale",               es: "Escala",               fr: "Échelle",               de: "Skala",                  it: "Scala",                  nl: "Schaal" },
+  { upTo: 250000, pt: "Mega",                 en: "Mega",                es: "Mega",                 fr: "Méga",                  de: "Mega",                   it: "Mega",                   nl: "Mega" },
+  { upTo: 1000000,pt: "Massa",                en: "Mass",                es: "Masa",                 fr: "Masse",                 de: "Masse",                  it: "Massa",                  nl: "Massa" },
+  { upTo: Infinity, pt: "Gigante",            en: "Giant",               es: "Gigante",              fr: "Géant",                 de: "Riese",                  it: "Gigante",                nl: "Reus" },
 ];
 
 const ENGAGEMENT_TIERS: Tier[] = [
-  { upTo: 50,     pt: "Conversa leve",        en: "Light conversation",  es: "Charla ligera" },
-  { upTo: 100,    pt: "Empurrão",             en: "First push",          es: "Impulso" },
-  { upTo: 500,    pt: "Crescimento",          en: "Initial growth",      es: "Crecimiento" },
-  { upTo: 1000,   pt: "Engajamento",          en: "Steady boost",        es: "Empuje" },
-  { upTo: 5000,   pt: "Mais alcance",         en: "More reach",          es: "Más alcance" },
-  { upTo: 10000,  pt: "Espalhe a palavra",    en: "Spread the word",     es: "Difunde la palabra" },
-  { upTo: 50000,  pt: "Escala",               en: "Scale",               es: "Escala" },
-  { upTo: 100000, pt: "Massa",                en: "Mass",                es: "Masa" },
-  { upTo: Infinity, pt: "Gigante",            en: "Giant",               es: "Gigante" },
+  { upTo: 50,     pt: "Conversa leve",        en: "Light conversation",  es: "Charla ligera",        fr: "Conversation légère",   de: "Lockeres Gespräch",      it: "Chiacchiera leggera",    nl: "Licht gesprek" },
+  { upTo: 100,    pt: "Empurrão",             en: "First push",          es: "Impulso",              fr: "Coup de pouce",         de: "Erster Schub",           it: "Prima spinta",           nl: "Eerste duwtje" },
+  { upTo: 500,    pt: "Crescimento",          en: "Initial growth",      es: "Crecimiento",          fr: "Croissance",            de: "Wachstum",               it: "Crescita",               nl: "Groei" },
+  { upTo: 1000,   pt: "Engajamento",          en: "Steady boost",        es: "Empuje",               fr: "Coup d'élan",           de: "Stetiger Schub",         it: "Spinta costante",        nl: "Gestage boost" },
+  { upTo: 5000,   pt: "Mais alcance",         en: "More reach",          es: "Más alcance",          fr: "Plus de portée",        de: "Mehr Reichweite",        it: "Più portata",            nl: "Meer bereik" },
+  { upTo: 10000,  pt: "Espalhe a palavra",    en: "Spread the word",     es: "Difunde la palabra",   fr: "Faites passer le mot",  de: "Verbreite die Botschaft",it: "Spargi la voce",         nl: "Verspreid het woord" },
+  { upTo: 50000,  pt: "Escala",               en: "Scale",               es: "Escala",               fr: "Échelle",               de: "Skala",                  it: "Scala",                  nl: "Schaal" },
+  { upTo: 100000, pt: "Massa",                en: "Mass",                es: "Masa",                 fr: "Masse",                 de: "Masse",                  it: "Massa",                  nl: "Massa" },
+  { upTo: Infinity, pt: "Gigante",            en: "Giant",               es: "Gigante",              fr: "Géant",                 de: "Riese",                  it: "Gigante",                nl: "Reus" },
 ];
 
 const VIEWS_TIERS: Tier[] = [
-  { upTo: 500,    pt: "Ignição",              en: "Ignition",            es: "Ignición" },
-  { upTo: 1000,   pt: "Empurrão inicial",     en: "First push",          es: "Impulso inicial" },
-  { upTo: 5000,   pt: "Mais alcance",         en: "More reach",          es: "Más alcance" },
-  { upTo: 10000,  pt: "Crescimento",          en: "Steady growth",       es: "Crecimiento" },
-  { upTo: 50000,  pt: "Escala",               en: "Scale",               es: "Escala" },
-  { upTo: 100000, pt: "Massa",                en: "Mass",                es: "Masa" },
-  { upTo: 1000000,pt: "Viral",                en: "Viral",               es: "Viral" },
-  { upTo: Infinity, pt: "Mega",               en: "Mega",                es: "Mega" },
+  { upTo: 500,    pt: "Ignição",              en: "Ignition",            es: "Ignición",             fr: "Allumage",              de: "Zündung",                it: "Accensione",             nl: "Ontsteking" },
+  { upTo: 1000,   pt: "Empurrão inicial",     en: "First push",          es: "Impulso inicial",      fr: "Premier élan",          de: "Erster Schub",           it: "Prima spinta",           nl: "Eerste duwtje" },
+  { upTo: 5000,   pt: "Mais alcance",         en: "More reach",          es: "Más alcance",          fr: "Plus de portée",        de: "Mehr Reichweite",        it: "Più portata",            nl: "Meer bereik" },
+  { upTo: 10000,  pt: "Crescimento",          en: "Steady growth",       es: "Crecimiento",          fr: "Croissance stable",     de: "Stetes Wachstum",        it: "Crescita costante",      nl: "Gestage groei" },
+  { upTo: 50000,  pt: "Escala",               en: "Scale",               es: "Escala",               fr: "Échelle",               de: "Skala",                  it: "Scala",                  nl: "Schaal" },
+  { upTo: 100000, pt: "Massa",                en: "Mass",                es: "Masa",                 fr: "Masse",                 de: "Masse",                  it: "Massa",                  nl: "Massa" },
+  { upTo: 1000000,pt: "Viral",                en: "Viral",               es: "Viral",                fr: "Viral",                 de: "Viral",                  it: "Virale",                 nl: "Viraal" },
+  { upTo: Infinity, pt: "Mega",               en: "Mega",                es: "Mega",                 fr: "Méga",                  de: "Mega",                   it: "Mega",                   nl: "Mega" },
 ];
 
 function pickTier(category: string, qty: number, lang: LangCode): string | null {
@@ -149,6 +208,10 @@ function pickTier(category: string, qty: number, lang: LangCode): string | null 
   const t = tiers.find((x) => qty <= x.upTo) ?? tiers[tiers.length - 1];
   if (lang === "pt") return t.pt;
   if (lang === "es" || lang === "es_AR") return t.es;
+  if (lang === "fr") return t.fr;
+  if (lang === "de") return t.de;
+  if (lang === "it") return t.it;
+  if (lang === "nl") return t.nl;
   return t.en;
 }
 
