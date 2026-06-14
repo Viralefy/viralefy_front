@@ -22,6 +22,12 @@ type AuthLayoutProps = {
   altCta?: {
     label: string;
     href: string;
+    /**
+     * Texto do próprio link (default: "→"). BUG-25 do QA 2026-06-12:
+     * antes ficava só "→" sem texto descritivo, deixando o usuário
+     * adivinhar o destino.
+     */
+    linkText?: string;
   };
 };
 
@@ -249,7 +255,7 @@ export function AuthLayout({ brandHeading, brandLead, children, altCta }: AuthLa
             >
               {altCta.label}{" "}
               <Link href={altCta.href} style={{ color: "var(--accent, #00fed6)", textDecoration: "none", fontWeight: 600 }}>
-                →
+                {altCta.linkText ?? "→"}
               </Link>
             </p>
           )}

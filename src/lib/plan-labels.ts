@@ -12,8 +12,12 @@
 import type { Plan } from "./api";
 import type { LangCode } from "@/i18n/languages";
 
-// Formato numérico por idioma — pt usa "1.000", en "1,000".
-function formatQty(qty: number, lang: LangCode): string {
+// Formato numérico por idioma — pt usa "1.000", en "1,000". Exportado pra
+// outros componentes (CategoryCardGrid, CategoryGroupedGrid) consumirem o
+// mesmo formato no número de unidades do card, evitando mistura entre
+// "1,000 followers Instagram" e "1.000 seguidores" no mesmo cartão
+// (BUG-174 do QA 2026-06-12).
+export function formatQty(qty: number, lang: LangCode): string {
   try {
     const loc = lang === "pt" ? "pt-BR"
       : lang === "es" || lang === "es_AR" ? "es"

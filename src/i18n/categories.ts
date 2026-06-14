@@ -83,7 +83,9 @@ export const CATEGORY_LABEL: Record<CategoryCode, Partial<Record<LangCode, strin
   },
   curtidas_instagram: {
     en: "Instagram likes", pt: "Curtidas Instagram",
-    es: "Likes Instagram", fr: "Likes Instagram",
+    // BUG-136/137 do QA 2026-06-12: ES estava "Likes Instagram" (anglicismo)
+    // em vez de "Me gusta Instagram" (forma canônica em espanhol).
+    es: "Me gusta Instagram", fr: "J'aime Instagram",
     de: "Instagram Likes", it: "Like Instagram",
     nl: "Instagram likes", ru: "Лайки Instagram",
     ja: "Instagramいいね", ko: "Instagram 좋아요",
@@ -94,7 +96,7 @@ export const CATEGORY_LABEL: Record<CategoryCode, Partial<Record<LangCode, strin
   },
   curtidas_tiktok: {
     en: "TikTok likes", pt: "Curtidas TikTok",
-    es: "Likes TikTok", fr: "Likes TikTok",
+    es: "Me gusta TikTok", fr: "J'aime TikTok",
     de: "TikTok Likes", it: "Like TikTok",
     nl: "TikTok likes", ru: "Лайки TikTok",
     ja: "TikTokいいね", ko: "TikTok 좋아요",
@@ -668,7 +670,7 @@ const COPY_SERV_PT: LongCopy = {
     `O time trabalha 1-a-1 com cada conta retida. Começamos com auditoria dos números atuais (alcance, taxa de engajamento, demografia, cadência), definimos meta de 90 dias, e desenhamos o calendário pra bater. Onde faz sentido, encaixamos pacotes de seguidores e engajamento da própria Viralefy pra acelerar.`,
     `Cobrança mensal — sem lock-in. Cancela a qualquer momento com um clique pela conta. Relatório cai no primeiro dia de cada mês com os números reais, o que funcionou, o que não, e o plano dos próximos 30 dias.`,
     `Se você tá pensando num retainer premium pra um projeto sério em ${c}, manda mensagem pro suporte antes do checkout — fazemos uma call curta de descoberta pra garantir o encaixe antes de qualquer lado gastar um centavo.`,
-    `Pra tudo o mais, os pacotes self-serve de seguidores, curtidas e views já cobrem as necessidades mais comuns.`,
+    `Pra tudo o mais, os pacotes self-service de seguidores, curtidas e visualizações já cobrem as necessidades mais comuns.`,
   ],
   bullets: () => [
     { title: "Estratégia mensal", body: "Calendário de conteúdo, cadência, pesquisa de hashtag." },

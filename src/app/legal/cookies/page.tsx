@@ -366,7 +366,7 @@ export default async function CookiesLegalPage({
 
         {/* Idiomas — espelha o dynamic [doc]/page.tsx pra não regredir hreflang UX. */}
         <div style={{ marginTop: "2rem", borderTop: "1px solid var(--border)", paddingTop: "1rem" }}>
-          <p style={{ fontSize: "0.85rem", color: "var(--muted)", marginBottom: "0.5rem" }}>Other languages:</p>
+          <p style={{ fontSize: "0.85rem", color: "var(--muted)", marginBottom: "0.5rem" }}>{isPT ? "Outros idiomas:" : "Other languages:"}</p>
           <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
             {(Object.keys(PACKS) as LangCode[]).map((code) => (
               <Link

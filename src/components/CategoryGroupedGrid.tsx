@@ -8,7 +8,7 @@ import { useApp } from "./Providers";
 import { CheckoutModal } from "./CheckoutModal";
 import { CATEGORY_CODES, categoryLabel, categorySlug, categoryUnit } from "@/i18n/categories";
 import { tr, type LangCode } from "@/i18n/languages";
-import { localizedPlanName, localizedPlanDescription } from "@/lib/plan-labels";
+import { localizedPlanName, localizedPlanDescription, formatQty } from "@/lib/plan-labels";
 
 // Grid usado em /<country> e em / (global). Agrupa os planos por categoria
 // na ordem canônica (seguidores → likes → comments → shares → views →
@@ -75,7 +75,7 @@ export function CategoryGroupedGrid({
                   <p className="plan-price">{priceFor(plan, currency)}</p>
                   {g.code !== "servicos" && (
                     <p style={{ fontSize: "0.9rem" }}>
-                      <strong>{plan.followers_qty.toLocaleString()}</strong>{" "}
+                      <strong>{formatQty(plan.followers_qty, lang)}</strong>{" "}
                       {categoryUnit(g.code, lang)}
                     </p>
                   )}

@@ -186,7 +186,7 @@ function RegisterPageInner() {
     <AuthLayout
       brandHeading="Get started in 30 seconds"
       brandLead="Create an account to keep order history, manage profiles per platform, and unlock loyalty rewards on every plan."
-      altCta={{ label: "Already have an account?", href: "/login" }}
+      altCta={{ label: "Already have an account?", href: "/login", linkText: "Sign in" }}
     >
       <header style={{ marginBottom: "0.25rem" }}>
         <h1 style={{ margin: 0, fontSize: "1.55rem", fontWeight: 700 }}>Create account</h1>

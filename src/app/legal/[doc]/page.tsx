@@ -22,6 +22,22 @@ function isSlug(s: string): s is LegalSlug {
   return (LEGAL_SLUGS as readonly string[]).includes(s);
 }
 
+function otherLanguagesLabel(lang: LangCode): string {
+  if (lang === "pt") return "Outros idiomas:";
+  if (lang === "es" || lang === "es_AR") return "Otros idiomas:";
+  if (lang === "fr") return "Autres langues :";
+  if (lang === "de") return "Andere Sprachen:";
+  if (lang === "it") return "Altre lingue:";
+  if (lang === "nl") return "Andere talen:";
+  if (lang === "ru") return "Другие языки:";
+  if (lang === "ja") return "他の言語:";
+  if (lang === "ko") return "다른 언어:";
+  if (lang === "ar") return "لغات أخرى:";
+  if (lang === "tr") return "Diğer diller:";
+  if (lang === "pl") return "Inne języki:";
+  return "Other languages:";
+}
+
 export async function generateMetadata({
   params,
   searchParams,
@@ -86,9 +102,11 @@ export default async function LegalPage({
         </p>
         <div style={{ marginTop: "1.5rem" }}>{renderLegalBody(d.body)}</div>
 
-        {/* Seletor de idioma para essa página legal */}
+        {/* Seletor de idioma para essa página legal — label localizado
+            (BUG-30 do QA 2026-06-12: "Other languages:" ficava em EN mesmo
+            em /legal/contact?lang=pt). */}
         <div style={{ marginTop: "2rem", borderTop: "1px solid var(--border)", paddingTop: "1rem" }}>
-          <p style={{ fontSize: "0.85rem", color: "var(--muted)", marginBottom: "0.5rem" }}>Other languages:</p>
+          <p style={{ fontSize: "0.85rem", color: "var(--muted)", marginBottom: "0.5rem" }}>{otherLanguagesLabel(lang)}</p>
           <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
             {(Object.keys(PACKS) as LangCode[]).map((code) => (
               <Link key={code} href={`/legal/${doc}?lang=${code}`} style={{ fontSize: "0.85rem", padding: "0.25rem 0.5rem", border: "1px solid var(--border)", borderRadius: "0.3rem" }}>

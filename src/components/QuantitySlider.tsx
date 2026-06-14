@@ -6,7 +6,7 @@ import { priceFor, priceForCountry } from "@/lib/format";
 import { useApp } from "./Providers";
 import { CheckoutModal } from "./CheckoutModal";
 import { tr, type LangCode } from "@/i18n/languages";
-import { localizedPlanName, localizedPlanDescription } from "@/lib/plan-labels";
+import { localizedPlanName, localizedPlanDescription, formatQty } from "@/lib/plan-labels";
 
 // Variante "calculadora" reutilizável (antes era apenas LandingCalculator pra
 // /v2). Recebe uma lista de planos JÁ filtrada pela categoria e um idioma; o
@@ -64,7 +64,7 @@ export function QuantitySlider({
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "0.5rem" }}>
           <span style={{ fontSize: "0.85rem", color: "var(--muted)" }}>{unitLabel}</span>
-          <strong style={{ fontSize: "2rem" }}>{qty.toLocaleString()}</strong>
+          <strong style={{ fontSize: "2rem" }}>{formatQty(qty, lang)}</strong>
         </div>
         <input
           // a11y BUG-65 do QA 2026-06-12: input range sem aria-* não é
@@ -81,12 +81,12 @@ export function QuantitySlider({
           aria-valuemin={minQty}
           aria-valuemax={maxQty}
           aria-valuenow={qty}
-          aria-valuetext={`${qty.toLocaleString()} ${unitLabel}`}
+          aria-valuetext={`${formatQty(qty, lang)} ${unitLabel}`}
           style={{ width: "100%", accentColor: "var(--accent)" }}
         />
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.75rem", color: "var(--muted)", marginTop: "0.25rem" }}>
-          <span>{minQty.toLocaleString()}</span>
-          <span>{maxQty.toLocaleString()}</span>
+          <span>{formatQty(minQty, lang)}</span>
+          <span>{formatQty(maxQty, lang)}</span>
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginTop: "1.5rem" }}>
@@ -144,7 +144,7 @@ export function QuantitySlider({
                   <div style={{ color: "var(--muted)", fontSize: "0.8rem" }}>{localizedPlanDescription(p, lang)}</div>
                 </td>
                 <td style={{ padding: "0.75rem 1rem", textAlign: "right", fontVariantNumeric: "tabular-nums" }}>
-                  {p.followers_qty.toLocaleString()}
+                  {formatQty(p.followers_qty, lang)}
                 </td>
                 <td style={{ padding: "0.75rem 1rem", textAlign: "right", fontVariantNumeric: "tabular-nums", fontWeight: 600 }}>
                   {renderPrice(p)}

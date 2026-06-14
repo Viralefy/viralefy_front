@@ -10,7 +10,7 @@ import { useApp } from "./Providers";
 import { CheckoutModal } from "./CheckoutModal";
 import { tr, type LangCode } from "@/i18n/languages";
 import { categorySlug, type CategoryCode } from "@/i18n/categories";
-import { localizedPlanName, localizedPlanDescription } from "@/lib/plan-labels";
+import { localizedPlanName, localizedPlanDescription, formatQty } from "@/lib/plan-labels";
 import { Icon } from "./Icon";
 import Link from "next/link";
 
@@ -88,7 +88,7 @@ export function CategoryCardGrid({
               )}
               {category !== "servicos" && (
                 <p style={{ fontSize: "0.95rem" }}>
-                  <strong>{plan.followers_qty.toLocaleString()}</strong> {unitLabel}
+                  <strong>{formatQty(plan.followers_qty, lang)}</strong> {unitLabel}
                 </p>
               )}
               <div style={{ display: "flex", gap: "0.5rem", marginTop: "auto", flexWrap: "wrap" }}>

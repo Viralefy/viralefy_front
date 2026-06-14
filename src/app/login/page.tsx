@@ -196,7 +196,7 @@ function LoginPageInner() {
           ? "Enter the 6-digit code from your authenticator (or a backup code) to finish signing in."
           : "Track every order, manage your profiles, and stay close to your growth — all in one account."
       }
-      altCta={partialToken ? undefined : { label: "Don't have an account?", href: "/register" }}
+      altCta={partialToken ? undefined : { label: "Don't have an account?", href: "/register", linkText: "Sign up" }}
     >
       <header style={{ marginBottom: "0.5rem" }}>
         <h1 style={{ margin: 0, fontSize: "1.55rem", fontWeight: 700 }}>
