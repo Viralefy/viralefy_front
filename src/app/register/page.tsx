@@ -80,6 +80,33 @@ function RegisterPageInner() {
   const [phone, setPhone] = useState("");
   const [telegram, setTelegram] = useState("");
 
+  // BUG-185 do QA: placeholder do phone era hard-coded "+55 11 98765-4321"
+  // mesmo pra usuários fora do Brasil. Detectamos o país do usuário via
+  // localStorage (lastCountry — gravado pelo Header quando navega em rotas
+  // /[country]) e ajustamos o placeholder. Fallback +1 (US) quando desconhecido.
+  // Lista pequena e curada — só países com storefront ativo + maiores TAMs.
+  const PHONE_PLACEHOLDERS: Record<string, string> = {
+    br: "+55 11 98765-4321",
+    us: "+1 555 123-4567",
+    uk: "+44 7700 900123",
+    gb: "+44 7700 900123",
+    es: "+34 612 345 678",
+    fr: "+33 6 12 34 56 78",
+    de: "+49 151 23456789",
+    it: "+39 312 345 6789",
+    jp: "+81 90 1234 5678",
+    cn: "+86 131 2345 6789",
+  };
+  const [phonePlaceholder, setPhonePlaceholder] = useState("+1 555 123-4567");
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const c = (window.localStorage.getItem("viralefy_last_country") || "").toLowerCase();
+      if (c && PHONE_PLACEHOLDERS[c]) setPhonePlaceholder(PHONE_PLACEHOLDERS[c]);
+    } catch { /* ignora */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // BUG-147 do QA: phone aceitava qualquer texto. Validamos formato
   // permissivo (E.164-ish: dígitos, espaço, hifen, parêntese, prefixo +).
   // Tamanho mín. 8 cobre 99% dos planos numéricos sem rejeitar formatos.
@@ -146,7 +173,7 @@ function RegisterPageInner() {
       return;
     }
     if (phone.trim() && !phoneOk) {
-      setError("Phone number doesn't look valid. Use format like +55 11 98765-4321.");
+      setError(`Phone number doesn't look valid. Use format like ${phonePlaceholder}.`);
       return;
     }
     if (telegram.trim() && !telegramOk) {
@@ -240,7 +267,7 @@ function RegisterPageInner() {
               name="phone"
               type="tel"
               autoComplete="tel"
-              placeholder="+55 11 98765-4321"
+              placeholder={phonePlaceholder}
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
             />

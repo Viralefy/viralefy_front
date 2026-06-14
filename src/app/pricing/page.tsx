@@ -28,12 +28,16 @@ function siteUrl() {
 // Como só estamos suportando PT vs EN nesta página por enquanto,
 // qualquer locale começando com "pt" cai em "pt"; o resto cai em "en".
 // Tipo local PageLang (subset de LangCode) garante index seguro no PRICING.
-type PageLang = "pt" | "en";
+type PageLang = "pt" | "en" | "es" | "fr" | "de" | "ja";
 
 async function resolveLang(): Promise<PageLang> {
   const h = await headers();
-  const locale = h.get("x-locale") || "en";
-  if (locale.toLowerCase().startsWith("pt")) return "pt";
+  const locale = (h.get("x-locale") || "en").toLowerCase();
+  if (locale.startsWith("pt")) return "pt";
+  if (locale.startsWith("es")) return "es";
+  if (locale.startsWith("fr")) return "fr";
+  if (locale.startsWith("de")) return "de";
+  if (locale.startsWith("ja")) return "ja";
   return "en";
 }
 
@@ -64,7 +68,7 @@ type PricingPack = {
   breadcrumbPricing: string;
 };
 
-const PRICING: Record<"pt" | "en", PricingPack> = {
+const PRICING: Record<PageLang, PricingPack> = {
   en: {
     metaTitle: "Transparent pricing in USDT — Viralefy",
     metaDescription:
@@ -115,14 +119,128 @@ const PRICING: Record<"pt" | "en", PricingPack> = {
     breadcrumbHome: "Início",
     breadcrumbPricing: "Preços",
   },
+  es: {
+    metaTitle: "Precios transparentes en USDT — Viralefy",
+    metaDescription:
+      "Compara los precios de Viralefy para seguidores, likes y vistas en Instagram y TikTok. Precios en USDT/USD, sin contraseña, con reposición garantizada.",
+    heroTitle: "Precios transparentes en USDT",
+    heroSubtitle:
+      "Una tabla canónica en USD/USDT para 130 mercados. Las monedas locales son solo visualización — el cobro es siempre en USD estable.",
+    tableFollowers: "Seguidores",
+    tableLikes: "Likes",
+    tableViews: "Vistas",
+    thPlatform: "Plataforma",
+    uspRefillTitle: "Reposición garantizada",
+    uspRefillBody: "Las bajas en los primeros 30 días se reponen automáticamente, sin coste adicional.",
+    uspPasswordTitle: "Sin contraseña",
+    uspPasswordBody: "Solo pedimos el @ público o el enlace del post — nunca tus credenciales.",
+    uspCryptoTitle: "Cripto primero",
+    uspCryptoBody: "Paga en USDT, BTC, ETH o más de 50 activos. Precio estable en USD en todo el catálogo.",
+    uspSupportTitle: "Soporte 24/7",
+    uspSupportBody: "Tickets atendidos por humanos cada día. Respuesta media en menos de 2 horas.",
+    browseAll: "Explorar los 130 mercados",
+    schemaPageName: "Precios Viralefy",
+    schemaPageDesc: "Precios transparentes en USDT para planes de engagement en Instagram y TikTok.",
+    breadcrumbHome: "Inicio",
+    breadcrumbPricing: "Precios",
+  },
+  fr: {
+    metaTitle: "Tarifs transparents en USDT — Viralefy",
+    metaDescription:
+      "Comparez les tarifs Viralefy pour les abonnés, likes et vues sur Instagram et TikTok. Prix en USDT/USD, sans mot de passe, avec garantie de recharge.",
+    heroTitle: "Tarifs transparents en USDT",
+    heroSubtitle:
+      "Une grille canonique en USD/USDT sur 130 marchés. Les devises locales sont uniquement affichées — la facturation se fait toujours en USD stable.",
+    tableFollowers: "Abonnés",
+    tableLikes: "Likes",
+    tableViews: "Vues",
+    thPlatform: "Plateforme",
+    uspRefillTitle: "Garantie de recharge",
+    uspRefillBody: "Les pertes dans les 30 jours sont rechargées automatiquement, sans frais.",
+    uspPasswordTitle: "Aucun mot de passe",
+    uspPasswordBody: "On vous demande uniquement votre @ public ou le lien du post — jamais vos identifiants.",
+    uspCryptoTitle: "Crypto en priorité",
+    uspCryptoBody: "Payez en USDT, BTC, ETH ou plus de 50 actifs. Prix stable en USD sur tout le catalogue.",
+    uspSupportTitle: "Support 24/7",
+    uspSupportBody: "Des tickets traités par des humains chaque jour. Réponse moyenne en moins de 2 heures.",
+    browseAll: "Explorer les 130 marchés",
+    schemaPageName: "Tarifs Viralefy",
+    schemaPageDesc: "Tarifs transparents en USDT pour les formules d'engagement sur Instagram et TikTok.",
+    breadcrumbHome: "Accueil",
+    breadcrumbPricing: "Tarifs",
+  },
+  de: {
+    metaTitle: "Transparente Preise in USDT — Viralefy",
+    metaDescription:
+      "Vergleichen Sie Viralefy-Preise für Follower, Likes und Views auf Instagram und TikTok. Preise in USDT/USD, ohne Passwort, mit Auffüll-Garantie.",
+    heroTitle: "Transparente Preise in USDT",
+    heroSubtitle:
+      "Eine kanonische Preisliste in USD/USDT für 130 Märkte. Lokale Währungen dienen nur der Anzeige — abgerechnet wird immer in stabilem USD.",
+    tableFollowers: "Follower",
+    tableLikes: "Likes",
+    tableViews: "Views",
+    thPlatform: "Plattform",
+    uspRefillTitle: "Auffüll-Garantie",
+    uspRefillBody: "Verluste innerhalb von 30 Tagen werden automatisch und kostenlos aufgefüllt.",
+    uspPasswordTitle: "Kein Passwort nötig",
+    uspPasswordBody: "Wir brauchen nur Ihr öffentliches @ oder den Beitrags-Link — niemals Ihre Zugangsdaten.",
+    uspCryptoTitle: "Krypto-First",
+    uspCryptoBody: "Zahlen Sie in USDT, BTC, ETH oder über 50 Assets. Stabile USD-Preise im gesamten Katalog.",
+    uspSupportTitle: "24/7-Support",
+    uspSupportBody: "Tickets werden täglich von Menschen beantwortet. Durchschnittliche Antwortzeit unter 2 Stunden.",
+    browseAll: "Alle 130 Märkte ansehen",
+    schemaPageName: "Viralefy Preise",
+    schemaPageDesc: "Transparente Preise in USDT für Engagement-Pakete auf Instagram und TikTok.",
+    breadcrumbHome: "Start",
+    breadcrumbPricing: "Preise",
+  },
+  ja: {
+    metaTitle: "USDT建ての透明な価格 — Viralefy",
+    metaDescription:
+      "Instagram と TikTok のフォロワー、いいね、再生数の Viralefy 価格を比較。USDT/USD 建て、パスワード不要、リフィル保証付き。",
+    heroTitle: "USDT建ての透明な価格",
+    heroSubtitle:
+      "130市場に対する USD/USDT の単一価格表。現地通貨は表示のみで、請求は常に安定した USD で行われます。",
+    tableFollowers: "フォロワー",
+    tableLikes: "いいね",
+    tableViews: "再生数",
+    thPlatform: "プラットフォーム",
+    uspRefillTitle: "リフィル保証",
+    uspRefillBody: "30日以内の減少は追加料金なしで自動的に補充されます。",
+    uspPasswordTitle: "パスワード不要",
+    uspPasswordBody: "必要なのは公開プロフィールまたは投稿の URL のみ — 認証情報は決して求めません。",
+    uspCryptoTitle: "クリプト・ファースト",
+    uspCryptoBody: "USDT、BTC、ETH など50以上のアセットで支払い可能。カタログ全体で安定した USD 価格。",
+    uspSupportTitle: "24時間365日サポート",
+    uspSupportBody: "毎日、人によるチケット対応。平均応答時間は2時間以内。",
+    browseAll: "130市場をすべて見る",
+    schemaPageName: "Viralefy 価格",
+    schemaPageDesc: "Instagram と TikTok のエンゲージメントプラン向けの USDT 建て透明な価格。",
+    breadcrumbHome: "ホーム",
+    breadcrumbPricing: "価格",
+  },
 };
 
 function ogLocale(lang: PageLang): string {
-  return lang === "pt" ? "pt_BR" : "en_US";
+  switch (lang) {
+    case "pt": return "pt_BR";
+    case "es": return "es_ES";
+    case "fr": return "fr_FR";
+    case "de": return "de_DE";
+    case "ja": return "ja_JP";
+    default:   return "en_US";
+  }
 }
 
 function schemaLang(lang: PageLang): string {
-  return lang === "pt" ? "pt-BR" : "en";
+  switch (lang) {
+    case "pt": return "pt-BR";
+    case "es": return "es-ES";
+    case "fr": return "fr-FR";
+    case "de": return "de-DE";
+    case "ja": return "ja-JP";
+    default:   return "en";
+  }
 }
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -139,7 +257,15 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: {
       canonical,
       // x-default mantém EN como padrão global; pt-BR adicionado pra Brasil/Portugal.
-      languages: { "x-default": canonical, en: canonical, "pt-BR": canonical },
+      languages: {
+        "x-default": canonical,
+        en: canonical,
+        "pt-BR": canonical,
+        "es-ES": canonical,
+        "fr-FR": canonical,
+        "de-DE": canonical,
+        "ja-JP": canonical,
+      },
     },
     openGraph: {
       title: t.metaTitle,

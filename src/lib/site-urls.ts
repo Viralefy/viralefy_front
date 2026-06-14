@@ -9,7 +9,7 @@
 // para as URLs cross-language.
 
 import { COUNTRIES } from "@/i18n/countries";
-import { CATEGORY_CODES, categorySlug } from "@/i18n/categories";
+import { CATEGORY_CODES, categorySlug, categoryFromSlug, type CategoryCode } from "@/i18n/categories";
 import { LEGAL_SLUGS } from "@/i18n/legal";
 import { PACKS, langOfCountry, type LangCode } from "@/i18n/languages";
 import { CITIES } from "@/lib/cities";
@@ -118,11 +118,93 @@ export async function allSiteUrls(): Promise<SiteUrl[]> {
     }
   }
 
-  return out;
+  // BUG-67/71/72/73/74 (QA 2026-06-13): sitemap chegava com entradas EN
+  // antes de PT (cosmético) e entradas PT "desordenadas/truncadas" — na
+  // verdade, *intra-bucket* a ordem dependia da ordem de iteração em
+  // COUNTRIES (us, ca, mx, …, br, …, pt) e do `sort_order` global vindo
+  // do banco (mesmo `sort_order` em planos de categorias diferentes
+  // produzia interlaceamento aparentemente aleatório).
+  //
+  // Mais grave: como SITEMAP_URLS_PER_PAGE=100, planos de uma mesma
+  // categoria PT eram cortados no meio da página (parecia "truncado").
+  //
+  // Fix: ordem determinística estável aplicada antes da paginação:
+  //   (lang ASC, country ASC, category index ASC, qty ASC, url ASC)
+  //
+  // Isso garante:
+  //   - Entradas agrupadas por país (br aparece junto com br, pt junto com pt);
+  //   - Categorias em ordem canônica de CATEGORY_CODES (seguidores antes
+  //     de curtidas etc.);
+  //   - Dentro da mesma categoria, qty crescente (100 antes de 500 antes
+  //     de 1000), mesmo quando `sort_order` no DB colide;
+  //   - Sem mistura EN×PT — cada lang vai pro seu bucket; mas entre buckets
+  //     o índice respeita SITEMAP_BUCKETS (en primeiro), e dentro de cada
+  //     bucket a ordem é estável.
+  return sortStableForSitemap(out);
+}
+
+// Limite hard do sitemap.org / Google / Bing: 50k URLs por arquivo. Como
+// paginamos em SITEMAP_URLS_PER_PAGE=100, nunca chegamos perto disso por
+// shard — mas o total por bucket pode ultrapassar quando o catálogo crescer
+// (atualmente ~10k em prod). Logamos um aviso se algum bucket passar de 50k
+// para que o time veja antes do Google rejeitar.
+const SITEMAP_HARD_CAP_PER_LANG = 50_000;
+
+// Chave estável usada pela ordenação. Path: /<country>/<categorySlug>/<qty>-<...>
+// → (country, categoryIndex, qty). URLs sem essa forma (home, /pricing,
+// /cities/*, /vs/*, /help/*, /case-studies/*, /legal/*) caem em
+// (country="", categoryIndex=-1, qty=-1) e ficam no topo do bucket em
+// ordem alfabética da URL.
+type SortKey = {
+  country: string;
+  categoryIndex: number;
+  qty: number;
+  url: string;
+};
+
+function sortKey(u: SiteUrl, base: string): SortKey {
+  const path = u.url.startsWith(base) ? u.url.slice(base.length) : u.url;
+  const parts = path.replace(/^\//, "").split("/");
+  const country = parts[0] ?? "";
+  const known = COUNTRIES.some((c) => c.code === country);
+  if (!known) return { country: "", categoryIndex: -1, qty: -1, url: u.url };
+  if (parts.length === 1) return { country, categoryIndex: -1, qty: -1, url: u.url };
+  const lang = langOfCountry(country);
+  const cat = categoryFromSlug(parts[1]) as CategoryCode | undefined;
+  // categoryFromSlug pode falhar para slugs idioma-específicos que não
+  // batem com o pack do país (acontece se o catálogo crescer descoordenado).
+  // Tratamos como categoria desconhecida (-1) — vai pro fim do país.
+  const catIdx = cat ? CATEGORY_CODES.indexOf(cat) : -1;
+  void lang; // lang só serve pra documentar a derivação; o filtro já foi feito.
+  if (parts.length === 2) return { country, categoryIndex: catIdx, qty: -1, url: u.url };
+  const m = parts[2].match(/^(\d+)-/);
+  const qty = m ? parseInt(m[1], 10) : -1;
+  return { country, categoryIndex: catIdx, qty, url: u.url };
+}
+
+function sortStableForSitemap(urls: SiteUrl[]): SiteUrl[] {
+  const base = siteUrl();
+  const decorated = urls.map((u, i) => ({ u, k: sortKey(u, base), i }));
+  decorated.sort((a, b) => {
+    if (a.k.country !== b.k.country) return a.k.country < b.k.country ? -1 : 1;
+    if (a.k.categoryIndex !== b.k.categoryIndex) return a.k.categoryIndex - b.k.categoryIndex;
+    if (a.k.qty !== b.k.qty) return a.k.qty - b.k.qty;
+    if (a.k.url !== b.k.url) return a.k.url < b.k.url ? -1 : 1;
+    return a.i - b.i; // tie-break final por ordem de inserção (estabilidade)
+  });
+  return decorated.map((d) => d.u);
 }
 
 export function urlsForLang(all: SiteUrl[], lang: LangCode | "legal"): SiteUrl[] {
-  return all.filter((u) => u.lang === lang);
+  const slice = all.filter((u) => u.lang === lang);
+  if (slice.length > SITEMAP_HARD_CAP_PER_LANG && typeof console !== "undefined") {
+    // Não truncamos — paginação cuida disso. Só avisamos.
+    console.warn(
+      `[sitemap] bucket "${lang}" tem ${slice.length} URLs (>${SITEMAP_HARD_CAP_PER_LANG}). ` +
+      `Considere split adicional por country.`,
+    );
+  }
+  return slice;
 }
 
 // Limite por sitemap. Google/Bing aceitam até 50k URLs/sitemap, mas o user

@@ -37,6 +37,10 @@ function detectAcceptLanguage(req: NextRequest): string | null {
     .sort((a, b) => b.weight - a.weight);
   for (const { tag } of tags) {
     if (tag.startsWith("pt")) return "pt-BR";
+    if (tag.startsWith("es")) return "es-ES";
+    if (tag.startsWith("fr")) return "fr-FR";
+    if (tag.startsWith("de")) return "de-DE";
+    if (tag.startsWith("ja")) return "ja-JP";
     if (tag.startsWith("en")) return "en";
   }
   return null;

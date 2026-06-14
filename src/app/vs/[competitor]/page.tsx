@@ -20,20 +20,38 @@ function siteUrl() {
   return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 }
 
-type PageLang = "pt" | "en";
+type PageLang = "pt" | "en" | "es" | "fr" | "de" | "ja";
 
 async function resolveLang(): Promise<PageLang> {
   const h = await headers();
-  const locale = h.get("x-locale") || "en";
-  if (locale.toLowerCase().startsWith("pt")) return "pt";
+  const locale = (h.get("x-locale") || "en").toLowerCase();
+  if (locale.startsWith("pt")) return "pt";
+  if (locale.startsWith("es")) return "es";
+  if (locale.startsWith("fr")) return "fr";
+  if (locale.startsWith("de")) return "de";
+  if (locale.startsWith("ja")) return "ja";
   return "en";
 }
 
 function schemaLang(lang: PageLang): string {
-  return lang === "pt" ? "pt-BR" : "en";
+  switch (lang) {
+    case "pt": return "pt-BR";
+    case "es": return "es-ES";
+    case "fr": return "fr-FR";
+    case "de": return "de-DE";
+    case "ja": return "ja-JP";
+    default:   return "en";
+  }
 }
 function ogLocale(lang: PageLang): string {
-  return lang === "pt" ? "pt_BR" : "en_US";
+  switch (lang) {
+    case "pt": return "pt_BR";
+    case "es": return "es_ES";
+    case "fr": return "fr_FR";
+    case "de": return "de_DE";
+    case "ja": return "ja_JP";
+    default:   return "en_US";
+  }
 }
 
 type VsPack = {
@@ -76,7 +94,7 @@ type VsPack = {
   };
 };
 
-const VS: Record<"pt" | "en", VsPack> = {
+const VS: Record<PageLang, VsPack> = {
   en: {
     metaTitle: (name) => `Viralefy vs ${name} — side-by-side comparison`,
     metaDescription: (name) =>
@@ -160,6 +178,170 @@ const VS: Record<"pt" | "en", VsPack> = {
       competitorWindowSuffix: (h) => `janela de ${h}h`,
     },
   },
+  es: {
+    metaTitle: (name) => `Viralefy vs ${name} — comparación lado a lado`,
+    metaDescription: (name) =>
+      `Compara Viralefy y ${name} en precio inicial (USDT), tiempo de entrega, reposición, pagos en cripto y soporte humano 24/7.`,
+    heroSubtitleSuffix: " Aquí tienes la comparación factual con base en información pública.",
+    breadcrumbHome: "Inicio",
+    breadcrumbComparisons: "Comparaciones",
+    thFeature: "Característica",
+    thViralefy: "Viralefy",
+    ctaHeadline: "Prueba Viralefy desde 1,00 USD",
+    ctaSubtitle: "Elige un mercado, elige un plan y paga en USD, EUR, BRL o cripto. La entrega comienza en minutos.",
+    ctaBrowse: "Ver planes",
+    dataAsOf: (d) =>
+      `Datos basados en información pública hasta el ${d}. Envía correcciones a soporte y actualizaremos esta página.`,
+    schemaArticleDesc: (name) => `Comparación factual lado a lado entre Viralefy y ${name}.`,
+    rows: {
+      startingPrice: "Precio inicial",
+      viralefyStartingPrice: "desde 1,00 USD (100 likes de Instagram)",
+      avgDelivery: "Tiempo medio de entrega",
+      viralefyAvgDelivery: "0–6 horas (la mayoría empieza en minutos)",
+      refill: "Garantía de reposición",
+      viralefyRefill: "Reposición de 30 días en caso de baja",
+      refillNo: "No ofrecido",
+      support: "Canal de soporte",
+      viralefySupport: "Tickets dentro de la cuenta (gratis, asíncrono)",
+      supportNone: "No divulgado",
+      crypto: "Pagos en cripto",
+      viralefyCrypto: "Sí — USDT, BTC vía Heleket",
+      cryptoNo: "No ofrecido",
+      cardPix: "Tarjeta + PIX",
+      viralefyCardPix: "Stripe (tarjeta) + Abacate Pay (PIX BRL)",
+      competitorCard: "Tarjeta (varía)",
+      hreflang: "Hreflang + 130 mercados",
+      viralefyHreflang: "Sí — matriz hreflang completa en 130 países",
+      competitorHreflang: "Limitado o un único mercado",
+      multicurrency: "Visualización multimoneda",
+      viralefyMulticurrency: "Sí — USD canónico + visualización local en 6 monedas",
+      competitorMulticurrency: "Solo USD o una sola moneda fiat",
+      competitorWindowSuffix: (h) => `ventana de ${h}h`,
+    },
+  },
+  fr: {
+    metaTitle: (name) => `Viralefy vs ${name} — comparatif côte à côte`,
+    metaDescription: (name) =>
+      `Comparez Viralefy et ${name} sur le prix de départ (USDT), le délai de livraison, la recharge, les paiements crypto et le support humain 24/7.`,
+    heroSubtitleSuffix: " Voici un comparatif factuel basé sur des informations publiques.",
+    breadcrumbHome: "Accueil",
+    breadcrumbComparisons: "Comparatifs",
+    thFeature: "Caractéristique",
+    thViralefy: "Viralefy",
+    ctaHeadline: "Essayez Viralefy à partir de 1,00 $",
+    ctaSubtitle: "Choisissez un marché, choisissez une formule, payez en USD, EUR, BRL ou crypto. La livraison démarre en quelques minutes.",
+    ctaBrowse: "Voir les formules",
+    dataAsOf: (d) =>
+      `Données basées sur des informations publiques au ${d}. Envoyez les corrections au support et nous mettrons cette page à jour.`,
+    schemaArticleDesc: (name) => `Comparatif factuel côte à côte entre Viralefy et ${name}.`,
+    rows: {
+      startingPrice: "Prix de départ",
+      viralefyStartingPrice: "à partir de 1,00 $ (100 likes Instagram)",
+      avgDelivery: "Délai moyen de livraison",
+      viralefyAvgDelivery: "0–6 heures (la plupart démarrent en minutes)",
+      refill: "Garantie de recharge",
+      viralefyRefill: "Recharge 30 jours en cas de perte",
+      refillNo: "Non proposé",
+      support: "Canal de support",
+      viralefySupport: "Tickets dans le compte (gratuit, asynchrone)",
+      supportNone: "Non communiqué",
+      crypto: "Paiements crypto",
+      viralefyCrypto: "Oui — USDT, BTC via Heleket",
+      cryptoNo: "Non proposé",
+      cardPix: "Carte + PIX",
+      viralefyCardPix: "Stripe (carte) + Abacate Pay (PIX BRL)",
+      competitorCard: "Carte (variable)",
+      hreflang: "Hreflang + 130 marchés",
+      viralefyHreflang: "Oui — matrice hreflang complète sur 130 pays",
+      competitorHreflang: "Limité ou marché unique",
+      multicurrency: "Affichage multidevise",
+      viralefyMulticurrency: "Oui — USD canonique + affichage local en 6 devises",
+      competitorMulticurrency: "USD ou une seule devise fiat",
+      competitorWindowSuffix: (h) => `fenêtre de ${h}h`,
+    },
+  },
+  de: {
+    metaTitle: (name) => `Viralefy vs ${name} — direkter Vergleich`,
+    metaDescription: (name) =>
+      `Vergleichen Sie Viralefy und ${name} bei Einstiegspreis (USDT), Lieferzeit, Nachfüllung, Krypto-Zahlungen und 24/7-Live-Support.`,
+    heroSubtitleSuffix: " Hier ist ein sachlicher Vergleich auf Basis öffentlich verfügbarer Informationen.",
+    breadcrumbHome: "Start",
+    breadcrumbComparisons: "Vergleiche",
+    thFeature: "Merkmal",
+    thViralefy: "Viralefy",
+    ctaHeadline: "Viralefy ab 1,00 $ testen",
+    ctaSubtitle: "Markt wählen, Paket wählen, in USD, EUR, BRL oder Krypto bezahlen. Lieferung startet binnen Minuten.",
+    ctaBrowse: "Pakete ansehen",
+    dataAsOf: (d) =>
+      `Daten basieren auf öffentlich verfügbaren Informationen Stand ${d}. Schicken Sie Korrekturen an den Support und wir aktualisieren diese Seite.`,
+    schemaArticleDesc: (name) => `Sachlicher direkter Vergleich zwischen Viralefy und ${name}.`,
+    rows: {
+      startingPrice: "Einstiegspreis",
+      viralefyStartingPrice: "ab 1,00 $ USD (100 Instagram-Likes)",
+      avgDelivery: "Durchschnittliche Lieferzeit",
+      viralefyAvgDelivery: "0–6 Stunden (die meisten Bestellungen starten binnen Minuten)",
+      refill: "Auffüll-Garantie",
+      viralefyRefill: "30-Tage-Nachfüllung bei Verlust",
+      refillNo: "Nicht angeboten",
+      support: "Support-Kanal",
+      viralefySupport: "Support-Tickets im Konto (kostenlos, asynchron)",
+      supportNone: "Nicht angegeben",
+      crypto: "Krypto-Zahlungen",
+      viralefyCrypto: "Ja — USDT, BTC über Heleket",
+      cryptoNo: "Nicht angeboten",
+      cardPix: "Karte + PIX",
+      viralefyCardPix: "Stripe (Karte) + Abacate Pay (PIX BRL)",
+      competitorCard: "Karte (variiert)",
+      hreflang: "Hreflang + 130 Märkte",
+      viralefyHreflang: "Ja — vollständige Hreflang-Matrix über 130 Länder",
+      competitorHreflang: "Begrenzt oder Einzelmarkt",
+      multicurrency: "Multiwährungsanzeige",
+      viralefyMulticurrency: "Ja — USD kanonisch + lokale Anzeige in 6 Währungen",
+      competitorMulticurrency: "Nur USD oder eine einzige Fiat-Währung",
+      competitorWindowSuffix: (h) => `${h}h-Zeitfenster`,
+    },
+  },
+  ja: {
+    metaTitle: (name) => `Viralefy 対 ${name} — 横並び比較`,
+    metaDescription: (name) =>
+      `Viralefy と ${name} を、初期価格 (USDT)、配送時間、リフィル、暗号通貨決済、24時間365日の有人サポートで比較します。`,
+    heroSubtitleSuffix: " 公開情報に基づく事実ベースの横並び比較です。",
+    breadcrumbHome: "ホーム",
+    breadcrumbComparisons: "比較",
+    thFeature: "項目",
+    thViralefy: "Viralefy",
+    ctaHeadline: "Viralefy を 1.00 ドルから試す",
+    ctaSubtitle: "市場を選び、プランを選び、USD、EUR、BRL、または暗号通貨で支払い。配送は数分以内に開始します。",
+    ctaBrowse: "プランを見る",
+    dataAsOf: (d) =>
+      `${d} 時点の公開情報に基づくデータです。訂正はサポートまでお送りください。本ページを更新します。`,
+    schemaArticleDesc: (name) => `Viralefy と ${name} の事実ベース横並び比較。`,
+    rows: {
+      startingPrice: "初期価格",
+      viralefyStartingPrice: "1.00 USD から (Instagram いいね 100件)",
+      avgDelivery: "平均配送時間",
+      viralefyAvgDelivery: "0〜6時間 (大半は数分以内に開始)",
+      refill: "リフィル保証",
+      viralefyRefill: "減少時の30日間リフィル",
+      refillNo: "提供なし",
+      support: "サポート窓口",
+      viralefySupport: "アカウント内サポートチケット (無料、非同期)",
+      supportNone: "非公開",
+      crypto: "暗号通貨決済",
+      viralefyCrypto: "あり — Heleket 経由で USDT、BTC",
+      cryptoNo: "提供なし",
+      cardPix: "カード + PIX",
+      viralefyCardPix: "Stripe (カード) + Abacate Pay (PIX BRL)",
+      competitorCard: "カード (様々)",
+      hreflang: "Hreflang + 130市場",
+      viralefyHreflang: "あり — 130か国を網羅する完全な Hreflang マトリクス",
+      competitorHreflang: "限定的または単一市場",
+      multicurrency: "多通貨表示",
+      viralefyMulticurrency: "あり — USD を基軸に6通貨で現地表示",
+      competitorMulticurrency: "USD のみ、または単一の法定通貨のみ",
+      competitorWindowSuffix: (h) => `${h}時間ウィンドウ`,
+    },
+  },
 };
 
 export function generateStaticParams(): Params[] {
@@ -182,7 +364,15 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     alternates: {
       canonical,
       // BUG-75: adiciona alternate pt-BR pra Brasil/Portugal.
-      languages: { "x-default": canonical, en: canonical, "pt-BR": canonical },
+      languages: {
+        "x-default": canonical,
+        en: canonical,
+        "pt-BR": canonical,
+        "es-ES": canonical,
+        "fr-FR": canonical,
+        "de-DE": canonical,
+        "ja-JP": canonical,
+      },
     },
     robots: meta.robots,
     other: meta.other,
@@ -209,7 +399,15 @@ function buildRows(c: Competitor, lang: PageLang): Row[] {
   // "1 USDT" não existe (produto mais barato é $1.00 USD = 100 likes
   // Instagram). Substituímos pelas afirmações verificáveis.
   const r = VS[lang].rows;
-  const yes = lang === "pt" ? "Sim" : "Yes";
+  const yesByLang: Record<PageLang, string> = {
+    pt: "Sim",
+    en: "Yes",
+    es: "Sí",
+    fr: "Oui",
+    de: "Ja",
+    ja: "あり",
+  };
+  const yes = yesByLang[lang];
   return [
     {
       label: r.startingPrice,
