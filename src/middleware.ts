@@ -4,27 +4,63 @@ import { NextRequest, NextResponse } from "next/server";
 //   x-pathname  → path bruto (pra debugging/SSR-aware components)
 //   x-locale    → BCP47 do mercado atual (pra emitir <html lang=…> correto)
 //
-// O cálculo do locale é stateless: lê o primeiro segmento do path. Se for
-// um country code conhecido em COUNTRIES, retorna o htmlLang dele. Caso
-// contrário (root, /pricing, /case-studies, /legal, etc.) fica "en".
+// Resolução do locale:
+//   1. Se o primeiro segmento é um country code conhecido (/br, /us, /jp…),
+//      usa o htmlLang dele. Country-scoped sempre vence.
+//   2. Senão, em rotas globais (/pricing, /vs/*, /cities/*, /case-studies…),
+//      tenta o Accept-Language: o primeiro idioma com weight > 0 que tenha
+//      pack PT/EN suportado. Permite que /br?Accept-Language=pt sirva PT
+//      em rotas sem country prefix sem precisar duplicar URL.
+//   3. Fallback final: "en".
 //
-// Custo: ~0.1ms por request (1 split + 1 lookup em Set). Sem fetch.
-// Sem cookie. Sem geo-IP — geo só seria usado pra redirect, não pra lang.
+// Custo: ~0.1ms por request. Sem fetch.
 
 import { COUNTRIES } from "@/i18n/countries";
 
 const COUNTRY_LANG = new Map(COUNTRIES.map((c) => [c.code, c.htmlLang]));
 
+function detectAcceptLanguage(req: NextRequest): string | null {
+  const h = req.headers.get("accept-language");
+  if (!h) return null;
+  // Parse Accept-Language: pt-BR,pt;q=0.9,en;q=0.8 → ["pt-BR","pt","en"]
+  const tags = h
+    .split(",")
+    .map((part) => {
+      const [tag, ...params] = part.trim().split(";");
+      const q = params
+        .map((p) => p.trim())
+        .find((p) => p.startsWith("q="));
+      const weight = q ? parseFloat(q.slice(2)) : 1;
+      return { tag: tag.toLowerCase(), weight: Number.isFinite(weight) ? weight : 0 };
+    })
+    .filter((t) => t.weight > 0)
+    .sort((a, b) => b.weight - a.weight);
+  for (const { tag } of tags) {
+    if (tag.startsWith("pt")) return "pt-BR";
+    if (tag.startsWith("en")) return "en";
+  }
+  return null;
+}
+
 export function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
   const seg = path.split("/")[1] ?? "";
-  const locale = COUNTRY_LANG.get(seg) ?? "en";
+  let locale = COUNTRY_LANG.get(seg);
+  if (!locale) {
+    locale = detectAcceptLanguage(req) ?? "en";
+  }
 
   const headers = new Headers(req.headers);
   headers.set("x-pathname", path);
   headers.set("x-locale", locale);
 
-  return NextResponse.next({ request: { headers } });
+  const res = NextResponse.next({ request: { headers } });
+  // Sinaliza pro CDN/SEO que conteúdo varia por idioma quando não há
+  // country no path (rotas globais).
+  if (!COUNTRY_LANG.has(seg)) {
+    res.headers.set("Vary", "Accept-Language");
+  }
+  return res;
 }
 
 // Roda em TODAS as rotas exceto assets estáticos do Next + arquivos públicos.
