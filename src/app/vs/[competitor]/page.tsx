@@ -50,10 +50,14 @@ type Row = {
 };
 
 function buildRows(c: Competitor): Row[] {
+  // BUG-124/125/160/213 do QA 2026-06-12: as afirmações antigas mentiam
+  // sobre o produto real. "WhatsApp" não existe em nenhum lugar do site,
+  // "1 USDT" não existe (produto mais barato é $1.00 USD = 100 likes
+  // Instagram). Substituímos pelas afirmações verificáveis.
   return [
     {
-      label: "Starting price (USDT)",
-      viralefy: "1.00 USDT",
+      label: "Starting price",
+      viralefy: "from $1.00 USD (100 Instagram likes)",
       competitor: `$${c.priceFloorUsd.toFixed(2)}`,
     },
     {
@@ -67,14 +71,19 @@ function buildRows(c: Competitor): Row[] {
       competitor: c.offersRefill ? "Yes" : "Not offered",
     },
     {
-      label: "24/7 human support",
-      viralefy: "Yes — WhatsApp + ticket",
+      label: "Support channel",
+      viralefy: "In-account support tickets (free, async)",
       competitor: c.supportChannels.length ? c.supportChannels.join(", ") : "Not disclosed",
     },
     {
       label: "Crypto payments",
-      viralefy: "Yes — USDT (TRC20/ERC20), BTC",
+      viralefy: "Yes — USDT, BTC via Heleket",
       competitor: c.cryptoPayments ? "Yes" : "Not offered",
+    },
+    {
+      label: "Card + PIX",
+      viralefy: "Stripe (card) + Abacate Pay (PIX BRL)",
+      competitor: "Card (varies)",
     },
     {
       label: "Hreflang + 130 markets",
@@ -82,14 +91,9 @@ function buildRows(c: Competitor): Row[] {
       competitor: "Limited or single-market",
     },
     {
-      label: "USD-first pricing",
-      viralefy: "Yes — USDT canonical, local-currency display hint",
+      label: "Multicurrency display",
+      viralefy: "Yes — USD canonical + local-currency display in 6 currencies",
       competitor: "USD or single fiat only",
-    },
-    {
-      label: "Free trial",
-      viralefy: "Trial tier from 1 USDT",
-      competitor: "Not advertised",
     },
   ];
 }
@@ -178,9 +182,9 @@ export default async function VsCompetitorPage({ params }: { params: Promise<Par
           </section>
 
           <section style={{ marginTop: "2.5rem", textAlign: "center" }}>
-            <h2 style={{ fontSize: "1.4rem", marginBottom: "0.5rem" }}>Try Viralefy from 1 USDT</h2>
+            <h2 style={{ fontSize: "1.4rem", marginBottom: "0.5rem" }}>Try Viralefy from $1.00</h2>
             <p style={{ color: "var(--muted)", maxWidth: 560, margin: "0 auto 1.25rem" }}>
-              Pick a market, pick a plan, pay in USDT or local currency. Delivery starts within minutes.
+              Pick a market, pick a plan, pay in USD, EUR, BRL or crypto. Delivery starts within minutes.
             </p>
             <Link href="/" className="btn btn-primary">Browse plans</Link>
           </section>

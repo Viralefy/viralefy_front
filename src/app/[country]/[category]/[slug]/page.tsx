@@ -89,13 +89,17 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     de: `${qty.toLocaleString()} ${catLabel} in ${c.name} | Viralefy`,
     it: `${qty.toLocaleString()} ${catLabel.toLowerCase()} in ${c.name} | Viralefy`,
   };
+  // Plataforma específica derivada da category — antes a meta description
+  // dizia "Instagram ou TikTok" mesmo em produto Instagram-only, contando
+  // como duplicate content + impressão errada (BUG-130 do QA 2026-06-12).
+  const platformName = cat.endsWith("_tiktok") ? "TikTok" : "Instagram";
   const descByLang: Record<string, string> = {
-    en: `Buy ${qty.toLocaleString()} ${catLabel.toLowerCase()} for Instagram or TikTok in ${c.name}. Fast delivery, 30-day refill guarantee.`,
-    pt: `Compre ${qty.toLocaleString()} ${catLabel.toLowerCase()} para Instagram ou TikTok em ${c.name}. Entrega rápida, reposição em 30 dias.`,
-    es: `Compra ${qty.toLocaleString()} ${catLabel.toLowerCase()} para Instagram o TikTok en ${c.name}. Entrega rápida, reposición de 30 días.`,
-    fr: `Achetez ${qty.toLocaleString()} ${catLabel.toLowerCase()} pour Instagram ou TikTok en ${c.name}. Livraison rapide, garantie de 30 jours.`,
-    de: `Kaufen Sie ${qty.toLocaleString()} ${catLabel} für Instagram oder TikTok in ${c.name}. Schnelle Lieferung, 30-Tage-Garantie.`,
-    it: `Acquista ${qty.toLocaleString()} ${catLabel.toLowerCase()} per Instagram o TikTok in ${c.name}. Consegna rapida, garanzia di 30 giorni.`,
+    en: `Buy ${qty.toLocaleString()} ${catLabel.toLowerCase()} for ${platformName} in ${c.name}. Fast delivery, 30-day refill guarantee.`,
+    pt: `Compre ${qty.toLocaleString()} ${catLabel.toLowerCase()} para ${platformName} em ${c.name}. Entrega rápida, reposição em 30 dias.`,
+    es: `Compra ${qty.toLocaleString()} ${catLabel.toLowerCase()} para ${platformName} en ${c.name}. Entrega rápida, reposición de 30 días.`,
+    fr: `Achetez ${qty.toLocaleString()} ${catLabel.toLowerCase()} pour ${platformName} en ${c.name}. Livraison rapide, garantie de 30 jours.`,
+    de: `Kaufen Sie ${qty.toLocaleString()} ${catLabel} für ${platformName} in ${c.name}. Schnelle Lieferung, 30-Tage-Garantie.`,
+    it: `Acquista ${qty.toLocaleString()} ${catLabel.toLowerCase()} per ${platformName} in ${c.name}. Consegna rapida, garanzia di 30 giorni.`,
   };
   const title = titleByLang[lang] ?? titleByLang.en;
   const description = descByLang[lang] ?? descByLang.en;

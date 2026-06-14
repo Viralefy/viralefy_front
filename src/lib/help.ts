@@ -29,7 +29,7 @@ export const HELP_TOPICS: HelpTopic[] = [
     category: "buying",
     updatedAt: UPDATED,
     intro:
-      "Viralefy sells Instagram and TikTok engagement plans. The buying flow is the same for every product: pick a country storefront, open a plan, set the quantity, paste the public username or URL you want to boost, choose a payment method, and finish checkout. There is no signup gate. You receive a one-time link to your order page and a magic link by email so you can come back later, follow progress, open tickets and download invoices without ever creating a password.",
+      "Viralefy sells Instagram and TikTok engagement plans. The buying flow is the same for every product: pick a country storefront, open a plan, set the quantity, paste the public username or URL you want to boost, choose a payment method, and finish checkout. You can buy as a guest or sign up before checkout — both flows confirm the order to your e-mail with the link to the order page. If you sign up, you also get a password-protected account dashboard at viralefy.com/account where you can follow progress, open tickets and download invoices.",
     sections: [
       {
         heading: "Pick a storefront and plan",
@@ -45,7 +45,7 @@ export const HELP_TOPICS: HelpTopic[] = [
       },
       {
         heading: "Save the access link",
-        body: "After checkout we send a magic link to the email you used. That link opens your full order history and lets you reorder, request a refill or contact support, all without a password. If you lose the email, the recovery form on the login page sends a new link in seconds. Treat the email as the source of truth: it is the only credential we keep for your account.",
+        body: "After checkout you receive an order confirmation by e-mail with the link to your order page. If you signed up before checkout, the order also lands in your account dashboard at viralefy.com/account and you can reorder, request a refill or open a support ticket from there. Forgot your password? Open a password-reset ticket from the login page and we'll help you back in within one business day.",
       },
     ],
     relatedSlugs: ["choose-the-right-plan", "delivery-time", "payment-methods-overview"],
@@ -91,7 +91,7 @@ export const HELP_TOPICS: HelpTopic[] = [
       },
       {
         heading: "How to request a refill",
-        body: "Open the order page from your magic link, click Request refill, and the form pre-fills with the target and the delivered count. Our routing checks the current count on the target, confirms a drop has happened, and dispatches the top-up. You can also open a regular support ticket if you prefer to talk it through. There is no fee and no limit on the number of refill requests inside the window.",
+        body: "Open the order page (from the confirmation e-mail or from your account dashboard), click Request refill, and the form pre-fills with the target and the delivered count. Our routing checks the current count on the target, confirms a drop has happened, and dispatches the top-up. You can also open a regular support ticket if you prefer to talk it through. There is no fee and no limit on the number of refill requests inside the window.",
       },
       {
         heading: "What the guarantee does not cover",
@@ -172,7 +172,7 @@ export const HELP_TOPICS: HelpTopic[] = [
       },
       {
         heading: "Confirmation time",
-        body: "PIX is designed for instant settlement and most payments confirm in under 30 seconds. Some banks queue transfers in batches at off-peak hours, in which case the confirmation can take a few minutes; that is a quirk of the issuing bank, not our system. Once the bank reports the transfer to the PIX network, our payment processor pushes a webhook and the order page updates automatically. There is no need to send a screenshot of the receipt — we do not accept manual proofs.",
+        body: "PIX is designed for instant settlement and most payments confirm in under 30 seconds. Some banks queue transfers in batches at off-peak hours, in which case the confirmation can take a few minutes; that is a quirk of the issuing bank, not our system. Once the bank reports the transfer to the PIX network, Abacate Pay pushes a webhook and the order page updates automatically. The checkout offers an optional 'Upload your proof' step in case you want to attach a screenshot — it can speed up reconciliation when the automatic webhook is delayed, but it is not required for delivery to start.",
       },
       {
         heading: "Expiry and retry",
@@ -207,7 +207,7 @@ export const HELP_TOPICS: HelpTopic[] = [
       },
       {
         heading: "Phishing patterns to watch for",
-        body: "If you receive a message pretending to be Viralefy and asking you to log in to your Instagram or TikTok account, it is phishing. We do not send such messages. Real emails from us only contain the magic link to your customer dashboard, order receipts, or replies to tickets you opened. When in doubt, navigate to the site by typing the address yourself and open the order from the dashboard instead of clicking through an email.",
+        body: "If you receive a message pretending to be Viralefy and asking you to log in to your Instagram or TikTok account, it is phishing. We do not send such messages. Real emails from us only contain order receipts, links to your order page, or replies to tickets you opened — and they always come from a viralefy.com address. When in doubt, navigate to the site by typing the address yourself and open the order from your account dashboard at viralefy.com/account instead of clicking through an email.",
       },
     ],
     relatedSlugs: ["how-to-buy", "delivery-time", "refund-policy-explained"],
@@ -234,7 +234,7 @@ export const HELP_TOPICS: HelpTopic[] = [
       },
       {
         heading: "How to request a refund",
-        body: "Open the order page from the magic link in your email and use the Request refund button. The form lets you describe what happened and attach screenshots; the ticket lands directly with the team. Most refund decisions come back within one business day. You can also email support if you cannot find the magic link, and we will help you locate the order from the email address you used at checkout.",
+        body: "Open the order page (from your confirmation e-mail or from your account dashboard) and use the Request refund button. The form lets you describe what happened and attach screenshots; the ticket lands directly with the team. Most refund decisions come back within one business day. You can also email support if you cannot find the order, and we will help you locate it from the email address you used at checkout.",
       },
     ],
     relatedSlugs: ["refill-guarantee", "delivery-time", "payment-methods-overview"],

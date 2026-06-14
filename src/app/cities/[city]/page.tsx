@@ -177,7 +177,18 @@ export default async function CityPage({ params }: { params: Promise<{ city: str
       ))}
 
       <article lang="en">
-        <header className="hero container" style={{ textAlign: "center", maxWidth: 820, margin: "0 auto", padding: "3rem 1rem 1.5rem" }}>
+        {/* BUG-164 do QA 2026-06-12: páginas de cidade não tinham breadcrumb,
+            quebrando navegação contextual + Schema breadcrumb estava ausente. */}
+        <nav aria-label="Breadcrumb" className="container" style={{ paddingTop: "0.75rem", fontSize: "0.85rem", color: "var(--muted)" }}>
+          <ol style={{ listStyle: "none", display: "flex", gap: "0.5rem", padding: 0, flexWrap: "wrap" }}>
+            <li><Link href="/">Home</Link></li>
+            <li aria-hidden>›</li>
+            <li><Link href="/cities">Cities</Link></li>
+            <li aria-hidden>›</li>
+            <li aria-current="page">{city.name}</li>
+          </ol>
+        </nav>
+        <header className="hero container" style={{ textAlign: "center", maxWidth: 820, margin: "0 auto", padding: "1.5rem 1rem 1.5rem" }}>
           <div style={{ marginBottom: "0.75rem" }}>
             <Flag code={city.country} width={80} title={city.name} style={{ borderRadius: "4px" }} />
           </div>
