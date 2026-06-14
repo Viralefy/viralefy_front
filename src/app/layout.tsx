@@ -145,13 +145,30 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const ck = await cookies();
   const { pref: themePref, effective: themeEffective } = readThemeCookie(ck.get(THEME_COOKIE)?.value);
   const currencyCookie = ck.get(CURRENCY_COOKIE)?.value ?? null;
+  // RTL — árabe/hebraico/persa. Não temos infra de mirror de layout completo
+  // (paddings, ordem de flex etc. são LTR-only), então só emitimos dir="rtl"
+  // pra que o browser inverta inline text e bidi marks corretamente. Layout
+  // visualmente ficará parcialmente quebrado mas o conteúdo permanece legível
+  // — trade-off aceito pra desbloquear conteúdo nesses idiomas. RTL completo
+  // (logical properties no CSS) continua pendente.
+  const dir = lang.startsWith("ar") || lang.startsWith("he") || lang.startsWith("fa") ? "rtl" : "ltr";
   return (
-    <html lang={lang} data-theme={themeEffective} data-theme-pref={themePref}>
+    <html lang={lang} dir={dir} data-theme={themeEffective} data-theme-pref={themePref}>
       <head>
-        {/* Preconnect ao CDN de bandeiras — economiza ~120ms no LCP em páginas
-            com muitas flags (header megamenu, country index, footer). */}
+        {/* Resource hints — BUG-161/162/182/185 (perf). preconnect abre TCP+TLS
+            cedo pros hosts críticos (LCP); dns-prefetch só resolve DNS pros
+            secundários (auth/Turnstile/GTM só aparecem pós-interação ou após
+            consent). Ordem importa: o browser dá orçamento limitado de
+            conexões "warm" — gastamos com api+flagcdn (rendem no LCP) e
+            deixamos GTM como dns-only. */}
+        <link rel="preconnect" href="https://api.viralefy.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://flagcdn.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://api.viralefy.com" />
+        <link rel="dns-prefetch" href="https://auth.viralefy.com" />
+        <link rel="dns-prefetch" href="https://cdn.viralefy.com" />
         <link rel="dns-prefetch" href="https://flagcdn.com" />
+        <link rel="dns-prefetch" href="https://challenges.cloudflare.com" />
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
 
         {/* Anti-flash tema — antes de tudo */}
         <script dangerouslySetInnerHTML={{ __html: ANTI_FLASH_THEME }} />

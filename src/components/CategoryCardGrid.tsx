@@ -1,14 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { useSearchParams, useRouter } from "next/navigation";
 import type { Plan } from "@/lib/api";
 import { priceForCountry } from "@/lib/format";
 import { subscribe as apiSubscribe } from "@/lib/api";
 import { getToken } from "@/lib/auth";
 import { useApp } from "./Providers";
-import { CheckoutModal } from "./CheckoutModal";
 import { tr, type LangCode } from "@/i18n/languages";
+
+// Lazy: o grid renderiza em country pages SEO-heavy onde o JS inicial pesa.
+// O modal só sobe quando o usuário toca "Buy" — fora do critical path.
+const CheckoutModal = dynamic(
+  () => import("./CheckoutModal").then((m) => ({ default: m.CheckoutModal })),
+  { ssr: false }
+);
 import { categorySlug, type CategoryCode } from "@/i18n/categories";
 import { localizedPlanName, localizedPlanDescription, formatQty } from "@/lib/plan-labels";
 import { Icon } from "./Icon";

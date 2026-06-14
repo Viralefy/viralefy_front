@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { Footer } from "@/components/Footer";
 import { indexableMeta, indexableDates } from "@/lib/seo-meta";
 import { COMPETITORS, getCompetitor, type Competitor } from "@/lib/competitors";
+import { toJsonLdGraph } from "@/lib/jsonld";
 // LangCode não importado: Footer aceita o subset "pt"|"en" como compatível.
 
 // Comparison detail: Viralefy vs <Competitor>. Linguagem factual,
@@ -20,7 +21,7 @@ function siteUrl() {
   return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 }
 
-type PageLang = "pt" | "en" | "es" | "fr" | "de" | "ja" | "it" | "ru" | "nl" | "ko";
+type PageLang = "pt" | "en" | "es" | "fr" | "de" | "ja" | "it" | "ru" | "nl" | "ko" | "ar" | "zh" | "hi" | "tr";
 
 async function resolveLang(): Promise<PageLang> {
   const h = await headers();
@@ -34,6 +35,10 @@ async function resolveLang(): Promise<PageLang> {
   if (locale.startsWith("ru")) return "ru";
   if (locale.startsWith("nl")) return "nl";
   if (locale.startsWith("ko")) return "ko";
+  if (locale.startsWith("ar")) return "ar";
+  if (locale.startsWith("zh")) return "zh";
+  if (locale.startsWith("hi")) return "hi";
+  if (locale.startsWith("tr")) return "tr";
   return "en";
 }
 
@@ -48,6 +53,10 @@ function schemaLang(lang: PageLang): string {
     case "ru": return "ru-RU";
     case "nl": return "nl-NL";
     case "ko": return "ko-KR";
+    case "ar": return "ar";
+    case "zh": return "zh-Hans";
+    case "hi": return "hi-IN";
+    case "tr": return "tr-TR";
     default:   return "en";
   }
 }
@@ -62,6 +71,10 @@ function ogLocale(lang: PageLang): string {
     case "ru": return "ru_RU";
     case "nl": return "nl_NL";
     case "ko": return "ko_KR";
+    case "ar": return "ar_AR";
+    case "zh": return "zh_CN";
+    case "hi": return "hi_IN";
+    case "tr": return "tr_TR";
     default:   return "en_US";
   }
 }
@@ -518,6 +531,170 @@ const VS: Record<PageLang, VsPack> = {
       competitorWindowSuffix: (h) => `${h}시간 윈도우`,
     },
   },
+  ar: {
+    metaTitle: (name) => `Viralefy مقابل ${name} — مقارنة جنبًا إلى جنب`,
+    metaDescription: (name) =>
+      `قارن بين Viralefy و${name} في السعر الابتدائي (USDT) ووقت التسليم وتعويض النقص ومدفوعات العملات المشفرة والدعم البشري على مدار الساعة.`,
+    heroSubtitleSuffix: " فيما يلي مقارنة وقائعية مبنية على معلومات متاحة للعموم.",
+    breadcrumbHome: "الرئيسية",
+    breadcrumbComparisons: "المقارنات",
+    thFeature: "الميزة",
+    thViralefy: "Viralefy",
+    ctaHeadline: "جرّب Viralefy بدءًا من $1.00",
+    ctaSubtitle: "اختر السوق، اختر الخطة، وادفع بالدولار الأمريكي أو اليورو أو الريال البرازيلي أو العملات المشفرة. يبدأ التسليم خلال دقائق.",
+    ctaBrowse: "تصفّح الخطط",
+    dataAsOf: (d) =>
+      `بيانات مبنية على معلومات عامة حتى ${d}. أرسل أي تصحيحات إلى الدعم وسنُحدّث هذه الصفحة.`,
+    schemaArticleDesc: (name) => `مقارنة وقائعية جنبًا إلى جنب بين Viralefy و${name}.`,
+    rows: {
+      startingPrice: "السعر الابتدائي",
+      viralefyStartingPrice: "بدءًا من $1.00 USD (100 إعجاب على Instagram)",
+      avgDelivery: "متوسط وقت التسليم",
+      viralefyAvgDelivery: "0–6 ساعات (تبدأ معظم الطلبات خلال دقائق)",
+      refill: "ضمان تعويض النقص",
+      viralefyRefill: "تعويض النقص لمدة 30 يومًا",
+      refillNo: "غير متوفر",
+      support: "قناة الدعم",
+      viralefySupport: "تذاكر دعم داخل الحساب (مجاني، غير متزامن)",
+      supportNone: "غير معلن",
+      crypto: "الدفع بالعملات المشفرة",
+      viralefyCrypto: "نعم — USDT و BTC عبر Heleket",
+      cryptoNo: "غير متوفر",
+      cardPix: "بطاقة + PIX",
+      viralefyCardPix: "Stripe (بطاقة) + Abacate Pay (PIX بالريال البرازيلي)",
+      competitorCard: "بطاقة (يختلف)",
+      hreflang: "Hreflang + 130 سوقًا",
+      viralefyHreflang: "نعم — مصفوفة hreflang كاملة عبر 130 دولة",
+      competitorHreflang: "محدود أو سوق واحد",
+      multicurrency: "عرض متعدد العملات",
+      viralefyMulticurrency: "نعم — USD معياري + عرض محلي بـ 6 عملات",
+      competitorMulticurrency: "USD فقط أو عملة قانونية واحدة",
+      competitorWindowSuffix: (h) => `نافذة ${h} ساعة`,
+    },
+  },
+  zh: {
+    metaTitle: (name) => `Viralefy 对比 ${name} — 并列比较`,
+    metaDescription: (name) =>
+      `从起步价格(USDT)、交付时间、补单、加密货币支付以及 24/7 真人客服等维度,比较 Viralefy 与 ${name}。`,
+    heroSubtitleSuffix: " 以下基于公开信息进行客观并列比较。",
+    breadcrumbHome: "首页",
+    breadcrumbComparisons: "比较",
+    thFeature: "项目",
+    thViralefy: "Viralefy",
+    ctaHeadline: "$1.00 起体验 Viralefy",
+    ctaSubtitle: "选择市场、选择套餐,使用 USD、EUR、BRL 或加密货币支付。交付在数分钟内启动。",
+    ctaBrowse: "浏览套餐",
+    dataAsOf: (d) =>
+      `数据基于截至 ${d} 的公开信息。如有勘误请发至客服,我们将更新本页。`,
+    schemaArticleDesc: (name) => `Viralefy 与 ${name} 的事实性并列比较。`,
+    rows: {
+      startingPrice: "起步价格",
+      viralefyStartingPrice: "$1.00 USD 起(100 个 Instagram 点赞)",
+      avgDelivery: "平均交付时间",
+      viralefyAvgDelivery: "0–6 小时(多数订单数分钟内启动)",
+      refill: "补单保障",
+      viralefyRefill: "掉量后 30 天内自动补单",
+      refillNo: "不提供",
+      support: "客服渠道",
+      viralefySupport: "账户内工单(免费,异步)",
+      supportNone: "未披露",
+      crypto: "加密货币支付",
+      viralefyCrypto: "支持 — 通过 Heleket 支持 USDT、BTC",
+      cryptoNo: "不提供",
+      cardPix: "银行卡 + PIX",
+      viralefyCardPix: "Stripe(银行卡)+ Abacate Pay(PIX BRL)",
+      competitorCard: "银行卡(因平台而异)",
+      hreflang: "Hreflang + 130 个市场",
+      viralefyHreflang: "支持 — 覆盖 130 国的完整 hreflang 矩阵",
+      competitorHreflang: "有限或单一市场",
+      multicurrency: "多币种展示",
+      viralefyMulticurrency: "支持 — 以 USD 为基准 + 6 种货币本地展示",
+      competitorMulticurrency: "仅 USD 或单一法币",
+      competitorWindowSuffix: (h) => `${h} 小时窗口`,
+    },
+  },
+  hi: {
+    metaTitle: (name) => `Viralefy बनाम ${name} — साथ-साथ तुलना`,
+    metaDescription: (name) =>
+      `Viralefy और ${name} की तुलना शुरुआती कीमत (USDT), डिलीवरी समय, रिफिल, क्रिप्टो भुगतान और 24/7 मानवीय सहायता पर करें।`,
+    heroSubtitleSuffix: " नीचे सार्वजनिक रूप से उपलब्ध जानकारी पर आधारित तथ्यात्मक तुलना है।",
+    breadcrumbHome: "होम",
+    breadcrumbComparisons: "तुलना",
+    thFeature: "विशेषता",
+    thViralefy: "Viralefy",
+    ctaHeadline: "$1.00 से Viralefy आज़माएँ",
+    ctaSubtitle: "एक बाज़ार चुनें, एक प्लान चुनें, और USD, EUR, BRL या क्रिप्टो में भुगतान करें। डिलीवरी मिनटों में शुरू होती है।",
+    ctaBrowse: "प्लान देखें",
+    dataAsOf: (d) =>
+      `${d} तक की सार्वजनिक जानकारी पर आधारित डेटा। सुधार के लिए सहायता को संदेश भेजें और हम यह पृष्ठ अपडेट करेंगे।`,
+    schemaArticleDesc: (name) => `Viralefy और ${name} के बीच तथ्यात्मक साथ-साथ तुलना।`,
+    rows: {
+      startingPrice: "शुरुआती कीमत",
+      viralefyStartingPrice: "$1.00 USD से (100 Instagram लाइक्स)",
+      avgDelivery: "औसत डिलीवरी समय",
+      viralefyAvgDelivery: "0–6 घंटे (अधिकांश ऑर्डर मिनटों में शुरू)",
+      refill: "रिफिल गारंटी",
+      viralefyRefill: "गिरावट पर 30-दिन की रिफिल",
+      refillNo: "उपलब्ध नहीं",
+      support: "सहायता चैनल",
+      viralefySupport: "खाते के भीतर सपोर्ट टिकट (निःशुल्क, asynchronous)",
+      supportNone: "घोषित नहीं",
+      crypto: "क्रिप्टो भुगतान",
+      viralefyCrypto: "हाँ — Heleket के माध्यम से USDT, BTC",
+      cryptoNo: "उपलब्ध नहीं",
+      cardPix: "कार्ड + PIX",
+      viralefyCardPix: "Stripe (कार्ड) + Abacate Pay (PIX BRL)",
+      competitorCard: "कार्ड (बदलता है)",
+      hreflang: "Hreflang + 130 बाज़ार",
+      viralefyHreflang: "हाँ — 130 देशों में पूर्ण hreflang मैट्रिक्स",
+      competitorHreflang: "सीमित या केवल एक बाज़ार",
+      multicurrency: "बहु-मुद्रा प्रदर्शन",
+      viralefyMulticurrency: "हाँ — USD मानक + 6 मुद्राओं में स्थानीय प्रदर्शन",
+      competitorMulticurrency: "केवल USD या एकल फ़िएट मुद्रा",
+      competitorWindowSuffix: (h) => `${h} घंटे की विंडो`,
+    },
+  },
+  tr: {
+    metaTitle: (name) => `Viralefy vs ${name} — yan yana karşılaştırma`,
+    metaDescription: (name) =>
+      `Viralefy ile ${name} arasında başlangıç fiyatı (USDT), teslimat süresi, yenileme, kripto ödeme ve 7/24 insan destek açısından karşılaştırma.`,
+    heroSubtitleSuffix: " Aşağıda kamuya açık bilgilere dayanan olgusal bir karşılaştırma yer alıyor.",
+    breadcrumbHome: "Ana sayfa",
+    breadcrumbComparisons: "Karşılaştırmalar",
+    thFeature: "Özellik",
+    thViralefy: "Viralefy",
+    ctaHeadline: "Viralefy'i $1.00'dan deneyin",
+    ctaSubtitle: "Bir pazar ve bir plan seçin; USD, EUR, BRL veya kripto ile ödeyin. Teslimat birkaç dakika içinde başlar.",
+    ctaBrowse: "Planlara göz at",
+    dataAsOf: (d) =>
+      `Veriler ${d} tarihine kadar olan kamuya açık bilgilere dayanmaktadır. Düzeltmeleri destek ekibine iletin, bu sayfayı güncelleyelim.`,
+    schemaArticleDesc: (name) => `Viralefy ile ${name} arasında olgusal yan yana karşılaştırma.`,
+    rows: {
+      startingPrice: "Başlangıç fiyatı",
+      viralefyStartingPrice: "$1.00 USD'den (100 Instagram beğeni)",
+      avgDelivery: "Ortalama teslimat süresi",
+      viralefyAvgDelivery: "0–6 saat (siparişlerin çoğu dakikalar içinde başlar)",
+      refill: "Yenileme garantisi",
+      viralefyRefill: "Düşüşler için 30 günlük yenileme",
+      refillNo: "Sunulmuyor",
+      support: "Destek kanalı",
+      viralefySupport: "Hesap içi destek biletleri (ücretsiz, asenkron)",
+      supportNone: "Açıklanmadı",
+      crypto: "Kripto ödemeler",
+      viralefyCrypto: "Evet — Heleket üzerinden USDT, BTC",
+      cryptoNo: "Sunulmuyor",
+      cardPix: "Kart + PIX",
+      viralefyCardPix: "Stripe (kart) + Abacate Pay (PIX BRL)",
+      competitorCard: "Kart (değişken)",
+      hreflang: "Hreflang + 130 pazar",
+      viralefyHreflang: "Evet — 130 ülkede tam hreflang matrisi",
+      competitorHreflang: "Sınırlı veya tek pazar",
+      multicurrency: "Çoklu para birimi gösterimi",
+      viralefyMulticurrency: "Evet — kanonik USD + 6 para biriminde yerel gösterim",
+      competitorMulticurrency: "Yalnızca USD veya tek bir fiat para birimi",
+      competitorWindowSuffix: (h) => `${h} saatlik pencere`,
+    },
+  },
 };
 
 export function generateStaticParams(): Params[] {
@@ -552,6 +729,10 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
         "ru-RU": canonical,
         "nl-NL": canonical,
         "ko-KR": canonical,
+        ar: canonical,
+        "zh-Hans": canonical,
+        "hi-IN": canonical,
+        "tr-TR": canonical,
       },
     },
     robots: meta.robots,
@@ -590,6 +771,10 @@ function buildRows(c: Competitor, lang: PageLang): Row[] {
     ru: "Да",
     nl: "Ja",
     ko: "지원",
+    ar: "نعم",
+    zh: "支持",
+    hi: "हाँ",
+    tr: "Evet",
   };
   const yes = yesByLang[lang];
   return [
@@ -649,9 +834,9 @@ export default async function VsCompetitorPage({ params }: { params: Promise<Par
   const dates = indexableDates();
   const buildDate = new Date().toISOString().slice(0, 10);
 
-  const jsonld: object[] = [
+  // BUG-191: consolida BreadcrumbList + Article em UM @graph.
+  const jsonld = toJsonLdGraph([
     {
-      "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: tt.breadcrumbHome, item: url },
@@ -660,7 +845,6 @@ export default async function VsCompetitorPage({ params }: { params: Promise<Par
       ],
     },
     {
-      "@context": "https://schema.org",
       "@type": "Article",
       "@id": `${pageUrl}#article`,
       headline: `Viralefy vs ${c.name}`,
@@ -673,13 +857,11 @@ export default async function VsCompetitorPage({ params }: { params: Promise<Par
       publisher: { "@type": "Organization", name: "Viralefy", url },
       about: { "@type": "Service", name: c.name, description: c.tagline },
     },
-  ];
+  ]);
 
   return (
     <>
-      {jsonld.map((doc, i) => (
-        <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(doc) }} />
-      ))}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonld) }} />
 
       <article lang={schemaLang(lang)}>
         <nav aria-label="Breadcrumb" className="container" style={{ paddingTop: "0.5rem", fontSize: "0.85rem", color: "var(--muted)" }}>

@@ -8,6 +8,7 @@ export type LangCode =
   | "cs" | "sk" | "hu" | "ro" | "bg" | "el" | "hr" | "sl" | "ca"
   // Ásia, África, Oceania, Europa-fora-SEPA
   | "ja" | "ko" | "ar" | "hi" | "id" | "vi" | "th" | "tr" | "uk"
+  | "zh"
   | "tl" | "ms" | "sr" | "sq" | "bs" | "fa" | "he" | "bn" | "ur"
   | "sw" | "am"
   // Russo (Rússia, Bielorrússia, Cazaquistão, Quirguistão e diáspora)
@@ -1147,6 +1148,12 @@ export const PACKS: Record<LangCode, Pack> = {
     home: { ...en.home, heroTitle: "نمِّ حساب Instagram و TikTok", heroSubtitle: "متابعين حقيقيون، تفاعل ومشاهدات بتسليم سريع. ادفع بالدولار الأمريكي أو اليورو أو العملات المشفرة.", plansByService: "الخدمات", pickService: "اختر خدمة", viewService: "عرض التفاصيل" },
     header: { ...en.header, login: "تسجيل الدخول", register: "إنشاء حساب", account: "حسابي", support: "الدعم", logout: "تسجيل الخروج", currency: "العملة", markets: "الأسواق", allServices: "الخدمات", searchPlaceholder: "ابحث عن الخدمات والأسواق…", searchNoResults: "لا توجد نتائج." },
     cta: { ...en.cta, buy: "شراء", buyNow: "اشترِ الآن", seeAll: "عرض كل الباقات", backToHome: "العودة للرئيسية", backToCategory: "العودة للفئة" },
+  },
+  zh: {
+    ...en,
+    home: { ...en.home, heroTitle: "增长您的 Instagram 与 TikTok", heroSubtitle: "真实粉丝、互动与播放量,快速交付。支持 USD、EUR 或加密货币支付。", plansByService: "服务", pickService: "选择服务", viewService: "查看详情" },
+    header: { ...en.header, login: "登录", register: "创建账户", account: "我的账户", support: "客服", logout: "退出", currency: "货币", markets: "市场", allServices: "服务", searchPlaceholder: "搜索服务和市场…", searchNoResults: "无结果。" },
+    cta: { ...en.cta, buy: "购买", buyNow: "立即购买", seeAll: "查看所有套餐", backToHome: "返回首页", backToCategory: "返回分类" },
   },
   hi: {
     ...en,

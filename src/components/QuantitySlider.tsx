@@ -1,11 +1,18 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import dynamic from "next/dynamic";
 import type { Plan } from "@/lib/api";
 import { priceFor, priceForCountry } from "@/lib/format";
 import { useApp } from "./Providers";
-import { CheckoutModal } from "./CheckoutModal";
 import { tr, type LangCode } from "@/i18n/languages";
+
+// Lazy: o modal só monta quando o usuário clica em "Buy". Mantém o bundle
+// inicial do slider (visível above-the-fold em /vs e /pricing) menor.
+const CheckoutModal = dynamic(
+  () => import("./CheckoutModal").then((m) => ({ default: m.CheckoutModal })),
+  { ssr: false }
+);
 import { localizedPlanName, localizedPlanDescription, formatQty } from "@/lib/plan-labels";
 
 // Variante "calculadora" reutilizável (antes era apenas LandingCalculator pra

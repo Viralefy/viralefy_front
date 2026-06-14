@@ -163,10 +163,10 @@ export default function APIKeysPage() {
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ textAlign: "left", color: "var(--muted)", fontSize: "0.85rem" }}>
-                <th style={{ padding: "0.6rem 0.8rem" }}>Label</th>
-                <th style={{ padding: "0.6rem 0.8rem" }}>Created</th>
-                <th style={{ padding: "0.6rem 0.8rem" }}>Last used</th>
-                <th style={{ padding: "0.6rem 0.8rem", textAlign: "right" }}>Actions</th>
+                <th scope="col" style={{ padding: "0.6rem 0.8rem" }}>Label</th>
+                <th scope="col" style={{ padding: "0.6rem 0.8rem" }}>Created</th>
+                <th scope="col" style={{ padding: "0.6rem 0.8rem" }}>Last used</th>
+                <th scope="col" style={{ padding: "0.6rem 0.8rem", textAlign: "right" }}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -205,9 +205,9 @@ export default function APIKeysPage() {
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
                 <tr style={{ textAlign: "left", color: "var(--muted)", fontSize: "0.85rem" }}>
-                  <th style={{ padding: "0.6rem 0.8rem" }}>Label</th>
-                  <th style={{ padding: "0.6rem 0.8rem" }}>Created</th>
-                  <th style={{ padding: "0.6rem 0.8rem" }}>Revoked</th>
+                  <th scope="col" style={{ padding: "0.6rem 0.8rem" }}>Label</th>
+                  <th scope="col" style={{ padding: "0.6rem 0.8rem" }}>Created</th>
+                  <th scope="col" style={{ padding: "0.6rem 0.8rem" }}>Revoked</th>
                 </tr>
               </thead>
               <tbody>

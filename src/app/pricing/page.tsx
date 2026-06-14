@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import type { Plan } from "@/lib/api";
 import { Footer } from "@/components/Footer";
 import { indexableMeta } from "@/lib/seo-meta";
+import { toJsonLdGraph } from "@/lib/jsonld";
 // LangCode importado abaixo apenas pra anotar `lang` recebido pelo Footer.
 
 // Pricing overview — hub público em USDT/USD canônico.
@@ -28,7 +29,7 @@ function siteUrl() {
 // Como só estamos suportando PT vs EN nesta página por enquanto,
 // qualquer locale começando com "pt" cai em "pt"; o resto cai em "en".
 // Tipo local PageLang (subset de LangCode) garante index seguro no PRICING.
-type PageLang = "pt" | "en" | "es" | "fr" | "de" | "ja" | "it" | "ru" | "nl" | "ko";
+type PageLang = "pt" | "en" | "es" | "fr" | "de" | "ja" | "it" | "ru" | "nl" | "ko" | "ar" | "zh" | "hi" | "tr";
 
 async function resolveLang(): Promise<PageLang> {
   const h = await headers();
@@ -42,6 +43,10 @@ async function resolveLang(): Promise<PageLang> {
   if (locale.startsWith("ru")) return "ru";
   if (locale.startsWith("nl")) return "nl";
   if (locale.startsWith("ko")) return "ko";
+  if (locale.startsWith("ar")) return "ar";
+  if (locale.startsWith("zh")) return "zh";
+  if (locale.startsWith("hi")) return "hi";
+  if (locale.startsWith("tr")) return "tr";
   return "en";
 }
 
@@ -323,6 +328,106 @@ const PRICING: Record<PageLang, PricingPack> = {
     breadcrumbHome: "홈",
     breadcrumbPricing: "가격",
   },
+  ar: {
+    metaTitle: "أسعار شفافة بعملة USDT — Viralefy",
+    metaDescription:
+      "قارن أسعار Viralefy لمتابعي وإعجابات ومشاهدات Instagram وTikTok. الأسعار بـ USDT/USD، بدون كلمة سر، مع ضمان تعويض النقص.",
+    heroTitle: "أسعار شفافة بعملة USDT",
+    heroSubtitle:
+      "قائمة أسعار موحدة بـ USD/USDT تغطي 130 سوقًا. العملات المحلية للعرض فقط — الفوترة تتم دائمًا بالدولار الأمريكي المستقر.",
+    tableFollowers: "المتابعون",
+    tableLikes: "الإعجابات",
+    tableViews: "المشاهدات",
+    thPlatform: "المنصة",
+    uspRefillTitle: "ضمان تعويض النقص",
+    uspRefillBody: "أي نقص خلال 30 يومًا يُعوَّض تلقائيًا دون رسوم إضافية.",
+    uspPasswordTitle: "بدون كلمة سر",
+    uspPasswordBody: "نحتاج فقط إلى الحساب العام أو رابط المنشور — لا نطلب أي بيانات اعتماد أبدًا.",
+    uspCryptoTitle: "العملات المشفرة أولاً",
+    uspCryptoBody: "ادفع بـ USDT أو BTC أو ETH أو أكثر من 50 أصلًا. تسعير ثابت بالدولار في جميع الباقات.",
+    uspSupportTitle: "دعم على مدار الساعة",
+    uspSupportBody: "تذاكر دعم يجيب عنها بشر يوميًا. متوسط زمن الرد أقل من ساعتين.",
+    browseAll: "تصفح الأسواق الـ 130",
+    schemaPageName: "أسعار Viralefy",
+    schemaPageDesc: "أسعار شفافة بعملة USDT لباقات التفاعل على Instagram وTikTok.",
+    breadcrumbHome: "الرئيسية",
+    breadcrumbPricing: "الأسعار",
+  },
+  zh: {
+    metaTitle: "USDT 透明定价 — Viralefy",
+    metaDescription:
+      "比较 Viralefy 在 Instagram 与 TikTok 粉丝、点赞和播放量上的价格。USDT/USD 计价,无需密码,保障掉量补单。",
+    heroTitle: "USDT 透明定价",
+    heroSubtitle:
+      "覆盖 130 个市场的统一 USD/USDT 价目表。本地货币仅用于展示——结算始终采用稳定的美元。",
+    tableFollowers: "粉丝",
+    tableLikes: "点赞",
+    tableViews: "播放量",
+    thPlatform: "平台",
+    uspRefillTitle: "掉量补单保障",
+    uspRefillBody: "30 天内出现掉量将自动免费补单。",
+    uspPasswordTitle: "无需密码",
+    uspPasswordBody: "我们只需要公开主页或帖子链接——绝不索取您的账户凭证。",
+    uspCryptoTitle: "加密货币优先",
+    uspCryptoBody: "支持 USDT、BTC、ETH 等 50 多种资产支付。全目录均采用稳定美元定价。",
+    uspSupportTitle: "24/7 客服",
+    uspSupportBody: "每天由真人处理工单。平均响应时间不超过 2 小时。",
+    browseAll: "浏览全部 130 个市场",
+    schemaPageName: "Viralefy 价格",
+    schemaPageDesc: "面向 Instagram 与 TikTok 互动套餐的 USDT 透明定价。",
+    breadcrumbHome: "首页",
+    breadcrumbPricing: "价格",
+  },
+  hi: {
+    metaTitle: "USDT में पारदर्शी कीमतें — Viralefy",
+    metaDescription:
+      "Instagram और TikTok फॉलोअर्स, लाइक्स और व्यूज़ के लिए Viralefy की कीमतों की तुलना करें। USDT/USD में मूल्य, बिना पासवर्ड, रिफिल गारंटी के साथ।",
+    heroTitle: "USDT में पारदर्शी कीमतें",
+    heroSubtitle:
+      "130 बाज़ारों के लिए USD/USDT में एक ही मानक मूल्य सूची। स्थानीय मुद्राएँ केवल प्रदर्शन के लिए हैं — बिलिंग हमेशा स्थिर USD में होती है।",
+    tableFollowers: "फॉलोअर्स",
+    tableLikes: "लाइक्स",
+    tableViews: "व्यूज़",
+    thPlatform: "प्लेटफ़ॉर्म",
+    uspRefillTitle: "रिफिल गारंटी",
+    uspRefillBody: "30 दिनों के भीतर गिरावट को बिना अतिरिक्त शुल्क के स्वतः रिफिल किया जाता है।",
+    uspPasswordTitle: "पासवर्ड की ज़रूरत नहीं",
+    uspPasswordBody: "हमें केवल आपका सार्वजनिक @ या पोस्ट लिंक चाहिए — आपकी क्रेडेंशियल्स कभी नहीं।",
+    uspCryptoTitle: "क्रिप्टो पहले",
+    uspCryptoBody: "USDT, BTC, ETH या 50+ ऐसेट्स में भुगतान करें। पूरे कैटलॉग में स्थिर USD मूल्य।",
+    uspSupportTitle: "24/7 सहायता",
+    uspSupportBody: "टिकट हर दिन इंसानों द्वारा उत्तर दिए जाते हैं। औसत प्रतिक्रिया 2 घंटे से कम।",
+    browseAll: "सभी 130 बाज़ार देखें",
+    schemaPageName: "Viralefy की कीमतें",
+    schemaPageDesc: "Instagram और TikTok एंगेजमेंट प्लान के लिए USDT में पारदर्शी कीमतें।",
+    breadcrumbHome: "होम",
+    breadcrumbPricing: "कीमतें",
+  },
+  tr: {
+    metaTitle: "USDT cinsinden şeffaf fiyatlandırma — Viralefy",
+    metaDescription:
+      "Instagram ve TikTok takipçi, beğeni ve görüntüleme için Viralefy fiyatlarını karşılaştırın. USDT/USD fiyatlandırma, şifresiz, yenileme garantili.",
+    heroTitle: "USDT cinsinden şeffaf fiyatlandırma",
+    heroSubtitle:
+      "130 pazarı kapsayan tek bir kanonik USD/USDT fiyat listesi. Yerel para birimleri yalnızca gösterim içindir — ücretlendirme her zaman stabil USD üzerinden yapılır.",
+    tableFollowers: "Takipçi",
+    tableLikes: "Beğeni",
+    tableViews: "Görüntüleme",
+    thPlatform: "Platform",
+    uspRefillTitle: "Yenileme garantisi",
+    uspRefillBody: "30 gün içindeki düşüşler ek ücret olmadan otomatik yenilenir.",
+    uspPasswordTitle: "Şifre gerekmez",
+    uspPasswordBody: "Yalnızca herkese açık @ veya gönderi bağlantısı yeterli — kimlik bilgilerinizi asla istemeyiz.",
+    uspCryptoTitle: "Önce kripto",
+    uspCryptoBody: "USDT, BTC, ETH veya 50'den fazla varlıkla ödeyin. Tüm katalogda stabil USD fiyatlandırması.",
+    uspSupportTitle: "7/24 destek",
+    uspSupportBody: "Biletler her gün insanlar tarafından yanıtlanır. Ortalama yanıt süresi 2 saatin altında.",
+    browseAll: "Tüm 130 pazara göz at",
+    schemaPageName: "Viralefy fiyatları",
+    schemaPageDesc: "Instagram ve TikTok etkileşim planları için USDT cinsinden şeffaf fiyatlandırma.",
+    breadcrumbHome: "Ana sayfa",
+    breadcrumbPricing: "Fiyatlandırma",
+  },
 };
 
 function ogLocale(lang: PageLang): string {
@@ -336,6 +441,10 @@ function ogLocale(lang: PageLang): string {
     case "ru": return "ru_RU";
     case "nl": return "nl_NL";
     case "ko": return "ko_KR";
+    case "ar": return "ar_AR";
+    case "zh": return "zh_CN";
+    case "hi": return "hi_IN";
+    case "tr": return "tr_TR";
     default:   return "en_US";
   }
 }
@@ -351,6 +460,10 @@ function schemaLang(lang: PageLang): string {
     case "ru": return "ru-RU";
     case "nl": return "nl-NL";
     case "ko": return "ko-KR";
+    case "ar": return "ar";
+    case "zh": return "zh-Hans";
+    case "hi": return "hi-IN";
+    case "tr": return "tr-TR";
     default:   return "en";
   }
 }
@@ -381,6 +494,10 @@ export async function generateMetadata(): Promise<Metadata> {
         "ru-RU": canonical,
         "nl-NL": canonical,
         "ko-KR": canonical,
+        ar: canonical,
+        "zh-Hans": canonical,
+        "hi-IN": canonical,
+        "tr-TR": canonical,
       },
     },
     openGraph: {
@@ -549,9 +666,9 @@ export default async function PricingPage() {
     }
   }
 
-  const jsonld: object[] = [
+  // BUG-191: consolida WebPage + BreadcrumbList + ItemList em UM @graph.
+  const jsonld = toJsonLdGraph([
     {
-      "@context": "https://schema.org",
       "@type": "WebPage",
       "@id": `${pageUrl}#webpage`,
       name: t.schemaPageName,
@@ -561,7 +678,6 @@ export default async function PricingPage() {
       isPartOf: { "@id": `${url}/#website` },
     },
     {
-      "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: t.breadcrumbHome, item: url },
@@ -569,24 +685,17 @@ export default async function PricingPage() {
       ],
     },
     {
-      "@context": "https://schema.org",
       "@type": "ItemList",
       "@id": `${pageUrl}#itemlist`,
       name: "Viralefy plans",
       numberOfItems: offerItems.length,
       itemListElement: offerItems,
     },
-  ];
+  ]);
 
   return (
     <>
-      {jsonld.map((doc, i) => (
-        <script
-          key={i}
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(doc) }}
-        />
-      ))}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonld) }} />
 
       <article lang={schemaLang(lang)}>
         <header className="hero container">

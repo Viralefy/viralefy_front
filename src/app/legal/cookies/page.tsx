@@ -47,6 +47,59 @@ function resolveLang(raw: string | undefined): LangCode {
   return code in PACKS ? code : "en";
 }
 
+// Localiza "Other languages:" — espelha o helper do dynamic [doc]/page.tsx
+// (BUG-30/118 do QA: rótulo ficava em EN mesmo em /legal/cookies?lang=fr).
+function otherLanguagesLabel(lang: LangCode): string {
+  if (lang === "pt") return "Outros idiomas:";
+  if (lang === "es" || lang === "es_AR") return "Otros idiomas:";
+  if (lang === "fr") return "Autres langues :";
+  if (lang === "de") return "Andere Sprachen:";
+  if (lang === "it") return "Altre lingue:";
+  if (lang === "nl") return "Andere talen:";
+  if (lang === "ru") return "Другие языки:";
+  if (lang === "ja") return "他の言語:";
+  if (lang === "ko") return "다른 언어:";
+  if (lang === "ar") return "لغات أخرى:";
+  if (lang === "tr") return "Diğer diller:";
+  if (lang === "pl") return "Inne języki:";
+  return "Other languages:";
+}
+
+// "Voltar ao início" — espelha o tr().cta.backToHome do pack i18n
+// mas evitamos importar tr() inteiro pra manter este arquivo standalone.
+function backToHomeLabel(lang: LangCode): string {
+  if (lang === "pt") return "Voltar ao início";
+  if (lang === "es" || lang === "es_AR") return "Volver al inicio";
+  if (lang === "fr") return "Retour à l'accueil";
+  if (lang === "de") return "Zurück zur Startseite";
+  if (lang === "it") return "Torna alla home";
+  if (lang === "nl") return "Terug naar home";
+  if (lang === "ru") return "На главную";
+  if (lang === "ja") return "ホームに戻る";
+  if (lang === "ko") return "홈으로";
+  if (lang === "ar") return "العودة إلى الرئيسية";
+  if (lang === "tr") return "Ana sayfaya dön";
+  if (lang === "pl") return "Powrót do strony głównej";
+  return "Back to home";
+}
+
+// "Updated" label — mecânico, mesmo padrão.
+function updatedLabel(lang: LangCode): string {
+  if (lang === "pt") return "Atualizado em";
+  if (lang === "es" || lang === "es_AR") return "Actualizado el";
+  if (lang === "fr") return "Mis à jour le";
+  if (lang === "de") return "Aktualisiert am";
+  if (lang === "it") return "Aggiornato il";
+  if (lang === "nl") return "Bijgewerkt op";
+  if (lang === "ru") return "Обновлено";
+  if (lang === "ja") return "更新日";
+  if (lang === "ko") return "업데이트됨";
+  if (lang === "ar") return "تم التحديث في";
+  if (lang === "tr") return "Güncellendi";
+  if (lang === "pl") return "Zaktualizowano";
+  return "Updated";
+}
+
 export async function generateMetadata({
   searchParams,
 }: {
@@ -297,11 +350,11 @@ export default async function CookiesLegalPage({
       />
       <article className="container" style={{ paddingTop: "2rem", paddingBottom: "3rem", maxWidth: 880 }}>
         <p style={{ fontSize: "0.85rem", color: "var(--muted)", marginBottom: "0.5rem" }}>
-          <Link href="/">← {isPT ? "Voltar" : "Back to home"}</Link>
+          <Link href="/">← {backToHomeLabel(lang)}</Link>
         </p>
         <h1 style={{ marginBottom: "0.25rem" }}>{d.title}</h1>
         <p style={{ fontSize: "0.8rem", color: "var(--muted)" }}>
-          {isPT ? "Atualizado em" : "Updated"} {d.updatedAt}
+          {updatedLabel(lang)} {d.updatedAt}
         </p>
 
         {/* Corpo narrativo — mesma fonte i18n do dynamic [doc]. */}
@@ -326,13 +379,13 @@ export default async function CookiesLegalPage({
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.85rem", minWidth: 720 }}>
               <thead>
                 <tr style={{ background: "rgba(20, 20, 31, 0.5)", textAlign: "left" }}>
-                  <th style={{ padding: "0.6rem 0.8rem" }}>{isPT ? "Nome" : "Name"}</th>
-                  <th style={{ padding: "0.6rem 0.8rem" }}>{isPT ? "Provedor" : "Provider"}</th>
-                  <th style={{ padding: "0.6rem 0.8rem" }}>{isPT ? "Origem" : "Party"}</th>
-                  <th style={{ padding: "0.6rem 0.8rem" }}>{isPT ? "Categoria" : "Category"}</th>
-                  <th style={{ padding: "0.6rem 0.8rem" }}>{isPT ? "Propósito" : "Purpose"}</th>
-                  <th style={{ padding: "0.6rem 0.8rem" }}>{isPT ? "Duração" : "Duration"}</th>
-                  <th style={{ padding: "0.6rem 0.8rem" }}>{isPT ? "Tipo" : "Type"}</th>
+                  <th scope="col" style={{ padding: "0.6rem 0.8rem" }}>{isPT ? "Nome" : "Name"}</th>
+                  <th scope="col" style={{ padding: "0.6rem 0.8rem" }}>{isPT ? "Provedor" : "Provider"}</th>
+                  <th scope="col" style={{ padding: "0.6rem 0.8rem" }}>{isPT ? "Origem" : "Party"}</th>
+                  <th scope="col" style={{ padding: "0.6rem 0.8rem" }}>{isPT ? "Categoria" : "Category"}</th>
+                  <th scope="col" style={{ padding: "0.6rem 0.8rem" }}>{isPT ? "Propósito" : "Purpose"}</th>
+                  <th scope="col" style={{ padding: "0.6rem 0.8rem" }}>{isPT ? "Duração" : "Duration"}</th>
+                  <th scope="col" style={{ padding: "0.6rem 0.8rem" }}>{isPT ? "Tipo" : "Type"}</th>
                 </tr>
               </thead>
               <tbody>
@@ -378,7 +431,7 @@ export default async function CookiesLegalPage({
 
         {/* Idiomas — espelha o dynamic [doc]/page.tsx pra não regredir hreflang UX. */}
         <div style={{ marginTop: "2rem", borderTop: "1px solid var(--border)", paddingTop: "1rem" }}>
-          <p style={{ fontSize: "0.85rem", color: "var(--muted)", marginBottom: "0.5rem" }}>{isPT ? "Outros idiomas:" : "Other languages:"}</p>
+          <p style={{ fontSize: "0.85rem", color: "var(--muted)", marginBottom: "0.5rem" }}>{otherLanguagesLabel(lang)}</p>
           <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
             {(Object.keys(PACKS) as LangCode[]).map((code) => (
               <Link

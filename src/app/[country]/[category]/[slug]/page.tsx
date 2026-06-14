@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { AggregateRating, Plan, PublicReview } from "@/lib/api";
-import { buildAggregateRating, buildOfferEnhancements } from "@/lib/jsonld";
+import { buildAggregateRating, buildOfferEnhancements, toJsonLdGraph } from "@/lib/jsonld";
 import { slugAlternates } from "@/lib/hreflang";
 import { indexableMeta } from "@/lib/seo-meta";
 import { localizedPlanName } from "@/lib/plan-labels";
@@ -230,9 +230,10 @@ export default async function PlanPage({ params }: { params: Promise<Params> }) 
   const ogImageUrl = `${url}/og/${c.code}/${catSlug}/${qty}-${catSlug}`;
   const offerEnhancements = buildOfferEnhancements(c.code);
 
-  const jsonld: object[] = [
+  // BUG-191: consolida BreadcrumbList + Product em UM @graph. Antes
+  // emitia 2 scripts separados.
+  const jsonld = toJsonLdGraph([
     {
-      "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: t.category.breadcrumb, item: url },
@@ -242,7 +243,6 @@ export default async function PlanPage({ params }: { params: Promise<Params> }) 
       ],
     },
     {
-      "@context": "https://schema.org",
       "@type": "Product",
       name: `${plan.name} — ${c.name}`,
       description: narrative[0],
@@ -271,13 +271,11 @@ export default async function PlanPage({ params }: { params: Promise<Params> }) 
         ...offerEnhancements,
       },
     },
-  ];
+  ]);
 
   return (
     <>
-      {jsonld.map((doc, i) => (
-        <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(doc) }} />
-      ))}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonld) }} />
 
       <article lang={c.htmlLang}>
         <nav aria-label="Breadcrumb" className="container" style={{ paddingTop: "0.5rem", fontSize: "0.85rem", color: "var(--muted)" }}>

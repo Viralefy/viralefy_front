@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { Footer } from "@/components/Footer";
 import { indexableMeta } from "@/lib/seo-meta";
 import { CITIES, getCity } from "@/lib/cities";
+import { toJsonLdGraph } from "@/lib/jsonld";
 import { Flag } from "@/components/Flag";
 import { categorySlug } from "@/i18n/categories";
 import type { LangCode } from "@/i18n/languages";
@@ -17,7 +18,7 @@ import type { LangCode } from "@/i18n/languages";
 // landmarks locais em PT, etc.) — encerrar isso em PT é trivial mas merece
 // QA dedicado.
 
-type PageLang = "pt" | "en" | "es" | "fr" | "de" | "ja" | "it" | "ru" | "nl" | "ko";
+type PageLang = "pt" | "en" | "es" | "fr" | "de" | "ja" | "it" | "ru" | "nl" | "ko" | "ar" | "zh" | "hi" | "tr";
 
 async function resolveLang(): Promise<PageLang> {
   const h = await headers();
@@ -31,6 +32,10 @@ async function resolveLang(): Promise<PageLang> {
   if (locale.startsWith("ru")) return "ru";
   if (locale.startsWith("nl")) return "nl";
   if (locale.startsWith("ko")) return "ko";
+  if (locale.startsWith("ar")) return "ar";
+  if (locale.startsWith("zh")) return "zh";
+  if (locale.startsWith("hi")) return "hi";
+  if (locale.startsWith("tr")) return "tr";
   return "en";
 }
 
@@ -45,6 +50,10 @@ function schemaLang(lang: PageLang): string {
     case "ru": return "ru-RU";
     case "nl": return "nl-NL";
     case "ko": return "ko-KR";
+    case "ar": return "ar";
+    case "zh": return "zh-Hans";
+    case "hi": return "hi-IN";
+    case "tr": return "tr-TR";
     default:   return "en";
   }
 }
@@ -59,6 +68,10 @@ function ogLocale(lang: PageLang): string {
     case "ru": return "ru_RU";
     case "nl": return "nl_NL";
     case "ko": return "ko_KR";
+    case "ar": return "ar_AR";
+    case "zh": return "zh_CN";
+    case "hi": return "hi_IN";
+    case "tr": return "tr_TR";
     default:   return "en_US";
   }
 }
@@ -437,6 +450,146 @@ const CITY_T: Record<PageLang, CityPack> = {
     schemaWebPageName: (city) => `${city}에서 Instagram 팔로워 구매`,
     schemaServiceName: (city) => `${city}의 Instagram 및 TikTok 성장`,
   },
+  ar: {
+    metaTitle: (city) => `شراء متابعي Instagram في ${city} — نمو محلي | Viralefy`,
+    metaDescription: (city) =>
+      `نمِّ حسابك على Instagram وTikTok في ${city}. متابعون وإعجابات ومشاهدات حقيقية مع تسليم مضبوط على التوقيت المحلي. ادفع بـ USDT/USD وابدأ خلال دقائق.`,
+    heroTitle: (city) => `شراء متابعي Instagram في ${city}`,
+    heroSubtitle: (city) =>
+      `جمهور محلي، تفاعل حقيقي، تسليم فوري — مصمم للمبدعين والعلامات في ${city}.`,
+    ctaSeePlans: (city) => `عرض خطط ${city}`,
+    ctaAllCities: "كل المدن",
+    breadcrumbHome: "الرئيسية",
+    breadcrumbCities: "المدن",
+    whyHeading: (city) => `لماذا يختار صنّاع المحتوى في ${city} Viralefy`,
+    bullets: (city) => [
+      "حسابات بمظهر حقيقي — صورة بروفايل، وصف، وسجل منشورات. لا توقيع للبوتات.",
+      `تسليم تدريجي مضبوط على المنطقة الزمنية لـ ${city} ليصل في ذروة الحضور المحلي.`,
+      "تسعير بـ USDT/USD — بدون مفاجآت صرف، بدون بيانات بطاقة، بدون ردّ مبالغ.",
+      "ضمان تعويض النقص لمدة 30 يومًا على كل باقة متابعين.",
+      "لوحة تحكم واحدة لـ Instagram وTikTok وطلبات التعويض.",
+      `دعم بالإنجليزية وباللغة المحلية الرئيسية لـ ${city}.`,
+    ],
+    readyHeading: (city) => `جاهز للنمو في ${city}؟`,
+    readyBody: (country) =>
+      `اختر باقة مضبوطة على سوق ${country} — متابعون أو إعجابات أو مشاهدات، تُسلَّم اليوم.`,
+    readyCta: "عرض باقات متابعي Instagram",
+    bodyP1: (city, hoods, landmark) =>
+      `سواء كنت صانع محتوى تصوّر بالقرب من ${landmark}، أو علامة صغيرة تروّج لمتاجر مؤقتة في ${hoods}، أو وكالة تُوسّع حسابات عملاء عبر ${city}، فإن كثافة الجمهور هي عنق الزجاجة. توفّر Viralefy متابعين وإعجابات وتعليقات على Instagram ومشاهدات TikTok مع نوافذ تسليم متوافقة مع منطقتك الزمنية المحلية — لتصل الإشارة الاجتماعية الجديدة حين يكون جمهورك المحلي متصلًا فعلًا.`,
+    bodyP2: (city, population) =>
+      `${city} من أكثر الـ feeds تنافسية في العالم. مع أكثر من ${population} ساكن واقتصاد صنّاع محتوى مكثّف، يصبح اختراق مرحلة الإحماء في الخوارزمية دون دفعة أولى أمرًا قاسيًا. تسد باقاتنا التمهيدية هذه الفجوة: تصاعد محسوب لحسابات بمظهر حقيقي يضع منشورك في تبويب الاستكشاف، ثم يتراكم التفاعل العضوي من هناك.`,
+    bodyP3:
+      "كل طلب يُدفع بـ USDT أو USD ويُسوّى on-chain — لا ردّ مبالغ ولا بيانات بطاقة مكشوفة. يبدأ التسليم خلال دقائق من التأكيد وينتهي خلال ساعات أو أيام حسب حجم الباقة. التدفّق البطيء مقصود: يحاكي الأنماط العضوية ليتعامل نظام أمان المنصة مع النمو على أنه طبيعي. يمكنك مراقبة التسليم من لوحتك وإيقافه أو زيادته في أي وقت.",
+    bodyP4: (city, hoods) =>
+      `سوق ${city} يتحرّك بالجمالية — ما ينجح في ${hoods} لا ينجح في feed ضاحوي على بُعد مدينتين. لا نزعم أنّنا سنُصلح محتواك. ما نفعله هو إزالة ضريبة البداية الباردة كي يحصل المحتوى الذي تنشره أصلًا على مساحة العرض التي يستحقها. إن لم تكن متأكدًا أيّ باقة تناسب مرحلتك، يجيب فريقنا عن التذاكر بالإنجليزية واللغة الرئيسية للمدينة.`,
+    schemaWebPageName: (city) => `شراء متابعي Instagram في ${city}`,
+    schemaServiceName: (city) => `نمو Instagram وTikTok في ${city}`,
+  },
+  zh: {
+    metaTitle: (city) => `在${city}购买 Instagram 粉丝 — 本地增长 | Viralefy`,
+    metaDescription: (city) =>
+      `在${city}发展您的 Instagram 与 TikTok。真实粉丝、点赞和播放量,交付时段对齐本地时区。USDT/USD 计价,数分钟内开始。`,
+    heroTitle: (city) => `在${city}购买 Instagram 粉丝`,
+    heroSubtitle: (city) =>
+      `本地受众、真实互动、即时交付 — 为${city}的创作者和品牌而打造。`,
+    ctaSeePlans: (city) => `查看${city}套餐`,
+    ctaAllCities: "全部城市",
+    breadcrumbHome: "首页",
+    breadcrumbCities: "城市",
+    whyHeading: (city) => `${city}的创作者为何选择 Viralefy`,
+    bullets: (city) => [
+      "真实感账号 — 含头像、简介与发帖历史。无机器人痕迹。",
+      `对齐${city}时区的滴灌式交付,投放在本地高峰时段。`,
+      "USDT/USD 计价 — 无汇率意外、无卡片信息、无拒付。",
+      "每个粉丝套餐均提供 30 天掉量补单保障。",
+      "Instagram、TikTok 与补单申请共用同一控制台。",
+      `提供英语及${city}主要本地语言的客服支持。`,
+    ],
+    readyHeading: (city) => `准备好在${city}增长了吗?`,
+    readyBody: (country) =>
+      `选择适配${country}市场的套餐 — 粉丝、点赞或播放量,今日送达。`,
+    readyCta: "查看 Instagram 粉丝套餐",
+    bodyP1: (city, hoods, landmark) =>
+      `无论您是在${landmark}附近拍摄的创作者,在${hoods}推广快闪的小品牌,还是在${city}全域扩张客户账号的代理商,瓶颈始终是受众密度。Viralefy 按您所在的本地时区提供 Instagram 粉丝、点赞、评论与 TikTok 播放量的交付窗口 — 让新的社交证明在本地受众真正在线时落地。`,
+    bodyP2: (city, population) =>
+      `${city}是全球竞争最激烈的内容流之一。当人口超过 ${population} 且创作者经济密度极高时,在没有初始推力的情况下突破算法预热阶段极其艰难。我们的起步套餐恰好补上这段空缺:适度递增的真实感账号,将您的帖子推进探索页,之后自然互动便会自我累积。`,
+    bodyP3:
+      "每个订单均以 USDT 或 USD 支付,并通过链上结算 — 无拒付、无暴露的卡片信息。确认后数分钟即开始交付,根据套餐规模在数小时至数天内完成。缓慢滴灌是刻意为之:它模拟自然增长模式,使平台的安全系统将其视为正常。您可在控制台监控交付,并随时暂停或追加。",
+    bodyP4: (city, hoods) =>
+      `${city}市场靠美学驱动 — 在${hoods}流行的并不一定能在两座城外的郊区流量中胜出。我们不承诺替您修补内容。我们要做的,是消除冷启动税,让您本就在做的内容获得应有的曝光面。如果不确定哪种套餐适合当前阶段,我们的团队会用英语和该城市的主要语言回复工单。`,
+    schemaWebPageName: (city) => `在${city}购买 Instagram 粉丝`,
+    schemaServiceName: (city) => `${city}的 Instagram 与 TikTok 增长`,
+  },
+  hi: {
+    metaTitle: (city) => `${city} में Instagram फॉलोअर्स खरीदें — स्थानीय ग्रोथ | Viralefy`,
+    metaDescription: (city) =>
+      `${city} में अपना Instagram और TikTok बढ़ाएं। असली फॉलोअर्स, लाइक्स और व्यूज़ — स्थानीय समय क्षेत्र के अनुसार डिलीवरी। USDT/USD में भुगतान करें और मिनटों में शुरू करें।`,
+    heroTitle: (city) => `${city} में Instagram फॉलोअर्स खरीदें`,
+    heroSubtitle: (city) =>
+      `स्थानीय दर्शक, असली एंगेजमेंट, तुरंत डिलीवरी — ${city} के क्रिएटर्स और ब्रांड्स के लिए बनाया गया।`,
+    ctaSeePlans: (city) => `${city} के प्लान देखें`,
+    ctaAllCities: "सभी शहर",
+    breadcrumbHome: "होम",
+    breadcrumbCities: "शहर",
+    whyHeading: (city) => `${city} के क्रिएटर्स Viralefy क्यों चुनते हैं`,
+    bullets: (city) => [
+      "असली दिखने वाले अकाउंट — प्रोफ़ाइल फोटो, बायो और पोस्टिंग हिस्ट्री के साथ। कोई बॉट साइन नहीं।",
+      `${city} के समय क्षेत्र के अनुसार चरणबद्ध डिलीवरी, स्थानीय पीक समय पर पहुँचती है।`,
+      "USDT/USD में कीमतें — कोई FX झटका नहीं, कोई कार्ड डेटा नहीं, कोई चार्जबैक नहीं।",
+      "हर फॉलोअर पैकेज पर 30-दिन की रिफिल गारंटी।",
+      "Instagram, TikTok और रिफिल अनुरोधों के लिए एक ही डैशबोर्ड।",
+      `अंग्रेज़ी और ${city} की मुख्य स्थानीय भाषा में सहायता।`,
+    ],
+    readyHeading: (city) => `${city} में बढ़ने के लिए तैयार हैं?`,
+    readyBody: (country) =>
+      `${country} बाज़ार के अनुरूप एक प्लान चुनें — फॉलोअर्स, लाइक्स या व्यूज़, आज डिलीवर।`,
+    readyCta: "Instagram फॉलोअर प्लान देखें",
+    bodyP1: (city, hoods, landmark) =>
+      `चाहे आप ${landmark} के पास शूट करने वाले क्रिएटर हों, ${hoods} में पॉप-अप चलाने वाला छोटा ब्रांड हों, या ${city} में क्लाइंट अकाउंट्स बढ़ा रही एजेंसी हों, बाधा हमेशा दर्शकों की घनत्व होती है। Viralefy आपके स्थानीय समय क्षेत्र के अनुरूप डिलीवरी विंडो के साथ Instagram फॉलोअर्स, लाइक्स, कमेंट्स और TikTok व्यूज़ देती है — ताकि नई सोशल प्रूफ तब उतरे जब आपका स्थानीय दर्शक वाकई ऑनलाइन हो।`,
+    bodyP2: (city, population) =>
+      `${city} दुनिया के सबसे प्रतिस्पर्धी फीड्स में से एक है। ${population} से अधिक निवासियों और घनी क्रिएटर अर्थव्यवस्था के बीच, बिना शुरुआती धक्के के एल्गोरिदम की वार्म-अप अवस्था पार करना कठिन है। हमारे स्टार्टर पैक यह अंतर भरते हैं: असली दिखने वाले अकाउंट्स की मापी हुई बढ़ोतरी जो आपकी पोस्ट को एक्सप्लोर टैब तक पहुँचाती है, और वहाँ से ऑर्गेनिक एंगेजमेंट खुद बढ़ता है।`,
+    bodyP3:
+      "हर ऑर्डर USDT या USD में भुगतान होता है और on-chain सेटल होता है — कोई चार्जबैक नहीं, कोई कार्ड डेटा उजागर नहीं। पुष्टि के मिनटों के भीतर डिलीवरी शुरू होती है और पैकेज के आकार के अनुसार घंटों या दिनों में पूरी होती है। धीमी ड्रिप जान-बूझकर है: यह ऑर्गेनिक पैटर्न की नकल करती है ताकि प्लेटफ़ॉर्म के सुरक्षा सिस्टम इस ग्रोथ को सामान्य मानें। आप डैशबोर्ड से डिलीवरी देख सकते हैं और कभी भी रोक या टॉप-अप कर सकते हैं।",
+    bodyP4: (city, hoods) =>
+      `${city} का बाज़ार सौंदर्यबोध पर चलता है — जो ${hoods} में जीतता है, वही दो शहर दूर के उपनगरीय फीड में नहीं जीतेगा। हम आपका कंटेंट ठीक करने का दावा नहीं करते। हम कोल्ड-स्टार्ट का बोझ हटाते हैं ताकि जो कंटेंट आप पहले से बना रहे हैं उसे योग्य प्रदर्शन क्षेत्र मिले। यदि असमंजस हो कि कौन-सा पैकेज आपके चरण के लिए सही है, हमारी टीम अंग्रेज़ी और शहर की मुख्य भाषा में टिकट का जवाब देती है।`,
+    schemaWebPageName: (city) => `${city} में Instagram फॉलोअर्स खरीदें`,
+    schemaServiceName: (city) => `${city} में Instagram और TikTok ग्रोथ`,
+  },
+  tr: {
+    metaTitle: (city) => `${city}'de Instagram takipçi satın al — yerel büyüme | Viralefy`,
+    metaDescription: (city) =>
+      `${city}'de Instagram ve TikTok'unu büyüt. Yerel saat dilimine ayarlı teslimatla gerçek takipçi, beğeni ve görüntüleme. USDT/USD ile öde, dakikalar içinde başla.`,
+    heroTitle: (city) => `${city}'de Instagram takipçi satın al`,
+    heroSubtitle: (city) =>
+      `Yerel kitle, gerçek etkileşim, anında teslimat — ${city}'deki içerik üreticileri ve markalar için tasarlandı.`,
+    ctaSeePlans: (city) => `${city} planlarını gör`,
+    ctaAllCities: "Tüm şehirler",
+    breadcrumbHome: "Ana sayfa",
+    breadcrumbCities: "Şehirler",
+    whyHeading: (city) => `${city}'deki içerik üreticileri neden Viralefy'ı seçiyor`,
+    bullets: (city) => [
+      "Gerçek görünümlü hesaplar — profil fotoğrafı, biyografi ve paylaşım geçmişi. Bot imzası yok.",
+      `${city} saat dilimine ayarlı kademeli teslimat, yerel zirve saatlerinde ulaşır.`,
+      "USDT/USD fiyatlandırma — döviz sürprizi yok, kart verisi yok, chargeback yok.",
+      "Her takipçi paketinde düşüşlere karşı 30 günlük yenileme garantisi.",
+      "Instagram, TikTok ve yenileme talepleri için tek panel.",
+      `İngilizce ve ${city}'nin başlıca yerel dilinde destek.`,
+    ],
+    readyHeading: (city) => `${city}'de büyümeye hazır mısın?`,
+    readyBody: (country) =>
+      `${country} pazarına ayarlı bir plan seç — takipçi, beğeni veya görüntüleme, bugün teslim.`,
+    readyCta: "Instagram takipçi planlarını gör",
+    bodyP1: (city, hoods, landmark) =>
+      `${landmark} çevresinde çekim yapan bir içerik üretici de olsan, ${hoods}'da pop-up itelemeye çalışan küçük bir marka da, ${city} genelinde müşteri hesaplarını ölçeklendiren bir ajans da, darboğaz kitle yoğunluğudur. Viralefy, Instagram takipçi, beğeni, yorum ve TikTok görüntülemelerini yerel saat dilimine hizalı teslimat pencereleriyle gönderir — böylece yeni sosyal kanıt, yerel kitlen gerçekten çevrimiçiyken iner.`,
+    bodyP2: (city, population) =>
+      `${city}, dünyanın en rekabetçi feed'lerinden biridir. ${population}'i aşan nüfus ve yoğun bir içerik üretici ekonomisi içinde algoritmanın ısınma evresini ilk itki olmadan kırmak ağırdır. Başlangıç paketlerimiz bu boşluğu kapatır: gerçek görünümlü hesapların ölçülü artışı, paylaşımını keşfet sekmesine taşır; organik etkileşim oradan kendiliğinden büyür.`,
+    bodyP3:
+      "Her sipariş USDT veya USD ile ödenir ve zincir üzerinde uzlaştırılır — chargeback yok, açığa çıkan kart verisi yok. Teslimat, onaydan sonra dakikalar içinde başlar ve paket boyutuna göre saatler ya da günler içinde tamamlanır. Yavaş damlama bilinçlidir: organik kalıpları taklit eder, böylece platformun güvenlik sistemleri büyümeyi normal kabul eder. Teslimatı panelden izleyebilir, istediğin an duraklatabilir ya da takviye edebilirsin.",
+    bodyP4: (city, hoods) =>
+      `${city} pazarı estetikle döner — ${hoods}'da kazanan, iki şehir ötedeki banliyö feed'inde kazanmaz. İçeriğini düzelteceğimizi iddia etmiyoruz. Yaptığımız şey, soğuk başlangıç vergisini kaldırmak; zaten ürettiğin içerik, hak ettiği gösterim alanını alsın diye. Hangi paketin aşamana uygun olduğundan emin değilsen, ekibimiz biletlere İngilizce ve şehrin başlıca dilinde yanıt verir.`,
+    schemaWebPageName: (city) => `${city}'de Instagram takipçi satın al`,
+    schemaServiceName: (city) => `${city}'de Instagram ve TikTok büyümesi`,
+  },
 };
 
 // Programmatic SEO city LP. 50 rotas estáticas; cada uma fala da cidade
@@ -533,6 +686,10 @@ export async function generateMetadata({ params }: { params: Promise<{ city: str
         "ru-RU": `/cities/${city.slug}`,
         "nl-NL": `/cities/${city.slug}`,
         "ko-KR": `/cities/${city.slug}`,
+        ar: `/cities/${city.slug}`,
+        "zh-Hans": `/cities/${city.slug}`,
+        "hi-IN": `/cities/${city.slug}`,
+        "tr-TR": `/cities/${city.slug}`,
       },
     },
     robots: meta.robots,
@@ -570,6 +727,10 @@ function neighborhoodsText(
       ru: `центр города ${city}`,
       nl: `het centrum van ${city}`,
       ko: `${city}의 중심부`,
+      ar: `وسط ${city}`,
+      zh: `${city}市中心`,
+      hi: `${city} का केंद्र`,
+      tr: `${city} merkezi`,
     };
     return { hoods: fallbackHoods[lang], landmark: `${city}` };
   }
@@ -587,6 +748,10 @@ function neighborhoodsText(
     ru: " и ",
     nl: " en ",
     ko: ", ",
+    ar: " و ",
+    zh: "、",
+    hi: " और ",
+    tr: " ve ",
   };
   return {
     hoods: list.length > 1 ? `${head}${connector[lang]}${last}` : last,
@@ -615,6 +780,10 @@ export default async function CityPage({ params }: { params: Promise<{ city: str
     ru: "ru-RU",
     nl: "nl-NL",
     ko: "ko-KR",
+    ar: "ar-SA",
+    zh: "zh-CN",
+    hi: "hi-IN",
+    tr: "tr-TR",
   };
   const populationFmt = city.population.toLocaleString(localeFmtByLang[lang]);
   // BUG-90/163 do QA 2026-06-12: ctaHref apontava pra alias EN
@@ -626,9 +795,9 @@ export default async function CityPage({ params }: { params: Promise<{ city: str
   const ctaHref = `/${city.country}/${ctaSlug}`;
   const { hoods, landmark } = neighborhoodsText(city.slug, city.name, lang);
 
-  const jsonld: object[] = [
+  // BUG-191: consolida WebPage + BreadcrumbList + Service em UM @graph.
+  const jsonld = toJsonLdGraph([
     {
-      "@context": "https://schema.org",
       "@type": "WebPage",
       "@id": `${pageUrl}#webpage`,
       name: tt.schemaWebPageName(city.name),
@@ -637,7 +806,6 @@ export default async function CityPage({ params }: { params: Promise<{ city: str
       isPartOf: { "@id": `${url}/#website` },
     },
     {
-      "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: tt.breadcrumbHome, item: url },
@@ -646,7 +814,6 @@ export default async function CityPage({ params }: { params: Promise<{ city: str
       ],
     },
     {
-      "@context": "https://schema.org",
       "@type": "Service",
       "@id": `${pageUrl}#service`,
       name: tt.schemaServiceName(city.name),
@@ -663,13 +830,11 @@ export default async function CityPage({ params }: { params: Promise<{ city: str
       },
       url: pageUrl,
     },
-  ];
+  ]);
 
   return (
     <>
-      {jsonld.map((doc, i) => (
-        <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(doc) }} />
-      ))}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonld) }} />
 
       <article lang={schemaLang(lang)}>
         {/* BUG-164 do QA 2026-06-12: páginas de cidade não tinham breadcrumb,

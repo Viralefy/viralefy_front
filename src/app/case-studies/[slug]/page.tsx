@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Footer } from "@/components/Footer";
 import { indexableMeta } from "@/lib/seo-meta";
 import { CASE_STUDIES, CASE_STUDY_DISCLAIMER, getCaseStudy } from "@/lib/case-studies";
+import { toJsonLdGraph } from "@/lib/jsonld";
 
 // BUG-153/165 do QA 2026-06-12: meta description cortada no meio da frase
 // (slice(0, 150)) terminava em "Pay i". Agora cortamos no último espaço
@@ -71,9 +72,9 @@ export default async function CaseStudyDetailPage({ params }: { params: Promise<
   const url = siteUrl();
   const pageUrl = `${url}/case-studies/${c.slug}`;
 
-  const jsonld: object[] = [
+  // BUG-191: consolida BreadcrumbList + Article em UM @graph.
+  const jsonld = toJsonLdGraph([
     {
-      "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Home", item: url },
@@ -82,7 +83,6 @@ export default async function CaseStudyDetailPage({ params }: { params: Promise<
       ],
     },
     {
-      "@context": "https://schema.org",
       "@type": "Article",
       headline: c.title,
       description: smartTrim(c.challenge, 200),
@@ -98,13 +98,11 @@ export default async function CaseStudyDetailPage({ params }: { params: Promise<
       },
       about: c.industry,
     },
-  ];
+  ]);
 
   return (
     <>
-      {jsonld.map((doc, i) => (
-        <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(doc) }} />
-      ))}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonld) }} />
 
       <article lang="en">
         <nav aria-label="Breadcrumb" className="container" style={{ paddingTop: "0.5rem", fontSize: "0.85rem", color: "var(--muted)" }}>

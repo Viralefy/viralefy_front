@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Footer } from "@/components/Footer";
 import { indexableMeta } from "@/lib/seo-meta";
 import { CITIES, REGION_LABEL, REGION_ORDER, citiesByRegion } from "@/lib/cities";
+import { toJsonLdGraph } from "@/lib/jsonld";
 import { Flag } from "@/components/Flag";
 
 // Programmatic SEO hub: lista as 50 cidades top agrupadas por região.
@@ -42,9 +43,9 @@ export default function CitiesHub() {
   const pageUrl = `${url}/cities`;
   const grouped = citiesByRegion();
 
-  const jsonld: object[] = [
+  // BUG-191: consolida CollectionPage + BreadcrumbList + ItemList em UM @graph.
+  const jsonld = toJsonLdGraph([
     {
-      "@context": "https://schema.org",
       "@type": "CollectionPage",
       "@id": `${pageUrl}#collection`,
       name: "Viralefy — Cities",
@@ -54,7 +55,6 @@ export default function CitiesHub() {
       isPartOf: { "@id": `${url}/#website` },
     },
     {
-      "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Home", item: url },
@@ -62,7 +62,6 @@ export default function CitiesHub() {
       ],
     },
     {
-      "@context": "https://schema.org",
       "@type": "ItemList",
       "@id": `${pageUrl}#itemlist`,
       name: "Top 50 cities",
@@ -74,13 +73,11 @@ export default function CitiesHub() {
         url: `${url}/cities/${c.slug}`,
       })),
     },
-  ];
+  ]);
 
   return (
     <>
-      {jsonld.map((doc, i) => (
-        <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(doc) }} />
-      ))}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonld) }} />
 
       <article lang="en">
         <header className="hero container" style={{ textAlign: "center", maxWidth: 880, margin: "0 auto", padding: "3rem 1rem 1.5rem" }}>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Footer } from "@/components/Footer";
 import { indexableMeta } from "@/lib/seo-meta";
 import { COMPETITORS } from "@/lib/competitors";
+import { toJsonLdGraph } from "@/lib/jsonld";
 
 // Hub de comparações Viralefy vs competidores.
 
@@ -39,9 +40,9 @@ export default function VsHubPage() {
   const url = siteUrl();
   const pageUrl = `${url}/vs`;
 
-  const jsonld: object[] = [
+  // BUG-191: consolida CollectionPage + BreadcrumbList + ItemList em UM @graph.
+  const jsonld = toJsonLdGraph([
     {
-      "@context": "https://schema.org",
       "@type": "CollectionPage",
       "@id": `${pageUrl}#collection`,
       name: "Viralefy vs the rest",
@@ -51,7 +52,6 @@ export default function VsHubPage() {
       isPartOf: { "@id": `${url}/#website` },
     },
     {
-      "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Home", item: url },
@@ -59,7 +59,6 @@ export default function VsHubPage() {
       ],
     },
     {
-      "@context": "https://schema.org",
       "@type": "ItemList",
       "@id": `${pageUrl}#itemlist`,
       name: "Comparison pages",
@@ -71,13 +70,11 @@ export default function VsHubPage() {
         url: `${url}/vs/${c.slug}`,
       })),
     },
-  ];
+  ]);
 
   return (
     <>
-      {jsonld.map((doc, i) => (
-        <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(doc) }} />
-      ))}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonld) }} />
 
       <article lang="en">
         <header className="hero container">

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Footer } from "@/components/Footer";
 import { indexableMeta } from "@/lib/seo-meta";
+import { toJsonLdGraph } from "@/lib/jsonld";
 
 // Status page público — consome /v1/status do API por request.
 //
@@ -79,9 +80,9 @@ export default async function StatusPage() {
 
   const overall = COLORS[payload.overall];
 
-  const jsonld: object[] = [
+  // BUG-191: consolida WebPage + BreadcrumbList em UM @graph.
+  const jsonld = toJsonLdGraph([
     {
-      "@context": "https://schema.org",
       "@type": "WebPage",
       "@id": `${pageUrl}#webpage`,
       name: "System status",
@@ -91,21 +92,18 @@ export default async function StatusPage() {
       isPartOf: { "@id": `${url}/#website` },
     },
     {
-      "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Home", item: url },
         { "@type": "ListItem", position: 2, name: "Status", item: pageUrl },
       ],
     },
-  ];
+  ]);
 
   return (
     <>
-      {jsonld.map((doc, i) => (
-        <script key={i} type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(doc) }} />
-      ))}
+      <script type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonld) }} />
 
       <article lang="en">
         <header className="hero container">

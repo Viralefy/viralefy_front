@@ -107,6 +107,66 @@ function pickOfferCurrency(prices: Record<string, string> | undefined): { code: 
   return first ? { code: first[0], amount: first[1] } : null;
 }
 
+// BUG-191 (QA 2026-06-14): páginas com múltiplos blocos JSON-LD emitiam N
+// scripts separados (`<script type="application/ld+json">` por nó), o que faz
+// Google/Bing/Ahrefs reportarem "duplicação" e a Rich Results Test expandir
+// cada bloco como se fosse documento isolado. Convenção Schema.org pra
+// documentos multi-entidade é UM script com `@graph: [...]`. Helper abaixo
+// recebe os nós (sem `@context` em cada um — fica só no envelope) e devolve
+// o documento canônico.
+//
+// Se algum nó já carregar `@context`, removemos pra evitar repetição. `@graph`
+// herda o `@context` do envelope.
+export function toJsonLdGraph(nodes: ReadonlyArray<object | null | undefined>): object {
+  const clean = nodes
+    .filter((n): n is object => Boolean(n))
+    .map((n) => {
+      if (!("@context" in n)) return n;
+      // Strip @context — fica só no envelope.
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { ["@context"]: _ctx, ...rest } = n as Record<string, unknown>;
+      return rest;
+    });
+  return { "@context": "https://schema.org", "@graph": clean };
+}
+
+// BUG-192 (QA 2026-06-14): AggregateOffer.lowPrice tem que ser o MÍNIMO real
+// dos tiers, highPrice o máximo. Antes cada page replicava a fórmula manual
+// e algumas variantes (slug page) não filtravam preços não-numéricos
+// (`"on_request"`, `""`, `null`). Cenário borda: um tier com `amount = "0"`
+// derruba o lowPrice pra 0 sem que seja oferta real. Helper centralizado:
+//   1. Filtra ofertas com `price` numérico > 0 (zero = enterprise/cotação)
+//   2. Calcula low/high a partir dos validos
+//   3. priceCurrency obrigatório (Schema.org); usamos o passado em opts
+//   4. Retorna null quando 0 offers válidas — caller omite o bloco
+export type AggregateOfferInput = {
+  price: string;
+  priceCurrency: string;
+  [k: string]: unknown;
+};
+export function buildAggregateOffer(
+  offers: ReadonlyArray<AggregateOfferInput>,
+  opts: { priceCurrency: string },
+): object | null {
+  const sameCurrency = offers.filter((o) => o.priceCurrency === opts.priceCurrency);
+  const numericOffers = sameCurrency.filter((o) => {
+    const n = parseFloat(o.price);
+    return Number.isFinite(n) && n > 0;
+  });
+  if (numericOffers.length === 0) return null;
+  const prices = numericOffers.map((o) => parseFloat(o.price));
+  const low = Math.min(...prices).toFixed(2);
+  const high = Math.max(...prices).toFixed(2);
+  return {
+    "@type": "AggregateOffer",
+    priceCurrency: opts.priceCurrency,
+    lowPrice: low,
+    highPrice: high,
+    offerCount: numericOffers.length,
+    offers: numericOffers,
+  };
+}
+
 // buildHomeJsonLd — emite Organization + WebSite + Service + AggregateOffer
 // pra home global. Antes a home só tinha Organization + WebSite (sem schema
 // de Product/Offer, sem rich result candidato).
@@ -143,9 +203,8 @@ export function buildHomeJsonLd(plans: Plan[], siteUrl: string) {
     };
   });
 
-  const prices = offers.map((o) => parseFloat(o.price)).filter((n) => !isNaN(n));
-  const low = prices.length ? Math.min(...prices).toFixed(2) : "0";
-  const high = prices.length ? Math.max(...prices).toFixed(2) : "0";
+  // AggregateOffer via helper centralizado (filtra non-numéricos / zero).
+  const aggregateOffer = buildAggregateOffer(offers, { priceCurrency: "USD" });
 
   // Schema.org @graph: agrupa todos os nós num único documento. Validators
   // tratam refs @id como ponteiros (não inlinam o conteúdo de novo), o que
@@ -194,22 +253,10 @@ export function buildHomeJsonLd(plans: Plan[], siteUrl: string) {
     serviceType: "Social media growth",
     provider: { "@id": `${siteUrl}/#organization` },
     areaServed: { "@type": "Place", name: "Worldwide" },
-    offers: offers.length > 0
-      ? {
-          "@type": "AggregateOffer",
-          priceCurrency: "USD",
-          lowPrice: low,
-          highPrice: high,
-          offerCount: offers.length,
-          offers,
-        }
-      : undefined,
+    offers: aggregateOffer ?? undefined,
   };
 
-  return {
-    "@context": "https://schema.org",
-    "@graph": [organization, website, service],
-  };
+  return toJsonLdGraph([organization, website, service]);
 }
 
 // categorySlugEn — versão "en" do slug, sem precisar importar i18n/categories
@@ -257,13 +304,11 @@ export function buildCountryJsonLd(country: Country, plans: Plan[], siteUrl: str
     };
   });
 
-  // Bucket de preços só pra AggregateOffer (mesma moeda). Pega o primeiro plano
-  // pra definir a moeda de display do agregado.
+  // AggregateOffer: filtra na moeda canônica do agregado (a primeira oferta
+  // define a moeda de display). Helper trata non-numéricos/zero e omite o
+  // bloco se nada sobra. BUG-192.
   const firstOfferCurrency = offers[0]?.priceCurrency ?? "USD";
-  const sameCurrencyOffers = offers.filter((o) => o.priceCurrency === firstOfferCurrency);
-  const prices = sameCurrencyOffers.map((o) => parseFloat(o.price)).filter((n) => !isNaN(n));
-  const low = prices.length ? Math.min(...prices).toFixed(2) : "0";
-  const high = prices.length ? Math.max(...prices).toFixed(2) : "0";
+  const aggregateOffer = buildAggregateOffer(offers, { priceCurrency: firstOfferCurrency });
 
   // @graph wrapper canônico — ver buildHomeJsonLd pra detalhe da decisão.
   const organization = {
@@ -337,18 +382,8 @@ export function buildCountryJsonLd(country: Country, plans: Plan[], siteUrl: str
     // `inLanguage` não é válido em Service (só em CreativeWork e subtipos).
     // O idioma desta página já é declarado pelo WebPage acima — o Google
     // junta os dois nós via @id e atribui o idioma ao serviço por inferência.
-    offers: offers.length > 0 ? {
-      "@type": "AggregateOffer",
-      priceCurrency: firstOfferCurrency,
-      lowPrice: low,
-      highPrice: high,
-      offerCount: offers.length,
-      offers,
-    } : undefined,
+    offers: aggregateOffer ?? undefined,
   };
 
-  return {
-    "@context": "https://schema.org",
-    "@graph": [organization, website, webpage, breadcrumb, service],
-  };
+  return toJsonLdGraph([organization, website, webpage, breadcrumb, service]);
 }

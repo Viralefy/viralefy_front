@@ -45,6 +45,10 @@ function detectAcceptLanguage(req: NextRequest): string | null {
     if (tag.startsWith("ru")) return "ru-RU";
     if (tag.startsWith("nl")) return "nl-NL";
     if (tag.startsWith("ko")) return "ko-KR";
+    if (tag.startsWith("ar")) return "ar-SA";
+    if (tag.startsWith("zh")) return "zh-CN";
+    if (tag.startsWith("hi")) return "hi-IN";
+    if (tag.startsWith("tr")) return "tr-TR";
     if (tag.startsWith("en")) return "en";
   }
   return null;

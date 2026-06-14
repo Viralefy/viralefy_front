@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Footer } from "@/components/Footer";
 import { indexableMeta } from "@/lib/seo-meta";
 import { HELP_TOPICS, helpAllSlugs, helpTopicBySlug } from "@/lib/help";
+import { toJsonLdGraph } from "@/lib/jsonld";
 
 // Help center detail. EN-only. generateStaticParams + per-slug canonical.
 
@@ -62,9 +63,8 @@ export default async function HelpTopicPage({ params }: { params: Promise<Params
     .map((s) => HELP_TOPICS.find((t) => t.slug === s))
     .filter((t): t is (typeof HELP_TOPICS)[number] => Boolean(t));
 
-  const jsonld: object[] = [
+  const nodes: object[] = [
     {
-      "@context": "https://schema.org",
       "@type": "Article",
       "@id": `${pageUrl}#article`,
       headline: topic.title,
@@ -82,7 +82,6 @@ export default async function HelpTopicPage({ params }: { params: Promise<Params
       },
     },
     {
-      "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Home", item: url },
@@ -93,8 +92,7 @@ export default async function HelpTopicPage({ params }: { params: Promise<Params
   ];
 
   if (looksFaqLike) {
-    jsonld.push({
-      "@context": "https://schema.org",
+    nodes.push({
       "@type": "FAQPage",
       mainEntity: topic.sections.map((s) => ({
         "@type": "Question",
@@ -104,11 +102,12 @@ export default async function HelpTopicPage({ params }: { params: Promise<Params
     });
   }
 
+  // BUG-191: consolida em UM @graph.
+  const jsonld = toJsonLdGraph(nodes);
+
   return (
     <>
-      {jsonld.map((doc, i) => (
-        <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(doc) }} />
-      ))}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonld) }} />
 
       <article className="container" lang="en" style={{ paddingTop: "2rem", paddingBottom: "3rem", maxWidth: 760 }}>
         <p style={{ fontSize: "0.85rem", color: "var(--muted)", marginBottom: "0.5rem" }}>

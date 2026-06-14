@@ -2,11 +2,19 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import dynamic from "next/dynamic";
 import type { Plan } from "@/lib/api";
 import { priceFor } from "@/lib/format";
 import { useApp } from "./Providers";
-import { CheckoutModal } from "./CheckoutModal";
 import { CATEGORY_CODES, categoryLabel, categorySlug, categoryUnit } from "@/i18n/categories";
+
+// Lazy: home global e country home renderizam este grid e raramente o
+// usuário compra antes de navegar pra uma categoria. Tira CheckoutModal do
+// chunk inicial do landing.
+const CheckoutModal = dynamic(
+  () => import("./CheckoutModal").then((m) => ({ default: m.CheckoutModal })),
+  { ssr: false }
+);
 import { tr, type LangCode } from "@/i18n/languages";
 import { localizedPlanName, localizedPlanDescription, formatQty } from "@/lib/plan-labels";
 

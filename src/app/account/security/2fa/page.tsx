@@ -158,7 +158,7 @@ function EnrollWizard({ data, onDone }: { data: TwoFAEnroll; onDone: () => void 
       </ol>
       <div style={{ textAlign: "center", marginBottom: "1rem" }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={qrSrc} alt="2FA QR code" width={220} height={220} style={{ borderRadius: "0.5rem", background: "white", padding: "0.25rem" }} />
+        <img src={qrSrc} alt="2FA QR code" width={220} height={220} loading="lazy" decoding="async" style={{ borderRadius: "0.5rem", background: "white", padding: "0.25rem" }} />
       </div>
       <details style={{ marginBottom: "1rem" }}>
         <summary style={{ cursor: "pointer", fontSize: "0.85rem", color: "var(--muted)" }}>Can&apos;t scan? Paste this secret manually</summary>

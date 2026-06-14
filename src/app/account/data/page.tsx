@@ -218,6 +218,7 @@ export default function DataPage() {
               id="reason"
               className="input"
               rows={3}
+              maxLength={2000}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="Let us know why — it helps us improve."

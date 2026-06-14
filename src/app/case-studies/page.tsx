@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Footer } from "@/components/Footer";
 import { indexableMeta } from "@/lib/seo-meta";
 import { CASE_STUDIES, CASE_STUDY_DISCLAIMER } from "@/lib/case-studies";
+import { toJsonLdGraph } from "@/lib/jsonld";
 
 const TITLE = "Case studies | Viralefy";
 const DESCRIPTION =
@@ -47,9 +48,9 @@ export default function CaseStudiesHubPage() {
   const url = siteUrl();
   const pageUrl = `${url}${PATH}`;
 
-  const jsonld: object[] = [
+  // BUG-191: consolida BreadcrumbList + CollectionPage + ItemList em UM @graph.
+  const jsonld = toJsonLdGraph([
     {
-      "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Home", item: url },
@@ -57,7 +58,6 @@ export default function CaseStudiesHubPage() {
       ],
     },
     {
-      "@context": "https://schema.org",
       "@type": "CollectionPage",
       name: "Viralefy case studies",
       description: DESCRIPTION,
@@ -65,7 +65,6 @@ export default function CaseStudiesHubPage() {
       isPartOf: { "@type": "WebSite", name: "Viralefy", url },
     },
     {
-      "@context": "https://schema.org",
       "@type": "ItemList",
       itemListOrder: "https://schema.org/ItemListOrderDescending",
       numberOfItems: CASE_STUDIES.length,
@@ -76,13 +75,11 @@ export default function CaseStudiesHubPage() {
         url: `${url}${PATH}/${c.slug}`,
       })),
     },
-  ];
+  ]);
 
   return (
     <>
-      {jsonld.map((doc, i) => (
-        <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(doc) }} />
-      ))}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonld) }} />
 
       <article lang="en">
         <nav aria-label="Breadcrumb" className="container" style={{ paddingTop: "0.5rem", fontSize: "0.85rem", color: "var(--muted)" }}>

@@ -61,12 +61,13 @@ export default function NewTicketPage() {
               name="body"
               rows={6}
               required
+              maxLength={8000}
               placeholder="Describe what happened in detail. The more context, the faster we can resolve it."
             />
           </div>
           <div>
             <label className="label" htmlFor="order_id">Order ID (optional)</label>
-            <input className="input" id="order_id" name="order_id" placeholder="Paste the ID if related to a specific order" />
+            <input className="input" id="order_id" name="order_id" maxLength={64} placeholder="Paste the ID if related to a specific order" />
           </div>
           <button type="submit" className="btn btn-primary" disabled={loading}>
             {loading ? "Sending…" : "Send"}

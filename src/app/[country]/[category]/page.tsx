@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Plan } from "@/lib/api";
-import { buildOfferEnhancements } from "@/lib/jsonld";
+import { buildOfferEnhancements, buildAggregateOffer, toJsonLdGraph } from "@/lib/jsonld";
 import { categoryAlternates } from "@/lib/hreflang";
 import { indexableMeta } from "@/lib/seo-meta";
 import { COUNTRIES, getCountry } from "@/i18n/countries";
@@ -125,13 +125,14 @@ export default async function CategoryPage({ params }: { params: Promise<Params>
       ...offerEnhancements,
     };
   });
-  const prices = offers.map((o) => parseFloat(o.price)).filter((n) => !isNaN(n));
-  const low = prices.length ? Math.min(...prices).toFixed(2) : "0";
-  const high = prices.length ? Math.max(...prices).toFixed(2) : "0";
+  // BUG-192: AggregateOffer via helper (filtra non-numéricos / zero).
+  const aggregateOffer = buildAggregateOffer(offers, { priceCurrency: "USD" });
 
-  const jsonld: object[] = [
+  // BUG-191: consolida todos os nós em UM @graph. Antes emitia 3 scripts
+  // separados (Breadcrumb + Service + FAQPage) que Ahrefs/Rich Results
+  // expandem como duplicates.
+  const jsonld = toJsonLdGraph([
     {
-      "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: t.category.breadcrumb, item: url },
@@ -140,7 +141,6 @@ export default async function CategoryPage({ params }: { params: Promise<Params>
       ],
     },
     {
-      "@context": "https://schema.org",
       "@type": "Service",
       name: copy.h1(c.name),
       description: copy.metaDescription(c.name),
@@ -149,19 +149,9 @@ export default async function CategoryPage({ params }: { params: Promise<Params>
       // `inLanguage` não é válido em Service — Schema.org restringe a
       // propriedade a CreativeWork. O <article lang={c.htmlLang}> da página
       // e o BreadcrumbList já carregam o sinal de idioma.
-      offers: offers.length
-        ? {
-            "@type": "AggregateOffer",
-            priceCurrency: "USD",
-            lowPrice: low,
-            highPrice: high,
-            offerCount: offers.length,
-            offers,
-          }
-        : undefined,
+      offers: aggregateOffer ?? undefined,
     },
     {
-      "@context": "https://schema.org",
       "@type": "FAQPage",
       mainEntity: copy.faq().map((q) => ({
         "@type": "Question",
@@ -169,13 +159,11 @@ export default async function CategoryPage({ params }: { params: Promise<Params>
         acceptedAnswer: { "@type": "Answer", text: q.a },
       })),
     },
-  ];
+  ]);
 
   return (
     <>
-      {jsonld.map((doc, i) => (
-        <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(doc) }} />
-      ))}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonld) }} />
 
       <article lang={c.htmlLang}>
         <nav aria-label="Breadcrumb" className="container" style={{ paddingTop: "0.5rem", fontSize: "0.85rem", color: "var(--muted)" }}>

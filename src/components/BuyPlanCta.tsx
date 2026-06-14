@@ -1,11 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import type { Plan } from "@/lib/api";
 import { priceFor, priceForCountry } from "@/lib/format";
 import { useApp } from "./Providers";
-import { CheckoutModal } from "./CheckoutModal";
 import { TrustSignals } from "./TrustSignals";
+
+// CheckoutModal é pesado (Pix QR, Stripe Elements, copy localizado por
+// idioma). 99% das renderizações do CTA NÃO abrem o checkout, então sai do
+// bundle inicial. ssr:false pq o modal é puramente interativo (sem SEO).
+const CheckoutModal = dynamic(
+  () => import("./CheckoutModal").then((m) => ({ default: m.CheckoutModal })),
+  { ssr: false }
+);
 import { tr, type LangCode } from "@/i18n/languages";
 
 // Bloco isolado de CTA na página do plano. Mantemos `client` aqui pra deixar

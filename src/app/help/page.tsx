@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Footer } from "@/components/Footer";
 import { indexableMeta } from "@/lib/seo-meta";
 import { HELP_CATEGORIES, HELP_TOPICS, helpTopicsByCategory } from "@/lib/help";
+import { toJsonLdGraph } from "@/lib/jsonld";
 
 // Help center hub. EN-only por enquanto, standalone (sem variantes por país).
 
@@ -40,9 +41,9 @@ export default function HelpHub() {
   const url = siteUrl();
   const pageUrl = `${url}/help`;
 
-  const jsonld: object[] = [
+  // BUG-191: consolida CollectionPage + BreadcrumbList + ItemList em UM @graph.
+  const jsonld = toJsonLdGraph([
     {
-      "@context": "https://schema.org",
       "@type": "CollectionPage",
       "@id": `${pageUrl}#collection`,
       name: "Viralefy Help center",
@@ -53,7 +54,6 @@ export default function HelpHub() {
       isPartOf: { "@id": `${url}/#website` },
     },
     {
-      "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Home", item: url },
@@ -61,7 +61,6 @@ export default function HelpHub() {
       ],
     },
     {
-      "@context": "https://schema.org",
       "@type": "ItemList",
       "@id": `${pageUrl}#itemlist`,
       name: "Help articles",
@@ -73,13 +72,11 @@ export default function HelpHub() {
         url: `${url}/help/${t.slug}`,
       })),
     },
-  ];
+  ]);
 
   return (
     <>
-      {jsonld.map((doc, i) => (
-        <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(doc) }} />
-      ))}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonld) }} />
 
       <article lang="en">
         <header className="hero container" style={{ paddingTop: "2.5rem", paddingBottom: "1.5rem" }}>

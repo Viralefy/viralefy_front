@@ -59,12 +59,22 @@ const nextConfig: NextConfig = {
     const VARY_ACCEPT_LANG = [
       { key: "Vary", value: "Accept-Language, RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch, Accept-Encoding" },
     ];
+    // Cache imutável pra hashed bundles do Next (`_next/static/*` carrega
+    // hash no path, então qualquer mudança gera URL nova — seguro fixar 1y).
+    // O Next já manda esse header em prod, mas o Caddy/proxy em frente pode
+    // reescrever; reafirmar aqui garante o contrato no compose final.
+    // BUG-161/162 (perf): força immutable nas builds que vão pro CDN.
+    const STATIC_IMMUTABLE = [
+      { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+    ];
     return [
       { source: "/:path*", headers: SECURITY_HEADERS },
       { source: "/pricing", headers: VARY_ACCEPT_LANG },
       { source: "/vs/:competitor*", headers: VARY_ACCEPT_LANG },
       { source: "/cities/:city*", headers: VARY_ACCEPT_LANG },
       { source: "/case-studies/:path*", headers: VARY_ACCEPT_LANG },
+      { source: "/_next/static/:path*", headers: STATIC_IMMUTABLE },
+      { source: "/fonts/:path*", headers: STATIC_IMMUTABLE },
     ];
   },
 
