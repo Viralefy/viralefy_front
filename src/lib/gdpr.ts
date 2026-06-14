@@ -32,7 +32,7 @@ const GDPR_COOKIE_NAME = "vf_gdpr_consent";
 export const GDPR_MAX_AGE_MS = 365 * 24 * 60 * 60 * 1000;
 const GDPR_COOKIE_MAX_AGE_S = Math.floor(GDPR_MAX_AGE_MS / 1000);
 
-function cookieDomain(): string {
+export function cookieDomain(): string {
   if (typeof window === "undefined") return "";
   const host = window.location.hostname;
   // localhost / 127.0.0.1 / *.local — sem Domain (cookie host-only).

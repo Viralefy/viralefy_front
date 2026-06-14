@@ -51,7 +51,10 @@ export default function NewTicketPage() {
           {error && <div className="alert alert-error">{error}</div>}
           <div>
             <label className="label" htmlFor="subject">Subject</label>
-            <input className="input" id="subject" name="subject" placeholder="E.g.: Order #ABC123 didn't arrive" required maxLength={120} />
+            {/* minLength=4 fecha o caminho mais comum de spam (subject "a"/"oi"
+                /etc.) sem ferir UX legítima. Combina com W-307/308 do round 17
+                que já tinha maxLength em body/order_id. */}
+            <input className="input" id="subject" name="subject" placeholder="E.g.: Order #ABC123 didn't arrive" required minLength={4} maxLength={120} />
           </div>
           <div>
             <label className="label" htmlFor="body">Message</label>
@@ -61,6 +64,7 @@ export default function NewTicketPage() {
               name="body"
               rows={6}
               required
+              minLength={10}
               maxLength={8000}
               placeholder="Describe what happened in detail. The more context, the faster we can resolve it."
             />

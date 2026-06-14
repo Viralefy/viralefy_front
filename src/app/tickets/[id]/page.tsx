@@ -131,7 +131,7 @@ export default function TicketThreadPage() {
       ) : (
         <form onSubmit={onReply} className="card">
           <label className="label" htmlFor="body">Reply</label>
-          <textarea className="input" id="body" name="body" rows={4} required maxLength={8000} placeholder="Write your message…" />
+          <textarea className="input" id="body" name="body" rows={4} required minLength={2} maxLength={8000} placeholder="Write your message…" />
           <button type="submit" className="btn btn-primary" style={{ marginTop: "0.75rem" }} disabled={sending}>
             {sending ? "Sending…" : "Send reply"}
           </button>

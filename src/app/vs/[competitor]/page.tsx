@@ -21,7 +21,7 @@ function siteUrl() {
   return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 }
 
-type PageLang = "pt" | "en" | "es" | "fr" | "de" | "ja" | "it" | "ru" | "nl" | "ko" | "ar" | "zh" | "hi" | "tr" | "pl" | "sv";
+type PageLang = "pt" | "en" | "es" | "fr" | "de" | "ja" | "it" | "ru" | "nl" | "ko" | "ar" | "zh" | "hi" | "tr" | "pl" | "sv" | "da" | "no" | "fi";
 
 async function resolveLang(): Promise<PageLang> {
   const h = await headers();
@@ -41,6 +41,9 @@ async function resolveLang(): Promise<PageLang> {
   if (locale.startsWith("tr")) return "tr";
   if (locale.startsWith("pl")) return "pl";
   if (locale.startsWith("sv")) return "sv";
+  if (locale.startsWith("da")) return "da";
+  if (locale.startsWith("no") || locale.startsWith("nb")) return "no";
+  if (locale.startsWith("fi")) return "fi";
   return "en";
 }
 
@@ -61,6 +64,9 @@ function schemaLang(lang: PageLang): string {
     case "tr": return "tr-TR";
     case "pl": return "pl-PL";
     case "sv": return "sv-SE";
+    case "da": return "da-DK";
+    case "no": return "nb-NO";
+    case "fi": return "fi-FI";
     default:   return "en";
   }
 }
@@ -81,6 +87,9 @@ function ogLocale(lang: PageLang): string {
     case "tr": return "tr_TR";
     case "pl": return "pl_PL";
     case "sv": return "sv_SE";
+    case "da": return "da_DK";
+    case "no": return "nb_NO";
+    case "fi": return "fi_FI";
     default:   return "en_US";
   }
 }
@@ -783,6 +792,129 @@ const VS: Record<PageLang, VsPack> = {
       competitorWindowSuffix: (h) => `${h} h-fönster`,
     },
   },
+  da: {
+    metaTitle: (name) => `Viralefy vs ${name} — side om side-sammenligning`,
+    metaDescription: (name) =>
+      `Sammenlign Viralefy og ${name} på startpris (USDT), leveringstid, genopfyldning, krypto-betalinger og 24/7 menneskelig support.`,
+    heroSubtitleSuffix: " Her er en faktuel sammenligning baseret på offentligt tilgængelige oplysninger.",
+    breadcrumbHome: "Hjem",
+    breadcrumbComparisons: "Sammenligninger",
+    thFeature: "Funktion",
+    thViralefy: "Viralefy",
+    ctaHeadline: "Køb Viralefy fra $1,00",
+    ctaSubtitle: "Vælg et marked, vælg en pakke, og betal i USD, EUR, BRL eller krypto. Leveringen starter inden for få minutter.",
+    ctaBrowse: "Se pakker",
+    dataAsOf: (d) =>
+      `Data baseret på offentlige oplysninger pr. ${d}. Send rettelser til support, så opdaterer vi denne side.`,
+    schemaArticleDesc: (name) => `Faktuel side om side-sammenligning mellem Viralefy og ${name}.`,
+    rows: {
+      startingPrice: "Startpris",
+      viralefyStartingPrice: "fra $1,00 USD (100 Instagram-likes)",
+      avgDelivery: "Gennemsnitlig leveringstid",
+      viralefyAvgDelivery: "0–6 timer (de fleste ordrer starter inden for få minutter)",
+      refill: "Genopfyldningsgaranti",
+      viralefyRefill: "30 dages genopfyldning ved tab",
+      refillNo: "Tilbydes ikke",
+      support: "Supportkanal",
+      viralefySupport: "Supportsager i kontoen (gratis, asynkrone)",
+      supportNone: "Ikke oplyst",
+      crypto: "Krypto-betalinger",
+      viralefyCrypto: "Ja — USDT, BTC via Heleket",
+      cryptoNo: "Tilbydes ikke",
+      cardPix: "Kort + PIX",
+      viralefyCardPix: "Stripe (kort) + Abacate Pay (PIX BRL)",
+      competitorCard: "Kort (varierer)",
+      hreflang: "Hreflang + 130 markeder",
+      viralefyHreflang: "Ja — komplet hreflang-matrix på tværs af 130 lande",
+      competitorHreflang: "Begrænset eller enkelt marked",
+      multicurrency: "Multivaluta-visning",
+      viralefyMulticurrency: "Ja — kanonisk USD + lokal visning i 6 valutaer",
+      competitorMulticurrency: "Kun USD eller én fiatvaluta",
+      competitorWindowSuffix: (h) => `${h} t-vindue`,
+    },
+  },
+  no: {
+    metaTitle: (name) => `Viralefy vs ${name} — side ved side-sammenligning`,
+    metaDescription: (name) =>
+      `Sammenlign Viralefy og ${name} på startpris (USDT), leveringstid, påfylling, kryptobetalinger og menneskelig støtte døgnet rundt.`,
+    heroSubtitleSuffix: " Her er en saklig sammenligning basert på offentlig tilgjengelig informasjon.",
+    breadcrumbHome: "Hjem",
+    breadcrumbComparisons: "Sammenligninger",
+    thFeature: "Funksjon",
+    thViralefy: "Viralefy",
+    ctaHeadline: "Kjøp Viralefy fra $1,00",
+    ctaSubtitle: "Velg et marked, velg en pakke, og betal i USD, EUR, BRL eller krypto. Leveringen starter innen få minutter.",
+    ctaBrowse: "Se pakker",
+    dataAsOf: (d) =>
+      `Data basert på offentlig informasjon per ${d}. Send rettelser til støtte, så oppdaterer vi denne siden.`,
+    schemaArticleDesc: (name) => `Saklig side ved side-sammenligning mellom Viralefy og ${name}.`,
+    rows: {
+      startingPrice: "Startpris",
+      viralefyStartingPrice: "fra $1,00 USD (100 Instagram-likes)",
+      avgDelivery: "Gjennomsnittlig leveringstid",
+      viralefyAvgDelivery: "0–6 timer (de fleste ordrer starter innen få minutter)",
+      refill: "Påfyllingsgaranti",
+      viralefyRefill: "30 dagers påfylling ved tap",
+      refillNo: "Tilbys ikke",
+      support: "Støttekanal",
+      viralefySupport: "Støttesaker i kontoen (gratis, asynkrone)",
+      supportNone: "Ikke oppgitt",
+      crypto: "Kryptobetalinger",
+      viralefyCrypto: "Ja — USDT, BTC via Heleket",
+      cryptoNo: "Tilbys ikke",
+      cardPix: "Kort + PIX",
+      viralefyCardPix: "Stripe (kort) + Abacate Pay (PIX BRL)",
+      competitorCard: "Kort (varierer)",
+      hreflang: "Hreflang + 130 markeder",
+      viralefyHreflang: "Ja — komplett hreflang-matrise over 130 land",
+      competitorHreflang: "Begrenset eller ett marked",
+      multicurrency: "Flervaluta-visning",
+      viralefyMulticurrency: "Ja — kanonisk USD + lokal visning i 6 valutaer",
+      competitorMulticurrency: "Bare USD eller én fiatvaluta",
+      competitorWindowSuffix: (h) => `${h} t-vindu`,
+    },
+  },
+  fi: {
+    metaTitle: (name) => `Viralefy vs ${name} — vierekkäinen vertailu`,
+    metaDescription: (name) =>
+      `Vertaa Viralefyä ja ${name}-palvelua aloitushinnan (USDT), toimitusajan, täydennyksen, kryptomaksujen ja 24/7 ihmisten tuen osalta.`,
+    heroSubtitleSuffix: " Alla on asiallinen vertailu, joka perustuu julkisesti saatavilla oleviin tietoihin.",
+    breadcrumbHome: "Etusivu",
+    breadcrumbComparisons: "Vertailut",
+    thFeature: "Ominaisuus",
+    thViralefy: "Viralefy",
+    ctaHeadline: "Osta Viralefy alkaen 1,00 $",
+    ctaSubtitle: "Valitse markkina ja paketti, maksa USD:nä, EUR:na, BRL:nä tai kryptolla. Toimitus alkaa muutamassa minuutissa.",
+    ctaBrowse: "Selaa paketteja",
+    dataAsOf: (d) =>
+      `Tiedot perustuvat julkiseen tietoon ${d} mennessä. Lähetä korjaukset tukeen, niin päivitämme tämän sivun.`,
+    schemaArticleDesc: (name) => `Asiallinen vierekkäinen vertailu Viralefyn ja ${name}:n välillä.`,
+    rows: {
+      startingPrice: "Aloitushinta",
+      viralefyStartingPrice: "alkaen 1,00 $ USD (100 Instagram-tykkäystä)",
+      avgDelivery: "Keskimääräinen toimitusaika",
+      viralefyAvgDelivery: "0–6 tuntia (suurin osa tilauksista alkaa muutamassa minuutissa)",
+      refill: "Täydennystakuu",
+      viralefyRefill: "30 päivän täydennys menetyksen yhteydessä",
+      refillNo: "Ei tarjolla",
+      support: "Tukikanava",
+      viralefySupport: "Tukitiketit tilin sisällä (ilmainen, asynkroninen)",
+      supportNone: "Ei ilmoitettu",
+      crypto: "Kryptomaksut",
+      viralefyCrypto: "Kyllä — USDT, BTC Heleketin kautta",
+      cryptoNo: "Ei tarjolla",
+      cardPix: "Kortti + PIX",
+      viralefyCardPix: "Stripe (kortti) + Abacate Pay (PIX BRL)",
+      competitorCard: "Kortti (vaihtelee)",
+      hreflang: "Hreflang + 130 markkinaa",
+      viralefyHreflang: "Kyllä — täydellinen hreflang-matriisi 130 maassa",
+      competitorHreflang: "Rajoitettu tai yksittäinen markkina",
+      multicurrency: "Monivaluuttainen näyttö",
+      viralefyMulticurrency: "Kyllä — kanoninen USD + paikallinen näyttö 6 valuutassa",
+      competitorMulticurrency: "Vain USD tai yksi fiat-valuutta",
+      competitorWindowSuffix: (h) => `${h} t -ikkuna`,
+    },
+  },
 };
 
 export function generateStaticParams(): Params[] {
@@ -823,6 +955,9 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
         "tr-TR": canonical,
         "pl-PL": canonical,
         "sv-SE": canonical,
+        "da-DK": canonical,
+        "nb-NO": canonical,
+        "fi-FI": canonical,
       },
     },
     robots: meta.robots,
@@ -867,6 +1002,9 @@ function buildRows(c: Competitor, lang: PageLang): Row[] {
     tr: "Evet",
     pl: "Tak",
     sv: "Ja",
+    da: "Ja",
+    no: "Ja",
+    fi: "Kyllä",
   };
   const yes = yesByLang[lang];
   return [

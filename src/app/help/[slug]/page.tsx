@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { Footer } from "@/components/Footer";
 import { indexableMeta } from "@/lib/seo-meta";
 import { HELP_TOPICS, helpAllSlugs, helpTopicBySlug } from "@/lib/help";
-import { toJsonLdGraph } from "@/lib/jsonld";
+import { withGlobalGraph } from "@/lib/jsonld";
 
 // Help center detail. EN-only. generateStaticParams + per-slug canonical.
 
@@ -73,13 +73,10 @@ export default async function HelpTopicPage({ params }: { params: Promise<Params
       dateModified,
       inLanguage: "en",
       mainEntityOfPage: { "@type": "WebPage", "@id": pageUrl },
-      author: { "@type": "Organization", name: "Viralefy", url },
-      publisher: {
-        "@type": "Organization",
-        name: "Viralefy",
-        url,
-        logo: { "@type": "ImageObject", url: `${url}/logo.png` },
-      },
+      // Track CC: author/publisher referenciam o nó Organization canônico
+      // prepended por withGlobalGraph (mesmo @id `${url}/#organization`).
+      author: { "@id": `${url}/#organization` },
+      publisher: { "@id": `${url}/#organization` },
     },
     {
       "@type": "BreadcrumbList",
@@ -103,7 +100,8 @@ export default async function HelpTopicPage({ params }: { params: Promise<Params
   }
 
   // BUG-191: consolida em UM @graph.
-  const jsonld = toJsonLdGraph(nodes);
+  // Track CC: withGlobalGraph prepende Org+WebSite (en-only).
+  const jsonld = withGlobalGraph(nodes, { siteUrl: url, inLanguage: "en" });
 
   return (
     <>

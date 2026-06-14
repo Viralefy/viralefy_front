@@ -29,7 +29,7 @@ function siteUrl() {
 // Como só estamos suportando PT vs EN nesta página por enquanto,
 // qualquer locale começando com "pt" cai em "pt"; o resto cai em "en".
 // Tipo local PageLang (subset de LangCode) garante index seguro no PRICING.
-type PageLang = "pt" | "en" | "es" | "fr" | "de" | "ja" | "it" | "ru" | "nl" | "ko" | "ar" | "zh" | "hi" | "tr" | "pl" | "sv";
+type PageLang = "pt" | "en" | "es" | "fr" | "de" | "ja" | "it" | "ru" | "nl" | "ko" | "ar" | "zh" | "hi" | "tr" | "pl" | "sv" | "da" | "no" | "fi";
 
 async function resolveLang(): Promise<PageLang> {
   const h = await headers();
@@ -49,6 +49,9 @@ async function resolveLang(): Promise<PageLang> {
   if (locale.startsWith("tr")) return "tr";
   if (locale.startsWith("pl")) return "pl";
   if (locale.startsWith("sv")) return "sv";
+  if (locale.startsWith("da")) return "da";
+  if (locale.startsWith("no") || locale.startsWith("nb")) return "no";
+  if (locale.startsWith("fi")) return "fi";
   return "en";
 }
 
@@ -480,6 +483,81 @@ const PRICING: Record<PageLang, PricingPack> = {
     breadcrumbHome: "Hem",
     breadcrumbPricing: "Priser",
   },
+  da: {
+    metaTitle: "Gennemsigtige priser i USDT — Viralefy",
+    metaDescription:
+      "Sammenlign Viralefy-priser for følgere, likes og visninger på Instagram og TikTok. Priser i USDT/USD, uden adgangskode, med genopfyldningsgaranti.",
+    heroTitle: "Gennemsigtige priser i USDT",
+    heroSubtitle:
+      "Én kanonisk prisliste i USD/USDT for 130 markeder. Lokale valutaer er kun til visning — afregningen sker altid i stabil USD.",
+    tableFollowers: "Følgere",
+    tableLikes: "Likes",
+    tableViews: "Visninger",
+    thPlatform: "Platform",
+    uspRefillTitle: "Genopfyldningsgaranti",
+    uspRefillBody: "Tab inden for 30 dage genopfyldes automatisk uden ekstra omkostninger.",
+    uspPasswordTitle: "Ingen adgangskode kræves",
+    uspPasswordBody: "Vi har kun brug for din offentlige profil eller post-link — aldrig dine loginoplysninger.",
+    uspCryptoTitle: "Krypto først",
+    uspCryptoBody: "Betal i USDT, BTC, ETH eller 50+ aktiver. Stabile USD-priser i hele kataloget.",
+    uspSupportTitle: "Support døgnet rundt",
+    uspSupportBody: "Sager besvares af mennesker hver dag. Gennemsnitligt svar under 2 timer.",
+    browseAll: "Gennemse alle 130 markeder",
+    schemaPageName: "Viralefy priser",
+    schemaPageDesc: "Gennemsigtige priser i USDT for engagementpakker på Instagram og TikTok.",
+    breadcrumbHome: "Hjem",
+    breadcrumbPricing: "Priser",
+  },
+  no: {
+    metaTitle: "Gjennomsiktige priser i USDT — Viralefy",
+    metaDescription:
+      "Sammenlign Viralefy-priser for følgere, likes og visninger på Instagram og TikTok. Priser i USDT/USD, uten passord, med påfyllingsgaranti.",
+    heroTitle: "Gjennomsiktige priser i USDT",
+    heroSubtitle:
+      "Én kanonisk prisliste i USD/USDT for 130 markeder. Lokale valutaer er kun til visning — fakturering skjer alltid i stabil USD.",
+    tableFollowers: "Følgere",
+    tableLikes: "Likes",
+    tableViews: "Visninger",
+    thPlatform: "Plattform",
+    uspRefillTitle: "Påfyllingsgaranti",
+    uspRefillBody: "Tap innen 30 dager fylles på automatisk uten ekstra kostnad.",
+    uspPasswordTitle: "Ingen passord kreves",
+    uspPasswordBody: "Vi trenger bare din offentlige profil eller postlenke — aldri innloggingsinformasjonen din.",
+    uspCryptoTitle: "Krypto først",
+    uspCryptoBody: "Betal i USDT, BTC, ETH eller 50+ aktiva. Stabile USD-priser i hele katalogen.",
+    uspSupportTitle: "Døgnåpen støtte",
+    uspSupportBody: "Saker besvares av mennesker hver dag. Gjennomsnittlig svar under 2 timer.",
+    browseAll: "Bla gjennom alle 130 markeder",
+    schemaPageName: "Viralefy priser",
+    schemaPageDesc: "Gjennomsiktige priser i USDT for engasjementspakker på Instagram og TikTok.",
+    breadcrumbHome: "Hjem",
+    breadcrumbPricing: "Priser",
+  },
+  fi: {
+    metaTitle: "Läpinäkyvät hinnat USDT:nä — Viralefy",
+    metaDescription:
+      "Vertaile Viralefyn hintoja Instagramin ja TikTokin seuraajille, tykkäyksille ja katseluille. Hinnat USDT/USD, ei salasanaa, täydennystakuu.",
+    heroTitle: "Läpinäkyvät hinnat USDT:nä",
+    heroSubtitle:
+      "Yksi kanoninen hinnasto USD/USDT-valuutoissa 130 markkinalle. Paikalliset valuutat ovat vain näyttöä varten — laskutus tapahtuu aina vakaassa USD:ssä.",
+    tableFollowers: "Seuraajat",
+    tableLikes: "Tykkäykset",
+    tableViews: "Katselut",
+    thPlatform: "Alusta",
+    uspRefillTitle: "Täydennystakuu",
+    uspRefillBody: "30 päivän sisällä tapahtuvat menetykset täydennetään automaattisesti ilman lisäkustannuksia.",
+    uspPasswordTitle: "Salasanaa ei tarvita",
+    uspPasswordBody: "Tarvitsemme vain julkisen profiilisi tai julkaisun linkin — emme koskaan tunnistetietojasi.",
+    uspCryptoTitle: "Krypto ensin",
+    uspCryptoBody: "Maksa USDT:ssä, BTC:ssä, ETH:ssä tai yli 50 muussa varallisuudessa. Vakaat USD-hinnat koko luettelossa.",
+    uspSupportTitle: "Tuki ympäri vuorokauden",
+    uspSupportBody: "Ihmiset vastaavat tiketteihin joka päivä. Keskimääräinen vastausaika alle 2 tuntia.",
+    browseAll: "Selaa kaikkia 130 markkinaa",
+    schemaPageName: "Viralefyn hinnat",
+    schemaPageDesc: "Läpinäkyvät hinnat USDT:nä Instagramin ja TikTokin sitoutumispaketteihin.",
+    breadcrumbHome: "Etusivu",
+    breadcrumbPricing: "Hinnat",
+  },
 };
 
 function ogLocale(lang: PageLang): string {
@@ -499,6 +577,9 @@ function ogLocale(lang: PageLang): string {
     case "tr": return "tr_TR";
     case "pl": return "pl_PL";
     case "sv": return "sv_SE";
+    case "da": return "da_DK";
+    case "no": return "nb_NO";
+    case "fi": return "fi_FI";
     default:   return "en_US";
   }
 }
@@ -520,6 +601,9 @@ function schemaLang(lang: PageLang): string {
     case "tr": return "tr-TR";
     case "pl": return "pl-PL";
     case "sv": return "sv-SE";
+    case "da": return "da-DK";
+    case "no": return "nb-NO";
+    case "fi": return "fi-FI";
     default:   return "en";
   }
 }
@@ -556,6 +640,9 @@ export async function generateMetadata(): Promise<Metadata> {
         "tr-TR": canonical,
         "pl-PL": canonical,
         "sv-SE": canonical,
+        "da-DK": canonical,
+        "nb-NO": canonical,
+        "fi-FI": canonical,
       },
     },
     openGraph: {

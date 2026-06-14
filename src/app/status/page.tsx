@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Footer } from "@/components/Footer";
 import { indexableMeta } from "@/lib/seo-meta";
-import { toJsonLdGraph } from "@/lib/jsonld";
+import { withGlobalGraph } from "@/lib/jsonld";
 
 // Status page público — consome /v1/status do API por request.
 //
@@ -81,24 +81,29 @@ export default async function StatusPage() {
   const overall = COLORS[payload.overall];
 
   // BUG-191: consolida WebPage + BreadcrumbList em UM @graph.
-  const jsonld = toJsonLdGraph([
-    {
-      "@type": "WebPage",
-      "@id": `${pageUrl}#webpage`,
-      name: "System status",
-      url: pageUrl,
-      description: "Live status of the Viralefy services.",
-      inLanguage: "en",
-      isPartOf: { "@id": `${url}/#website` },
-    },
-    {
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: url },
-        { "@type": "ListItem", position: 2, name: "Status", item: pageUrl },
-      ],
-    },
-  ]);
+  // Track CC: withGlobalGraph prepende Org+WebSite pra fechar o gráfico
+  // (isPartOf aponta pra #website existente no mesmo documento).
+  const jsonld = withGlobalGraph(
+    [
+      {
+        "@type": "WebPage",
+        "@id": `${pageUrl}#webpage`,
+        name: "System status",
+        url: pageUrl,
+        description: "Live status of the Viralefy services.",
+        inLanguage: "en",
+        isPartOf: { "@id": `${url}/#website` },
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: url },
+          { "@type": "ListItem", position: 2, name: "Status", item: pageUrl },
+        ],
+      },
+    ],
+    { siteUrl: url, inLanguage: "en" },
+  );
 
   return (
     <>

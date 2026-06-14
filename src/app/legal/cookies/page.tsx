@@ -3,6 +3,7 @@ import Link from "next/link";
 import { legalDoc, legalMetaDescription } from "@/i18n/legal";
 import { PACKS, type LangCode } from "@/i18n/languages";
 import { renderLegalBody } from "@/lib/legal-render";
+import { withGlobalGraph } from "@/lib/jsonld";
 import { Footer } from "@/components/Footer";
 
 // Página estática `/legal/cookies` — shadow do dynamic `[doc]` para este slug.
@@ -317,10 +318,12 @@ export default async function CookiesLegalPage({
 
   // SEO + estrutura: JSON-LD WebPage + Breadcrumb. Igual padrão do
   // `/legal/cookie-preferences/page.tsx` — Google entende essa relação.
-  const pageUrl = `${siteUrl()}/legal/cookies?lang=${lang}`;
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@graph": [
+  const baseUrl = siteUrl();
+  const pageUrl = `${baseUrl}/legal/cookies?lang=${lang}`;
+  // Track CC: withGlobalGraph prepende Org+WebSite — fecha o gráfico pra
+  // WebPage.isPartOf apontar pra `#website` presente no mesmo documento.
+  const jsonLd = withGlobalGraph(
+    [
       {
         "@type": "WebPage",
         "@id": `${pageUrl}#webpage`,
@@ -328,19 +331,20 @@ export default async function CookiesLegalPage({
         name: `${d.title} | Viralefy`,
         description: legalMetaDescription(lang, "cookies"),
         inLanguage: lang,
-        isPartOf: { "@id": `${siteUrl()}/#website` },
+        isPartOf: { "@id": `${baseUrl}/#website` },
         dateModified: d.updatedAt,
       },
       {
         "@type": "BreadcrumbList",
         itemListElement: [
-          { "@type": "ListItem", position: 1, name: "Home", item: siteUrl() },
-          { "@type": "ListItem", position: 2, name: "Legal", item: `${siteUrl()}/legal/privacy?lang=${lang}` },
+          { "@type": "ListItem", position: 1, name: "Home", item: baseUrl },
+          { "@type": "ListItem", position: 2, name: "Legal", item: `${baseUrl}/legal/privacy?lang=${lang}` },
           { "@type": "ListItem", position: 3, name: d.title, item: pageUrl },
         ],
       },
     ],
-  };
+    { siteUrl: baseUrl, inLanguage: lang },
+  );
 
   return (
     <>

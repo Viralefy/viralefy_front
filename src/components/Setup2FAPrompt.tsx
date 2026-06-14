@@ -57,7 +57,8 @@ export function Setup2FAPrompt() {
   return (
     <div
       role="dialog"
-      aria-modal
+      aria-modal="true"
+      aria-labelledby="vf-2fa-prompt-title"
       style={{
         position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)",
         display: "flex", alignItems: "center", justifyContent: "center",
@@ -65,7 +66,7 @@ export function Setup2FAPrompt() {
       }}
     >
       <div className="card" style={{ maxWidth: 440, width: "100%" }}>
-        <h2 style={{ marginBottom: "0.5rem", display: "inline-flex", alignItems: "center", gap: "0.5rem" }}>
+        <h2 id="vf-2fa-prompt-title" style={{ marginBottom: "0.5rem", display: "inline-flex", alignItems: "center", gap: "0.5rem" }}>
           <Icon name="lock" size={20} color="var(--accent, #00fed6)" />
           Protect your account
         </h2>

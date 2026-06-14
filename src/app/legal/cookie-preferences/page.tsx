@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Footer } from "@/components/Footer";
 import { getConsent, resetConsent, setConsent, type GdprConsent } from "@/lib/gdpr";
 import { recordConsent } from "@/lib/consent-audit";
+import { withGlobalGraph } from "@/lib/jsonld";
 
 // Cookie preferences hub. Mostra o estado atual do consentimento e oferece:
 //   - Salvar mudanças nos 3 toggles opt-in (preferences, analytics, marketing).
@@ -199,9 +200,10 @@ export default function CookiePreferencesPage() {
     setSavedAt(null);
   }
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@graph": [
+  // Track CC: withGlobalGraph prepende Org+WebSite ao @graph (sem isso,
+  // WebPage.isPartOf vira ponteiro pendurado pro validador).
+  const jsonLd = withGlobalGraph(
+    [
       {
         "@type": "WebPage",
         "@id": `${PAGE_URL}#webpage`,
@@ -220,7 +222,8 @@ export default function CookiePreferencesPage() {
         ],
       },
     ],
-  };
+    { siteUrl: SITE_URL, inLanguage: lang },
+  );
 
   return (
     <>

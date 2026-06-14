@@ -102,11 +102,28 @@ export default function ProfilesPage() {
           </div>
           <div>
             <label className="label" htmlFor="handle">@ handle</label>
-            <input className="input" name="handle" id="handle" placeholder="yourhandle" required />
+            {/* Handles do Instagram/TikTok seguem o mesmo subset estrito (letras,
+                números, ponto, underscore) e cap em 30 chars — BUG-16 do QA
+                2026-06-12 (formulário aceitava handle inválido como "user!@#").
+                Aplicamos pattern + maxLength no client pra rejeitar antes de bater
+                no backend. minLength=1 idem IG/TT. */}
+            <input
+              className="input"
+              name="handle"
+              id="handle"
+              placeholder="yourhandle"
+              required
+              maxLength={30}
+              pattern="[A-Za-z0-9._]{1,30}"
+              autoCapitalize="off"
+              autoCorrect="off"
+              spellCheck={false}
+              title="Letters, numbers, dot or underscore. Up to 30 chars."
+            />
           </div>
           <div>
             <label className="label" htmlFor="display_name">Nickname (optional)</label>
-            <input className="input" name="display_name" id="display_name" placeholder="Personal, Brand…" />
+            <input className="input" name="display_name" id="display_name" placeholder="Personal, Brand…" maxLength={60} />
           </div>
         </div>
         <button type="submit" className="btn btn-primary" style={{ marginTop: "0.75rem" }} disabled={adding}>

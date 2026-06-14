@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { AggregateRating, Plan, PublicReview } from "@/lib/api";
-import { buildAggregateRating, buildOfferEnhancements, toJsonLdGraph } from "@/lib/jsonld";
+import { buildAggregateRating, buildOfferEnhancements, withGlobalGraph } from "@/lib/jsonld";
 import { slugAlternates } from "@/lib/hreflang";
 import { indexableMeta } from "@/lib/seo-meta";
 import { localizedPlanName } from "@/lib/plan-labels";
@@ -232,7 +232,10 @@ export default async function PlanPage({ params }: { params: Promise<Params> }) 
 
   // BUG-191: consolida BreadcrumbList + Product em UM @graph. Antes
   // emitia 2 scripts separados.
-  const jsonld = toJsonLdGraph([
+  // Track CC: withGlobalGraph prepende Org+WebSite — fecha o gráfico pro
+  // validator linkar Product (e ofertas) ao publisher canônico.
+  const jsonld = withGlobalGraph(
+    [
     {
       "@type": "BreadcrumbList",
       itemListElement: [
@@ -271,7 +274,9 @@ export default async function PlanPage({ params }: { params: Promise<Params> }) 
         ...offerEnhancements,
       },
     },
-  ]);
+    ],
+    { siteUrl: url, inLanguage: c.htmlLang },
+  );
 
   return (
     <>

@@ -257,7 +257,7 @@ export default function NotificationsPage() {
               gap: "0.75rem",
             }}
           >
-            <label style={{ display: "block" }}>
+            <label style={{ display: "block" }} htmlFor="vf-wa-number">
               <span
                 style={{
                   display: "block",
@@ -268,11 +268,19 @@ export default function NotificationsPage() {
               >
                 WhatsApp number
               </span>
+              {/* E.164 cap = 15 dígitos + "+" = 16. Aceitamos espaço/parêntese/
+                  hífen pra UX → backend normaliza. BUG-147 idem register page:
+                  type=tel sem pattern aceita lixo. */}
               <input
                 type="tel"
+                id="vf-wa-number"
+                name="wa_number"
                 inputMode="tel"
+                autoComplete="tel"
                 placeholder="+5511999999999"
                 value={wa.number}
+                maxLength={20}
+                pattern="\+?[\d\s().-]{8,20}"
                 onChange={(e) => {
                   const number = e.target.value;
                   setWa((p) => (p ? { ...p, number } : p));

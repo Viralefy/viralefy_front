@@ -171,11 +171,11 @@ export default function CreditsPage() {
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ background: "var(--accent-dimmer)" }}>
-                <th style={{ padding: "0.6rem 1rem", textAlign: "start", fontSize: "0.8rem", color: "var(--muted)" }}>When</th>
-                <th style={{ padding: "0.6rem 1rem", textAlign: "start", fontSize: "0.8rem", color: "var(--muted)" }}>Type</th>
-                <th style={{ padding: "0.6rem 1rem", textAlign: "start", fontSize: "0.8rem", color: "var(--muted)" }}>Description</th>
-                <th style={{ padding: "0.6rem 1rem", textAlign: "end", fontSize: "0.8rem", color: "var(--muted)" }}>Amount</th>
-                <th style={{ padding: "0.6rem 1rem", textAlign: "end", fontSize: "0.8rem", color: "var(--muted)" }}>Balance</th>
+                <th scope="col" style={{ padding: "0.6rem 1rem", textAlign: "start", fontSize: "0.8rem", color: "var(--muted)" }}>When</th>
+                <th scope="col" style={{ padding: "0.6rem 1rem", textAlign: "start", fontSize: "0.8rem", color: "var(--muted)" }}>Type</th>
+                <th scope="col" style={{ padding: "0.6rem 1rem", textAlign: "start", fontSize: "0.8rem", color: "var(--muted)" }}>Description</th>
+                <th scope="col" style={{ padding: "0.6rem 1rem", textAlign: "end", fontSize: "0.8rem", color: "var(--muted)" }}>Amount</th>
+                <th scope="col" style={{ padding: "0.6rem 1rem", textAlign: "end", fontSize: "0.8rem", color: "var(--muted)" }}>Balance</th>
               </tr>
             </thead>
             <tbody>
@@ -218,6 +218,7 @@ function CustomAmount({ onSubmit, disabled }: { onSubmit: (v: number) => void; d
         min={5}
         step="0.01"
         className="input"
+        aria-label="Custom top-up amount in USD"
         placeholder="Other amount in USD (min. 5)"
         value={val}
         onChange={(e) => setVal(e.target.value)}

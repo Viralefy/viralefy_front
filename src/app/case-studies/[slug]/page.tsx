@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { Footer } from "@/components/Footer";
 import { indexableMeta } from "@/lib/seo-meta";
 import { CASE_STUDIES, CASE_STUDY_DISCLAIMER, getCaseStudy } from "@/lib/case-studies";
-import { toJsonLdGraph } from "@/lib/jsonld";
+import { withGlobalGraph } from "@/lib/jsonld";
 
 // BUG-153/165 do QA 2026-06-12: meta description cortada no meio da frase
 // (slice(0, 150)) terminava em "Pay i". Agora cortamos no último espaço
@@ -73,32 +73,32 @@ export default async function CaseStudyDetailPage({ params }: { params: Promise<
   const pageUrl = `${url}/case-studies/${c.slug}`;
 
   // BUG-191: consolida BreadcrumbList + Article em UM @graph.
-  const jsonld = toJsonLdGraph([
-    {
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: url },
-        { "@type": "ListItem", position: 2, name: "Case studies", item: `${url}/case-studies` },
-        { "@type": "ListItem", position: 3, name: c.title, item: pageUrl },
-      ],
-    },
-    {
-      "@type": "Article",
-      headline: c.title,
-      description: smartTrim(c.challenge, 200),
-      datePublished: c.publishedAt,
-      dateModified: c.updatedAt,
-      mainEntityOfPage: pageUrl,
-      author: { "@type": "Organization", name: "Viralefy", url },
-      publisher: {
-        "@type": "Organization",
-        name: "Viralefy",
-        url,
-        logo: { "@type": "ImageObject", url: `${url}/logotipo-default.png` },
+  // Track CC: withGlobalGraph prepende Org+WebSite. Article.author/publisher
+  // referenciam Organization por @id (entidade canônica).
+  const jsonld = withGlobalGraph(
+    [
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: url },
+          { "@type": "ListItem", position: 2, name: "Case studies", item: `${url}/case-studies` },
+          { "@type": "ListItem", position: 3, name: c.title, item: pageUrl },
+        ],
       },
-      about: c.industry,
-    },
-  ]);
+      {
+        "@type": "Article",
+        headline: c.title,
+        description: smartTrim(c.challenge, 200),
+        datePublished: c.publishedAt,
+        dateModified: c.updatedAt,
+        mainEntityOfPage: pageUrl,
+        author: { "@id": `${url}/#organization` },
+        publisher: { "@id": `${url}/#organization` },
+        about: c.industry,
+      },
+    ],
+    { siteUrl: url, inLanguage: "en" },
+  );
 
   return (
     <>

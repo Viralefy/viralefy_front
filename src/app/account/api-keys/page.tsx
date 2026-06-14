@@ -251,6 +251,7 @@ export default function APIKeysPage() {
               <>
                 <h2 style={{ marginBottom: "1rem" }}>Create new API key</h2>
                 <label
+                  htmlFor="vf-apikey-label"
                   style={{
                     display: "block",
                     marginBottom: "0.4rem",
@@ -260,13 +261,18 @@ export default function APIKeysPage() {
                 >
                   Label (visible only to you)
                 </label>
+                {/* a11y: label-input pairing — sem htmlFor o screen reader não
+                    anuncia "Label" ao focar o input (WCAG 1.3.1 / 4.1.2). */}
                 <input
+                  id="vf-apikey-label"
+                  name="apikey_label"
                   type="text"
                   className="input"
                   placeholder="e.g. Production server"
                   value={newLabel}
                   onChange={(e) => setNewLabel(e.target.value)}
                   maxLength={80}
+                  minLength={1}
                   style={{ width: "100%", marginBottom: "1rem" }}
                 />
                 <div style={{ display: "flex", gap: "0.5rem", justifyContent: "flex-end" }}>

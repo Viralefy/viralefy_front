@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Plan } from "@/lib/api";
-import { buildOfferEnhancements, buildAggregateOffer, toJsonLdGraph } from "@/lib/jsonld";
+import { buildOfferEnhancements, buildAggregateOffer, withGlobalGraph } from "@/lib/jsonld";
 import { categoryAlternates } from "@/lib/hreflang";
 import { indexableMeta } from "@/lib/seo-meta";
 import { COUNTRIES, getCountry } from "@/i18n/countries";
@@ -131,35 +131,41 @@ export default async function CategoryPage({ params }: { params: Promise<Params>
   // BUG-191: consolida todos os nós em UM @graph. Antes emitia 3 scripts
   // separados (Breadcrumb + Service + FAQPage) que Ahrefs/Rich Results
   // expandem como duplicates.
-  const jsonld = toJsonLdGraph([
-    {
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        { "@type": "ListItem", position: 1, name: t.category.breadcrumb, item: url },
-        { "@type": "ListItem", position: 2, name: c.name, item: `${url}/${c.code}` },
-        { "@type": "ListItem", position: 3, name: catLabel, item: pageUrl },
-      ],
-    },
-    {
-      "@type": "Service",
-      name: copy.h1(c.name),
-      description: copy.metaDescription(c.name),
-      provider: { "@type": "Organization", name: "Viralefy", url },
-      areaServed: { "@type": "Country", name: c.name },
-      // `inLanguage` não é válido em Service — Schema.org restringe a
-      // propriedade a CreativeWork. O <article lang={c.htmlLang}> da página
-      // e o BreadcrumbList já carregam o sinal de idioma.
-      offers: aggregateOffer ?? undefined,
-    },
-    {
-      "@type": "FAQPage",
-      mainEntity: copy.faq().map((q) => ({
-        "@type": "Question",
-        name: q.q,
-        acceptedAnswer: { "@type": "Answer", text: q.a },
-      })),
-    },
-  ]);
+  // Track CC: withGlobalGraph prepende Org+WebSite — Service.provider passa a
+  // referenciar `#organization` por @id (entidade canônica no mesmo graph),
+  // não mais um Organization inline anônimo.
+  const jsonld = withGlobalGraph(
+    [
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: t.category.breadcrumb, item: url },
+          { "@type": "ListItem", position: 2, name: c.name, item: `${url}/${c.code}` },
+          { "@type": "ListItem", position: 3, name: catLabel, item: pageUrl },
+        ],
+      },
+      {
+        "@type": "Service",
+        name: copy.h1(c.name),
+        description: copy.metaDescription(c.name),
+        provider: { "@id": `${url}/#organization` },
+        areaServed: { "@type": "Country", name: c.name },
+        // `inLanguage` não é válido em Service — Schema.org restringe a
+        // propriedade a CreativeWork. O <article lang={c.htmlLang}> da página
+        // e o BreadcrumbList já carregam o sinal de idioma.
+        offers: aggregateOffer ?? undefined,
+      },
+      {
+        "@type": "FAQPage",
+        mainEntity: copy.faq().map((q) => ({
+          "@type": "Question",
+          name: q.q,
+          acceptedAnswer: { "@type": "Answer", text: q.a },
+        })),
+      },
+    ],
+    { siteUrl: url, inLanguage: c.htmlLang },
+  );
 
   return (
     <>
