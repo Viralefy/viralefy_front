@@ -1,8 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
+import { THEME_COOKIE, type ResolvedTheme, type Theme } from "@/lib/theme";
+import { CURRENCY_COOKIE } from "@/lib/currency";
 import { Header } from "@/components/Header";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { CookieBanner } from "@/components/CookieBanner";
@@ -103,18 +105,34 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-// Anti-flash inline. Executa antes do <body> aparecer.
+// Anti-flash script — só roda quando o cookie diz "system". Lê
+// prefers-color-scheme do browser e sobrescreve `data-theme`. Quando o
+// cookie é "dark" ou "light" o SSR já injetou o atributo correto e este
+// script é no-op. Compacto pra cair antes do <body> sem custar bytes.
 const ANTI_FLASH_THEME = `
 (function() {
   try {
-    var t = localStorage.getItem('viralefy_theme');
-    if (t === 'light') document.documentElement.setAttribute('data-theme', 'light');
-    else document.documentElement.setAttribute('data-theme', 'dark');
-  } catch (e) {
-    document.documentElement.setAttribute('data-theme', 'dark');
-  }
+    var ds = document.documentElement.getAttribute('data-theme-pref');
+    if (ds === 'system' && window.matchMedia) {
+      var m = window.matchMedia('(prefers-color-scheme: light)');
+      document.documentElement.setAttribute('data-theme', m.matches ? 'light' : 'dark');
+    }
+  } catch (e) { /* keep SSR default */ }
 })();
 `;
+
+// Lê o cookie de tema no server e devolve preferência + tema efetivo.
+// `data-theme` recebe o tema efetivo (dark/light) pro CSS aplicar;
+// `data-theme-pref` carrega a preferência crua (inclui `system`) pro
+// script anti-flash decidir se precisa sobrescrever.
+function readThemeCookie(value: string | undefined): { pref: Theme; effective: ResolvedTheme } {
+  const v = value === "dark" || value === "light" || value === "system" ? value : "system";
+  // SSR não consegue ler prefers-color-scheme. Servimos `dark` como tema
+  // efetivo default; o script anti-flash corrige antes do paint quando
+  // a preferência é `system` e o browser prefere light.
+  const effective: ResolvedTheme = v === "light" ? "light" : "dark";
+  return { pref: v, effective };
+}
 
 // JSON-LD Organization/WebSite NÃO vai no root layout: home e country pages
 // já emitem o bloco completo via buildHomeJsonLd/buildCountryJsonLd. Repetir
@@ -124,8 +142,11 @@ const ANTI_FLASH_THEME = `
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const h = await headers();
   const lang = h.get("x-locale") || "en";
+  const ck = await cookies();
+  const { pref: themePref, effective: themeEffective } = readThemeCookie(ck.get(THEME_COOKIE)?.value);
+  const currencyCookie = ck.get(CURRENCY_COOKIE)?.value ?? null;
   return (
-    <html lang={lang}>
+    <html lang={lang} data-theme={themeEffective} data-theme-pref={themePref}>
       <head>
         {/* Preconnect ao CDN de bandeiras — economiza ~120ms no LCP em páginas
             com muitas flags (header megamenu, country index, footer). */}
@@ -149,7 +170,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             Visitantes sem JS simplesmente não são medidos (aceitável). */}
         {/* GtmLoader monta o GTM em runtime SÓ após consent analytics. */}
         <GtmLoader />
-        <Providers>
+        <Providers initialCurrency={currencyCookie}>
           {/* TrackingHydrator — dispara pageview/landing em CADA nav do App
               Router. Suspense pq usePathname/useSearchParams precisam de
               boundary no Next 15. */}

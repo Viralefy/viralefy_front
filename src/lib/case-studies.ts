@@ -82,7 +82,7 @@ export const CASE_STUDIES: CaseStudy[] = [
     challenge:
       "The creator had high-quality content but the cold-start problem was severe. Posts were sitting at single-digit reach for three weeks and brand-deal outreach was being declined on follower-count grounds.",
     approach:
-      "We staged a structured ramp: niche-targeted followers in week one, story views and saves layered against organic posts in weeks two through four, then post likes spread across the back catalogue to lift social proof on profile visits.",
+      "We staged a structured ramp: niche-targeted followers in week one, story views and saves layered against organic posts in weeks two through four, then post likes spread across the back catalog to lift social proof on profile visits.",
     resultMetric: "10,400 followers in 6 weeks",
     resultBody:
       "The account crossed 10k followers in week six, which unlocked the Instagram swipe-up equivalent and changed the response rate on brand outreach from under 5% to roughly 30%. Engagement rate held above 4% across the ramp.",

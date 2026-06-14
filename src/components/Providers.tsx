@@ -5,6 +5,7 @@ import type { Currency, PPPEntry, Session, User } from "@/lib/api";
 import { fetchCountryPPP, fetchCurrencies } from "@/lib/api";
 import { clearSession, getUser, saveSession } from "@/lib/auth";
 import { initTracking } from "@/lib/tracking";
+import { CURRENCY_CHANGED_EVENT, getStoredCurrency, storeCurrency } from "@/lib/currency";
 
 type AppState = {
   currencies: Currency[];
@@ -19,7 +20,6 @@ type AppState = {
   pppMap: Record<string, number>;
 };
 
-const CURRENCY_KEY = "viralefy_currency";
 const AppContext = createContext<AppState | null>(null);
 
 export function useApp(): AppState {
@@ -28,7 +28,18 @@ export function useApp(): AppState {
   return ctx;
 }
 
-export function Providers({ children }: { children: React.ReactNode }) {
+export function Providers({
+  children,
+  initialCurrency = null,
+}: {
+  children: React.ReactNode;
+  /**
+   * Moeda lida do cookie no SSR (layout.tsx). Quando presente, garante
+   * que o primeiro paint client-side já mostre a moeda salva — sem o
+   * salto USD→USDT relatado em BUG-79/111.
+   */
+  initialCurrency?: string | null;
+}) {
   const [currencies, setCurrencies] = useState<Currency[]>([]);
   // Catálogo PPP em memória. Baixado uma vez no mount; tabela pequena (<50
   // linhas) → custo trivial. Consumido por priceForCountry() pra ajustar
@@ -39,11 +50,15 @@ export function Providers({ children }: { children: React.ReactNode }) {
   // era BRL (acidente histórico do MVP brasileiro). Visitante novo cai em
   // USDT até `/api/geo` decidir outra (BR→BRL, EU→EUR, etc.) ou o seletor
   // sobrescrever.
-  const [code, setCode] = useState<string>("USDT");
+  //
+  // Quando `initialCurrency` chega do SSR (cookie lido no layout) usamos
+  // ele como estado inicial — sem isso o primeiro render é USDT e só
+  // depois do useEffect a moeda salva aparece, gerando o flash relatado.
+  const [code, setCode] = useState<string>(initialCurrency ?? "USDT");
   const [user, setUser] = useState<User | null>(null);
   // Marca que o usuário escolheu a moeda manualmente (ou já tinha cookie). Se
   // verdadeiro, ignoramos qualquer resposta de `/api/geo` que chegar atrasada.
-  const [userSet, setUserSet] = useState<boolean>(false);
+  const [userSet, setUserSet] = useState<boolean>(Boolean(initialCurrency));
 
   useEffect(() => {
     setUser(getUser());
@@ -51,9 +66,15 @@ export function Providers({ children }: { children: React.ReactNode }) {
     // UTM/fbclid/etc. da URL atual + landing_url + referrer + viewport
     // ficam em sessionStorage pra serem anexados em checkout/recovery.
     initTracking();
-    const saved = localStorage.getItem(CURRENCY_KEY);
-    if (saved) {
+    // Cookie (cross-subdomain) é a verdade; LS fica como fallback legacy.
+    // Se o SSR já passou `initialCurrency`, isso só revalida — `saved`
+    // deveria bater. Se não passou (SSR sem cookie + LS legado existe),
+    // hidrata aqui.
+    const saved = getStoredCurrency();
+    if (saved && saved !== code) {
       setCode(saved);
+      setUserSet(true);
+    } else if (saved) {
       setUserSet(true);
     }
 
@@ -70,11 +91,24 @@ export function Providers({ children }: { children: React.ReactNode }) {
           const wanted = j?.data?.currency as string | undefined;
           if (wanted && !userSet) {
             // Não persistimos — é apenas o default da sessão. Se o usuário
-            // mexer no seletor é que salvamos em localStorage.
+            // mexer no seletor é que salvamos em cookie+LS.
             setCode(wanted);
           }
         })
         .catch(() => undefined);
+    }
+
+    // Subdomain crossover: outra aba/host pode ter mudado a moeda.
+    // Reagimos ao evento global pra refletir sem reload.
+    function onCurrencyChanged(e: Event) {
+      const ce = e as CustomEvent<string>;
+      if (typeof ce.detail === "string" && ce.detail !== code) {
+        setCode(ce.detail);
+        setUserSet(true);
+      }
+    }
+    if (typeof window !== "undefined") {
+      window.addEventListener(CURRENCY_CHANGED_EVENT, onCurrencyChanged);
     }
 
     // PPP catalog — best-effort. Falha de rede mantém mapa vazio (=preço cheio).
@@ -106,6 +140,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
     return () => {
       cancelled = true;
+      if (typeof window !== "undefined") {
+        window.removeEventListener(CURRENCY_CHANGED_EVENT, onCurrencyChanged);
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -113,7 +150,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
   function setCurrencyCode(c: string) {
     setCode(c);
     setUserSet(true);
-    localStorage.setItem(CURRENCY_KEY, c);
+    // Persistência canônica: cookie cross-subdomain + LS legacy + evento.
+    // Sem o cookie, a moeda não sobrevive a uma navegação SSR (caía em
+    // USDT no próximo render — BUG-79/111).
+    storeCurrency(c);
   }
 
   function login(s: Session) {

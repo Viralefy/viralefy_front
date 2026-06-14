@@ -112,12 +112,24 @@ const COOKIES: CookieRow[] = [
     type: "cookie",
   },
   {
-    name: "viralefy_currency",
+    name: "vf_currency",
     provider: "Viralefy",
     party: "1st",
     purpose: {
-      en: "Remembers the currency you selected (USD, BRL, EUR…) so prices render the same on every visit.",
-      pt: "Lembra a moeda escolhida (USD, BRL, EUR…) para que os preços apareçam iguais a cada visita.",
+      en: "Remembers the currency you selected (USD, BRL, EUR…) so prices render the same on every visit, across www/auth/admin subdomains.",
+      pt: "Lembra a moeda escolhida (USD, BRL, EUR…) para que os preços apareçam iguais a cada visita, em www/auth/admin.",
+    },
+    category: "preferences",
+    duration: { en: "1 year", pt: "1 ano" },
+    type: "cookie",
+  },
+  {
+    name: "vf_theme",
+    provider: "Viralefy",
+    party: "1st",
+    purpose: {
+      en: "Remembers your dark/light/system theme choice across pages and subdomains. Read server-side to avoid a flash of the wrong theme on first paint.",
+      pt: "Lembra sua escolha de tema (escuro/claro/sistema) entre páginas e subdomínios. Lido no servidor para evitar flash do tema errado na primeira pintura.",
     },
     category: "preferences",
     duration: { en: "1 year", pt: "1 ano" },

@@ -254,6 +254,29 @@ a:hover {
   box-shadow: 0 0 0 3px rgba(0, 254, 214, 0.15);
 }
 
+/* BUG-29 do QA 2026-06-14: campos com erro de validação ganham borda vermelha
+   + halo. Garante feedback visual associado ao alerta (a11y) — sem isso o
+   usuário só via mensagem genérica no topo do form sem saber qual campo
+   conferir. Combina com aria-invalid + aria-describedby no input. */
+.input.input-invalid,
+.input[aria-invalid="true"] {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px rgba(255, 85, 112, 0.18);
+}
+
+.input.input-invalid:focus,
+.input[aria-invalid="true"]:focus {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px rgba(255, 85, 112, 0.28);
+}
+
+.field-error {
+  color: var(--danger);
+  font-size: 0.78rem;
+  margin: 0.3rem 0 0;
+  line-height: 1.3;
+}
+
 .input::placeholder {
   color: var(--muted);
 }
@@ -412,7 +435,14 @@ tbody tr:hover {
   align-items: center;
   gap: 0.65rem;
   padding: 0.75rem 0;
-  flex-wrap: wrap;
+  /* flex-wrap: nowrap — antes era `wrap`, mas isso fazia o .site-header__nav
+     (Theme + Currency + 3 botões auth) quebrar pra uma SEGUNDA LINHA em telas
+     intermediárias (~900-1100px) após o mount (Currency catalog hidrata e
+     o nav cresce). Visualmente parecia "navbar duplicada" durante o
+     carregamento (BUG-13). Com nowrap o conteúdo fica numa linha única;
+     min-width:0 permite o flex shrink correto. */
+  flex-wrap: nowrap;
+  min-width: 0;
 }
 
 .site-header__logo img {
@@ -432,7 +462,11 @@ tbody tr:hover {
   align-items: center;
   gap: 0.5rem;
   margin-left: auto;
-  flex-wrap: wrap;
+  /* nowrap — ver comentário em .site-header__row. Em mobile (<760px) o nav
+     inteiro fica em display:none via .site-header__hide-mobile, então não
+     há risco de overflow horizontal aqui. */
+  flex-wrap: nowrap;
+  flex-shrink: 0;
 }
 
 .site-header__hamburger {

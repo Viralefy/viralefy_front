@@ -158,6 +158,17 @@ export type Pack = {
       confirmAndPay: string;
       back: string;
     };
+    // BUG-29 do QA 2026-06-14: mensagens de erro por campo. Antes o form só
+    // mostrava um alerta genérico no topo; agora cada campo invalido aparece
+    // destacado em vermelho com a mensagem específica abaixo.
+    fieldError?: {
+      required: string;
+      nameInvalid: string;
+      emailInvalid: string;
+      handleInvalid: string;
+      publicationUrlInvalid: string;
+      formSummary: string;
+    };
   };
   notFound: {
     title: string;            // big hero
@@ -308,6 +319,14 @@ const en: Pack = {
       confirmAndPay: "Confirm and pay",
       back: "← Back",
     },
+    fieldError: {
+      required: "This field is required.",
+      nameInvalid: "Enter your full name.",
+      emailInvalid: "Enter a valid email address.",
+      handleInvalid: "Use letters, numbers, dot or underscore (1–30 chars). No spaces.",
+      publicationUrlInvalid: "Paste a valid post or video URL.",
+      formSummary: "Please fix the highlighted fields and try again.",
+    },
   },
   notFound: {
     title: "This page doesn't exist — but your next follower does.",
@@ -455,6 +474,14 @@ const pt: Pack = {
       totalLabel: "Total",
       confirmAndPay: "Confirmar e pagar",
       back: "← Voltar",
+    },
+    fieldError: {
+      required: "Campo obrigatório.",
+      nameInvalid: "Informe seu nome completo.",
+      emailInvalid: "Informe um e-mail válido.",
+      handleInvalid: "Use letras, números, ponto ou underline (1–30 caracteres). Sem espaços.",
+      publicationUrlInvalid: "Cole a URL válida do post ou vídeo.",
+      formSummary: "Corrija os campos destacados e tente novamente.",
     },
   },
   notFound: {
@@ -686,6 +713,14 @@ const es: Pack = {
       totalLabel: "Total",
       confirmAndPay: "Confirmar y pagar",
       back: "← Volver",
+    },
+    fieldError: {
+      required: "Este campo es obligatorio.",
+      nameInvalid: "Ingresa tu nombre completo.",
+      emailInvalid: "Ingresa un email válido.",
+      handleInvalid: "Usa letras, números, punto o guion bajo (1–30 caracteres). Sin espacios.",
+      publicationUrlInvalid: "Pega una URL válida del post o video.",
+      formSummary: "Corrige los campos resaltados e inténtalo de nuevo.",
     },
   },
 };

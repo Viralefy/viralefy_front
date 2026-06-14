@@ -178,10 +178,19 @@ export const CATEGORY_LABEL: Record<CategoryCode, Partial<Record<LangCode, strin
     sv: "Premiumtjänster", da: "Premium-tjenester", no: "Premium-tjenester",
     fi: "Premium-palvelut", is: "Premium þjónusta",
     et: "Premium teenused", lv: "Premium pakalpojumi", lt: "Premium paslaugos",
-    cs: "Prémiové služby", sk: "Prémiové služby", hu: "Prémium szolgáltatações",
+    // BUG fix typo HU: "szolgáltatações" → "szolgáltatások".
+    cs: "Prémiové služby", sk: "Prémiové služby", hu: "Prémium szolgáltatások",
     ro: "Servicii premium", bg: "Премиум услуги", el: "Premium υπηρεσίες",
     hr: "Premium usluge", sl: "Premium storitve", ca: "Serveis premium",
     ru: "Премиум услуги",
+    // BUG-204 do QA 2026-06-14: /jp e /kr exibiam "Premium services" em
+    // inglês na nav de categorias. Cobrimos os 9 idiomas que já têm label
+    // localizado nas demais categorias.
+    ja: "プレミアムサービス", ko: "프리미엄 서비스",
+    ar: "خدمات بريميوم", hi: "प्रीमियम सेवाएं",
+    id: "Layanan premium", vi: "Dịch vụ cao cấp",
+    th: "บริการพรีเมียม", tr: "Premium hizmetler",
+    uk: "Преміум послуги",
   },
   recuperacao_perfil: {
     en: "Account recovery", pt: "Recuperação de perfil",
@@ -584,9 +593,9 @@ const COPY_VIEWS_PT: LongCopy = {
   metaDescription: (c) =>
     `Impulsione qualquer vídeo com visualizações reais em ${c}. Reels, TikTok e Stories. Início em 1 hora.`,
   paragraphs: (c) => [
-    `Visualização é a métrica de manchete de qualquer vídeo curto. Um reel parado em 320 views parece morto; o mesmo reel em 32.000 parece estar pegando fogo. Os espectadores em ${c} usam esse número como heurística pra decidir se assistem — e o algoritmo usa como sinal de ranqueamento pra decidir se empurra o vídeo mais longe. Comprar views é a forma mais barata de subir essa linha de base.`,
-    `A Viralefy entrega views que contam para o algoritmo: impressões de assistência completa, vindas de contas com atividade real, distribuídas para a curva imitar descoberta orgânica. Views de Story não aparecem para sua audiência; views de Reels aparecem no contador público. Os dois funcionam igual para o algoritmo.`,
-    `Os pacotes vão de 10 mil até 1 milhão+ por vídeo. O preço por pacote é mais baixo que uma campanha de ads no TikTok ou Instagram com o mesmo número de impressões — e as views vindas de anúncio somem do contador público quando a campanha acaba. As views da Viralefy ficam.`,
+    `Visualização é a métrica de manchete de qualquer vídeo curto. Um reel parado em 320 visualizações parece morto; o mesmo reel em 32.000 parece estar pegando fogo. Os espectadores em ${c} usam esse número como heurística pra decidir se assistem — e o algoritmo usa como sinal de ranqueamento pra decidir se empurra o vídeo mais longe. Comprar visualizações é a forma mais barata de subir essa linha de base.`,
+    `A Viralefy entrega visualizações que contam para o algoritmo: impressões de assistência completa, vindas de contas com atividade real, distribuídas para a curva imitar descoberta orgânica. Visualizações de Story não aparecem para sua audiência; visualizações de Reels aparecem no contador público. Os dois funcionam igual para o algoritmo.`,
+    `Os pacotes vão de 10 mil até 1 milhão+ por vídeo. O preço por pacote é mais baixo que uma campanha de ads no TikTok ou Instagram com o mesmo número de impressões — e as visualizações vindas de anúncio somem do contador público quando a campanha acaba. As visualizações da Viralefy ficam.`,
     `Pra criadores em ${c} que postam vários vídeos por semana, rodar um pequeno boost de views em cada upload novo é uma forma de baixo atrito de alimentar o algoritmo com o sinal inicial que ele precisa. A reposição de 30 dias vale aqui também.`,
     `Escolhe um pacote pronto abaixo ou define a quantidade exata com o slider.`,
   ],
@@ -1698,7 +1707,73 @@ export const COPY: Record<CategoryCode, Partial<Record<LangCode, LongCopy>>> = {
 // Aqui sobrescrevemos só essas 3 strings em EN/PT/ES — o resto do COPY
 // (parágrafos/bullets/faq) permanece compartilhado, já que descreve
 // princípios genéricos de view-count.
-type CopyOverride = Partial<Pick<LongCopy, "h1" | "metaTitle" | "metaDescription">>;
+type CopyOverride = Partial<Pick<LongCopy, "h1" | "metaTitle" | "metaDescription" | "faq">>;
+
+// BUG-179 do QA 2026-06-14: a FAQ #1 de /br/seguidores-instagram dizia
+// "É seguro comprar seguidores para o meu Instagram ou TikTok?" — mencionar
+// TikTok numa página exclusiva de Instagram polui o sinal semântico.
+// Override por-plataforma só na primeira pergunta da FAQ. Demais perguntas
+// (entrega, reposição, senha, pagamentos) seguem sendo plataforma-agnósticas
+// e ficam herdadas do COPY_SEGUIDORES_*.
+const SEGUIDORES_INSTAGRAM_OVERRIDES: Partial<Record<LangCode, CopyOverride>> = {
+  en: {
+    faq: () => [
+      { q: "Is buying followers safe for my Instagram account?", a: "Yes, when it's done at a sane pace. Viralefy distributes the order over hours or days so Instagram sees a natural growth curve. We never request your password — only your public handle." },
+      { q: "How long does delivery take?", a: "Small orders (up to 500) usually finish within 6 hours. Larger orders are split across 24–72 hours to keep the pace natural." },
+      { q: "Can I lose the followers later?", a: "Drops are possible on every platform. That's why Viralefy includes a 30-day refill guarantee — we top your count back up at no cost." },
+      { q: "Do you need my password?", a: "Never. We never ask for credentials. If anyone offering a growth service asks for your password, walk away." },
+      { q: "What payment methods are supported?", a: "Card, bank transfer, local rails (Pix in Brazil), and crypto (USDT and BTC). Invoices are emailed automatically." },
+    ],
+  },
+  pt: {
+    faq: () => [
+      { q: "É seguro comprar seguidores para o meu Instagram?", a: "Sim, quando feito em ritmo natural. A Viralefy distribui o pedido ao longo de horas ou dias para o Instagram ver uma curva orgânica. Nunca pedimos sua senha — só o seu @ público." },
+      { q: "Quanto tempo leva a entrega?", a: "Pedidos pequenos (até 500) costumam terminar em até 6 horas. Pedidos maiores são divididos entre 24 e 72 horas para manter o ritmo natural." },
+      { q: "Posso perder os seguidores depois?", a: "Quedas acontecem em qualquer plataforma. Por isso incluímos garantia de reposição por 30 dias — repomos sem custo." },
+      { q: "Precisam da minha senha?", a: "Nunca. Não pedimos credencial nenhuma. Se alguém pedir, fuja correndo." },
+      { q: "Quais pagamentos vocês aceitam?", a: "Cartão (Stripe), Pix (Abacate Pay) e cripto USDT/BTC (Heleket). O recibo chega automático no e-mail." },
+    ],
+  },
+  es: {
+    faq: () => [
+      { q: "¿Es seguro comprar seguidores para mi Instagram?", a: "Sí, si se hace a ritmo natural. Viralefy distribuye el pedido a lo largo de horas o días para que Instagram vea una curva orgánica. Nunca pedimos tu contraseña." },
+      { q: "¿Cuánto tarda la entrega?", a: "Pedidos pequeños (hasta 500) terminan en menos de 6 horas. Pedidos grandes se reparten en 24–72 horas." },
+      { q: "¿Puedo perder los seguidores después?", a: "Las bajas son posibles. Por eso incluimos garantía de reposición de 30 días — reponemos sin coste." },
+      { q: "¿Necesitan mi contraseña?", a: "Nunca. No pedimos credenciales. Si alguien te las pide, sospechá." },
+      { q: "¿Qué pagos aceptan?", a: "Tarjeta, transferencia y cripto (USDT y BTC)." },
+    ],
+  },
+};
+
+const SEGUIDORES_TIKTOK_OVERRIDES: Partial<Record<LangCode, CopyOverride>> = {
+  en: {
+    faq: () => [
+      { q: "Is buying followers safe for my TikTok account?", a: "Yes, when it's done at a sane pace. Viralefy distributes the order over hours or days so TikTok sees a natural growth curve. We never request your password — only your public handle." },
+      { q: "How long does delivery take?", a: "Small orders (up to 500) usually finish within 6 hours. Larger orders are split across 24–72 hours to keep the pace natural." },
+      { q: "Can I lose the followers later?", a: "Drops are possible on every platform. That's why Viralefy includes a 30-day refill guarantee — we top your count back up at no cost." },
+      { q: "Do you need my password?", a: "Never. We never ask for credentials. If anyone offering a growth service asks for your password, walk away." },
+      { q: "What payment methods are supported?", a: "Card, bank transfer, local rails (Pix in Brazil), and crypto (USDT and BTC). Invoices are emailed automatically." },
+    ],
+  },
+  pt: {
+    faq: () => [
+      { q: "É seguro comprar seguidores para o meu TikTok?", a: "Sim, quando feito em ritmo natural. A Viralefy distribui o pedido ao longo de horas ou dias para o TikTok ver uma curva orgânica. Nunca pedimos sua senha — só o seu @ público." },
+      { q: "Quanto tempo leva a entrega?", a: "Pedidos pequenos (até 500) costumam terminar em até 6 horas. Pedidos maiores são divididos entre 24 e 72 horas para manter o ritmo natural." },
+      { q: "Posso perder os seguidores depois?", a: "Quedas acontecem em qualquer plataforma. Por isso incluímos garantia de reposição por 30 dias — repomos sem custo." },
+      { q: "Precisam da minha senha?", a: "Nunca. Não pedimos credencial nenhuma. Se alguém pedir, fuja correndo." },
+      { q: "Quais pagamentos vocês aceitam?", a: "Cartão (Stripe), Pix (Abacate Pay) e cripto USDT/BTC (Heleket). O recibo chega automático no e-mail." },
+    ],
+  },
+  es: {
+    faq: () => [
+      { q: "¿Es seguro comprar seguidores para mi TikTok?", a: "Sí, si se hace a ritmo natural. Viralefy distribuye el pedido a lo largo de horas o días para que TikTok vea una curva orgánica. Nunca pedimos tu contraseña." },
+      { q: "¿Cuánto tarda la entrega?", a: "Pedidos pequeños (hasta 500) terminan en menos de 6 horas. Pedidos grandes se reparten en 24–72 horas." },
+      { q: "¿Puedo perder los seguidores después?", a: "Las bajas son posibles. Por eso incluimos garantía de reposición de 30 días — reponemos sin coste." },
+      { q: "¿Necesitan mi contraseña?", a: "Nunca. No pedimos credenciales. Si alguien te las pide, sospechá." },
+      { q: "¿Qué pagos aceptan?", a: "Tarjeta, transferencia y cripto (USDT y BTC)." },
+    ],
+  },
+};
 
 const VIEWS_TIKTOK_OVERRIDES: Partial<Record<LangCode, CopyOverride>> = {
   en: {
@@ -1731,6 +1806,14 @@ export function copyFor(category: CategoryCode, lang: LangCode): LongCopy {
   const base = COPY[category][lang] ?? COPY[category].en ?? COPY_SEGUIDORES_EN;
   if (category === "visualizacoes_tiktok") {
     const ov = VIEWS_TIKTOK_OVERRIDES[lang] ?? VIEWS_TIKTOK_OVERRIDES.en;
+    if (ov) return { ...base, ...ov };
+  }
+  if (category === "seguidores_instagram") {
+    const ov = SEGUIDORES_INSTAGRAM_OVERRIDES[lang] ?? SEGUIDORES_INSTAGRAM_OVERRIDES.en;
+    if (ov) return { ...base, ...ov };
+  }
+  if (category === "seguidores_tiktok") {
+    const ov = SEGUIDORES_TIKTOK_OVERRIDES[lang] ?? SEGUIDORES_TIKTOK_OVERRIDES.en;
     if (ov) return { ...base, ...ov };
   }
   return base;

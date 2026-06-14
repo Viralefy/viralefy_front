@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import type {
   CheckoutResult,
   Currency,
@@ -80,6 +80,17 @@ export function CheckoutModal({
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<CheckoutResult | null>(null);
 
+  // BUG-29 do QA 2026-06-14: erro por campo (handle/email/etc) precisa ser
+  // visualmente associado ao input — antes só existia o alerta genérico no
+  // topo do form e o usuário não sabia onde olhar. Mapa por nome do campo:
+  //   name, email, handle, publication_url
+  // O setter clearFieldError é chamado no onChange/onInput pra limpar o
+  // estado vermelho assim que o usuário começa a corrigir. Refs apontam pro
+  // input do campo pra focar o primeiro com erro depois do submit falhar
+  // (WCAG 3.3.1 — Error Identification).
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const fieldRefs = useRef<Record<string, HTMLInputElement | null>>({});
+
   const [profiles, setProfiles] = useState<Profile[] | null>(null);
   const [credit, setCredit] = useState<CreditAccount | null>(null);
   const [selectedProfileId, setSelectedProfileId] = useState<string>("");
@@ -157,20 +168,102 @@ export function CheckoutModal({
   const taxUsdCents = vatRate > 0 ? Math.round((netCents * vatRate) / 100) : 0;
   const enoughCredits = credit ? credit.balance_cents >= plan.price_cents : false;
 
+  // Limpa o erro de um campo específico (usado no onChange dos inputs pra
+  // remover o destaque vermelho assim que o usuário corrige). Mantém o
+  // resto do mapa intacto pra não esconder outros erros pendentes.
+  function clearFieldError(field: string) {
+    setFieldErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  }
+
+  // i18n com fallback inline — packs antigos não têm fieldError.
+  const fe = tc.fieldError ?? {
+    required: "This field is required.",
+    nameInvalid: "Enter your full name.",
+    emailInvalid: "Enter a valid email address.",
+    handleInvalid: "Use letters, numbers, dot or underscore (1–30 chars). No spaces.",
+    publicationUrlInvalid: "Paste a valid post or video URL.",
+    formSummary: "Please fix the highlighted fields and try again.",
+  };
+
+  // Validação manual antes de avançar — não dá pra confiar só no `required`
+  // / `pattern` do HTML porque queremos:
+  //   1. mensagem específica por campo (não a bolha nativa do browser)
+  //   2. destaque vermelho + aria-invalid persistente, não só ao tocar
+  //   3. controle de foco pro primeiro campo invalido (a11y)
+  const HANDLE_RE = /^@?[A-Za-z0-9._]{1,30}$/;
+  // Regex de e-mail propositalmente permissiva — bloqueia gritante (sem @,
+  // sem TLD, espaço) sem rejeitar endereços válidos exóticos.
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
   // Step 1 → Step 2 (review): valida campos básicos, captura snapshot.
   // BUG-69: NÃO avança direto pro method picker — mostra primeiro o resumo
-  // pra confirmação visual. Form HTML continua sendo o gate de validação
-  // client-side (pattern do handle, required, etc).
+  // pra confirmação visual.
+  // BUG-29 do QA 2026-06-14: substituímos o HTML5 nativo por validação
+  // controlada com mensagem por campo + foco no primeiro erro.
   function advanceToReview(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     const snap = {
-      name: String(fd.get("name") ?? user?.Name ?? ""),
-      email: String(fd.get("email") ?? user?.Email ?? ""),
-      handle: String(fd.get("handle") ?? ""),
-      display_name: String(fd.get("display_name") ?? ""),
-      publication_url: String(fd.get("publication_url") ?? ""),
+      name: String(fd.get("name") ?? user?.Name ?? "").trim(),
+      email: String(fd.get("email") ?? user?.Email ?? "").trim(),
+      handle: String(fd.get("handle") ?? "").trim(),
+      display_name: String(fd.get("display_name") ?? "").trim(),
+      publication_url: String(fd.get("publication_url") ?? "").trim(),
     };
+
+    const errs: Record<string, string> = {};
+
+    // name/email só são editáveis quando não tem user logado.
+    if (!user) {
+      if (!snap.name) errs.name = fe.required;
+      else if (snap.name.length < 2) errs.name = fe.nameInvalid;
+      if (!snap.email) errs.email = fe.required;
+      else if (!EMAIL_RE.test(snap.email)) errs.email = fe.emailInvalid;
+    }
+
+    if (isProfile) {
+      // Valida handle quando estamos criando um perfil novo (anônimo ou
+      // logado com "+ Adicionar outro perfil"). Quando usa perfil
+      // existente, o handle vem do select e não precisa validar.
+      const needsHandle = !user || useNewProfile || !selectedProfileId;
+      if (needsHandle) {
+        if (!snap.handle) errs.handle = fe.required;
+        else if (!HANDLE_RE.test(snap.handle)) errs.handle = fe.handleInvalid;
+      }
+    } else {
+      if (!snap.publication_url) errs.publication_url = fe.required;
+      else {
+        try {
+          // URL constructor aceita qualquer scheme — restringir a http(s).
+          const u = new URL(snap.publication_url);
+          if (u.protocol !== "http:" && u.protocol !== "https:") {
+            errs.publication_url = fe.publicationUrlInvalid;
+          }
+        } catch {
+          errs.publication_url = fe.publicationUrlInvalid;
+        }
+      }
+    }
+
+    if (Object.keys(errs).length > 0) {
+      setFieldErrors(errs);
+      setError(fe.formSummary);
+      // Foca o primeiro campo com erro na ordem do form.
+      const order = ["name", "email", "handle", "publication_url"];
+      const first = order.find((k) => errs[k]);
+      if (first) {
+        // Próximo tick pra garantir que o React já aplicou aria-invalid.
+        setTimeout(() => fieldRefs.current[first]?.focus(), 0);
+      }
+      return;
+    }
+
+    setFieldErrors({});
     setFormSnapshot(snap);
     setError(null);
     setStep("review");
@@ -327,18 +420,45 @@ export function CheckoutModal({
         {step === "form" && (
           <>
             <TrustSignals lang={lang} variant="compact" />
-            <form onSubmit={advanceToReview} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-              {error && <div className="alert alert-error">{error}</div>}
+            <form
+              onSubmit={advanceToReview}
+              noValidate
+              style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+            >
+              {error && <div className="alert alert-error" role="alert">{error}</div>}
 
               {!user && (
                 <>
                   <div>
                     <label className="label" htmlFor="name">{tc.fullName}</label>
-                    <input className="input" id="name" name="name" required />
+                    <input
+                      className="input"
+                      id="name"
+                      name="name"
+                      ref={(el) => { fieldRefs.current.name = el; }}
+                      aria-invalid={!!fieldErrors.name}
+                      aria-describedby={fieldErrors.name ? "name-error" : undefined}
+                      onChange={() => clearFieldError("name")}
+                    />
+                    {fieldErrors.name && (
+                      <p id="name-error" className="field-error" role="alert">{fieldErrors.name}</p>
+                    )}
                   </div>
                   <div>
                     <label className="label" htmlFor="email">{tc.email}</label>
-                    <input className="input" id="email" name="email" type="email" required />
+                    <input
+                      className="input"
+                      id="email"
+                      name="email"
+                      type="email"
+                      ref={(el) => { fieldRefs.current.email = el; }}
+                      aria-invalid={!!fieldErrors.email}
+                      aria-describedby={fieldErrors.email ? "email-error" : undefined}
+                      onChange={() => clearFieldError("email")}
+                    />
+                    {fieldErrors.email && (
+                      <p id="email-error" className="field-error" role="alert">{fieldErrors.email}</p>
+                    )}
                   </div>
                   <p style={{ color: "var(--muted)", fontSize: "0.8rem", margin: 0 }}>
                     We&apos;ll create your account and send the password by email.
@@ -357,9 +477,19 @@ export function CheckoutModal({
                   setSelectedProfileId={setSelectedProfileId}
                   useNewProfile={useNewProfile}
                   setUseNewProfile={setUseNewProfile}
+                  fieldError={fieldErrors.handle}
+                  clearFieldError={() => clearFieldError("handle")}
+                  handleRef={(el) => { fieldRefs.current.handle = el; }}
                 />
               ) : (
-                <PublicationSection platform={plan.platform} platformLabel={platformLabel} platformIcon={platformIcon} />
+                <PublicationSection
+                  platform={plan.platform}
+                  platformLabel={platformLabel}
+                  platformIcon={platformIcon}
+                  fieldError={fieldErrors.publication_url}
+                  clearFieldError={() => clearFieldError("publication_url")}
+                  inputRef={(el) => { fieldRefs.current.publication_url = el; }}
+                />
               )}
 
               {hasCustomFields(plan.category as CategoryCode) && (
@@ -929,6 +1059,7 @@ function CouponInput({
 function ProfileSection({
   user, profiles, platformLabel, platformIcon,
   selectedProfileId, setSelectedProfileId, useNewProfile, setUseNewProfile,
+  fieldError, clearFieldError, handleRef,
 }: {
   user: boolean;
   profiles: Profile[] | null;
@@ -939,12 +1070,12 @@ function ProfileSection({
   setSelectedProfileId: (s: string) => void;
   useNewProfile: boolean;
   setUseNewProfile: (b: boolean) => void;
+  // BUG-29: erro/ref por campo vêm de cima pra integrar com a validação
+  // controlada do form (substituindo o pattern/required do HTML5).
+  fieldError?: string;
+  clearFieldError: () => void;
+  handleRef: (el: HTMLInputElement | null) => void;
 }) {
-  // BUG-16 do QA 2026-06-12: handle Instagram aceitava "usuario invalido!"
-  // até passar pra step de pagamento. Validamos client-side: letras, números,
-  // underscore e ponto, 1-30 chars. TikTok permite a mesma faixa. Permite
-  // @ opcional no início pra UX.
-  const HANDLE_PATTERN = "^@?[A-Za-z0-9._]{1,30}$";
   if (!user) {
     return (
       <div>
@@ -954,13 +1085,17 @@ function ProfileSection({
           id="handle"
           name="handle"
           placeholder="yourhandle"
-          pattern={HANDLE_PATTERN}
-          title="Letters, numbers, dot and underscore. No spaces or special chars."
           autoCapitalize="off"
           autoCorrect="off"
           spellCheck={false}
-          required
+          ref={handleRef}
+          aria-invalid={!!fieldError}
+          aria-describedby={fieldError ? "handle-error" : undefined}
+          onChange={clearFieldError}
         />
+        {fieldError && (
+          <p id="handle-error" className="field-error" role="alert">{fieldError}</p>
+        )}
       </div>
     );
   }
@@ -985,17 +1120,22 @@ function ProfileSection({
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
             <input
               className="input"
+              id="handle"
               name="handle"
               placeholder="@ handle"
-              pattern={HANDLE_PATTERN}
-              title="Letters, numbers, dot and underscore. No spaces or special chars."
               autoCapitalize="off"
               autoCorrect="off"
               spellCheck={false}
-              required
+              ref={handleRef}
+              aria-invalid={!!fieldError}
+              aria-describedby={fieldError ? "handle-error" : undefined}
+              onChange={clearFieldError}
             />
             <input className="input" name="display_name" placeholder="Nickname (optional)" />
           </div>
+          {fieldError && (
+            <p id="handle-error" className="field-error" role="alert">{fieldError}</p>
+          )}
           {profiles && profiles.length > 0 && (
             <button type="button" className="btn btn-ghost" style={{ marginTop: "0.5rem", fontSize: "0.85rem", padding: "0.25rem 0" }} onClick={() => setUseNewProfile(false)}>
               ← Use existing profile
@@ -1007,7 +1147,16 @@ function ProfileSection({
   );
 }
 
-function PublicationSection({ platform, platformLabel, platformIcon }: { platform: Platform; platformLabel: string; platformIcon: ReactNode }) {
+function PublicationSection({
+  platform, platformLabel, platformIcon, fieldError, clearFieldError, inputRef,
+}: {
+  platform: Platform;
+  platformLabel: string;
+  platformIcon: ReactNode;
+  fieldError?: string;
+  clearFieldError: () => void;
+  inputRef: (el: HTMLInputElement | null) => void;
+}) {
   const placeholder =
     platform === "tiktok"
       ? "https://www.tiktok.com/@user/video/123…"
@@ -1015,10 +1164,23 @@ function PublicationSection({ platform, platformLabel, platformIcon }: { platfor
   return (
     <div>
       <label className="label" htmlFor="publication_url">{platformIcon} Post URL ({platformLabel})</label>
-      <input className="input" id="publication_url" name="publication_url" placeholder={placeholder} required />
-      <p style={{ color: "var(--muted)", fontSize: "0.78rem", marginTop: "0.3rem" }}>
-        Paste the link to the post/video where the service will be applied.
-      </p>
+      <input
+        className="input"
+        id="publication_url"
+        name="publication_url"
+        placeholder={placeholder}
+        ref={inputRef}
+        aria-invalid={!!fieldError}
+        aria-describedby={fieldError ? "publication_url-error" : "publication_url-help"}
+        onChange={clearFieldError}
+      />
+      {fieldError ? (
+        <p id="publication_url-error" className="field-error" role="alert">{fieldError}</p>
+      ) : (
+        <p id="publication_url-help" style={{ color: "var(--muted)", fontSize: "0.78rem", marginTop: "0.3rem" }}>
+          Paste the link to the post/video where the service will be applied.
+        </p>
+      )}
     </div>
   );
 }

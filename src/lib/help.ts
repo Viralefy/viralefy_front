@@ -33,7 +33,7 @@ export const HELP_TOPICS: HelpTopic[] = [
     sections: [
       {
         heading: "Pick a storefront and plan",
-        body: "Each country page lists the engagement plans available in that market, with prices already adjusted for the local currency and the categories most relevant to creators in that region. You can also browse from the home page or from the global catalogue. Open any plan card to see what it includes: type of engagement (followers, likes, views, comments), the volume range, the refill window, and the estimated delivery time. Plans never promise a specific ranking outcome on Instagram or TikTok — they describe a publicly visible engagement boost, and the cards make that scope clear so you know exactly what you are buying before you reach checkout.",
+        body: "Each country page lists the engagement plans available in that market, with prices already adjusted for the local currency and the categories most relevant to creators in that region. You can also browse from the home page or from the global catalog. Open any plan card to see what it includes: type of engagement (followers, likes, views, comments), the volume range, the refill window, and the estimated delivery time. Plans never promise a specific ranking outcome on Instagram or TikTok — they describe a publicly visible engagement boost, and the cards make that scope clear so you know exactly what you are buying before you reach checkout.",
       },
       {
         heading: "Set quantity and target",
@@ -113,20 +113,22 @@ export const HELP_TOPICS: HelpTopic[] = [
       "Viralefy accepts a small, curated set of payment methods. The canonical settlement currency is USDT, pegged 1:1 with USD; everything else is converted at checkout. Local methods are available where they make practical sense — PIX in Brazil, cards in most countries — but the storefront defaults to USD or USDT pricing so the numbers are comparable across markets. There is no signup or KYC for normal orders; checkout is one-shot and tied to the email you provide.",
     sections: [
       {
-        heading: "Cards",
-        body: "Visa, Mastercard and the main local card networks are accepted in markets where the processor supports them. The charge appears on your statement as Viralefy or as the processor descriptor for that region. Card payments confirm instantly in most cases. We do not store the card data ourselves; the processor handles tokenisation and 3-D Secure. Refunds to cards go through the original processor and take the usual 5 to 10 business days to appear, depending on the issuer.",
+        heading: "Cards (Stripe)",
+        // BUG-170 do QA: artigo não nomeava Stripe; usuário ficava sem
+        // como amarrar o descritor do cartão ao processador real.
+        body: "Card payments are processed by Stripe — Visa, Mastercard and the main local card networks are accepted in markets where Stripe supports them. The charge appears on your statement as Viralefy or as the Stripe processor descriptor for that region. Card payments confirm instantly in most cases. We do not store the card data ourselves; Stripe handles tokenization and 3-D Secure. Refunds to cards go through Stripe and take the usual 5 to 10 business days to appear, depending on the issuer.",
       },
       {
-        heading: "PIX (Brazil)",
-        body: "Brazilian customers can pay with PIX, the instant transfer rail run by the Central Bank of Brazil. The checkout shows a QR code and a copy-paste key; payment usually confirms in seconds. PIX amounts are quoted in BRL but the underlying order is still recorded in USDT, so the conversion rate is locked at the moment you open the QR. We do not pre-charge or hold funds — the QR expires after a few minutes if unused.",
+        heading: "PIX (Brazil) — Abacate Pay",
+        body: "Brazilian customers can pay with PIX, the instant transfer rail run by the Central Bank of Brazil. The PIX gateway we use is Abacate Pay — that is the name you will see in your bank statement. The checkout shows a QR code and a copy-paste key; payment usually confirms in seconds. PIX amounts are quoted in BRL but the underlying order is still recorded in USDT, so the conversion rate is locked at the moment you open the QR. We do not pre-charge or hold funds — the QR expires after a few minutes if unused.",
       },
       {
-        heading: "Crypto: USDT, BTC, ETH",
-        body: "Crypto payments are first-class. USDT on TRC-20 is the most common because the fee is tiny and confirmations are fast. BTC on the main chain and ETH on Ethereum mainnet are also supported. The checkout shows a fresh address per order; sending the exact amount to that address confirms the order once the network reaches the required confirmation count. Sending less than the invoice will leave the order unpaid until the difference lands.",
+        heading: "Crypto: USDT, BTC, ETH — Heleket",
+        body: "Crypto payments are processed by Heleket and are first-class on Viralefy. USDT on TRC-20 is the most common because the fee is tiny and confirmations are fast. BTC on the main chain and ETH on Ethereum mainnet are also supported. The checkout shows a fresh address per order; sending the exact amount to that address confirms the order once the network reaches the required confirmation count. Sending less than the invoice will leave the order unpaid until the difference lands.",
       },
       {
         heading: "Display currency vs. billing currency",
-        body: "The site can display prices in many currencies as a hint, but the actual billing happens in USD or USDT for non-PIX flows. The currency hint changes the number you see on the card; it does not change which currency is charged. This separation keeps the catalogue consistent across countries and avoids float drift when the storefront is opened in two tabs with different display currencies.",
+        body: "The site can display prices in many currencies as a hint, but the actual billing happens in USD or USDT for non-PIX flows. The currency hint changes the number you see on the card; it does not change which currency is charged. This separation keeps the catalog consistent across countries and avoids float drift when the storefront is opened in two tabs with different display currencies.",
       },
     ],
     relatedSlugs: ["paying-with-crypto", "paying-with-pix-brl", "refund-policy-explained"],
@@ -145,7 +147,7 @@ export const HELP_TOPICS: HelpTopic[] = [
       },
       {
         heading: "Confirmations and timing",
-        body: "Each network needs a number of block confirmations before we mark the payment as final. USDT on TRC-20 typically confirms in under a minute. BTC needs three confirmations on mainnet, which can take 20 to 40 minutes depending on fee market conditions. ETH usually finalises within a few minutes. The order page polls the chain and updates the status the moment the threshold is reached; there is no manual step on your side.",
+        body: "Each network needs a number of block confirmations before we mark the payment as final. USDT on TRC-20 typically confirms in under a minute. BTC needs three confirmations on mainnet, which can take 20 to 40 minutes depending on fee market conditions. ETH usually finalizes within a few minutes. The order page polls the chain and updates the status the moment the threshold is reached; there is no manual step on your side.",
       },
       {
         heading: "Underpayments and overpayments",
@@ -203,7 +205,10 @@ export const HELP_TOPICS: HelpTopic[] = [
       },
       {
         heading: "What we do store",
-        body: "We store the email you used at checkout, the orders you placed, the public target you provided, and the payment trail required for tax and refund handling. We do not store passwords for your social accounts because we never ask for them. The magic-link system on the login page is the only authentication we use for your customer dashboard; it sends a one-time link to the email on file and that link expires after use.",
+        // BUG-190 do QA: artigo descrevia "magic-link" como mecanismo de
+        // login do dashboard, mas o site usa cadastro com senha + dashboard
+        // em viralefy.com/account. Texto corrigido pra refletir o real.
+        body: "We store the email you used at checkout, the orders you placed, the public target you provided, and the payment trail required for tax and refund handling. We do not store passwords for your social accounts because we never ask for them. For the customer dashboard at viralefy.com/account we use a standard email + password sign-in; password resets are handled via a support ticket from the help center.",
       },
       {
         heading: "Phishing patterns to watch for",
@@ -315,7 +320,7 @@ export const HELP_TOPICS: HelpTopic[] = [
       },
       {
         heading: "When in doubt, start small",
-        body: "Buying a small plan first is the cheapest way to validate how the delivery and refill work for your specific account, before committing to a larger order. The marketplace is designed so a small first order is a low-friction action: no signup, one-shot checkout, magic-link follow-up. Use that to feel the system out, then scale the second order to the size that actually matches the goal.",
+        body: "Buying a small plan first is the cheapest way to validate how the delivery and refill work for your specific account, before committing to a larger order. The marketplace is designed so a small first order is a low-friction action: one-shot checkout, order confirmation by e-mail, and the dashboard at viralefy.com/account to track delivery. Use that to feel the system out, then scale the second order to the size that actually matches the goal.",
       },
     ],
     relatedSlugs: ["how-to-buy", "instagram-followers-buying-guide", "tiktok-followers-buying-guide"],
