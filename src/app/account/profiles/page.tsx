@@ -143,7 +143,7 @@ export default function ProfilesPage() {
                         <span style={{ color: "var(--muted)", fontSize: "0.85rem" }}> — {p.display_name}</span>
                       )}
                       {p.verified && (
-                        <span style={{ marginLeft: "0.5rem", fontSize: "0.75rem", color: "var(--success)", display: "inline-flex", alignItems: "center", gap: "0.25rem" }}>
+                        <span style={{ marginInlineStart: "0.5rem", fontSize: "0.75rem", color: "var(--success)", display: "inline-flex", alignItems: "center", gap: "0.25rem" }}>
                           <Icon name="check" size={12} />
                           verified
                         </span>

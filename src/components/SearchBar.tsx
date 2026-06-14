@@ -220,13 +220,13 @@ export function SearchBar({ lang, currentCountry = "" }: { lang: LangCode; curre
         }}
         onFocus={() => setOpen(true)}
         onKeyDown={onKeyDown}
-        style={{ paddingLeft: "2.25rem", padding: "0.55rem 0.75rem 0.55rem 2.25rem", fontSize: "0.9rem" }}
+        style={{ paddingBlock: "0.55rem", paddingInlineStart: "2.25rem", paddingInlineEnd: "0.75rem", fontSize: "0.9rem" }}
       />
       <span
         aria-hidden="true"
         style={{
           position: "absolute",
-          left: "0.75rem",
+          insetInlineStart: "0.75rem",
           top: "50%",
           transform: "translateY(-50%)",
           pointerEvents: "none",
@@ -243,8 +243,8 @@ export function SearchBar({ lang, currentCountry = "" }: { lang: LangCode; curre
           style={{
             position: "absolute",
             top: "calc(100% + 0.4rem)",
-            left: 0,
-            right: 0,
+            insetInlineStart: 0,
+            insetInlineEnd: 0,
             background: "var(--surface)",
             border: "1px solid var(--border)",
             borderRadius: "0.6rem",
@@ -278,7 +278,7 @@ export function SearchBar({ lang, currentCountry = "" }: { lang: LangCode; curre
                   borderBottom: "1px solid var(--border)",
                   cursor: "pointer",
                   color: "var(--text)",
-                  textAlign: "left",
+                  textAlign: "start",
                 }}
               >
                 <Flag code={h.flagCode} width={20} title={h.market} />

@@ -150,7 +150,7 @@ function EnrollWizard({ data, onDone }: { data: TwoFAEnroll; onDone: () => void 
   return (
     <div style={{ marginTop: "1rem" }}>
       {err && <div className="alert alert-error" style={{ marginBottom: "1rem" }}>{err}</div>}
-      <ol style={{ paddingLeft: "1.1rem", color: "var(--muted)", fontSize: "0.85rem", marginBottom: "1rem" }}>
+      <ol style={{ paddingInlineStart: "1.1rem", color: "var(--muted)", fontSize: "0.85rem", marginBottom: "1rem" }}>
         <li>Install Google Authenticator, Authy, 1Password, or Bitwarden.</li>
         <li>Scan the QR code (or paste the secret manually).</li>
         <li>Save your backup codes — they are shown only here.</li>

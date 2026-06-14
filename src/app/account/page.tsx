@@ -121,9 +121,9 @@ export default function AccountPage() {
                         textDecoration: "underline",
                       }}
                     >
-                      <Icon name="chat" size={14} style={{ marginRight: "0.35rem" }} />
+                      <Icon name="chat" size={14} style={{ marginInlineEnd: "0.35rem" }} />
                       Open support ticket
-                      <Icon name="arrowRight" size={14} style={{ marginLeft: "0.35rem" }} />
+                      <Icon name="arrowRight" size={14} style={{ marginInlineStart: "0.35rem" }} />
                     </Link>
                   )}
                   {isHighTouch && !hasTicket && o.status === "pending" && (
@@ -132,7 +132,7 @@ export default function AccountPage() {
                     </div>
                   )}
                 </div>
-                <div style={{ textAlign: "right" }}>
+                <div style={{ textAlign: "end" }}>
                   <div>
                     {o.display_amount} {o.display_currency}
                     {o.settlement_currency !== o.display_currency && (

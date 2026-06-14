@@ -302,7 +302,7 @@ export default async function PlanPage({ params }: { params: Promise<Params> }) 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem", marginBottom: "2rem" }}>
             <div className="card">
               <h2 style={{ fontSize: "1.1rem", marginBottom: "0.5rem" }}>{t.plan.detailsTitle}</h2>
-              <ul style={{ paddingLeft: "1.25rem", color: "var(--muted)" }}>
+              <ul style={{ paddingInlineStart: "1.25rem", color: "var(--muted)" }}>
                 {copy.bullets().slice(0, 4).map((b, i) => (
                   <li key={i} style={{ margin: "0.4rem 0" }}>
                     <strong style={{ color: "var(--text)" }}>{b.title}.</strong> {b.body}
@@ -397,7 +397,7 @@ function ReviewsSection({ reviews, aggregate }: { reviews: PublicReview[]; aggre
       <h2 style={{ marginBottom: "1rem", fontSize: "1.2rem" }}>
         Customer reviews
         {aggregate && (
-          <span style={{ fontWeight: 400, fontSize: "0.9rem", color: "var(--muted)", marginLeft: "0.5rem" }}>
+          <span style={{ fontWeight: 400, fontSize: "0.9rem", color: "var(--muted)", marginInlineStart: "0.5rem" }}>
             · <strong>{aggregate.rating_value.toFixed(1)}</strong>/5 ({aggregate.review_count})
           </span>
         )}

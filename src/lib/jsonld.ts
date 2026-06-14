@@ -130,6 +130,88 @@ export function toJsonLdGraph(nodes: ReadonlyArray<object | null | undefined>): 
   return { "@context": "https://schema.org", "@graph": clean };
 }
 
+// BUG-191 / Track Y (QA 2026-06-14): index pages /cities, /vs, /help,
+// /case-studies emitiam apenas CollectionPage + BreadcrumbList + ItemList no
+// `@graph`, sem Organization nem WebSite. Validators (Rich Results, Schema.org
+// Validator, Ahrefs) só conseguem linkar `isPartOf` ao `#website` quando o nó
+// está presente no mesmo documento. Sem isso, o gráfico de entidades fica
+// "órfão" e Ahrefs reporta "Organization missing" naquela URL.
+//
+// Convenção do projeto: home e country pages já emitem Org+WebSite inline via
+// buildHomeJsonLd/buildCountryJsonLd. Pra pages globais (sem país no path)
+// usamos `buildOrganizationNode`/`buildWebSiteNode` com `@id` canônico
+// (`${siteUrl}/#organization`, `${siteUrl}/#website`) — mesmos IDs usados
+// pelas pages por país, então validators tratam como uma entidade só.
+//
+// `withGlobalGraph(nodes, opts)` prepende Organization + WebSite ao @graph
+// da page. `opts.inLanguage` cobre o caso onde a page tem idioma fixo
+// (todas as 4 index pages atuais são en-only).
+export function buildOrganizationNode(siteUrl: string): object {
+  const logoUrl = `${siteUrl}/logo.png`;
+  return {
+    "@type": "Organization",
+    "@id": `${siteUrl}/#organization`,
+    name: "Viralefy",
+    url: siteUrl,
+    logo: { "@type": "ImageObject", url: logoUrl, width: 2471, height: 704 },
+    // sameAs intencionalmente omitido até termos perfis sociais oficiais.
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "customer support",
+      availableLanguage: ["en", "pt", "es", "fr", "de", "it", "nl", "ru", "ja", "ar"],
+      url: `${siteUrl}/legal/contact?lang=en`,
+    },
+  };
+}
+
+export function buildWebSiteNode(
+  siteUrl: string,
+  opts: { inLanguage?: string | string[] } = {},
+): object {
+  const inLanguage = opts.inLanguage ?? [
+    "en",
+    "pt",
+    "es",
+    "fr",
+    "de",
+    "it",
+    "nl",
+    "ru",
+    "ja",
+    "ar",
+  ];
+  return {
+    "@type": "WebSite",
+    "@id": `${siteUrl}/#website`,
+    name: "Viralefy",
+    url: siteUrl,
+    publisher: { "@id": `${siteUrl}/#organization` },
+    inLanguage,
+    potentialAction: {
+      "@type": "SearchAction",
+      target: { "@type": "EntryPoint", urlTemplate: `${siteUrl}/{country_code}` },
+      "query-input": "required name=country_code",
+    },
+  };
+}
+
+// withGlobalGraph — prepende Org + WebSite aos nós da page e empacota num
+// único `@graph`. Use em qualquer page que emita JSON-LD próprio pra garantir
+// que o gráfico tenha as entidades globais (sem isso, `isPartOf: { @id: …/#website }`
+// vira ponteiro pendurado pro validador).
+//
+// `opts.inLanguage` é repassado ao WebSite. Não confunda com o inLanguage de
+// CollectionPage/WebPage — esse continua sendo definido pela própria page
+// (idioma da URL/conteúdo); o do WebSite descreve o site como um todo.
+export function withGlobalGraph(
+  pageNodes: ReadonlyArray<object | null | undefined>,
+  opts: { siteUrl: string; inLanguage?: string | string[] },
+): object {
+  const org = buildOrganizationNode(opts.siteUrl);
+  const website = buildWebSiteNode(opts.siteUrl, { inLanguage: opts.inLanguage });
+  return toJsonLdGraph([org, website, ...pageNodes]);
+}
+
 // BUG-192 (QA 2026-06-14): AggregateOffer.lowPrice tem que ser o MÍNIMO real
 // dos tiers, highPrice o máximo. Antes cada page replicava a fórmula manual
 // e algumas variantes (slug page) não filtravam preços não-numéricos

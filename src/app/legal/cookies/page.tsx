@@ -378,7 +378,7 @@ export default async function CookiesLegalPage({
           <div style={{ overflowX: "auto", border: "1px solid var(--border)", borderRadius: "0.5rem" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.85rem", minWidth: 720 }}>
               <thead>
-                <tr style={{ background: "rgba(20, 20, 31, 0.5)", textAlign: "left" }}>
+                <tr style={{ background: "rgba(20, 20, 31, 0.5)", textAlign: "start" }}>
                   <th scope="col" style={{ padding: "0.6rem 0.8rem" }}>{isPT ? "Nome" : "Name"}</th>
                   <th scope="col" style={{ padding: "0.6rem 0.8rem" }}>{isPT ? "Provedor" : "Provider"}</th>
                   <th scope="col" style={{ padding: "0.6rem 0.8rem" }}>{isPT ? "Origem" : "Party"}</th>

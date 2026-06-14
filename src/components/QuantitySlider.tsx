@@ -103,7 +103,7 @@ export function QuantitySlider({
             </p>
             <p style={{ fontSize: "1.1rem", fontWeight: 600, margin: 0 }}>{matched ? localizedPlanName(matched, lang) : "—"}</p>
           </div>
-          <div style={{ textAlign: "right" }}>
+          <div style={{ textAlign: "end" }}>
             <p style={{ fontSize: "0.75rem", color: "var(--muted)", textTransform: "uppercase", letterSpacing: ".5px", marginBottom: "0.25rem" }}>
               {t.category.total}
             </p>
@@ -131,16 +131,16 @@ export function QuantitySlider({
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ background: "var(--accent-dim)", borderBottom: "1px solid var(--border)" }}>
-              <th style={{ padding: "0.75rem 1rem", textAlign: "left", fontSize: "0.85rem", color: "var(--muted)" }}>
+              <th style={{ padding: "0.75rem 1rem", textAlign: "start", fontSize: "0.85rem", color: "var(--muted)" }}>
                 {t.category.table.plan}
               </th>
-              <th style={{ padding: "0.75rem 1rem", textAlign: "right", fontSize: "0.85rem", color: "var(--muted)" }}>
+              <th style={{ padding: "0.75rem 1rem", textAlign: "end", fontSize: "0.85rem", color: "var(--muted)" }}>
                 {t.category.table.qty}
               </th>
-              <th style={{ padding: "0.75rem 1rem", textAlign: "right", fontSize: "0.85rem", color: "var(--muted)" }}>
+              <th style={{ padding: "0.75rem 1rem", textAlign: "end", fontSize: "0.85rem", color: "var(--muted)" }}>
                 {t.category.table.price}
               </th>
-              <th style={{ padding: "0.75rem 1rem", textAlign: "right" }} />
+              <th style={{ padding: "0.75rem 1rem", textAlign: "end" }} />
             </tr>
           </thead>
           <tbody>
@@ -150,13 +150,13 @@ export function QuantitySlider({
                   <strong>{localizedPlanName(p, lang)}</strong>
                   <div style={{ color: "var(--muted)", fontSize: "0.8rem" }}>{localizedPlanDescription(p, lang)}</div>
                 </td>
-                <td style={{ padding: "0.75rem 1rem", textAlign: "right", fontVariantNumeric: "tabular-nums" }}>
+                <td style={{ padding: "0.75rem 1rem", textAlign: "end", fontVariantNumeric: "tabular-nums" }}>
                   {formatQty(p.followers_qty, lang)}
                 </td>
-                <td style={{ padding: "0.75rem 1rem", textAlign: "right", fontVariantNumeric: "tabular-nums", fontWeight: 600 }}>
+                <td style={{ padding: "0.75rem 1rem", textAlign: "end", fontVariantNumeric: "tabular-nums", fontWeight: 600 }}>
                   {renderPrice(p)}
                 </td>
-                <td style={{ padding: "0.75rem 1rem", textAlign: "right" }}>
+                <td style={{ padding: "0.75rem 1rem", textAlign: "end" }}>
                   <button type="button" className="btn btn-outline" style={{ padding: "0.4rem 0.8rem", fontSize: "0.85rem" }} onClick={() => setSelected(p)}>
                     {t.cta.buy}
                   </button>

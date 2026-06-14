@@ -162,11 +162,11 @@ export default function APIKeysPage() {
         <div className="card" style={{ padding: 0, marginBottom: "2rem" }}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
-              <tr style={{ textAlign: "left", color: "var(--muted)", fontSize: "0.85rem" }}>
+              <tr style={{ textAlign: "start", color: "var(--muted)", fontSize: "0.85rem" }}>
                 <th scope="col" style={{ padding: "0.6rem 0.8rem" }}>Label</th>
                 <th scope="col" style={{ padding: "0.6rem 0.8rem" }}>Created</th>
                 <th scope="col" style={{ padding: "0.6rem 0.8rem" }}>Last used</th>
-                <th scope="col" style={{ padding: "0.6rem 0.8rem", textAlign: "right" }}>Actions</th>
+                <th scope="col" style={{ padding: "0.6rem 0.8rem", textAlign: "end" }}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -179,7 +179,7 @@ export default function APIKeysPage() {
                   <td style={{ padding: "0.6rem 0.8rem", color: "var(--muted)" }}>
                     {formatDate(k.last_used_at)}
                   </td>
-                  <td style={{ padding: "0.6rem 0.8rem", textAlign: "right" }}>
+                  <td style={{ padding: "0.6rem 0.8rem", textAlign: "end" }}>
                     <button
                       type="button"
                       className="btn btn-outline"
@@ -204,7 +204,7 @@ export default function APIKeysPage() {
           <div className="card" style={{ padding: 0 }}>
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
-                <tr style={{ textAlign: "left", color: "var(--muted)", fontSize: "0.85rem" }}>
+                <tr style={{ textAlign: "start", color: "var(--muted)", fontSize: "0.85rem" }}>
                   <th scope="col" style={{ padding: "0.6rem 0.8rem" }}>Label</th>
                   <th scope="col" style={{ padding: "0.6rem 0.8rem" }}>Created</th>
                   <th scope="col" style={{ padding: "0.6rem 0.8rem" }}>Revoked</th>

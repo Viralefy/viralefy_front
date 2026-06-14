@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Footer } from "@/components/Footer";
 import { indexableMeta } from "@/lib/seo-meta";
 import { CITIES, REGION_LABEL, REGION_ORDER, citiesByRegion } from "@/lib/cities";
-import { toJsonLdGraph } from "@/lib/jsonld";
+import { withGlobalGraph } from "@/lib/jsonld";
 import { Flag } from "@/components/Flag";
 
 // Programmatic SEO hub: lista as 50 cidades top agrupadas por região.
@@ -43,37 +43,43 @@ export default function CitiesHub() {
   const pageUrl = `${url}/cities`;
   const grouped = citiesByRegion();
 
-  // BUG-191: consolida CollectionPage + BreadcrumbList + ItemList em UM @graph.
-  const jsonld = toJsonLdGraph([
-    {
-      "@type": "CollectionPage",
-      "@id": `${pageUrl}#collection`,
-      name: "Viralefy — Cities",
-      url: pageUrl,
-      description: "City-targeted Instagram and TikTok growth packages across 50 top markets.",
-      inLanguage: "en",
-      isPartOf: { "@id": `${url}/#website` },
-    },
-    {
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: url },
-        { "@type": "ListItem", position: 2, name: "Cities", item: pageUrl },
-      ],
-    },
-    {
-      "@type": "ItemList",
-      "@id": `${pageUrl}#itemlist`,
-      name: "Top 50 cities",
-      numberOfItems: CITIES.length,
-      itemListElement: CITIES.map((c, i) => ({
-        "@type": "ListItem",
-        position: i + 1,
-        name: c.name,
-        url: `${url}/cities/${c.slug}`,
-      })),
-    },
-  ]);
+  // BUG-191 / Track Y: consolida Organization + WebSite + CollectionPage +
+  // BreadcrumbList + ItemList em UM @graph. Org+WebSite vêm via
+  // withGlobalGraph pra evitar gráfico órfão (isPartOf aponta pra
+  // #website e o validador precisa enxergar o nó no mesmo documento).
+  const jsonld = withGlobalGraph(
+    [
+      {
+        "@type": "CollectionPage",
+        "@id": `${pageUrl}#collection`,
+        name: "Viralefy — Cities",
+        url: pageUrl,
+        description: "City-targeted Instagram and TikTok growth packages across 50 top markets.",
+        inLanguage: "en",
+        isPartOf: { "@id": `${url}/#website` },
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: url },
+          { "@type": "ListItem", position: 2, name: "Cities", item: pageUrl },
+        ],
+      },
+      {
+        "@type": "ItemList",
+        "@id": `${pageUrl}#itemlist`,
+        name: "Top 50 cities",
+        numberOfItems: CITIES.length,
+        itemListElement: CITIES.map((c, i) => ({
+          "@type": "ListItem",
+          position: i + 1,
+          name: c.name,
+          url: `${url}/cities/${c.slug}`,
+        })),
+      },
+    ],
+    { siteUrl: url, inLanguage: "en" },
+  );
 
   return (
     <>

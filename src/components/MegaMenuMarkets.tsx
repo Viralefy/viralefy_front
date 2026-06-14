@@ -111,9 +111,9 @@ export function MegaMenuMarkets({ lang }: { lang: LangCode }) {
         aria-expanded={open}
         onClick={() => setOpen(true)}
       >
-        <Icon name="globe" size={16} style={{ marginRight: "0.4rem" }} />
+        <Icon name="globe" size={16} style={{ marginInlineEnd: "0.4rem" }} />
         {t.header.markets}
-        <Icon name="chevronDown" size={14} style={{ marginLeft: "0.3rem" }} />
+        <Icon name="chevronDown" size={14} style={{ marginInlineStart: "0.3rem" }} />
       </button>
 
       <Modal
@@ -122,7 +122,7 @@ export function MegaMenuMarkets({ lang }: { lang: LangCode }) {
         title={t.header.markets}
         maxWidth={900}
         footer={
-          <p style={{ fontSize: "0.78rem", color: "var(--muted)", margin: 0, textAlign: "right" }}>
+          <p style={{ fontSize: "0.78rem", color: "var(--muted)", margin: 0, textAlign: "end" }}>
             {totalShown} / {COUNTRIES.length}
           </p>
         }

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Footer } from "@/components/Footer";
 import { indexableMeta } from "@/lib/seo-meta";
 import { HELP_CATEGORIES, HELP_TOPICS, helpTopicsByCategory } from "@/lib/help";
-import { toJsonLdGraph } from "@/lib/jsonld";
+import { withGlobalGraph } from "@/lib/jsonld";
 
 // Help center hub. EN-only por enquanto, standalone (sem variantes por país).
 
@@ -41,38 +41,42 @@ export default function HelpHub() {
   const url = siteUrl();
   const pageUrl = `${url}/help`;
 
-  // BUG-191: consolida CollectionPage + BreadcrumbList + ItemList em UM @graph.
-  const jsonld = toJsonLdGraph([
-    {
-      "@type": "CollectionPage",
-      "@id": `${pageUrl}#collection`,
-      name: "Viralefy Help center",
-      url: pageUrl,
-      description:
-        "Help articles for Viralefy customers — buying plans, delivery timing, refill guarantee, payment methods, account safety and refunds.",
-      inLanguage: "en",
-      isPartOf: { "@id": `${url}/#website` },
-    },
-    {
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: url },
-        { "@type": "ListItem", position: 2, name: "Help center", item: pageUrl },
-      ],
-    },
-    {
-      "@type": "ItemList",
-      "@id": `${pageUrl}#itemlist`,
-      name: "Help articles",
-      numberOfItems: HELP_TOPICS.length,
-      itemListElement: HELP_TOPICS.map((t, i) => ({
-        "@type": "ListItem",
-        position: i + 1,
-        name: t.title,
-        url: `${url}/help/${t.slug}`,
-      })),
-    },
-  ]);
+  // BUG-191 / Track Y: Organization + WebSite + CollectionPage + Breadcrumb
+  // + ItemList em UM @graph via withGlobalGraph (ver lib/jsonld.ts).
+  const jsonld = withGlobalGraph(
+    [
+      {
+        "@type": "CollectionPage",
+        "@id": `${pageUrl}#collection`,
+        name: "Viralefy Help center",
+        url: pageUrl,
+        description:
+          "Help articles for Viralefy customers — buying plans, delivery timing, refill guarantee, payment methods, account safety and refunds.",
+        inLanguage: "en",
+        isPartOf: { "@id": `${url}/#website` },
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: url },
+          { "@type": "ListItem", position: 2, name: "Help center", item: pageUrl },
+        ],
+      },
+      {
+        "@type": "ItemList",
+        "@id": `${pageUrl}#itemlist`,
+        name: "Help articles",
+        numberOfItems: HELP_TOPICS.length,
+        itemListElement: HELP_TOPICS.map((t, i) => ({
+          "@type": "ListItem",
+          position: i + 1,
+          name: t.title,
+          url: `${url}/help/${t.slug}`,
+        })),
+      },
+    ],
+    { siteUrl: url, inLanguage: "en" },
+  );
 
   return (
     <>

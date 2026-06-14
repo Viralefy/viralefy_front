@@ -68,21 +68,22 @@ export function Modal({
     };
   }, [open, onClose, returnFocusTo]);
 
-  // Scroll-lock no body — paddingRight evita "pulo" do layout no desktop
-  // por causa do scrollbar que some.
+  // Scroll-lock no body — paddingInlineEnd evita "pulo" do layout no desktop
+  // por causa do scrollbar que some. Em RTL o scrollbar fica na borda
+  // inline-start visualmente; logical property cobre os dois casos.
   useEffect(() => {
     if (!open || typeof document === "undefined") return;
     const body = document.body;
     const prevOverflow = body.style.overflow;
-    const prevPadding = body.style.paddingRight;
+    const prevPadding = body.style.paddingInlineEnd;
     const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
     body.style.overflow = "hidden";
     if (scrollbarWidth > 0) {
-      body.style.paddingRight = `${scrollbarWidth}px`;
+      body.style.paddingInlineEnd = `${scrollbarWidth}px`;
     }
     return () => {
       body.style.overflow = prevOverflow;
-      body.style.paddingRight = prevPadding;
+      body.style.paddingInlineEnd = prevPadding;
     };
   }, [open]);
 
@@ -160,7 +161,7 @@ export function Modal({
           style={{
             flex: 1,
             overflowY: "auto",
-            paddingRight: "0.25rem",
+            paddingInlineEnd: "0.25rem",
             minHeight: 0,
           }}
         >

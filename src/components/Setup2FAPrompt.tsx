@@ -73,7 +73,7 @@ export function Setup2FAPrompt() {
           You&apos;ve completed an order with us — your account now has data worth protecting. Two-factor authentication
           (2FA) adds a 6-digit code from your phone on every login, blocking attackers even if they have your password.
         </p>
-        <ul style={{ color: "var(--muted)", fontSize: "0.85rem", paddingLeft: "1.1rem", marginBottom: "1rem" }}>
+        <ul style={{ color: "var(--muted)", fontSize: "0.85rem", paddingInlineStart: "1.1rem", marginBottom: "1rem" }}>
           <li>30 seconds to set up.</li>
           <li>Works with Google Authenticator, Authy, 1Password.</li>
           <li>You&apos;ll get 8 backup codes in case you lose your phone.</li>

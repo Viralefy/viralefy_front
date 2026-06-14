@@ -685,23 +685,23 @@ function ReviewStep({
       <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "0.5rem" }}>
         <li style={{ display: "flex", justifyContent: "space-between", gap: "1rem" }}>
           <span style={{ color: "var(--muted)" }}>{r.handleLabel}</span>
-          <strong style={{ textAlign: "right", wordBreak: "break-all" }}>{recipientValue || "—"}</strong>
+          <strong style={{ textAlign: "end", wordBreak: "break-all" }}>{recipientValue || "—"}</strong>
         </li>
         <li style={{ display: "flex", justifyContent: "space-between", gap: "1rem" }}>
           <span style={{ color: "var(--muted)" }}>Plan</span>
-          <strong style={{ textAlign: "right" }}>
+          <strong style={{ textAlign: "end" }}>
             {localizedPlanName(plan, lang)}
           </strong>
         </li>
         <li style={{ display: "flex", justifyContent: "space-between", gap: "1rem" }}>
           <span style={{ color: "var(--muted)" }}>{r.totalLabel}</span>
-          <strong style={{ textAlign: "right" }} data-testid="checkout-review-total">
+          <strong style={{ textAlign: "end" }} data-testid="checkout-review-total">
             {priceFor(plan, currency)}
           </strong>
         </li>
         <li style={{ display: "flex", justifyContent: "space-between", gap: "1rem" }}>
           <span style={{ color: "var(--muted)" }}>Payment</span>
-          <strong style={{ textAlign: "right" }}>{methodLabel}</strong>
+          <strong style={{ textAlign: "end" }}>{methodLabel}</strong>
         </li>
       </ul>
       <button
@@ -835,7 +835,7 @@ function MethodCard({
       data-method-kind={method.kind}
       onClick={onSelect}
       style={{
-        textAlign: "left",
+        textAlign: "start",
         padding: "0.85rem",
         borderRadius: "0.6rem",
         border: active ? "2px solid var(--accent)" : "1px solid var(--border)",

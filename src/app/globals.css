@@ -3,7 +3,7 @@
  * brand e direciona pra <main id="main">. BUG-206 do QA 2026-06-12. */
 .skip-link {
   position: absolute;
-  left: -1000px;
+  inset-inline-start: -1000px;
   top: -1000px;
   width: 1px;
   height: 1px;
@@ -13,7 +13,7 @@
 .skip-link:focus {
   position: fixed;
   top: 0.5rem;
-  left: 0.5rem;
+  inset-inline-start: 0.5rem;
   width: auto;
   height: auto;
   padding: 0.55rem 0.9rem;
@@ -380,7 +380,7 @@ table {
 }
 
 th {
-  text-align: left;
+  text-align: start;
   padding: 0.65rem 0.9rem;
   font-size: 0.8rem;
   color: var(--muted-strong);
@@ -461,7 +461,7 @@ tbody tr:hover {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-left: auto;
+  margin-inline-start: auto;
   /* nowrap — ver comentário em .site-header__row. Em mobile (<760px) o nav
      inteiro fica em display:none via .site-header__hide-mobile, então não
      há risco de overflow horizontal aqui. */
@@ -481,7 +481,7 @@ tbody tr:hover {
   cursor: pointer;
   align-items: center;
   justify-content: center;
-  margin-left: auto;
+  margin-inline-start: auto;
 }
 
 .site-header__hamburger:hover {
@@ -611,4 +611,69 @@ body[data-auth-page] {
     padding: 2rem 1.25rem !important;
     min-height: 100vh;
   }
+}
+
+/* ===================== RTL support (ar/he/fa) =====================
+   Track S (Round 17) emite <html dir="rtl"> quando lang ∈ {ar,he,fa}.
+   Logical properties (padding-inline-*, margin-inline-*, text-align: start/end)
+   já cobrem o grosso do layout automaticamente. As regras abaixo tratam o
+   que NÃO vira automático: glifos direcionais (chevrons, setas) que precisam
+   de espelhamento visual, e elementos que devem permanecer LTR mesmo em
+   contexto RTL (números, código, logos). */
+
+/* Breadcrumbs usam `›` literal num <li aria-hidden> dentro de <ol> sem
+   classe. Em RTL, o caractere precisa virar `‹` — fazemos via scaleX(-1)
+   pra não exigir mudança no JSX das pages. Escopo: <li aria-hidden> direto
+   filho de <ol> (pattern de breadcrumb consistente em todo o app). */
+[dir="rtl"] ol > li[aria-hidden],
+[dir="rtl"] ol > li[aria-hidden="true"] {
+  display: inline-block;
+  transform: scaleX(-1);
+}
+
+/* Setas direcionais (CTA arrows, "voltar"/"avançar"). Quem usar uma das
+   classes utilitárias abaixo num ícone/glifo direcional ganha flip
+   automático em RTL. Não afeta elementos sem a classe (ex.: setas que
+   referenciam tempo/cronologia podem preferir manter direção). */
+[dir="rtl"] .cta-arrow,
+[dir="rtl"] .arrow-flip,
+[dir="rtl"] [data-rtl="flip"] {
+  display: inline-block;
+  transform: scaleX(-1);
+}
+
+/* Ícones SVG do conjunto `arrowRight`/`chevronRight` (componente Icon)
+   também espelham. `chevronDown`/`chevronUp` NÃO espelham (vertical não
+   muda com direcionalidade). */
+[dir="rtl"] svg[data-icon="arrowRight"],
+[dir="rtl"] svg[data-icon="chevronRight"],
+[dir="rtl"] svg[data-icon="arrowLeft"],
+[dir="rtl"] svg[data-icon="chevronLeft"] {
+  transform: scaleX(-1);
+}
+
+/* Elementos que DEVEM permanecer LTR mesmo em página RTL:
+   - números/preços em tabular-nums (lê-se da esquerda pra direita em
+     qualquer cultura, incluindo árabe moderno padrão para dígitos
+     latinos);
+   - blocos de código, IDs, chaves de API;
+   - URL/email exibidos como texto;
+   - logo do header (composição visual fixa).
+   Marque com [dir="ltr"] no JSX OU use as classes abaixo. */
+[dir="rtl"] .force-ltr,
+[dir="rtl"] [data-dir="ltr"],
+[dir="rtl"] code,
+[dir="rtl"] kbd,
+[dir="rtl"] pre,
+[dir="rtl"] samp,
+[dir="rtl"] .site-header__logo {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/* Scrollbar custom — webkit não suporta logical properties no track,
+   então em RTL espelhamos a posição via direction. */
+[dir="rtl"] body {
+  /* nada extra hoje; reservado pra ajustes futuros de gradient
+     direcional. */
 }

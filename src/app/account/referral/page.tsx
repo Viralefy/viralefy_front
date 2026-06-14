@@ -160,7 +160,7 @@ export default function ReferralPage() {
 
           <div className="card">
             <h2 style={{ fontSize: "1.05rem", marginBottom: "0.5rem" }}>How it works</h2>
-            <ol style={{ color: "var(--muted)", lineHeight: 1.6, paddingLeft: "1.2rem" }}>
+            <ol style={{ color: "var(--muted)", lineHeight: 1.6, paddingInlineStart: "1.2rem" }}>
               <li>Share your invite link above.</li>
               <li>When a new user signs up via your link, they&apos;re tagged as your referral.</li>
               <li>The first time they pay for any plan, you receive 5% of the amount as credit.</li>

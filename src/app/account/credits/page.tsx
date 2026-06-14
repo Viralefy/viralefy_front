@@ -171,11 +171,11 @@ export default function CreditsPage() {
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ background: "var(--accent-dimmer)" }}>
-                <th style={{ padding: "0.6rem 1rem", textAlign: "left", fontSize: "0.8rem", color: "var(--muted)" }}>When</th>
-                <th style={{ padding: "0.6rem 1rem", textAlign: "left", fontSize: "0.8rem", color: "var(--muted)" }}>Type</th>
-                <th style={{ padding: "0.6rem 1rem", textAlign: "left", fontSize: "0.8rem", color: "var(--muted)" }}>Description</th>
-                <th style={{ padding: "0.6rem 1rem", textAlign: "right", fontSize: "0.8rem", color: "var(--muted)" }}>Amount</th>
-                <th style={{ padding: "0.6rem 1rem", textAlign: "right", fontSize: "0.8rem", color: "var(--muted)" }}>Balance</th>
+                <th style={{ padding: "0.6rem 1rem", textAlign: "start", fontSize: "0.8rem", color: "var(--muted)" }}>When</th>
+                <th style={{ padding: "0.6rem 1rem", textAlign: "start", fontSize: "0.8rem", color: "var(--muted)" }}>Type</th>
+                <th style={{ padding: "0.6rem 1rem", textAlign: "start", fontSize: "0.8rem", color: "var(--muted)" }}>Description</th>
+                <th style={{ padding: "0.6rem 1rem", textAlign: "end", fontSize: "0.8rem", color: "var(--muted)" }}>Amount</th>
+                <th style={{ padding: "0.6rem 1rem", textAlign: "end", fontSize: "0.8rem", color: "var(--muted)" }}>Balance</th>
               </tr>
             </thead>
             <tbody>
@@ -191,10 +191,10 @@ export default function CreditsPage() {
                       #{t.id.slice(0, 8)}
                     </div>
                   </td>
-                  <td style={{ padding: "0.6rem 1rem", textAlign: "right", fontSize: "0.9rem", fontWeight: 600, color: t.amount_cents > 0 ? "var(--success)" : "var(--danger)", fontVariantNumeric: "tabular-nums" }}>
+                  <td style={{ padding: "0.6rem 1rem", textAlign: "end", fontSize: "0.9rem", fontWeight: 600, color: t.amount_cents > 0 ? "var(--success)" : "var(--danger)", fontVariantNumeric: "tabular-nums" }}>
                     {t.amount_cents > 0 ? "+ " : "− "}{formatBalance(Math.abs(t.amount_cents), currency)}
                   </td>
-                  <td style={{ padding: "0.6rem 1rem", textAlign: "right", fontSize: "0.85rem", color: "var(--muted)", fontVariantNumeric: "tabular-nums" }}>
+                  <td style={{ padding: "0.6rem 1rem", textAlign: "end", fontSize: "0.85rem", color: "var(--muted)", fontVariantNumeric: "tabular-nums" }}>
                     {formatBalance(t.balance_after_cents, currency)}
                   </td>
                 </tr>

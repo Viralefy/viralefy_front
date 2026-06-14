@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Footer } from "@/components/Footer";
 import { indexableMeta } from "@/lib/seo-meta";
 import { CASE_STUDIES, CASE_STUDY_DISCLAIMER } from "@/lib/case-studies";
-import { toJsonLdGraph } from "@/lib/jsonld";
+import { withGlobalGraph } from "@/lib/jsonld";
 
 const TITLE = "Case studies | Viralefy";
 const DESCRIPTION =
@@ -48,34 +48,41 @@ export default function CaseStudiesHubPage() {
   const url = siteUrl();
   const pageUrl = `${url}${PATH}`;
 
-  // BUG-191: consolida BreadcrumbList + CollectionPage + ItemList em UM @graph.
-  const jsonld = toJsonLdGraph([
-    {
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: url },
-        { "@type": "ListItem", position: 2, name: "Case studies", item: pageUrl },
-      ],
-    },
-    {
-      "@type": "CollectionPage",
-      name: "Viralefy case studies",
-      description: DESCRIPTION,
-      url: pageUrl,
-      isPartOf: { "@type": "WebSite", name: "Viralefy", url },
-    },
-    {
-      "@type": "ItemList",
-      itemListOrder: "https://schema.org/ItemListOrderDescending",
-      numberOfItems: CASE_STUDIES.length,
-      itemListElement: CASE_STUDIES.map((c, i) => ({
-        "@type": "ListItem",
-        position: i + 1,
-        name: c.title,
-        url: `${url}${PATH}/${c.slug}`,
-      })),
-    },
-  ]);
+  // BUG-191 / Track Y: Organization + WebSite + Breadcrumb + CollectionPage
+  // + ItemList em UM @graph via withGlobalGraph (ver lib/jsonld.ts).
+  // O `isPartOf` da CollectionPage agora aponta pro mesmo `@id` canônico do
+  // WebSite injetado por withGlobalGraph (`${url}/#website`) — antes era um
+  // node WebSite inline duplicado.
+  const jsonld = withGlobalGraph(
+    [
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: url },
+          { "@type": "ListItem", position: 2, name: "Case studies", item: pageUrl },
+        ],
+      },
+      {
+        "@type": "CollectionPage",
+        name: "Viralefy case studies",
+        description: DESCRIPTION,
+        url: pageUrl,
+        isPartOf: { "@id": `${url}/#website` },
+      },
+      {
+        "@type": "ItemList",
+        itemListOrder: "https://schema.org/ItemListOrderDescending",
+        numberOfItems: CASE_STUDIES.length,
+        itemListElement: CASE_STUDIES.map((c, i) => ({
+          "@type": "ListItem",
+          position: i + 1,
+          name: c.title,
+          url: `${url}${PATH}/${c.slug}`,
+        })),
+      },
+    ],
+    { siteUrl: url, inLanguage: "en" },
+  );
 
   return (
     <>

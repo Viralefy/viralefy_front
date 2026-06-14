@@ -131,7 +131,7 @@ export function CurrencyPicker({
                     justifyContent: "space-between",
                     gap: "0.5rem",
                     fontSize: "0.9rem",
-                    textAlign: "left",
+                    textAlign: "start",
                     transition: "background 120ms ease",
                   }}
                 >

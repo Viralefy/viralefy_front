@@ -175,9 +175,12 @@ export default async function CaseStudyDetailPage({ params }: { params: Promise<
             style={{
               marginTop: "1.5rem",
               padding: "1.5rem 1.75rem",
-              borderLeft: "3px solid var(--accent)",
+              borderInlineStart: "3px solid var(--accent)",
               background: "rgba(255,255,255,0.02)",
-              borderRadius: "0 8px 8px 0",
+              borderStartStartRadius: 0,
+              borderStartEndRadius: "8px",
+              borderEndStartRadius: 0,
+              borderEndEndRadius: "8px",
             }}
           >
             <p style={{ fontSize: "1.1rem", fontStyle: "italic", lineHeight: 1.55, margin: 0 }}>

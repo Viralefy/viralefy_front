@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Footer } from "@/components/Footer";
 import { indexableMeta } from "@/lib/seo-meta";
 import { COMPETITORS } from "@/lib/competitors";
-import { toJsonLdGraph } from "@/lib/jsonld";
+import { withGlobalGraph } from "@/lib/jsonld";
 
 // Hub de comparações Viralefy vs competidores.
 
@@ -40,37 +40,41 @@ export default function VsHubPage() {
   const url = siteUrl();
   const pageUrl = `${url}/vs`;
 
-  // BUG-191: consolida CollectionPage + BreadcrumbList + ItemList em UM @graph.
-  const jsonld = toJsonLdGraph([
-    {
-      "@type": "CollectionPage",
-      "@id": `${pageUrl}#collection`,
-      name: "Viralefy vs the rest",
-      url: pageUrl,
-      description: "Side-by-side comparisons between Viralefy and other social-engagement providers.",
-      inLanguage: "en",
-      isPartOf: { "@id": `${url}/#website` },
-    },
-    {
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: url },
-        { "@type": "ListItem", position: 2, name: "Comparisons", item: pageUrl },
-      ],
-    },
-    {
-      "@type": "ItemList",
-      "@id": `${pageUrl}#itemlist`,
-      name: "Comparison pages",
-      numberOfItems: COMPETITORS.length,
-      itemListElement: COMPETITORS.map((c, i) => ({
-        "@type": "ListItem",
-        position: i + 1,
-        name: `Viralefy vs ${c.name}`,
-        url: `${url}/vs/${c.slug}`,
-      })),
-    },
-  ]);
+  // BUG-191 / Track Y: Organization + WebSite + CollectionPage + Breadcrumb
+  // + ItemList em UM @graph via withGlobalGraph (ver lib/jsonld.ts).
+  const jsonld = withGlobalGraph(
+    [
+      {
+        "@type": "CollectionPage",
+        "@id": `${pageUrl}#collection`,
+        name: "Viralefy vs the rest",
+        url: pageUrl,
+        description: "Side-by-side comparisons between Viralefy and other social-engagement providers.",
+        inLanguage: "en",
+        isPartOf: { "@id": `${url}/#website` },
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: url },
+          { "@type": "ListItem", position: 2, name: "Comparisons", item: pageUrl },
+        ],
+      },
+      {
+        "@type": "ItemList",
+        "@id": `${pageUrl}#itemlist`,
+        name: "Comparison pages",
+        numberOfItems: COMPETITORS.length,
+        itemListElement: COMPETITORS.map((c, i) => ({
+          "@type": "ListItem",
+          position: i + 1,
+          name: `Viralefy vs ${c.name}`,
+          url: `${url}/vs/${c.slug}`,
+        })),
+      },
+    ],
+    { siteUrl: url, inLanguage: "en" },
+  );
 
   return (
     <>

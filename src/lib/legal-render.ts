@@ -53,7 +53,7 @@ export function renderLegalBody(body: string): ReactElement[] {
         i++;
       }
       blocks.push(
-        createElement("ul", { key: key++, style: { paddingLeft: "1.25rem", margin: "0.5rem 0" } },
+        createElement("ul", { key: key++, style: { paddingInlineStart: "1.25rem", margin: "0.5rem 0" } },
           items.map((text, j) => createElement("li", { key: j, style: { margin: "0.25rem 0" } }, ...autoLink(text, key * 100 + j))))
       );
       continue;

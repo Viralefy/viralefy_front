@@ -29,7 +29,7 @@ function siteUrl() {
 // Como só estamos suportando PT vs EN nesta página por enquanto,
 // qualquer locale começando com "pt" cai em "pt"; o resto cai em "en".
 // Tipo local PageLang (subset de LangCode) garante index seguro no PRICING.
-type PageLang = "pt" | "en" | "es" | "fr" | "de" | "ja" | "it" | "ru" | "nl" | "ko" | "ar" | "zh" | "hi" | "tr";
+type PageLang = "pt" | "en" | "es" | "fr" | "de" | "ja" | "it" | "ru" | "nl" | "ko" | "ar" | "zh" | "hi" | "tr" | "pl" | "sv";
 
 async function resolveLang(): Promise<PageLang> {
   const h = await headers();
@@ -47,6 +47,8 @@ async function resolveLang(): Promise<PageLang> {
   if (locale.startsWith("zh")) return "zh";
   if (locale.startsWith("hi")) return "hi";
   if (locale.startsWith("tr")) return "tr";
+  if (locale.startsWith("pl")) return "pl";
+  if (locale.startsWith("sv")) return "sv";
   return "en";
 }
 
@@ -428,6 +430,56 @@ const PRICING: Record<PageLang, PricingPack> = {
     breadcrumbHome: "Ana sayfa",
     breadcrumbPricing: "Fiyatlandırma",
   },
+  pl: {
+    metaTitle: "Przejrzyste ceny w USDT — Viralefy",
+    metaDescription:
+      "Porównaj ceny Viralefy dla obserwujących, polubień i wyświetleń na Instagramie i TikToku. Ceny w USDT/USD, bez hasła, z gwarancją uzupełnienia.",
+    heroTitle: "Przejrzyste ceny w USDT",
+    heroSubtitle:
+      "Jeden kanoniczny cennik w USD/USDT dla 130 rynków. Lokalne waluty służą wyłącznie do wyświetlania — rozliczenie zawsze odbywa się w stabilnym USD.",
+    tableFollowers: "Obserwujący",
+    tableLikes: "Polubienia",
+    tableViews: "Wyświetlenia",
+    thPlatform: "Platforma",
+    uspRefillTitle: "Gwarancja uzupełnienia",
+    uspRefillBody: "Spadki w ciągu 30 dni są automatycznie uzupełniane bez dodatkowych opłat.",
+    uspPasswordTitle: "Bez hasła",
+    uspPasswordBody: "Potrzebujemy tylko publicznego profilu lub linku do posta — nigdy Twoich danych logowania.",
+    uspCryptoTitle: "Najpierw krypto",
+    uspCryptoBody: "Płać w USDT, BTC, ETH lub ponad 50 aktywach. Stabilne ceny w USD w całym katalogu.",
+    uspSupportTitle: "Wsparcie 24/7",
+    uspSupportBody: "Zgłoszenia obsługiwane codziennie przez ludzi. Średni czas odpowiedzi poniżej 2 godzin.",
+    browseAll: "Przeglądaj wszystkie 130 rynków",
+    schemaPageName: "Cennik Viralefy",
+    schemaPageDesc: "Przejrzyste ceny w USDT dla planów zaangażowania na Instagramie i TikToku.",
+    breadcrumbHome: "Strona główna",
+    breadcrumbPricing: "Cennik",
+  },
+  sv: {
+    metaTitle: "Transparenta priser i USDT — Viralefy",
+    metaDescription:
+      "Jämför Viralefys priser för följare, gillningar och visningar på Instagram och TikTok. Priser i USDT/USD, inget lösenord krävs, påfyllningsgaranti.",
+    heroTitle: "Transparenta priser i USDT",
+    heroSubtitle:
+      "En kanonisk prislista i USD/USDT för 130 marknader. Lokala valutor visas endast — debitering sker alltid i stabil USD.",
+    tableFollowers: "Följare",
+    tableLikes: "Gillningar",
+    tableViews: "Visningar",
+    thPlatform: "Plattform",
+    uspRefillTitle: "Påfyllningsgaranti",
+    uspRefillBody: "Tapp inom 30 dagar fylls på automatiskt utan extra kostnad.",
+    uspPasswordTitle: "Inget lösenord krävs",
+    uspPasswordBody: "Vi behöver bara din offentliga profil eller postlänk — aldrig dina inloggningsuppgifter.",
+    uspCryptoTitle: "Krypto först",
+    uspCryptoBody: "Betala i USDT, BTC, ETH eller 50+ tillgångar. Stabila USD-priser i hela katalogen.",
+    uspSupportTitle: "Support dygnet runt",
+    uspSupportBody: "Ärenden besvaras av människor varje dag. Genomsnittligt svar under 2 timmar.",
+    browseAll: "Bläddra bland alla 130 marknader",
+    schemaPageName: "Viralefy priser",
+    schemaPageDesc: "Transparenta priser i USDT för engagemangspaket på Instagram och TikTok.",
+    breadcrumbHome: "Hem",
+    breadcrumbPricing: "Priser",
+  },
 };
 
 function ogLocale(lang: PageLang): string {
@@ -445,6 +497,8 @@ function ogLocale(lang: PageLang): string {
     case "zh": return "zh_CN";
     case "hi": return "hi_IN";
     case "tr": return "tr_TR";
+    case "pl": return "pl_PL";
+    case "sv": return "sv_SE";
     default:   return "en_US";
   }
 }
@@ -464,6 +518,8 @@ function schemaLang(lang: PageLang): string {
     case "zh": return "zh-Hans";
     case "hi": return "hi-IN";
     case "tr": return "tr-TR";
+    case "pl": return "pl-PL";
+    case "sv": return "sv-SE";
     default:   return "en";
   }
 }
@@ -498,6 +554,8 @@ export async function generateMetadata(): Promise<Metadata> {
         "zh-Hans": canonical,
         "hi-IN": canonical,
         "tr-TR": canonical,
+        "pl-PL": canonical,
+        "sv-SE": canonical,
       },
     },
     openGraph: {

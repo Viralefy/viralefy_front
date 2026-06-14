@@ -21,7 +21,7 @@ function siteUrl() {
   return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 }
 
-type PageLang = "pt" | "en" | "es" | "fr" | "de" | "ja" | "it" | "ru" | "nl" | "ko" | "ar" | "zh" | "hi" | "tr";
+type PageLang = "pt" | "en" | "es" | "fr" | "de" | "ja" | "it" | "ru" | "nl" | "ko" | "ar" | "zh" | "hi" | "tr" | "pl" | "sv";
 
 async function resolveLang(): Promise<PageLang> {
   const h = await headers();
@@ -39,6 +39,8 @@ async function resolveLang(): Promise<PageLang> {
   if (locale.startsWith("zh")) return "zh";
   if (locale.startsWith("hi")) return "hi";
   if (locale.startsWith("tr")) return "tr";
+  if (locale.startsWith("pl")) return "pl";
+  if (locale.startsWith("sv")) return "sv";
   return "en";
 }
 
@@ -57,6 +59,8 @@ function schemaLang(lang: PageLang): string {
     case "zh": return "zh-Hans";
     case "hi": return "hi-IN";
     case "tr": return "tr-TR";
+    case "pl": return "pl-PL";
+    case "sv": return "sv-SE";
     default:   return "en";
   }
 }
@@ -75,6 +79,8 @@ function ogLocale(lang: PageLang): string {
     case "zh": return "zh_CN";
     case "hi": return "hi_IN";
     case "tr": return "tr_TR";
+    case "pl": return "pl_PL";
+    case "sv": return "sv_SE";
     default:   return "en_US";
   }
 }
@@ -695,6 +701,88 @@ const VS: Record<PageLang, VsPack> = {
       competitorWindowSuffix: (h) => `${h} saatlik pencere`,
     },
   },
+  pl: {
+    metaTitle: (name) => `Viralefy vs ${name} — porównanie obok siebie`,
+    metaDescription: (name) =>
+      `Porównaj Viralefy i ${name} pod kątem ceny startowej (USDT), czasu dostawy, uzupełnienia, płatności krypto i wsparcia 24/7.`,
+    heroSubtitleSuffix: " Poniżej obiektywne porównanie oparte na publicznie dostępnych informacjach.",
+    breadcrumbHome: "Strona główna",
+    breadcrumbComparisons: "Porównania",
+    thFeature: "Funkcja",
+    thViralefy: "Viralefy",
+    ctaHeadline: "Wypróbuj Viralefy już od 1,00 $",
+    ctaSubtitle: "Wybierz rynek, wybierz plan i zapłać w USD, EUR, BRL lub krypto. Dostawa rusza w ciągu kilku minut.",
+    ctaBrowse: "Przeglądaj plany",
+    dataAsOf: (d) =>
+      `Dane oparte na informacjach publicznych na dzień ${d}. Prześlij poprawki do wsparcia, a zaktualizujemy tę stronę.`,
+    schemaArticleDesc: (name) => `Obiektywne porównanie obok siebie pomiędzy Viralefy a ${name}.`,
+    rows: {
+      startingPrice: "Cena startowa",
+      viralefyStartingPrice: "od 1,00 $ USD (100 polubień na Instagramie)",
+      avgDelivery: "Średni czas dostawy",
+      viralefyAvgDelivery: "0–6 godzin (większość zamówień rusza w ciągu minut)",
+      refill: "Gwarancja uzupełnienia",
+      viralefyRefill: "30-dniowe uzupełnienie spadków",
+      refillNo: "Niedostępne",
+      support: "Kanał wsparcia",
+      viralefySupport: "Zgłoszenia w panelu konta (bezpłatne, asynchroniczne)",
+      supportNone: "Nieujawnione",
+      crypto: "Płatności krypto",
+      viralefyCrypto: "Tak — USDT, BTC przez Heleket",
+      cryptoNo: "Niedostępne",
+      cardPix: "Karta + PIX",
+      viralefyCardPix: "Stripe (karta) + Abacate Pay (PIX BRL)",
+      competitorCard: "Karta (różnie)",
+      hreflang: "Hreflang + 130 rynków",
+      viralefyHreflang: "Tak — pełna matryca hreflang dla 130 krajów",
+      competitorHreflang: "Ograniczony lub jeden rynek",
+      multicurrency: "Wyświetlanie wielowalutowe",
+      viralefyMulticurrency: "Tak — kanoniczne USD + lokalne wyświetlanie w 6 walutach",
+      competitorMulticurrency: "Tylko USD lub jedna waluta fiat",
+      competitorWindowSuffix: (h) => `okno ${h} godz.`,
+    },
+  },
+  sv: {
+    metaTitle: (name) => `Viralefy vs ${name} — sida vid sida-jämförelse`,
+    metaDescription: (name) =>
+      `Jämför Viralefy och ${name} på startpris (USDT), leveranstid, påfyllning, kryptobetalningar och support dygnet runt.`,
+    heroSubtitleSuffix: " Här är en saklig sida vid sida-jämförelse baserad på offentligt tillgänglig information.",
+    breadcrumbHome: "Hem",
+    breadcrumbComparisons: "Jämförelser",
+    thFeature: "Funktion",
+    thViralefy: "Viralefy",
+    ctaHeadline: "Testa Viralefy från 1,00 $",
+    ctaSubtitle: "Välj en marknad, välj ett paket och betala i USD, EUR, BRL eller krypto. Leveransen startar inom några minuter.",
+    ctaBrowse: "Bläddra bland paket",
+    dataAsOf: (d) =>
+      `Data baserad på offentlig information per ${d}. Skicka korrigeringar till supporten så uppdaterar vi sidan.`,
+    schemaArticleDesc: (name) => `Saklig sida vid sida-jämförelse mellan Viralefy och ${name}.`,
+    rows: {
+      startingPrice: "Startpris",
+      viralefyStartingPrice: "från 1,00 $ USD (100 gillningar på Instagram)",
+      avgDelivery: "Genomsnittlig leveranstid",
+      viralefyAvgDelivery: "0–6 timmar (de flesta order startar inom minuter)",
+      refill: "Påfyllningsgaranti",
+      viralefyRefill: "30 dagars påfyllning vid tapp",
+      refillNo: "Erbjuds inte",
+      support: "Supportkanal",
+      viralefySupport: "Supportärenden i kontot (gratis, asynkront)",
+      supportNone: "Ej angivet",
+      crypto: "Kryptobetalningar",
+      viralefyCrypto: "Ja — USDT, BTC via Heleket",
+      cryptoNo: "Erbjuds inte",
+      cardPix: "Kort + PIX",
+      viralefyCardPix: "Stripe (kort) + Abacate Pay (PIX BRL)",
+      competitorCard: "Kort (varierar)",
+      hreflang: "Hreflang + 130 marknader",
+      viralefyHreflang: "Ja — komplett hreflang-matris över 130 länder",
+      competitorHreflang: "Begränsat eller en enda marknad",
+      multicurrency: "Flervalutavisning",
+      viralefyMulticurrency: "Ja — USD som kanon + lokal visning i 6 valutor",
+      competitorMulticurrency: "Endast USD eller en enda fiatvaluta",
+      competitorWindowSuffix: (h) => `${h} h-fönster`,
+    },
+  },
 };
 
 export function generateStaticParams(): Params[] {
@@ -733,6 +821,8 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
         "zh-Hans": canonical,
         "hi-IN": canonical,
         "tr-TR": canonical,
+        "pl-PL": canonical,
+        "sv-SE": canonical,
       },
     },
     robots: meta.robots,
@@ -775,6 +865,8 @@ function buildRows(c: Competitor, lang: PageLang): Row[] {
     zh: "支持",
     hi: "हाँ",
     tr: "Evet",
+    pl: "Tak",
+    sv: "Ja",
   };
   const yes = yesByLang[lang];
   return [
