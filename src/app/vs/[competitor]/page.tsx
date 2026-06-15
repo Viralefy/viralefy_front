@@ -21,7 +21,7 @@ function siteUrl() {
   return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 }
 
-type PageLang = "pt" | "en" | "es" | "fr" | "de" | "ja" | "it" | "ru" | "nl" | "ko" | "ar" | "zh" | "hi" | "tr" | "pl" | "sv" | "da" | "no" | "fi";
+type PageLang = "pt" | "en" | "es" | "fr" | "de" | "ja" | "it" | "ru" | "nl" | "ko" | "ar" | "zh" | "hi" | "tr" | "pl" | "sv" | "da" | "no" | "fi" | "he" | "uk" | "cs" | "sk" | "th" | "vi" | "id";
 
 async function resolveLang(): Promise<PageLang> {
   const h = await headers();
@@ -44,6 +44,13 @@ async function resolveLang(): Promise<PageLang> {
   if (locale.startsWith("da")) return "da";
   if (locale.startsWith("no") || locale.startsWith("nb")) return "no";
   if (locale.startsWith("fi")) return "fi";
+  if (locale.startsWith("he") || locale.startsWith("iw")) return "he";
+  if (locale.startsWith("uk")) return "uk";
+  if (locale.startsWith("cs")) return "cs";
+  if (locale.startsWith("sk")) return "sk";
+  if (locale.startsWith("th")) return "th";
+  if (locale.startsWith("vi")) return "vi";
+  if (locale.startsWith("id")) return "id";
   return "en";
 }
 
@@ -67,6 +74,13 @@ function schemaLang(lang: PageLang): string {
     case "da": return "da-DK";
     case "no": return "nb-NO";
     case "fi": return "fi-FI";
+    case "he": return "he-IL";
+    case "uk": return "uk-UA";
+    case "cs": return "cs-CZ";
+    case "sk": return "sk-SK";
+    case "th": return "th-TH";
+    case "vi": return "vi-VN";
+    case "id": return "id-ID";
     default:   return "en";
   }
 }
@@ -90,6 +104,13 @@ function ogLocale(lang: PageLang): string {
     case "da": return "da_DK";
     case "no": return "nb_NO";
     case "fi": return "fi_FI";
+    case "he": return "he_IL";
+    case "uk": return "uk_UA";
+    case "cs": return "cs_CZ";
+    case "sk": return "sk_SK";
+    case "th": return "th_TH";
+    case "vi": return "vi_VN";
+    case "id": return "id_ID";
     default:   return "en_US";
   }
 }
@@ -915,7 +936,298 @@ const VS: Record<PageLang, VsPack> = {
       competitorWindowSuffix: (h) => `${h} t -ikkuna`,
     },
   },
+  he: {
+    metaTitle: (name) => `Viralefy מול ${name} — השוואה זה לצד זה`,
+    metaDescription: (name) =>
+      `השוו את Viralefy ו-${name} במחיר התחלתי (USDT), זמן אספקה, מילוי מחדש, תשלומי קריפטו ותמיכה אנושית 24/7.`,
+    heroSubtitleSuffix: " להלן השוואה עובדתית המבוססת על מידע ציבורי.",
+    breadcrumbHome: "דף הבית",
+    breadcrumbComparisons: "השוואות",
+    thFeature: "מאפיין",
+    thViralefy: "Viralefy",
+    ctaHeadline: "נסו את Viralefy החל מ-$1.00",
+    ctaSubtitle: "בחרו שוק, בחרו חבילה, ושלמו ב-USD, EUR, BRL או קריפטו. האספקה מתחילה תוך דקות.",
+    ctaBrowse: "עיינו בחבילות",
+    dataAsOf: (d) =>
+      `נתונים מבוססים על מידע ציבורי נכון ל-${d}. שלחו תיקונים לתמיכה ונעדכן את הדף הזה.`,
+    schemaArticleDesc: (name) => `השוואה עובדתית זה לצד זה בין Viralefy ל-${name}.`,
+    rows: {
+      startingPrice: "מחיר התחלתי",
+      viralefyStartingPrice: "החל מ-$1.00 USD (100 לייקים באינסטגרם)",
+      avgDelivery: "זמן אספקה ממוצע",
+      viralefyAvgDelivery: "0–6 שעות (רוב ההזמנות מתחילות תוך דקות)",
+      refill: "אחריות מילוי מחדש",
+      viralefyRefill: "מילוי מחדש ל-30 יום במקרה של ירידה",
+      refillNo: "לא מוצע",
+      support: "ערוץ תמיכה",
+      viralefySupport: "פניות תמיכה בחשבון (חינם, אסינכרוני)",
+      supportNone: "לא נחשף",
+      crypto: "תשלומי קריפטו",
+      viralefyCrypto: "כן — USDT, BTC דרך Heleket",
+      cryptoNo: "לא מוצע",
+      cardPix: "כרטיס + PIX",
+      viralefyCardPix: "Stripe (כרטיס) + Abacate Pay (PIX BRL)",
+      competitorCard: "כרטיס (משתנה)",
+      hreflang: "Hreflang + 130 שווקים",
+      viralefyHreflang: "כן — מטריצת hreflang מלאה ב-130 מדינות",
+      competitorHreflang: "מוגבל או שוק יחיד",
+      multicurrency: "תצוגה במספר מטבעות",
+      viralefyMulticurrency: "כן — USD קנוני + תצוגה מקומית ב-6 מטבעות",
+      competitorMulticurrency: "רק USD או מטבע פיאט יחיד",
+      competitorWindowSuffix: (h) => `חלון של ${h} שעות`,
+    },
+  },
+  uk: {
+    metaTitle: (name) => `Viralefy проти ${name} — порівняння поруч`,
+    metaDescription: (name) =>
+      `Порівняйте Viralefy та ${name} за стартовою ціною (USDT), часом доставки, поповненням, оплатою криптою та підтримкою 24/7.`,
+    heroSubtitleSuffix: " Нижче — фактологічне порівняння на основі загальнодоступної інформації.",
+    breadcrumbHome: "Головна",
+    breadcrumbComparisons: "Порівняння",
+    thFeature: "Параметр",
+    thViralefy: "Viralefy",
+    ctaHeadline: "Спробуйте Viralefy від $1.00",
+    ctaSubtitle: "Оберіть ринок, оберіть тариф, платіть у USD, EUR, BRL або крипті. Доставка стартує за лічені хвилини.",
+    ctaBrowse: "Переглянути тарифи",
+    dataAsOf: (d) =>
+      `Дані ґрунтуються на загальнодоступній інформації станом на ${d}. Надсилайте правки до підтримки — ми оновимо цю сторінку.`,
+    schemaArticleDesc: (name) => `Фактологічне порівняння Viralefy та ${name} поруч.`,
+    rows: {
+      startingPrice: "Стартова ціна",
+      viralefyStartingPrice: "від $1.00 USD (за 100 вподобайок в Instagram)",
+      avgDelivery: "Середній час доставки",
+      viralefyAvgDelivery: "0–6 годин (більшість замовлень стартують за хвилини)",
+      refill: "Гарантія поповнення",
+      viralefyRefill: "Поповнення протягом 30 днів у разі відписок",
+      refillNo: "Не пропонується",
+      support: "Канал підтримки",
+      viralefySupport: "Тікети всередині акаунта (безкоштовно, асинхронно)",
+      supportNone: "Не розкрито",
+      crypto: "Оплата криптою",
+      viralefyCrypto: "Так — USDT, BTC через Heleket",
+      cryptoNo: "Не пропонується",
+      cardPix: "Картка + PIX",
+      viralefyCardPix: "Stripe (картка) + Abacate Pay (PIX BRL)",
+      competitorCard: "Картка (варіюється)",
+      hreflang: "Hreflang + 130 ринків",
+      viralefyHreflang: "Так — повна матриця hreflang у 130 країнах",
+      competitorHreflang: "Обмежено або один ринок",
+      multicurrency: "Мультивалютне відображення",
+      viralefyMulticurrency: "Так — USD як канон + локальне відображення у 6 валютах",
+      competitorMulticurrency: "Лише USD або одна фіатна валюта",
+      competitorWindowSuffix: (h) => `вікно ${h} год`,
+    },
+  },
+  cs: {
+    metaTitle: (name) => `Viralefy vs ${name} — srovnání vedle sebe`,
+    metaDescription: (name) =>
+      `Porovnejte Viralefy a ${name} z hlediska počáteční ceny (USDT), doby dodání, doplnění, plateb v kryptu a lidské podpory 24/7.`,
+    heroSubtitleSuffix: " Níže je věcné srovnání založené na veřejně dostupných informacích.",
+    breadcrumbHome: "Domů",
+    breadcrumbComparisons: "Srovnání",
+    thFeature: "Vlastnost",
+    thViralefy: "Viralefy",
+    ctaHeadline: "Vyzkoušejte Viralefy od $1.00",
+    ctaSubtitle: "Vyberte trh, vyberte plán a plaťte v USD, EUR, BRL nebo kryptu. Dodání začíná během minut.",
+    ctaBrowse: "Procházet plány",
+    dataAsOf: (d) =>
+      `Data vycházejí z veřejně dostupných informací k ${d}. Opravy posílejte na podporu a stránku aktualizujeme.`,
+    schemaArticleDesc: (name) => `Věcné srovnání vedle sebe mezi Viralefy a ${name}.`,
+    rows: {
+      startingPrice: "Počáteční cena",
+      viralefyStartingPrice: "od $1.00 USD (100 lajků na Instagramu)",
+      avgDelivery: "Průměrná doba dodání",
+      viralefyAvgDelivery: "0–6 hodin (většina objednávek startuje během minut)",
+      refill: "Záruka doplnění",
+      viralefyRefill: "30denní doplnění při úbytku",
+      refillNo: "Nenabízí se",
+      support: "Kanál podpory",
+      viralefySupport: "Tikety v účtu (zdarma, asynchronní)",
+      supportNone: "Nezveřejněno",
+      crypto: "Platby v kryptu",
+      viralefyCrypto: "Ano — USDT, BTC přes Heleket",
+      cryptoNo: "Nenabízí se",
+      cardPix: "Karta + PIX",
+      viralefyCardPix: "Stripe (karta) + Abacate Pay (PIX BRL)",
+      competitorCard: "Karta (různí se)",
+      hreflang: "Hreflang + 130 trhů",
+      viralefyHreflang: "Ano — kompletní matice hreflang ve 130 zemích",
+      competitorHreflang: "Omezený nebo jediný trh",
+      multicurrency: "Vícevalutové zobrazení",
+      viralefyMulticurrency: "Ano — kanonické USD + místní zobrazení v 6 měnách",
+      competitorMulticurrency: "Pouze USD nebo jedna fiat měna",
+      competitorWindowSuffix: (h) => `okno ${h} h`,
+    },
+  },
+  sk: {
+    metaTitle: (name) => `Viralefy vs ${name} — porovnanie vedľa seba`,
+    metaDescription: (name) =>
+      `Porovnajte Viralefy a ${name} z hľadiska počiatočnej ceny (USDT), času doručenia, doplnenia, platieb v krypte a ľudskej podpory 24/7.`,
+    heroSubtitleSuffix: " Nižšie je vecné porovnanie založené na verejne dostupných informáciách.",
+    breadcrumbHome: "Domov",
+    breadcrumbComparisons: "Porovnania",
+    thFeature: "Vlastnosť",
+    thViralefy: "Viralefy",
+    ctaHeadline: "Vyskúšajte Viralefy od $1.00",
+    ctaSubtitle: "Vyberte trh, vyberte plán a plaťte v USD, EUR, BRL alebo krypte. Doručenie sa začína v priebehu minút.",
+    ctaBrowse: "Prezerať plány",
+    dataAsOf: (d) =>
+      `Údaje vychádzajú z verejne dostupných informácií k ${d}. Opravy pošlite na podporu a stránku aktualizujeme.`,
+    schemaArticleDesc: (name) => `Vecné porovnanie vedľa seba medzi Viralefy a ${name}.`,
+    rows: {
+      startingPrice: "Počiatočná cena",
+      viralefyStartingPrice: "od $1.00 USD (100 lajkov na Instagrame)",
+      avgDelivery: "Priemerný čas doručenia",
+      viralefyAvgDelivery: "0–6 hodín (väčšina objednávok štartuje v priebehu minút)",
+      refill: "Záruka doplnenia",
+      viralefyRefill: "30-dňové doplnenie pri úbytku",
+      refillNo: "Neponúka sa",
+      support: "Kanál podpory",
+      viralefySupport: "Tikety v účte (zdarma, asynchrónne)",
+      supportNone: "Nezverejnené",
+      crypto: "Platby v krypte",
+      viralefyCrypto: "Áno — USDT, BTC cez Heleket",
+      cryptoNo: "Neponúka sa",
+      cardPix: "Karta + PIX",
+      viralefyCardPix: "Stripe (karta) + Abacate Pay (PIX BRL)",
+      competitorCard: "Karta (líši sa)",
+      hreflang: "Hreflang + 130 trhov",
+      viralefyHreflang: "Áno — kompletná matica hreflang v 130 krajinách",
+      competitorHreflang: "Obmedzený alebo jediný trh",
+      multicurrency: "Viacmenové zobrazenie",
+      viralefyMulticurrency: "Áno — kanonické USD + miestne zobrazenie v 6 menách",
+      competitorMulticurrency: "Iba USD alebo jedna fiat mena",
+      competitorWindowSuffix: (h) => `okno ${h} h`,
+    },
+  },
+  th: {
+    metaTitle: (name) => `Viralefy เทียบกับ ${name} — เปรียบเทียบเคียงข้างกัน`,
+    metaDescription: (name) =>
+      `เปรียบเทียบ Viralefy และ ${name} ในด้านราคาเริ่มต้น (USDT) เวลาการจัดส่ง การเติม การชำระเงินด้วยคริปโต และการสนับสนุนจากมนุษย์ 24/7`,
+    heroSubtitleSuffix: " ด้านล่างเป็นการเปรียบเทียบเชิงข้อเท็จจริงโดยอ้างอิงข้อมูลที่เปิดเผยต่อสาธารณะ",
+    breadcrumbHome: "หน้าแรก",
+    breadcrumbComparisons: "การเปรียบเทียบ",
+    thFeature: "คุณสมบัติ",
+    thViralefy: "Viralefy",
+    ctaHeadline: "ลอง Viralefy เริ่มต้น $1.00",
+    ctaSubtitle: "เลือกตลาด เลือกแผน และชำระเงินด้วย USD, EUR, BRL หรือคริปโต การจัดส่งเริ่มภายในไม่กี่นาที",
+    ctaBrowse: "ดูแผนทั้งหมด",
+    dataAsOf: (d) =>
+      `ข้อมูลอ้างอิงจากข้อมูลสาธารณะ ณ วันที่ ${d} ส่งการแก้ไขมาที่ฝ่ายสนับสนุน เราจะอัปเดตหน้านี้`,
+    schemaArticleDesc: (name) => `การเปรียบเทียบเชิงข้อเท็จจริงเคียงข้างกันระหว่าง Viralefy และ ${name}`,
+    rows: {
+      startingPrice: "ราคาเริ่มต้น",
+      viralefyStartingPrice: "เริ่มต้น $1.00 USD (100 ไลก์ Instagram)",
+      avgDelivery: "เวลาจัดส่งเฉลี่ย",
+      viralefyAvgDelivery: "0–6 ชั่วโมง (คำสั่งซื้อส่วนใหญ่เริ่มภายในไม่กี่นาที)",
+      refill: "รับประกันการเติม",
+      viralefyRefill: "เติมใหม่ 30 วันเมื่อมีการลดลง",
+      refillNo: "ไม่มีให้บริการ",
+      support: "ช่องทางสนับสนุน",
+      viralefySupport: "ตั๋วสนับสนุนในบัญชี (ฟรี, ไม่ประสานเวลา)",
+      supportNone: "ไม่เปิดเผย",
+      crypto: "การชำระเงินด้วยคริปโต",
+      viralefyCrypto: "ใช่ — USDT, BTC ผ่าน Heleket",
+      cryptoNo: "ไม่มีให้บริการ",
+      cardPix: "บัตร + PIX",
+      viralefyCardPix: "Stripe (บัตร) + Abacate Pay (PIX BRL)",
+      competitorCard: "บัตร (แตกต่างกันไป)",
+      hreflang: "Hreflang + 130 ตลาด",
+      viralefyHreflang: "ใช่ — เมทริกซ์ hreflang เต็มรูปแบบใน 130 ประเทศ",
+      competitorHreflang: "จำกัดหรือตลาดเดียว",
+      multicurrency: "การแสดงผลหลายสกุลเงิน",
+      viralefyMulticurrency: "ใช่ — USD เป็นมาตรฐาน + แสดงผลท้องถิ่น 6 สกุลเงิน",
+      competitorMulticurrency: "USD เท่านั้นหรือสกุลเงินเฟียตเดียว",
+      competitorWindowSuffix: (h) => `หน้าต่าง ${h} ชั่วโมง`,
+    },
+  },
+  vi: {
+    metaTitle: (name) => `Viralefy so với ${name} — so sánh cạnh nhau`,
+    metaDescription: (name) =>
+      `So sánh Viralefy và ${name} về giá khởi điểm (USDT), thời gian giao hàng, bù đắp, thanh toán bằng crypto và hỗ trợ con người 24/7.`,
+    heroSubtitleSuffix: " Dưới đây là so sánh thực tế dựa trên thông tin công khai.",
+    breadcrumbHome: "Trang chủ",
+    breadcrumbComparisons: "So sánh",
+    thFeature: "Tính năng",
+    thViralefy: "Viralefy",
+    ctaHeadline: "Dùng thử Viralefy từ $1.00",
+    ctaSubtitle: "Chọn một thị trường, chọn một gói, thanh toán bằng USD, EUR, BRL hoặc crypto. Giao hàng bắt đầu trong vài phút.",
+    ctaBrowse: "Duyệt các gói",
+    dataAsOf: (d) =>
+      `Dữ liệu dựa trên thông tin công khai tính đến ${d}. Gửi đính chính tới bộ phận hỗ trợ và chúng tôi sẽ cập nhật trang này.`,
+    schemaArticleDesc: (name) => `So sánh thực tế cạnh nhau giữa Viralefy và ${name}.`,
+    rows: {
+      startingPrice: "Giá khởi điểm",
+      viralefyStartingPrice: "từ $1.00 USD (100 lượt thích Instagram)",
+      avgDelivery: "Thời gian giao hàng trung bình",
+      viralefyAvgDelivery: "0–6 giờ (hầu hết đơn hàng bắt đầu trong vài phút)",
+      refill: "Bảo hành bù đắp",
+      viralefyRefill: "Bù đắp 30 ngày khi giảm sút",
+      refillNo: "Không cung cấp",
+      support: "Kênh hỗ trợ",
+      viralefySupport: "Phiếu hỗ trợ trong tài khoản (miễn phí, bất đồng bộ)",
+      supportNone: "Không công bố",
+      crypto: "Thanh toán crypto",
+      viralefyCrypto: "Có — USDT, BTC qua Heleket",
+      cryptoNo: "Không cung cấp",
+      cardPix: "Thẻ + PIX",
+      viralefyCardPix: "Stripe (thẻ) + Abacate Pay (PIX BRL)",
+      competitorCard: "Thẻ (thay đổi)",
+      hreflang: "Hreflang + 130 thị trường",
+      viralefyHreflang: "Có — ma trận hreflang đầy đủ tại 130 quốc gia",
+      competitorHreflang: "Hạn chế hoặc một thị trường duy nhất",
+      multicurrency: "Hiển thị đa tiền tệ",
+      viralefyMulticurrency: "Có — USD chuẩn + hiển thị địa phương ở 6 loại tiền tệ",
+      competitorMulticurrency: "Chỉ USD hoặc một loại tiền pháp định duy nhất",
+      competitorWindowSuffix: (h) => `cửa sổ ${h} giờ`,
+    },
+  },
+  id: {
+    metaTitle: (name) => `Viralefy vs ${name} — perbandingan berdampingan`,
+    metaDescription: (name) =>
+      `Bandingkan Viralefy dan ${name} dalam hal harga awal (USDT), waktu pengiriman, pengisian ulang, pembayaran kripto, dan dukungan manusia 24/7.`,
+    heroSubtitleSuffix: " Berikut perbandingan faktual berdasarkan informasi yang tersedia untuk umum.",
+    breadcrumbHome: "Beranda",
+    breadcrumbComparisons: "Perbandingan",
+    thFeature: "Fitur",
+    thViralefy: "Viralefy",
+    ctaHeadline: "Coba Viralefy mulai $1.00",
+    ctaSubtitle: "Pilih pasar, pilih paket, bayar dengan USD, EUR, BRL atau kripto. Pengiriman dimulai dalam hitungan menit.",
+    ctaBrowse: "Lihat paket",
+    dataAsOf: (d) =>
+      `Data berdasarkan informasi publik per ${d}. Kirim koreksi ke dukungan dan kami akan memperbarui halaman ini.`,
+    schemaArticleDesc: (name) => `Perbandingan faktual berdampingan antara Viralefy dan ${name}.`,
+    rows: {
+      startingPrice: "Harga awal",
+      viralefyStartingPrice: "mulai $1.00 USD (100 suka Instagram)",
+      avgDelivery: "Waktu pengiriman rata-rata",
+      viralefyAvgDelivery: "0–6 jam (sebagian besar pesanan dimulai dalam hitungan menit)",
+      refill: "Jaminan pengisian ulang",
+      viralefyRefill: "Pengisian ulang 30 hari untuk penurunan",
+      refillNo: "Tidak ditawarkan",
+      support: "Saluran dukungan",
+      viralefySupport: "Tiket dukungan dalam akun (gratis, asinkron)",
+      supportNone: "Tidak diungkapkan",
+      crypto: "Pembayaran kripto",
+      viralefyCrypto: "Ya — USDT, BTC via Heleket",
+      cryptoNo: "Tidak ditawarkan",
+      cardPix: "Kartu + PIX",
+      viralefyCardPix: "Stripe (kartu) + Abacate Pay (PIX BRL)",
+      competitorCard: "Kartu (bervariasi)",
+      hreflang: "Hreflang + 130 pasar",
+      viralefyHreflang: "Ya — matriks hreflang lengkap di 130 negara",
+      competitorHreflang: "Terbatas atau pasar tunggal",
+      multicurrency: "Tampilan multimata uang",
+      viralefyMulticurrency: "Ya — USD kanonis + tampilan lokal dalam 6 mata uang",
+      competitorMulticurrency: "Hanya USD atau satu mata uang fiat",
+      competitorWindowSuffix: (h) => `jendela ${h} jam`,
+    },
+  },
 };
+
+// ISR (round 23 Track XX): SSG + revalidate. `headers()` força `ƒ` no Next 15
+// até refactor de i18n. Cache via Caddy compensa enquanto isso.
+export const revalidate = 1800;
 
 export function generateStaticParams(): Params[] {
   return COMPETITORS.map((c) => ({ competitor: c.slug }));
@@ -958,6 +1270,13 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
         "da-DK": canonical,
         "nb-NO": canonical,
         "fi-FI": canonical,
+        "he-IL": canonical,
+        "uk-UA": canonical,
+        "cs-CZ": canonical,
+        "sk-SK": canonical,
+        "th-TH": canonical,
+        "vi-VN": canonical,
+        "id-ID": canonical,
       },
     },
     robots: meta.robots,
@@ -1005,6 +1324,13 @@ function buildRows(c: Competitor, lang: PageLang): Row[] {
     da: "Ja",
     no: "Ja",
     fi: "Kyllä",
+    he: "כן",
+    uk: "Так",
+    cs: "Ano",
+    sk: "Áno",
+    th: "ใช่",
+    vi: "Có",
+    id: "Ya",
   };
   const yes = yesByLang[lang];
   return [

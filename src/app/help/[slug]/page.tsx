@@ -14,6 +14,9 @@ function siteUrl() {
   return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 }
 
+// ISR (round 23 Track XX): SSG via generateStaticParams + revalidate.
+export const revalidate = 1800;
+
 export function generateStaticParams(): { slug: string }[] {
   return helpAllSlugs().map((slug) => ({ slug }));
 }

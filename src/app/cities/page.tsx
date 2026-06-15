@@ -11,6 +11,13 @@ import { Flag } from "@/components/Flag";
 //
 // BUG-89 / BUG-50 (QA round 22): página era hard-coded EN; agora resolve
 // PT/ES via header `x-locale` setado pelo middleware. EN segue como fallback.
+//
+// ISR (round 23 Track XX): depende de `headers()` => Next 15 força dynamic
+// (não vira `●`/`○` no build). Aceitamos `ƒ` neste arquivo; ganho de TTFB
+// virá do Caddy/CDN via `Cache-Control: public, s-maxage=1800, swr=86400`
+// (debito pro Track de Caddy aplicar o header em /cities, /vs, /pricing).
+// Alternativa futura: mover i18n pra client-side context — débito Track WW.
+export const revalidate = 1800;
 
 type PageLang = "pt" | "en" | "es";
 

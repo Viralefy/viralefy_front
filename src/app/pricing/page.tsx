@@ -29,7 +29,7 @@ function siteUrl() {
 // Como só estamos suportando PT vs EN nesta página por enquanto,
 // qualquer locale começando com "pt" cai em "pt"; o resto cai em "en".
 // Tipo local PageLang (subset de LangCode) garante index seguro no PRICING.
-type PageLang = "pt" | "en" | "es" | "fr" | "de" | "ja" | "it" | "ru" | "nl" | "ko" | "ar" | "zh" | "hi" | "tr" | "pl" | "sv" | "da" | "no" | "fi";
+type PageLang = "pt" | "en" | "es" | "fr" | "de" | "ja" | "it" | "ru" | "nl" | "ko" | "ar" | "zh" | "hi" | "tr" | "pl" | "sv" | "da" | "no" | "fi" | "he" | "uk" | "cs" | "sk" | "th" | "vi" | "id";
 
 async function resolveLang(): Promise<PageLang> {
   const h = await headers();
@@ -52,6 +52,13 @@ async function resolveLang(): Promise<PageLang> {
   if (locale.startsWith("da")) return "da";
   if (locale.startsWith("no") || locale.startsWith("nb")) return "no";
   if (locale.startsWith("fi")) return "fi";
+  if (locale.startsWith("he") || locale.startsWith("iw")) return "he";
+  if (locale.startsWith("uk")) return "uk";
+  if (locale.startsWith("cs")) return "cs";
+  if (locale.startsWith("sk")) return "sk";
+  if (locale.startsWith("th")) return "th";
+  if (locale.startsWith("vi")) return "vi";
+  if (locale.startsWith("id")) return "id";
   return "en";
 }
 
@@ -558,6 +565,181 @@ const PRICING: Record<PageLang, PricingPack> = {
     breadcrumbHome: "Etusivu",
     breadcrumbPricing: "Hinnat",
   },
+  he: {
+    metaTitle: "תמחור שקוף ב-USDT — Viralefy",
+    metaDescription:
+      "השוו את מחירי Viralefy לעוקבים, לייקים וצפיות באינסטגרם וטיקטוק. תמחור ב-USDT/USD, ללא סיסמה, עם אחריות מילוי מחדש.",
+    heroTitle: "תמחור שקוף ב-USDT",
+    heroSubtitle:
+      "טבלת מחירים קנונית אחת ב-USD/USDT עבור 130 שווקים. המטבעות המקומיים להצגה בלבד — החיוב תמיד בדולר אמריקאי יציב.",
+    tableFollowers: "עוקבים",
+    tableLikes: "לייקים",
+    tableViews: "צפיות",
+    thPlatform: "פלטפורמה",
+    uspRefillTitle: "אחריות מילוי מחדש",
+    uspRefillBody: "ירידות תוך 30 יום ממולאות אוטומטית ללא עלות נוספת.",
+    uspPasswordTitle: "ללא סיסמה",
+    uspPasswordBody: "אנחנו צריכים רק את הפרופיל הציבורי או קישור לפוסט — לעולם לא את פרטי הגישה שלכם.",
+    uspCryptoTitle: "קריפטו קודם",
+    uspCryptoBody: "שלמו ב-USDT, BTC, ETH או ביותר מ-50 נכסים. מחירים יציבים בדולר בכל הקטלוג.",
+    uspSupportTitle: "תמיכה 24/7",
+    uspSupportBody: "פניות נענות על ידי בני אדם מדי יום. זמן מענה ממוצע מתחת לשעתיים.",
+    browseAll: "עיינו בכל 130 השווקים",
+    schemaPageName: "מחירי Viralefy",
+    schemaPageDesc: "תמחור שקוף ב-USDT לתוכניות מעורבות באינסטגרם וטיקטוק.",
+    breadcrumbHome: "דף הבית",
+    breadcrumbPricing: "מחירים",
+  },
+  uk: {
+    metaTitle: "Прозорі ціни в USDT — Viralefy",
+    metaDescription:
+      "Порівняйте ціни Viralefy на підписників, лайки та перегляди в Instagram і TikTok. Ціни в USDT/USD, без пароля, з гарантією поповнення.",
+    heroTitle: "Прозорі ціни в USDT",
+    heroSubtitle:
+      "Єдиний канонічний прайс у USD/USDT для 130 ринків. Локальні валюти лише для показу — списання завжди у стабільних USD.",
+    tableFollowers: "Підписники",
+    tableLikes: "Вподобайки",
+    tableViews: "Перегляди",
+    thPlatform: "Платформа",
+    uspRefillTitle: "Гарантія поповнення",
+    uspRefillBody: "Відписки протягом 30 днів поповнюються автоматично та без доплат.",
+    uspPasswordTitle: "Без пароля",
+    uspPasswordBody: "Нам потрібен лише публічний профіль або посилання на пост — жодних облікових даних.",
+    uspCryptoTitle: "Спочатку крипта",
+    uspCryptoBody: "Оплачуйте в USDT, BTC, ETH або понад 50 активах. Стабільні ціни в USD у всьому каталозі.",
+    uspSupportTitle: "Підтримка 24/7",
+    uspSupportBody: "Тікети опрацьовують люди щодня. Середня відповідь — менш ніж за 2 години.",
+    browseAll: "Переглянути всі 130 ринків",
+    schemaPageName: "Ціни Viralefy",
+    schemaPageDesc: "Прозорі ціни в USDT на пакети залученості для Instagram і TikTok.",
+    breadcrumbHome: "Головна",
+    breadcrumbPricing: "Ціни",
+  },
+  cs: {
+    metaTitle: "Transparentní ceny v USDT — Viralefy",
+    metaDescription:
+      "Porovnejte ceny Viralefy za sledující, lajky a zhlédnutí na Instagramu a TikToku. Ceny v USDT/USD, bez hesla, se zárukou doplnění.",
+    heroTitle: "Transparentní ceny v USDT",
+    heroSubtitle:
+      "Jeden kanonický ceník v USD/USDT pro 130 trhů. Místní měny slouží pouze pro zobrazení — účtujeme vždy ve stabilním USD.",
+    tableFollowers: "Sledující",
+    tableLikes: "Lajky",
+    tableViews: "Zhlédnutí",
+    thPlatform: "Platforma",
+    uspRefillTitle: "Záruka doplnění",
+    uspRefillBody: "Úbytky do 30 dnů se automaticky doplňují zdarma.",
+    uspPasswordTitle: "Bez hesla",
+    uspPasswordBody: "Potřebujeme jen veřejný profil nebo odkaz na příspěvek — nikdy přihlašovací údaje.",
+    uspCryptoTitle: "Krypto na prvním místě",
+    uspCryptoBody: "Plaťte v USDT, BTC, ETH nebo více než 50 aktivech. Stabilní ceny v USD v celém katalogu.",
+    uspSupportTitle: "Podpora 24/7",
+    uspSupportBody: "Tikety řeší lidé každý den. Průměrná odezva pod 2 hodiny.",
+    browseAll: "Procházet všech 130 trhů",
+    schemaPageName: "Ceny Viralefy",
+    schemaPageDesc: "Transparentní ceny v USDT pro balíčky zapojení na Instagramu a TikToku.",
+    breadcrumbHome: "Domů",
+    breadcrumbPricing: "Ceny",
+  },
+  sk: {
+    metaTitle: "Transparentné ceny v USDT — Viralefy",
+    metaDescription:
+      "Porovnajte ceny Viralefy za sledujúcich, lajky a zhliadnutia na Instagrame a TikToku. Ceny v USDT/USD, bez hesla, so zárukou doplnenia.",
+    heroTitle: "Transparentné ceny v USDT",
+    heroSubtitle:
+      "Jeden kanonický cenník v USD/USDT pre 130 trhov. Miestne meny slúžia len na zobrazenie — účtujeme vždy v stabilnom USD.",
+    tableFollowers: "Sledujúci",
+    tableLikes: "Lajky",
+    tableViews: "Zhliadnutia",
+    thPlatform: "Platforma",
+    uspRefillTitle: "Záruka doplnenia",
+    uspRefillBody: "Úbytky do 30 dní sa automaticky doplnia bez ďalších poplatkov.",
+    uspPasswordTitle: "Bez hesla",
+    uspPasswordBody: "Potrebujeme len verejný profil alebo odkaz na príspevok — nikdy prihlasovacie údaje.",
+    uspCryptoTitle: "Krypto na prvom mieste",
+    uspCryptoBody: "Plaťte v USDT, BTC, ETH alebo viac ako 50 aktívach. Stabilné ceny v USD v celom katalógu.",
+    uspSupportTitle: "Podpora 24/7",
+    uspSupportBody: "Tikety vybavujú ľudia každý deň. Priemerná odpoveď pod 2 hodiny.",
+    browseAll: "Prezrieť všetkých 130 trhov",
+    schemaPageName: "Ceny Viralefy",
+    schemaPageDesc: "Transparentné ceny v USDT pre balíčky zapojenia na Instagrame a TikToku.",
+    breadcrumbHome: "Domov",
+    breadcrumbPricing: "Ceny",
+  },
+  th: {
+    metaTitle: "ราคาโปร่งใสในรูปแบบ USDT — Viralefy",
+    metaDescription:
+      "เปรียบเทียบราคา Viralefy สำหรับผู้ติดตาม ไลก์ และการเข้าชม Instagram และ TikTok ราคาเป็น USDT/USD ไม่ต้องใช้รหัสผ่าน พร้อมรับประกันการเติม",
+    heroTitle: "ราคาโปร่งใสในรูปแบบ USDT",
+    heroSubtitle:
+      "ตารางราคามาตรฐานเดียวในรูปแบบ USD/USDT ครอบคลุม 130 ตลาด สกุลเงินท้องถิ่นมีไว้แสดงเท่านั้น — การเรียกเก็บเงินเป็น USD ที่มั่นคงเสมอ",
+    tableFollowers: "ผู้ติดตาม",
+    tableLikes: "ไลก์",
+    tableViews: "การเข้าชม",
+    thPlatform: "แพลตฟอร์ม",
+    uspRefillTitle: "รับประกันการเติม",
+    uspRefillBody: "การลดลงภายใน 30 วันจะถูกเติมโดยอัตโนมัติโดยไม่มีค่าใช้จ่ายเพิ่มเติม",
+    uspPasswordTitle: "ไม่ต้องใช้รหัสผ่าน",
+    uspPasswordBody: "เราต้องการเพียงโปรไฟล์สาธารณะหรือลิงก์โพสต์ของคุณ — ไม่เคยขอข้อมูลรับรองของคุณ",
+    uspCryptoTitle: "คริปโตมาก่อน",
+    uspCryptoBody: "ชำระเงินด้วย USDT, BTC, ETH หรือสินทรัพย์มากกว่า 50 ชนิด ราคา USD ที่มั่นคงทั่วทั้งแคตตาล็อก",
+    uspSupportTitle: "การสนับสนุน 24/7",
+    uspSupportBody: "ทีมงานตอบตั๋วทุกวัน เวลาตอบกลับเฉลี่ยน้อยกว่า 2 ชั่วโมง",
+    browseAll: "เรียกดู 130 ตลาดทั้งหมด",
+    schemaPageName: "ราคา Viralefy",
+    schemaPageDesc: "ราคาโปร่งใสในรูปแบบ USDT สำหรับแผนการมีส่วนร่วมบน Instagram และ TikTok",
+    breadcrumbHome: "หน้าแรก",
+    breadcrumbPricing: "ราคา",
+  },
+  vi: {
+    metaTitle: "Giá minh bạch bằng USDT — Viralefy",
+    metaDescription:
+      "So sánh giá Viralefy cho người theo dõi, lượt thích và lượt xem trên Instagram và TikTok. Giá tính bằng USDT/USD, không cần mật khẩu, có bảo hành bù đắp.",
+    heroTitle: "Giá minh bạch bằng USDT",
+    heroSubtitle:
+      "Một bảng giá chuẩn duy nhất bằng USD/USDT cho 130 thị trường. Tiền tệ địa phương chỉ để hiển thị — thanh toán luôn bằng USD ổn định.",
+    tableFollowers: "Người theo dõi",
+    tableLikes: "Lượt thích",
+    tableViews: "Lượt xem",
+    thPlatform: "Nền tảng",
+    uspRefillTitle: "Bảo hành bù đắp",
+    uspRefillBody: "Sụt giảm trong vòng 30 ngày được bù đắp tự động mà không tốn thêm phí.",
+    uspPasswordTitle: "Không cần mật khẩu",
+    uspPasswordBody: "Chúng tôi chỉ cần hồ sơ công khai hoặc liên kết bài đăng — không bao giờ cần thông tin đăng nhập của bạn.",
+    uspCryptoTitle: "Ưu tiên tiền điện tử",
+    uspCryptoBody: "Thanh toán bằng USDT, BTC, ETH hoặc hơn 50 loại tài sản. Giá USD ổn định trên toàn bộ danh mục.",
+    uspSupportTitle: "Hỗ trợ 24/7",
+    uspSupportBody: "Phiếu hỗ trợ được con người trả lời mỗi ngày. Thời gian phản hồi trung bình dưới 2 giờ.",
+    browseAll: "Duyệt tất cả 130 thị trường",
+    schemaPageName: "Giá Viralefy",
+    schemaPageDesc: "Giá minh bạch bằng USDT cho các gói tương tác trên Instagram và TikTok.",
+    breadcrumbHome: "Trang chủ",
+    breadcrumbPricing: "Giá",
+  },
+  id: {
+    metaTitle: "Harga transparan dalam USDT — Viralefy",
+    metaDescription:
+      "Bandingkan harga Viralefy untuk pengikut, suka, dan tayangan Instagram dan TikTok. Harga dalam USDT/USD, tanpa kata sandi, dengan jaminan pengisian ulang.",
+    heroTitle: "Harga transparan dalam USDT",
+    heroSubtitle:
+      "Satu daftar harga kanonis dalam USD/USDT untuk 130 pasar. Mata uang lokal hanya untuk tampilan — penagihan selalu dalam USD yang stabil.",
+    tableFollowers: "Pengikut",
+    tableLikes: "Suka",
+    tableViews: "Tayangan",
+    thPlatform: "Platform",
+    uspRefillTitle: "Jaminan pengisian ulang",
+    uspRefillBody: "Penurunan dalam 30 hari diisi ulang secara otomatis tanpa biaya tambahan.",
+    uspPasswordTitle: "Tanpa kata sandi",
+    uspPasswordBody: "Kami hanya butuh profil publik atau tautan posting Anda — tidak pernah kredensial Anda.",
+    uspCryptoTitle: "Kripto lebih dulu",
+    uspCryptoBody: "Bayar dengan USDT, BTC, ETH atau 50+ aset. Harga USD stabil di seluruh katalog.",
+    uspSupportTitle: "Dukungan 24/7",
+    uspSupportBody: "Tiket dijawab manusia setiap hari. Rata-rata waktu balasan kurang dari 2 jam.",
+    browseAll: "Jelajahi 130 pasar",
+    schemaPageName: "Harga Viralefy",
+    schemaPageDesc: "Harga transparan dalam USDT untuk paket keterlibatan Instagram dan TikTok.",
+    breadcrumbHome: "Beranda",
+    breadcrumbPricing: "Harga",
+  },
 };
 
 function ogLocale(lang: PageLang): string {
@@ -580,6 +762,13 @@ function ogLocale(lang: PageLang): string {
     case "da": return "da_DK";
     case "no": return "nb_NO";
     case "fi": return "fi_FI";
+    case "he": return "he_IL";
+    case "uk": return "uk_UA";
+    case "cs": return "cs_CZ";
+    case "sk": return "sk_SK";
+    case "th": return "th_TH";
+    case "vi": return "vi_VN";
+    case "id": return "id_ID";
     default:   return "en_US";
   }
 }
@@ -604,6 +793,13 @@ function schemaLang(lang: PageLang): string {
     case "da": return "da-DK";
     case "no": return "nb-NO";
     case "fi": return "fi-FI";
+    case "he": return "he-IL";
+    case "uk": return "uk-UA";
+    case "cs": return "cs-CZ";
+    case "sk": return "sk-SK";
+    case "th": return "th-TH";
+    case "vi": return "vi-VN";
+    case "id": return "id-ID";
     default:   return "en";
   }
 }
@@ -643,6 +839,13 @@ export async function generateMetadata(): Promise<Metadata> {
         "da-DK": canonical,
         "nb-NO": canonical,
         "fi-FI": canonical,
+        "he-IL": canonical,
+        "uk-UA": canonical,
+        "cs-CZ": canonical,
+        "sk-SK": canonical,
+        "th-TH": canonical,
+        "vi-VN": canonical,
+        "id-ID": canonical,
       },
     },
     openGraph: {

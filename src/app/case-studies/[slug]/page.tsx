@@ -22,6 +22,10 @@ function siteUrl() {
   return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 }
 
+// ISR (round 23 Track XX): já tinha generateStaticParams (SSG). Adicionado
+// revalidate=1800 pra permitir refresh em background se o dataset crescer.
+export const revalidate = 1800;
+
 export async function generateStaticParams(): Promise<Params[]> {
   return CASE_STUDIES.map((c) => ({ slug: c.slug }));
 }

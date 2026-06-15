@@ -6,6 +6,11 @@ import { HELP_CATEGORIES, HELP_TOPICS, helpTopicsByCategory } from "@/lib/help";
 import { withGlobalGraph } from "@/lib/jsonld";
 
 // Help center hub. EN-only por enquanto, standalone (sem variantes por país).
+//
+// ISR (round 23 Track XX): dataset HELP_TOPICS estático, sem fetch externo.
+// revalidate=1800. Caveat: root layout lê `headers()`/`cookies()` — pode
+// forçar `ƒ` até refactor do layout. Cache-Control em CDN/Caddy compensa.
+export const revalidate = 1800;
 
 function siteUrl() {
   return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";

@@ -35,6 +35,10 @@ import { Footer } from "@/components/Footer";
 // que persista qualquer coisa no browser, ATUALIZE esta tabela ANTES de
 // shippar. Caso contrário viramos não-conformes com a recomendação ANPD.
 
+// ISR (round 23 Track XX): depende de `searchParams.lang` => Next 15 força
+// `ƒ` sempre que searchParams existe. Mantemos `force-dynamic` explícito
+// (semântica clara) mas o conteúdo é estático por lang. Cache real vem do
+// Caddy via Cache-Control com chave (path + ?lang) — Track JJ.
 export const dynamic = "force-dynamic";
 
 type Search = { lang?: string };

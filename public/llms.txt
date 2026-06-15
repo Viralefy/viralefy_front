@@ -1,0 +1,17 @@
+# Viralefy llms.txt
+# https://llmstxt.org/
+
+User-agent: *
+Allow: /
+Disallow: /account/
+Disallow: /tickets/
+Disallow: /sso/
+Disallow: /admin/
+
+# Sitemap
+Sitemap: https://www.viralefy.com/sitemap.xml
+
+# About
+Site: Viralefy - social media growth services
+URL: https://www.viralefy.com
+Languages: en, pt-BR, es, fr, de, it, nl, pl, sv, da, no, fi, ru, uk, cs, sk, hu, ja, ko, zh, hi, tr, ar, he, th, vi, id

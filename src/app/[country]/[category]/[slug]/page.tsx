@@ -25,7 +25,11 @@ import { Flag } from "@/components/Flag";
 // o nome do plano e do país, body com explicação do tamanho, comparação com
 // vizinhos e CTA pro checkout.
 
-export const dynamic = "force-dynamic";
+// ISR (round 23 Track XX): plano específico por país. Cardinalidade alta
+// (~60 países × 5 categorias × ~6 quantidades ≈ 1.800 rotas). Sem
+// `generateStaticParams` — Next gera on-demand e cacheia por 30min.
+// Reviews têm TTL próprio (5min) via `next.revalidate` no fetch.
+export const revalidate = 1800;
 
 type Params = { country: string; category: string; slug: string };
 
@@ -36,7 +40,7 @@ function siteUrl() {
 async function getPlans(): Promise<Plan[]> {
   const base = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
   try {
-    const res = await fetch(`${base}/v1/plans`, { cache: "no-store" });
+    const res = await fetch(`${base}/v1/plans`, { next: { revalidate: 1800 } });
     const json = await res.json();
     return (json.data as Plan[]) ?? [];
   } catch {

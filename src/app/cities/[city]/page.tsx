@@ -18,7 +18,7 @@ import type { LangCode } from "@/i18n/languages";
 // landmarks locais em PT, etc.) — encerrar isso em PT é trivial mas merece
 // QA dedicado.
 
-type PageLang = "pt" | "en" | "es" | "fr" | "de" | "ja" | "it" | "ru" | "nl" | "ko" | "ar" | "zh" | "hi" | "tr" | "pl" | "sv" | "da" | "no" | "fi";
+type PageLang = "pt" | "en" | "es" | "fr" | "de" | "ja" | "it" | "ru" | "nl" | "ko" | "ar" | "zh" | "hi" | "tr" | "pl" | "sv" | "da" | "no" | "fi" | "he" | "uk" | "cs" | "sk" | "th" | "vi" | "id";
 
 async function resolveLang(): Promise<PageLang> {
   const h = await headers();
@@ -41,6 +41,13 @@ async function resolveLang(): Promise<PageLang> {
   if (locale.startsWith("da")) return "da";
   if (locale.startsWith("no") || locale.startsWith("nb")) return "no";
   if (locale.startsWith("fi")) return "fi";
+  if (locale.startsWith("he") || locale.startsWith("iw")) return "he";
+  if (locale.startsWith("uk")) return "uk";
+  if (locale.startsWith("cs")) return "cs";
+  if (locale.startsWith("sk")) return "sk";
+  if (locale.startsWith("th")) return "th";
+  if (locale.startsWith("vi")) return "vi";
+  if (locale.startsWith("id")) return "id";
   return "en";
 }
 
@@ -64,6 +71,13 @@ function schemaLang(lang: PageLang): string {
     case "da": return "da-DK";
     case "no": return "nb-NO";
     case "fi": return "fi-FI";
+    case "he": return "he-IL";
+    case "uk": return "uk-UA";
+    case "cs": return "cs-CZ";
+    case "sk": return "sk-SK";
+    case "th": return "th-TH";
+    case "vi": return "vi-VN";
+    case "id": return "id-ID";
     default:   return "en";
   }
 }
@@ -87,6 +101,13 @@ function ogLocale(lang: PageLang): string {
     case "da": return "da_DK";
     case "no": return "nb_NO";
     case "fi": return "fi_FI";
+    case "he": return "he_IL";
+    case "uk": return "uk_UA";
+    case "cs": return "cs_CZ";
+    case "sk": return "sk_SK";
+    case "th": return "th_TH";
+    case "vi": return "vi_VN";
+    case "id": return "id_ID";
     default:   return "en_US";
   }
 }
@@ -113,7 +134,11 @@ type CityPack = {
   schemaServiceName: (city: string) => string;
 };
 
-const CITY_T: Record<PageLang, CityPack> = {
+// Round 23 Track XX: PageLang foi expandido em outra Track (he/uk/cs/sk/th/vi/id)
+// sem atualizar este Record. Pra desbloquear o build sem regredir i18n, usamos
+// `Partial<>` — langs sem pack caem no fallback EN em runtime (lookup com `?? en`).
+// Débito explícito: traduzir as 7 langs faltantes pra encerrar BUG-89 totalmente.
+const CITY_T: Partial<Record<PageLang, CityPack>> = {
   en: {
     metaTitle: (city) => `Buy Instagram followers in ${city} — local growth | Viralefy`,
     metaDescription: (city) =>
@@ -780,6 +805,251 @@ const CITY_T: Record<PageLang, CityPack> = {
     schemaWebPageName: (city) => `Osta Instagram-seuraajia kaupungissa ${city}`,
     schemaServiceName: (city) => `Instagram- ja TikTok-kasvu kaupungissa ${city}`,
   },
+  he: {
+    metaTitle: (city) => `קנו עוקבים באינסטגרם ב${city} — צמיחה מקומית | Viralefy`,
+    metaDescription: (city) =>
+      `הצמיחו את האינסטגרם והטיקטוק שלכם ב${city}. עוקבים, לייקים וצפיות אמיתיים עם אספקה המכווננת לאזור הזמן המקומי. שלמו ב-USDT/USD והתחילו תוך דקות.`,
+    heroTitle: (city) => `קנו עוקבים באינסטגרם ב${city}`,
+    heroSubtitle: (city) =>
+      `קהל מקומי, מעורבות אמיתית, אספקה מיידית — נבנה ליוצרים ומותגים ב${city}.`,
+    ctaSeePlans: (city) => `הצג חבילות ל${city}`,
+    ctaAllCities: "כל הערים",
+    breadcrumbHome: "דף הבית",
+    breadcrumbCities: "ערים",
+    whyHeading: (city) => `למה יוצרים ב${city} בוחרים ב-Viralefy`,
+    bullets: (city) => [
+      "חשבונות שנראים אמיתיים — תמונת פרופיל, ביו והיסטוריית פרסומים. ללא חתימת בוט.",
+      `אספקה הדרגתית המכווננת לאזור הזמן של ${city}, מגיעה בשעות השיא המקומיות.`,
+      "תמחור ב-USDT/USD — ללא הפתעות שער חליפין, ללא נתוני כרטיס, ללא ביטולי חיוב.",
+      "אחריות מילוי מחדש ל-30 יום מול ירידות בכל חבילת עוקבים.",
+      "אותה לוח בקרה לאינסטגרם, טיקטוק ובקשות מילוי מחדש.",
+      `תמיכה באנגלית ובשפה המקומית העיקרית של ${city}.`,
+    ],
+    readyHeading: (city) => `מוכנים לצמוח ב${city}?`,
+    readyBody: (country) =>
+      `בחרו חבילה המתאימה לשוק ${country} — עוקבים, לייקים או צפיות, מסופקים היום.`,
+    readyCta: "צפו בחבילות עוקבים באינסטגרם",
+    bodyP1: (city, hoods, landmark) =>
+      `בין אם אתם יוצרים המצלמים סביב ${landmark}, מותג קטן שמקדם פופ-אפים ב${hoods}, או סוכנות המרחיבה חשבונות לקוחות ברחבי ${city}, צפיפות הקהל היא צוואר הבקבוק. Viralefy מספקת עוקבים, לייקים ותגובות באינסטגרם וצפיות בטיקטוק עם חלונות אספקה המותאמים לאזור הזמן המקומי שלכם — כך שההוכחה החברתית החדשה נוחתת כשהקהל המקומי שלכם באמת מחובר.`,
+    bodyP2: (city, population) =>
+      `${city} הוא אחד הפידים התחרותיים ביותר בעולם. עם יותר מ-${population} תושבים וכלכלת יוצרים צפופה, פריצת שלב החימום של האלגוריתם ללא דחיפה ראשונית היא אכזרית. חבילות הסטרטר שלנו מכסות את הפער הזה: עלייה מדודה של חשבונות שנראים אמיתיים שמכניסה את הפוסט שלכם לטאב גלה, ומשם המעורבות האורגנית מצטברת.`,
+    bodyP3:
+      "כל הזמנה משולמת ב-USDT או USD ומסולקת on-chain — ללא ביטולי חיוב וללא חשיפת נתוני כרטיס. האספקה מתחילה תוך דקות לאחר האישור ומסתיימת לאורך שעות או ימים בהתאם לגודל החבילה. הטפטוף האיטי מכוון: הוא מחקה דפוסים אורגניים כדי שמערכות הבטיחות של הפלטפורמה יתייחסו לצמיחה כרגילה. אתם עוקבים אחר האספקה מלוח הבקרה ויכולים להשהות או להוסיף בכל עת.",
+    bodyP4: (city, hoods) =>
+      `שוק ${city} נע לפי אסתטיקה — מה שמנצח ב${hoods} לא ינצח בפיד פרברי שתי ערים משם. אנחנו לא מתיימרים לתקן את התוכן שלכם. מה שאנחנו עושים זה להסיר את מס ההפעלה הקרה כדי שהתוכן שאתם כבר מייצרים יקבל את שטח התצוגה שמגיע לו. אם אינכם בטוחים איזו חבילה מתאימה לשלב שלכם, הצוות שלנו עונה לפניות באנגלית ובשפה הראשית של העיר.`,
+    schemaWebPageName: (city) => `קנו עוקבים באינסטגרם ב${city}`,
+    schemaServiceName: (city) => `צמיחת אינסטגרם וטיקטוק ב${city}`,
+  },
+  uk: {
+    metaTitle: (city) => `Купити підписників Instagram у ${city} — локальне зростання | Viralefy`,
+    metaDescription: (city) =>
+      `Розвивайте Instagram і TikTok у ${city}. Справжні підписники, лайки та перегляди з доставкою за місцевим часовим поясом. Оплата в USDT/USD, старт за лічені хвилини.`,
+    heroTitle: (city) => `Купити підписників Instagram у ${city}`,
+    heroSubtitle: (city) =>
+      `Локальна аудиторія, справжня залученість, миттєвий старт — створено для авторів і брендів у ${city}.`,
+    ctaSeePlans: (city) => `Тарифи для ${city}`,
+    ctaAllCities: "Усі міста",
+    breadcrumbHome: "Головна",
+    breadcrumbCities: "Міста",
+    whyHeading: (city) => `Чому автори в ${city} обирають Viralefy`,
+    bullets: (city) => [
+      "Акаунти зі справжнім виглядом — фото профілю, біо та історія публікацій. Без слідів ботів.",
+      `Крапельна доставка з прив'язкою до часового поясу міста ${city}, у години піку місцевої аудиторії.`,
+      "Ціни в USDT/USD — без сюрпризів курсу, без даних картки, без чарджбеків.",
+      "Гарантія поповнення 30 днів при відписках на кожному пакеті підписників.",
+      "Єдина панель для Instagram, TikTok і заявок на поповнення.",
+      `Підтримка англійською та основною місцевою мовою міста ${city}.`,
+    ],
+    readyHeading: (city) => `Готові зростати в місті ${city}?`,
+    readyBody: (country) =>
+      `Оберіть тариф під ринок ${country} — підписники, лайки або перегляди, доставка сьогодні.`,
+    readyCta: "Дивитися тарифи на підписників Instagram",
+    bodyP1: (city, hoods, landmark) =>
+      `Чи ви автор, який знімає біля ${landmark}, маленький бренд, що просуває поп-апи в ${hoods}, чи агенція, що масштабує клієнтські акаунти містом ${city}, вузьке місце — щільність аудиторії. Viralefy доставляє підписників, лайки та коментарі в Instagram і перегляди в TikTok у вікнах, прив'язаних до вашого місцевого часового поясу — щоб новий соціальний сигнал приходив тоді, коли ваша аудиторія дійсно онлайн.`,
+    bodyP2: (city, population) =>
+      `${city} — одна з найконкурентніших стрічок у світі. За понад ${population} мешканців і щільної економіки авторів пробити розігрів алгоритму без стартового поштовху вкрай складно. Наші стартові пакети закривають цей розрив: дозований приріст акаунтів зі справжнім виглядом, який виводить пост у рекомендації, а далі органіка розганяється сама.`,
+    bodyP3:
+      "Кожне замовлення оплачується в USDT або USD і проводиться в блокчейні — жодних чарджбеків і розкриття даних картки. Доставка стартує за лічені хвилини після підтвердження та завершується за години чи дні залежно від розміру пакета. Повільний дрип — це навмисно: він повторює органічні патерни, щоб системи безпеки платформи сприймали зростання як природне. Ви бачите доставку в панелі та можете будь-коли поставити на паузу або докупити.",
+    bodyP4: (city, hoods) =>
+      `Ринок міста ${city} живе естетикою — те, що виграє в ${hoods}, не виграє в приміській стрічці через два міста. Ми не обіцяємо полагодити ваш контент. Що ми робимо — знімаємо податок холодного старту, щоб контент, який ви вже створюєте, отримував ту площу показу, на яку заслуговує. Якщо не впевнені, який пакет підходить вашому етапу, наша команда відповідає на тікети англійською та основною мовою міста.`,
+    schemaWebPageName: (city) => `Купити підписників Instagram у ${city}`,
+    schemaServiceName: (city) => `Зростання в Instagram і TikTok у ${city}`,
+  },
+  cs: {
+    metaTitle: (city) => `Koupit sledující na Instagramu v ${city} — lokální růst | Viralefy`,
+    metaDescription: (city) =>
+      `Růst na Instagramu a TikToku v ${city}. Skuteční sledující, lajky a zhlédnutí s doručením naladěným na místní časové pásmo. Plaťte v USDT/USD a startujte během minut.`,
+    heroTitle: (city) => `Koupit sledující na Instagramu v ${city}`,
+    heroSubtitle: (city) =>
+      `Lokální publikum, skutečné zapojení, okamžité doručení — postaveno pro tvůrce a značky v ${city}.`,
+    ctaSeePlans: (city) => `Zobrazit plány pro ${city}`,
+    ctaAllCities: "Všechna města",
+    breadcrumbHome: "Domů",
+    breadcrumbCities: "Města",
+    whyHeading: (city) => `Proč si tvůrci v ${city} volí Viralefy`,
+    bullets: (city) => [
+      "Účty s autentickým vzhledem — profilová fotka, bio a historie příspěvků. Žádný botí podpis.",
+      `Postupné doručení sladěné s časovým pásmem ${city}, dopadá v místní špičce.`,
+      "Ceny v USDT/USD — žádná měnová překvapení, žádné kartové údaje, žádné chargebacky.",
+      "30denní záruka doplnění proti úbytkům u každého balíčku sledujících.",
+      "Stejný dashboard pro Instagram, TikTok i žádosti o doplnění.",
+      `Podpora v angličtině a v hlavním místním jazyce města ${city}.`,
+    ],
+    readyHeading: (city) => `Připraveni růst v ${city}?`,
+    readyBody: (country) =>
+      `Vyberte plán naladěný na trh ${country} — sledující, lajky nebo zhlédnutí, dodané ještě dnes.`,
+    readyCta: "Zobrazit plány sledujících na Instagramu",
+    bodyP1: (city, hoods, landmark) =>
+      `Ať jste tvůrce, který natáčí kolem ${landmark}, malá značka tlačící pop-upy přes ${hoods}, nebo agentura škálující klientské účty napříč ${city}, úzkým hrdlem je hustota publika. Viralefy doručuje sledující, lajky a komentáře na Instagramu a zhlédnutí na TikToku v doručovacích oknech sladěných s vaším místním časovým pásmem — aby nový sociální důkaz dopadl tehdy, když je vaše místní publikum skutečně online.`,
+    bodyP2: (city, population) =>
+      `${city} patří mezi nejkonkurenčnější feedy na světě. Při více než ${population} obyvatelích a husté tvůrčí ekonomice je prolomení rozehřívací fáze algoritmu bez počátečního strčení brutální. Naše startovací balíčky tuto mezeru zaplňují: měřený nárůst autenticky vypadajících účtů, který dostane váš příspěvek do záložky Prozkoumat, a odtud se organické zapojení sbalíčkuje samo.`,
+    bodyP3:
+      "Každá objednávka se platí v USDT nebo USD a vyúčtovává se on-chain — žádné chargebacky, žádné odhalené kartové údaje. Doručení startuje během minut po potvrzení a končí během hodin nebo dní podle velikosti balíčku. Pomalé kapání je záměrné: napodobuje organické vzorce, aby bezpečnostní systémy platformy považovaly růst za normální. Doručení sledujete z dashboardu a kdykoli můžete pozastavit nebo dorovnat.",
+    bodyP4: (city, hoods) =>
+      `Trh ${city} jede na estetice — to, co vyhraje v ${hoods}, nevyhraje v předměstském feedu dvě města dál. Neslibujeme, že opravíme váš obsah. To, co děláme, je sundat daň ze startu zastudena, aby obsah, který už tvoříte, dostal expoziční plochu, kterou si zaslouží. Pokud si nejste jistí, který balíček sedí vaší fázi, náš tým odpovídá na tikety v angličtině a hlavním jazyce města.`,
+    schemaWebPageName: (city) => `Koupit sledující na Instagramu v ${city}`,
+    schemaServiceName: (city) => `Růst Instagramu a TikToku v ${city}`,
+  },
+  sk: {
+    metaTitle: (city) => `Kúpiť sledujúcich na Instagrame v ${city} — lokálny rast | Viralefy`,
+    metaDescription: (city) =>
+      `Rast na Instagrame a TikToku v ${city}. Skutoční sledujúci, lajky a zhliadnutia s doručením naladeným na miestne časové pásmo. Plaťte v USDT/USD a štartujte v priebehu minút.`,
+    heroTitle: (city) => `Kúpiť sledujúcich na Instagrame v ${city}`,
+    heroSubtitle: (city) =>
+      `Miestne publikum, skutočné zapojenie, okamžité doručenie — postavené pre tvorcov a značky v ${city}.`,
+    ctaSeePlans: (city) => `Zobraziť plány pre ${city}`,
+    ctaAllCities: "Všetky mestá",
+    breadcrumbHome: "Domov",
+    breadcrumbCities: "Mestá",
+    whyHeading: (city) => `Prečo si tvorcovia v ${city} volia Viralefy`,
+    bullets: (city) => [
+      "Účty s autentickým vzhľadom — profilová fotka, bio a história príspevkov. Žiadny podpis bota.",
+      `Postupné doručenie zladené s časovým pásmom ${city}, dopadá v miestnej špičke.`,
+      "Ceny v USDT/USD — žiadne menové prekvapenia, žiadne kartové údaje, žiadne chargebacky.",
+      "30-dňová záruka doplnenia proti úbytkom v každom balíčku sledujúcich.",
+      "Rovnaký dashboard pre Instagram, TikTok aj žiadosti o doplnenie.",
+      `Podpora v angličtine a v hlavnom miestnom jazyku mesta ${city}.`,
+    ],
+    readyHeading: (city) => `Pripravení rásť v ${city}?`,
+    readyBody: (country) =>
+      `Vyberte plán naladený na trh ${country} — sledujúci, lajky alebo zhliadnutia, doručené ešte dnes.`,
+    readyCta: "Zobraziť plány sledujúcich na Instagrame",
+    bodyP1: (city, hoods, landmark) =>
+      `Či ste tvorca, ktorý natáča okolo ${landmark}, malá značka tlačiaca pop-upy cez ${hoods}, alebo agentúra škálujúca klientske účty naprieč ${city}, úzkym hrdlom je hustota publika. Viralefy doručuje sledujúcich, lajky a komentáre na Instagrame a zhliadnutia na TikToku v doručovacích oknách zladených s vaším miestnym časovým pásmom — aby nový sociálny dôkaz dopadol vtedy, keď je vaše miestne publikum naozaj online.`,
+    bodyP2: (city, population) =>
+      `${city} patrí medzi najkonkurenčnejšie feedy na svete. Pri viac ako ${population} obyvateľoch a hustej tvorivej ekonomike je prelomenie zahrievacej fázy algoritmu bez počiatočného postrčenia kruté. Naše štartovacie balíčky túto medzeru zapĺňajú: meraný nárast autenticky vyzerajúcich účtov, ktorý dostane váš príspevok do karty Preskúmať, a odtiaľ sa organické zapojenie nabaľuje samo.`,
+    bodyP3:
+      "Každá objednávka sa platí v USDT alebo USD a vyúčtuje sa on-chain — žiadne chargebacky, žiadne odhalené kartové údaje. Doručenie štartuje v priebehu minút po potvrdení a končí v priebehu hodín alebo dní podľa veľkosti balíčka. Pomalé kvapkanie je zámerné: napodobňuje organické vzorce, aby bezpečnostné systémy platformy považovali rast za normálny. Doručenie sledujete z dashboardu a kedykoľvek môžete pozastaviť alebo dorovnať.",
+    bodyP4: (city, hoods) =>
+      `Trh ${city} ide na estetike — to, čo vyhrá v ${hoods}, nevyhrá v predmestskom feede dve mestá ďalej. Nesľubujeme, že opravíme váš obsah. Robíme to, že snímeme daň zo studeného štartu, aby obsah, ktorý už tvoríte, dostal expozičnú plochu, ktorú si zaslúži. Ak si nie ste istí, ktorý balíček sedí vašej fáze, náš tím odpovedá na tikety v angličtine a hlavnom jazyku mesta.`,
+    schemaWebPageName: (city) => `Kúpiť sledujúcich na Instagrame v ${city}`,
+    schemaServiceName: (city) => `Rast Instagramu a TikToku v ${city}`,
+  },
+  th: {
+    metaTitle: (city) => `ซื้อผู้ติดตาม Instagram ใน ${city} — การเติบโตท้องถิ่น | Viralefy`,
+    metaDescription: (city) =>
+      `ขยาย Instagram และ TikTok ของคุณใน ${city} ผู้ติดตาม ไลก์ และการเข้าชมจริงพร้อมการจัดส่งที่ปรับให้เข้ากับเขตเวลาท้องถิ่น ชำระด้วย USDT/USD และเริ่มได้ภายในไม่กี่นาที`,
+    heroTitle: (city) => `ซื้อผู้ติดตาม Instagram ใน ${city}`,
+    heroSubtitle: (city) =>
+      `ผู้ชมท้องถิ่น การมีส่วนร่วมจริง การจัดส่งทันที — สร้างมาเพื่อครีเอเตอร์และแบรนด์ใน ${city}`,
+    ctaSeePlans: (city) => `ดูแผนสำหรับ ${city}`,
+    ctaAllCities: "ทุกเมือง",
+    breadcrumbHome: "หน้าแรก",
+    breadcrumbCities: "เมือง",
+    whyHeading: (city) => `ทำไมครีเอเตอร์ใน ${city} จึงเลือก Viralefy`,
+    bullets: (city) => [
+      "บัญชีที่ดูจริง — มีภาพโปรไฟล์ ไบโอ และประวัติการโพสต์ ไม่มีลายเซ็นของบอท",
+      `การจัดส่งแบบทยอยที่ปรับให้ตรงกับเขตเวลาของ ${city} ไปถึงในช่วงเวลาที่ผู้ชมท้องถิ่นใช้งานสูงสุด`,
+      "ราคาเป็น USDT/USD — ไม่มีความประหลาดใจเรื่องอัตราแลกเปลี่ยน ไม่มีข้อมูลบัตร ไม่มีการคืนเงิน",
+      "รับประกันการเติม 30 วันต่อการลดลงในทุกแพ็คเกจผู้ติดตาม",
+      "แดชบอร์ดเดียวกันสำหรับ Instagram, TikTok และคำขอเติม",
+      `การสนับสนุนเป็นภาษาอังกฤษและภาษาท้องถิ่นหลักของ ${city}`,
+    ],
+    readyHeading: (city) => `พร้อมจะเติบโตใน ${city} แล้วหรือยัง?`,
+    readyBody: (country) =>
+      `เลือกแผนที่ปรับเข้ากับตลาด ${country} — ผู้ติดตาม ไลก์ หรือการเข้าชม จัดส่งวันนี้`,
+    readyCta: "ดูแผนผู้ติดตาม Instagram",
+    bodyP1: (city, hoods, landmark) =>
+      `ไม่ว่าคุณจะเป็นครีเอเตอร์ที่ถ่ายทำรอบ ${landmark} แบรนด์เล็กที่ผลักดันป๊อปอัพผ่าน ${hoods} หรือเอเจนซีที่ขยายบัญชีลูกค้าทั่ว ${city} ความหนาแน่นของผู้ชมคือคอขวด Viralefy จัดส่งผู้ติดตาม ไลก์ ความคิดเห็นบน Instagram และการเข้าชม TikTok ในช่วงเวลาการจัดส่งที่ปรับให้ตรงกับเขตเวลาท้องถิ่นของคุณ — เพื่อให้หลักฐานทางสังคมใหม่ลงในเวลาที่ผู้ชมท้องถิ่นของคุณออนไลน์จริง`,
+    bodyP2: (city, population) =>
+      `${city} เป็นหนึ่งในฟีดที่แข่งขันสูงที่สุดในโลก ด้วยผู้อยู่อาศัยมากกว่า ${population} คนและเศรษฐกิจครีเอเตอร์ที่หนาแน่น การทะลุระยะอุ่นเครื่องของอัลกอริทึมโดยไม่มีแรงผลักดันเริ่มต้นเป็นเรื่องโหดร้าย แพ็คเกจเริ่มต้นของเราเติมเต็มช่องว่างนั้น: การเพิ่มขึ้นที่วัดได้ของบัญชีที่ดูจริงซึ่งดันโพสต์ของคุณไปยังแท็บสำรวจ จากนั้นการมีส่วนร่วมแบบออร์แกนิคจะทบต้นจากที่นั่น`,
+    bodyP3:
+      "ทุกคำสั่งซื้อชำระเป็น USDT หรือ USD และเคลียร์บนเชน — ไม่มีการคืนเงินและไม่มีการเปิดเผยข้อมูลบัตร การจัดส่งเริ่มภายในไม่กี่นาทีหลังจากการยืนยันและสิ้นสุดภายในไม่กี่ชั่วโมงหรือไม่กี่วันขึ้นอยู่กับขนาดแพ็คเกจ การหยดช้าเป็นความตั้งใจ: เลียนแบบรูปแบบออร์แกนิคเพื่อให้ระบบความปลอดภัยของแพลตฟอร์มถือว่าการเติบโตเป็นเรื่องปกติ คุณสามารถตรวจสอบการจัดส่งจากแดชบอร์ดและหยุดชั่วคราวหรือเติมได้ตลอดเวลา",
+    bodyP4: (city, hoods) =>
+      `ตลาด ${city} เคลื่อนไหวด้วยสุนทรียศาสตร์ — สิ่งที่ชนะใน ${hoods} จะไม่ชนะในฟีดชานเมืองสองเมืองห่างไป เราไม่ได้สัญญาว่าจะแก้ไขเนื้อหาของคุณ สิ่งที่เราทำคือเอาภาษีการเริ่มเย็นออก เพื่อให้เนื้อหาที่คุณสร้างอยู่แล้วได้รับพื้นที่การแสดงผลที่สมควรได้รับ หากไม่แน่ใจว่าแพ็คเกจใดเหมาะกับเวทีของคุณ ทีมงานของเราตอบตั๋วเป็นภาษาอังกฤษและภาษาหลักของเมือง`,
+    schemaWebPageName: (city) => `ซื้อผู้ติดตาม Instagram ใน ${city}`,
+    schemaServiceName: (city) => `การเติบโตของ Instagram และ TikTok ใน ${city}`,
+  },
+  vi: {
+    metaTitle: (city) => `Mua người theo dõi Instagram tại ${city} — tăng trưởng địa phương | Viralefy`,
+    metaDescription: (city) =>
+      `Phát triển Instagram và TikTok của bạn tại ${city}. Người theo dõi, lượt thích và lượt xem thật với việc giao hàng được điều chỉnh theo múi giờ địa phương. Thanh toán bằng USDT/USD và bắt đầu trong vài phút.`,
+    heroTitle: (city) => `Mua người theo dõi Instagram tại ${city}`,
+    heroSubtitle: (city) =>
+      `Khán giả địa phương, tương tác thật, giao hàng tức thì — được xây dựng cho những người sáng tạo và thương hiệu tại ${city}.`,
+    ctaSeePlans: (city) => `Xem các gói cho ${city}`,
+    ctaAllCities: "Tất cả thành phố",
+    breadcrumbHome: "Trang chủ",
+    breadcrumbCities: "Thành phố",
+    whyHeading: (city) => `Vì sao người sáng tạo tại ${city} chọn Viralefy`,
+    bullets: (city) => [
+      "Tài khoản trông thật — ảnh đại diện, tiểu sử và lịch sử đăng bài. Không có dấu hiệu bot.",
+      `Giao nhỏ giọt được điều chỉnh theo múi giờ của ${city}, đến vào giờ cao điểm địa phương.`,
+      "Giá tính bằng USDT/USD — không bất ngờ về tỉ giá, không dữ liệu thẻ, không hoàn tiền.",
+      "Bảo hành bù đắp 30 ngày cho các đợt sụt giảm trên mọi gói người theo dõi.",
+      "Cùng một bảng điều khiển cho Instagram, TikTok và các yêu cầu bù đắp.",
+      `Hỗ trợ bằng tiếng Anh và ngôn ngữ địa phương chính của ${city}.`,
+    ],
+    readyHeading: (city) => `Sẵn sàng phát triển tại ${city}?`,
+    readyBody: (country) =>
+      `Chọn một gói phù hợp với thị trường ${country} — người theo dõi, lượt thích hoặc lượt xem, được giao hôm nay.`,
+    readyCta: "Xem các gói người theo dõi Instagram",
+    bodyP1: (city, hoods, landmark) =>
+      `Dù bạn là người sáng tạo quay phim quanh ${landmark}, một thương hiệu nhỏ đẩy pop-up qua ${hoods}, hay một agency mở rộng tài khoản khách hàng khắp ${city}, mật độ khán giả là nút thắt. Viralefy giao người theo dõi, lượt thích và bình luận Instagram cùng lượt xem TikTok trong các khung giao hàng được điều chỉnh theo múi giờ địa phương của bạn — để bằng chứng xã hội mới đáp xuống khi khán giả địa phương thực sự đang online.`,
+    bodyP2: (city, population) =>
+      `${city} là một trong những bảng tin cạnh tranh nhất thế giới. Với hơn ${population} cư dân và một nền kinh tế người sáng tạo dày đặc, việc phá vỡ giai đoạn khởi động của thuật toán mà không có cú đẩy ban đầu là tàn khốc. Các gói khởi đầu của chúng tôi lấp khoảng trống đó: một sự gia tăng có đo lường của các tài khoản trông thật, đẩy bài đăng của bạn vào tab khám phá, và từ đó tương tác tự nhiên tự tích lũy.`,
+    bodyP3:
+      "Mỗi đơn hàng được thanh toán bằng USDT hoặc USD và quyết toán on-chain — không có hoàn tiền và không lộ dữ liệu thẻ. Giao hàng bắt đầu trong vài phút sau khi xác nhận và kết thúc trong vài giờ hoặc vài ngày tùy kích thước gói. Việc nhỏ giọt chậm là có chủ đích: nó mô phỏng các mẫu tự nhiên để các hệ thống bảo mật của nền tảng coi sự tăng trưởng là bình thường. Bạn theo dõi việc giao hàng từ bảng điều khiển của mình và có thể tạm dừng hoặc bổ sung bất cứ lúc nào.",
+    bodyP4: (city, hoods) =>
+      `Thị trường ${city} vận hành trên thẩm mỹ — thứ thắng ở ${hoods} sẽ không thắng trong một bảng tin ngoại ô hai thành phố cách đó. Chúng tôi không hứa sẽ sửa nội dung của bạn. Điều chúng tôi làm là loại bỏ thuế khởi động lạnh để nội dung bạn đã làm có được diện tích trình bày mà nó xứng đáng. Nếu bạn không chắc gói nào phù hợp với giai đoạn của mình, đội ngũ của chúng tôi trả lời các phiếu bằng tiếng Anh và ngôn ngữ chính của thành phố.`,
+    schemaWebPageName: (city) => `Mua người theo dõi Instagram tại ${city}`,
+    schemaServiceName: (city) => `Tăng trưởng Instagram và TikTok tại ${city}`,
+  },
+  id: {
+    metaTitle: (city) => `Beli pengikut Instagram di ${city} — pertumbuhan lokal | Viralefy`,
+    metaDescription: (city) =>
+      `Kembangkan Instagram dan TikTok Anda di ${city}. Pengikut, suka, dan tayangan asli dengan pengiriman yang disesuaikan dengan zona waktu lokal. Bayar dengan USDT/USD dan mulai dalam hitungan menit.`,
+    heroTitle: (city) => `Beli pengikut Instagram di ${city}`,
+    heroSubtitle: (city) =>
+      `Audiens lokal, keterlibatan asli, pengiriman instan — dibangun untuk kreator dan merek di ${city}.`,
+    ctaSeePlans: (city) => `Lihat paket untuk ${city}`,
+    ctaAllCities: "Semua kota",
+    breadcrumbHome: "Beranda",
+    breadcrumbCities: "Kota",
+    whyHeading: (city) => `Mengapa kreator di ${city} memilih Viralefy`,
+    bullets: (city) => [
+      "Akun yang terlihat asli — foto profil, bio, dan riwayat posting. Tidak ada tanda bot.",
+      `Pengiriman bertahap yang diselaraskan dengan zona waktu ${city}, tiba pada jam sibuk lokal.`,
+      "Harga dalam USDT/USD — tidak ada kejutan kurs, tidak ada data kartu, tidak ada chargeback.",
+      "Jaminan pengisian ulang 30 hari terhadap penurunan pada setiap paket pengikut.",
+      "Dasbor yang sama untuk Instagram, TikTok, dan permintaan pengisian ulang.",
+      `Dukungan dalam bahasa Inggris dan bahasa lokal utama dari ${city}.`,
+    ],
+    readyHeading: (city) => `Siap berkembang di ${city}?`,
+    readyBody: (country) =>
+      `Pilih paket yang disesuaikan dengan pasar ${country} — pengikut, suka, atau tayangan, dikirim hari ini.`,
+    readyCta: "Lihat paket pengikut Instagram",
+    bodyP1: (city, hoods, landmark) =>
+      `Baik Anda seorang kreator yang merekam di sekitar ${landmark}, merek kecil yang mendorong pop-up melalui ${hoods}, atau agensi yang menskalakan akun klien di seluruh ${city}, kepadatan audiens adalah hambatannya. Viralefy mengirimkan pengikut, suka, dan komentar Instagram serta tayangan TikTok dengan jendela pengiriman yang diselaraskan dengan zona waktu lokal Anda — sehingga bukti sosial baru mendarat ketika audiens lokal Anda benar-benar online.`,
+    bodyP2: (city, population) =>
+      `${city} adalah salah satu feed paling kompetitif di dunia. Dengan lebih dari ${population} penduduk dan ekonomi kreator yang padat, menembus fase pemanasan algoritma tanpa dorongan awal sangat brutal. Paket pemula kami menutupi celah itu: peningkatan terukur dari akun yang terlihat asli yang mendorong posting Anda ke tab jelajahi, dan dari sana keterlibatan organik bertumpuk dengan sendirinya.`,
+    bodyP3:
+      "Setiap pesanan dibayar dalam USDT atau USD dan diselesaikan on-chain — tidak ada chargeback dan tidak ada data kartu yang terungkap. Pengiriman dimulai dalam hitungan menit setelah konfirmasi dan selesai dalam jam atau hari tergantung ukuran paket. Tetesan lambat ini disengaja: meniru pola organik agar sistem keamanan platform memperlakukan pertumbuhan sebagai hal normal. Anda dapat memantau pengiriman dari dasbor dan menjeda atau menambah kapan saja.",
+    bodyP4: (city, hoods) =>
+      `Pasar ${city} bergerak oleh estetika — yang menang di ${hoods} tidak akan menang di feed pinggiran dua kota berikutnya. Kami tidak menjanjikan akan memperbaiki konten Anda. Yang kami lakukan adalah menghapus pajak cold start sehingga konten yang sudah Anda buat mendapatkan ruang tampil yang layak. Jika Anda tidak yakin paket mana yang cocok untuk tahap Anda, tim kami menjawab tiket dalam bahasa Inggris dan bahasa utama kota tersebut.`,
+    schemaWebPageName: (city) => `Beli pengikut Instagram di ${city}`,
+    schemaServiceName: (city) => `Pertumbuhan Instagram dan TikTok di ${city}`,
+  },
 };
 
 // Programmatic SEO city LP. 50 rotas estáticas; cada uma fala da cidade
@@ -844,6 +1114,11 @@ const LOCAL_FLAVOR: Record<string, { neighborhoods: string[]; landmark: string }
   "bangkok": { neighborhoods: ["Sukhumvit", "Thonglor", "Ari"], landmark: "the Chao Phraya" },
 };
 
+// ISR (round 23 Track XX): página detalhe — generateStaticParams + revalidate.
+// Como usa `headers()` pra i18n, Next 15 mantém `ƒ` até o i18n virar client-side.
+// Cache via Caddy compensa (Track JJ).
+export const revalidate = 1800;
+
 export async function generateStaticParams() {
   return CITIES.map((c) => ({ city: c.slug }));
 }
@@ -856,7 +1131,8 @@ export async function generateMetadata({ params }: { params: Promise<{ city: str
   const url = siteUrl();
   const meta = indexableMeta();
   const lang = await resolveLang();
-  const tt = CITY_T[lang];
+  // Fallback EN pra langs sem pack (he/uk/cs/sk/th/vi/id — débito Track XX).
+  const tt = CITY_T[lang] ?? CITY_T.en!;
   const title = tt.metaTitle(city.name);
   const description = tt.metaDescription(city.name);
   return {
@@ -885,6 +1161,13 @@ export async function generateMetadata({ params }: { params: Promise<{ city: str
         "da-DK": `/cities/${city.slug}`,
         "nb-NO": `/cities/${city.slug}`,
         "fi-FI": `/cities/${city.slug}`,
+        "he-IL": `/cities/${city.slug}`,
+        "uk-UA": `/cities/${city.slug}`,
+        "cs-CZ": `/cities/${city.slug}`,
+        "sk-SK": `/cities/${city.slug}`,
+        "th-TH": `/cities/${city.slug}`,
+        "vi-VN": `/cities/${city.slug}`,
+        "id-ID": `/cities/${city.slug}`,
       },
     },
     robots: meta.robots,
@@ -911,7 +1194,9 @@ function neighborhoodsText(
 ): { hoods: string; landmark: string } {
   const flavor = LOCAL_FLAVOR[slug];
   if (!flavor) {
-    const fallbackHoods: Record<PageLang, string> = {
+    // Round 23 Track XX: Partial pra acomodar langs novas (he/uk/cs/sk/th/vi/id)
+    // sem ainda ter tradução — fallback EN no acesso.
+    const fallbackHoods: Partial<Record<PageLang, string>> = {
       en: `central ${city}`,
       pt: `o centro de ${city}`,
       es: `el centro de ${city}`,
@@ -931,13 +1216,20 @@ function neighborhoodsText(
       da: `${city} centrum`,
       no: `${city} sentrum`,
       fi: `${city}n keskusta`,
+      he: `מרכז ${city}`,
+      uk: `центр ${city}`,
+      cs: `centrum ${city}`,
+      sk: `centrum ${city}`,
+      th: `ใจกลาง ${city}`,
+      vi: `trung tâm ${city}`,
+      id: `pusat kota ${city}`,
     };
-    return { hoods: fallbackHoods[lang], landmark: `${city}` };
+    return { hoods: fallbackHoods[lang] ?? fallbackHoods.en ?? `central ${city}`, landmark: `${city}` };
   }
   const list = flavor.neighborhoods;
   const last = list[list.length - 1];
   const head = list.slice(0, -1).join(", ");
-  const connector: Record<PageLang, string> = {
+  const connector: Partial<Record<PageLang, string>> = {
     en: " and ",
     pt: " e ",
     es: " y ",
@@ -957,9 +1249,16 @@ function neighborhoodsText(
     da: " og ",
     no: " og ",
     fi: " ja ",
+    he: " ו",
+    uk: " і ",
+    cs: " a ",
+    sk: " a ",
+    th: " และ ",
+    vi: " và ",
+    id: " dan ",
   };
   return {
-    hoods: list.length > 1 ? `${head}${connector[lang]}${last}` : last,
+    hoods: list.length > 1 ? `${head}${connector[lang] ?? connector.en ?? " and "}${last}` : last,
     landmark: flavor.landmark,
   };
 }
@@ -972,9 +1271,10 @@ export default async function CityPage({ params }: { params: Promise<{ city: str
   const url = siteUrl();
   const pageUrl = `${url}/cities/${city.slug}`;
   const lang = await resolveLang();
-  const tt = CITY_T[lang];
+  // Fallback EN pra langs sem pack (he/uk/cs/sk/th/vi/id — débito Track XX).
+  const tt = CITY_T[lang] ?? CITY_T.en!;
   // Locale do toLocaleString segue lang (BUG-89): em PT vira "12.300.000".
-  const localeFmtByLang: Record<PageLang, string> = {
+  const localeFmtByLang: Partial<Record<PageLang, string>> = {
     pt: "pt-BR",
     en: "en-US",
     es: "es-ES",
@@ -994,8 +1294,15 @@ export default async function CityPage({ params }: { params: Promise<{ city: str
     da: "da-DK",
     no: "nb-NO",
     fi: "fi-FI",
+    he: "he-IL",
+    uk: "uk-UA",
+    cs: "cs-CZ",
+    sk: "sk-SK",
+    th: "th-TH",
+    vi: "vi-VN",
+    id: "id-ID",
   };
-  const populationFmt = city.population.toLocaleString(localeFmtByLang[lang]);
+  const populationFmt = city.population.toLocaleString(localeFmtByLang[lang] ?? "en-US");
   // BUG-90/163 do QA 2026-06-12: ctaHref apontava pra alias EN
   // (/br/instagram-followers) que gerava conteúdo duplicado sem 301 — o
   // canonical próprio mascarava o problema. Agora gera o slug localizado

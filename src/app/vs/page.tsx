@@ -12,6 +12,11 @@ import { withGlobalGraph } from "@/lib/jsonld";
 // Agora resolve lang via header `x-locale` setado pelo middleware e usa
 // pack TEXT[lang] pra hero/tabela/footer. Sub-páginas /vs/<comp> ainda
 // dependem do dataset COMPETITORS (EN-only) — débito documentado.
+//
+// ISR (round 23 Track XX): `headers()` força dynamic. Cache vira responsabilidade
+// do Caddy (Cache-Control: public, s-maxage=1800, swr=86400). Track WW deve
+// avaliar mover i18n pra client context.
+export const revalidate = 1800;
 
 type PageLang = "pt" | "en" | "es";
 

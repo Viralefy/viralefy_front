@@ -5,6 +5,15 @@ import { indexableMeta } from "@/lib/seo-meta";
 import { CASE_STUDIES, CASE_STUDY_DISCLAIMER } from "@/lib/case-studies";
 import { withGlobalGraph } from "@/lib/jsonld";
 
+// ISR (round 23 Track XX): conteúdo estático (dataset CASE_STUDIES). Sem
+// fetch, sem cookies/headers próprios. revalidate=1800 mantém em sincronia
+// com refresh do dataset se ele virar dinâmico no futuro. NOTA: o root
+// layout lê `headers()`/`cookies()` pra theme/locale — isso pode forçar
+// dynamic mesmo com `revalidate` setado. Trade-off: aceitar que a page
+// suba como `ƒ` enquanto layout não for refatorado; mesmo assim Caddy
+// pode cachear via `Cache-Control: s-maxage` (debito pro Track de Caddy).
+export const revalidate = 1800;
+
 const TITLE = "Case studies | Viralefy";
 const DESCRIPTION =
   "Composite case studies showing how operators, agencies and creators use Viralefy to move real engagement metrics. Personas anonymised, numbers directional.";

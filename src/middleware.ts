@@ -65,6 +65,13 @@ function detectAcceptLanguage(req: NextRequest): string | null {
     if (tag.startsWith("da")) return "da-DK";
     if (tag.startsWith("nb") || tag.startsWith("no")) return "nb-NO";
     if (tag.startsWith("fi")) return "fi-FI";
+    if (tag.startsWith("he") || tag.startsWith("iw")) return "he-IL";
+    if (tag.startsWith("uk")) return "uk-UA";
+    if (tag.startsWith("cs")) return "cs-CZ";
+    if (tag.startsWith("sk")) return "sk-SK";
+    if (tag.startsWith("th")) return "th-TH";
+    if (tag.startsWith("vi")) return "vi-VN";
+    if (tag.startsWith("id")) return "id-ID";
     if (tag.startsWith("en")) return "en";
   }
   return null;

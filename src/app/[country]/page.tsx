@@ -14,7 +14,16 @@ import { CATEGORY_CODES, categoryLabel, categorySlug } from "@/i18n/categories";
 import { countryRootAlternates } from "@/lib/hreflang";
 import { indexableMeta } from "@/lib/seo-meta";
 
-export const dynamic = "force-dynamic";
+// ISR (round 23 Track XX): country root não depende de cookie/header/sessão
+// — só do slug do país (~60 valores conhecidos). Substituímos `force-dynamic`
+// por `generateStaticParams` + `revalidate=1800`: páginas pré-rendadas em build
+// (HTML servido em ms), revalidação background quando catálogo muda. Trade-off
+// idêntico à home — até 30min de defasagem nos preços do catálogo.
+export const revalidate = 1800;
+
+export function generateStaticParams(): { country: string }[] {
+  return COUNTRIES.map((c) => ({ country: c.code }));
+}
 
 type Params = { country: string };
 
@@ -64,7 +73,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 async function getPlans(): Promise<Plan[]> {
   const base = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
   try {
-    const res = await fetch(`${base}/v1/plans`, { cache: "no-store" });
+    const res = await fetch(`${base}/v1/plans`, { next: { revalidate: 1800 } });
     const json = await res.json();
     return (json.data as Plan[]) ?? [];
   } catch {

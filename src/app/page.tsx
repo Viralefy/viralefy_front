@@ -18,8 +18,14 @@ const seoMeta = indexableMeta();
 // mercados para CTR para subsites por país.
 //
 // `/` é a entrada canônica para `en` na hreflang.
-
-export const dynamic = "force-dynamic";
+//
+// ISR (round 23 Track XX): home não depende de cookies/headers/sessão. O
+// conteúdo varia só com o catálogo de planos, que muda raramente. Antes:
+// `force-dynamic` + `fetch(..., no-store)` => SSR a cada hit, p50 ~1.5-2.7s.
+// Agora: revalidate 30min => HTML pré-rendado servido em ms; revalidação em
+// background quando o TTL expira. Trade-off aceito: até 30min de defasagem
+// no catálogo, irrelevante pra home.
+export const revalidate = 1800;
 
 function siteUrl() {
   return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
@@ -55,7 +61,7 @@ export const metadata: Metadata = {
 async function getPlans(): Promise<Plan[]> {
   const base = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
   try {
-    const res = await fetch(`${base}/v1/plans`, { cache: "no-store" });
+    const res = await fetch(`${base}/v1/plans`, { next: { revalidate: 1800 } });
     const json = await res.json();
     return (json.data as Plan[]) ?? [];
   } catch {

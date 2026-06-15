@@ -31,7 +31,13 @@ import { Flag } from "@/components/Flag";
 //   - FAQ rico (JSON-LD FAQPage)
 //   - JSON-LD Service + AggregateOffer + BreadcrumbList
 
-export const dynamic = "force-dynamic";
+// ISR (round 23 Track XX): combinação países × categorias gera cardinalidade
+// alta (~60 × 5 = 300 rotas). NÃO usamos `generateStaticParams` aqui pra não
+// alongar o build — Next gera on-demand no primeiro hit e cacheia por 30min.
+// SEO/crawlers veem HTML pré-rendado a partir do 2º hit (cache hit). Trade-off:
+// primeiro hit numa combinação fria ainda paga o custo SSR (~1.5-2s), mas
+// crawlers e tráfego repetido pagam ~5ms (CDN/edge).
+export const revalidate = 1800;
 
 type Params = { country: string; category: string };
 
@@ -79,7 +85,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 async function getPlans(): Promise<Plan[]> {
   const base = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
   try {
-    const res = await fetch(`${base}/v1/plans`, { cache: "no-store" });
+    const res = await fetch(`${base}/v1/plans`, { next: { revalidate: 1800 } });
     const json = await res.json();
     return (json.data as Plan[]) ?? [];
   } catch {
