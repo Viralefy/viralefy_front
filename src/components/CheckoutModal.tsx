@@ -345,7 +345,26 @@ export function CheckoutModal({
       setResult(res);
       setStep(payMethod === "credits" ? "success" : "instructions");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Checkout error");
+      // BUG-29 (QA round 22): "invalid input" do backend era jogado solto
+      // sem destacar o campo problemático nem traduzir. Agora tentamos
+      // detectar shape estruturado (`{field, message}`) ou pattern do
+      // texto pra mapear ao field específico — aí o usuário vê borda
+      // vermelha + mensagem inline em vez de toast genérico em inglês.
+      const raw = err instanceof Error ? err.message : "Checkout error";
+      const lowered = raw.toLowerCase();
+      const nextFieldErrors: Record<string, string> = {};
+      // Heurísticas leves; matches strings comuns que o backend devolve
+      // (`handle invalid`, `email format`, `publication url`).
+      if (/handle|username|@/.test(lowered)) nextFieldErrors.handle = fe.handleInvalid;
+      else if (/email|e-mail/.test(lowered)) nextFieldErrors.email = fe.emailInvalid;
+      else if (/name|nome|nombre/.test(lowered)) nextFieldErrors.name = fe.nameInvalid;
+      else if (/publication|url|link/.test(lowered)) nextFieldErrors.publication_url = fe.publicationUrlInvalid;
+      if (Object.keys(nextFieldErrors).length > 0) {
+        setFieldErrors(nextFieldErrors);
+        setError(fe.formSummary);
+      } else {
+        setError(raw);
+      }
       setStep("form");
     } finally {
       setLoading(false);

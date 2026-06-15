@@ -274,8 +274,14 @@ export function urlsForBucket(all: SiteUrl[], b: SitemapBucketID): SiteUrl[] {
 // `fa` (persa) foi removido em 2026-06-05: não há Irã/Tajiquistão no catálogo
 // de países e o Google Search Console reportava o sitemap vazio como erro.
 // Reintroduzir apenas quando `ir` for adicionado em `countries.ts`.
+//
+// BUG-67 (QA round 22): ordem dos buckets afeta a sequência no
+// sitemap.xml index — Google prioriza crawl pelo top-da-lista. Reordenado
+// pra refletir tráfego real (PT é maior mercado, seguido por ES/EN/FR/DE),
+// não a ordem alfabética legada. EN continua presente, apenas não é o
+// primeiro de tudo.
 export const SITEMAP_BUCKETS: Array<LangCode | "legal"> = [
-  "en", "pt", "es", "es_AR", "fr", "de", "it", "nl",
+  "pt", "es", "es_AR", "en", "fr", "de", "it", "nl",
   "ja", "ko", "ar", "hi", "id", "vi", "th", "tr",
   "ru", "uk",
   "pl", "sv", "da", "no", "fi", "is", "et", "lv", "lt",

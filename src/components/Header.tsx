@@ -150,6 +150,7 @@ export function Header() {
   const SupportButton = (
     <Link
       href="/tickets"
+      prefetch={false}
       className="btn btn-outline"
       style={{
         padding: "0.5rem 0.85rem",

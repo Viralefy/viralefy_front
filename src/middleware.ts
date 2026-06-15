@@ -13,11 +13,22 @@ import { NextRequest, NextResponse } from "next/server";
 //      em rotas sem country prefix sem precisar duplicar URL.
 //   3. Fallback final: "en".
 //
+// BUG-200 (QA round 22): adicionado geo-redirect 1-shot na raiz:
+//   - Path `/`, sem cookie `vf_geo_redirected`, com `cf-ipcountry`/
+//     `x-vercel-ip-country` em allowlist → 302 pra `/{country}` + set cookie.
+//   - Crawler bots/healthchecks bypass via UA allowlist.
+//   - Cookie expira em 30 dias e o reset acontece se o usuário muda de país.
+//
 // Custo: ~0.1ms por request. Sem fetch.
 
 import { COUNTRIES } from "@/i18n/countries";
 
 const COUNTRY_LANG = new Map(COUNTRIES.map((c) => [c.code, c.htmlLang]));
+const COUNTRY_CODES = new Set(COUNTRIES.map((c) => c.code));
+
+// User-Agents que NUNCA devem ser redirecionados — crawlers precisam ver o
+// conteúdo canônico da raiz (sitemap, OG meta) sem desviar pra um país.
+const BOT_UA_RE = /bot|crawl|spider|slurp|facebookexternalhit|whatsapp|telegram|preview/i;
 
 function detectAcceptLanguage(req: NextRequest): string | null {
   const h = req.headers.get("accept-language");
@@ -59,9 +70,53 @@ function detectAcceptLanguage(req: NextRequest): string | null {
   return null;
 }
 
+// detectCountry tenta extrair o ISO 3166-1 alpha-2 do request via headers de
+// edge networks. Retorna lowercase ou null. NUNCA confia em IP DIY — só nos
+// headers que CF/Vercel inserem, que são forjáveis por usuário externo mas
+// não são vetor de attack aqui (impacto = redirect 302, não auth).
+function detectCountry(req: NextRequest): string | null {
+  const raw =
+    req.headers.get("cf-ipcountry") ||
+    req.headers.get("x-vercel-ip-country") ||
+    "";
+  if (!raw || raw === "XX" || raw === "T1") return null; // CF usa XX/T1 pra Tor
+  return raw.toLowerCase();
+}
+
 export function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
   const seg = path.split("/")[1] ?? "";
+
+  // BUG-200: geo-redirect na raiz. Só dispara quando:
+  //   - path é exatamente `/` (não `/pricing`, não `/vs/...`)
+  //   - sem query string que indique link explícito (`?nogeo=1` opt-out)
+  //   - cookie de "já redirecionei" ausente
+  //   - UA não é bot/crawler (preserva SEO da raiz canônica)
+  //   - header de geo presente E país está na nossa allowlist
+  if (path === "/" && req.method === "GET") {
+    const optOut = req.nextUrl.searchParams.has("nogeo");
+    const already = req.cookies.get("vf_geo_redirected")?.value;
+    const ua = req.headers.get("user-agent") || "";
+    const isBot = BOT_UA_RE.test(ua);
+    if (!optOut && !already && !isBot) {
+      const cc = detectCountry(req);
+      if (cc && COUNTRY_CODES.has(cc)) {
+        const url = req.nextUrl.clone();
+        url.pathname = `/${cc}`;
+        const redirect = NextResponse.redirect(url, 302);
+        // 30d — quando expira o usuário pode ser re-redirecionado caso o
+        // IP atual indique outro país (ex.: viagem).
+        redirect.cookies.set("vf_geo_redirected", "1", {
+          maxAge: 60 * 60 * 24 * 30,
+          path: "/",
+          sameSite: "lax",
+          httpOnly: false, // o front pode ler pra exibir "voltar pra raiz"
+        });
+        return redirect;
+      }
+    }
+  }
+
   let locale = COUNTRY_LANG.get(seg);
   if (!locale) {
     locale = detectAcceptLanguage(req) ?? "en";

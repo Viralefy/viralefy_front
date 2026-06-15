@@ -2,7 +2,14 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { COUNTRIES, countriesByRegion, type Country, type Region } from "@/i18n/countries";
+import {
+  COUNTRIES,
+  countriesByRegion,
+  countriesByRegionLocalized,
+  countryDisplayName,
+  type Country,
+  type Region,
+} from "@/i18n/countries";
 import { tr, type LangCode } from "@/i18n/languages";
 import { Icon } from "./Icon";
 import { Flag } from "./Flag";
@@ -43,16 +50,27 @@ export function MegaMenuMarkets({ lang }: { lang: LangCode }) {
     setFilter("");
   }
 
+  // BUG-114: filter precisa casar o nome localizado também (não só o nativo)
+  // pra que usuário PT consiga buscar "Japão" e achar "日本".
+  const displayLang: "pt" | "en" | "es" =
+    lang === "pt" ? "pt" : lang === "es" || lang === "es_AR" ? "es" : "en";
   const f = filter.trim().toLowerCase();
   const match = (c: Country) =>
-    !f || c.name.toLowerCase().includes(f) || c.code.includes(f) || c.h1.toLowerCase().includes(f);
+    !f ||
+    c.name.toLowerCase().includes(f) ||
+    countryDisplayName(c, displayLang).toLowerCase().includes(f) ||
+    c.code.includes(f) ||
+    c.h1.toLowerCase().includes(f);
 
   const leftRegions: Region[] = ["americas", "sepa"];
   const rightRegions: Region[] = ["asia", "africa", "oceania", "europe_other"];
   const totalShown = f ? COUNTRIES.filter(match).length : COUNTRIES.length;
 
   function RegionBlock({ region }: { region: Region }) {
-    const list = countriesByRegion(region).filter(match);
+    // BUG-115: regiões Ásia/África/Mid-East precisam ordenar pelo nome
+    // localizado (latin script) e não pelo `name` nativo que misturava
+    // alfabetos.
+    const list = countriesByRegionLocalized(region, displayLang).filter(match);
     if (list.length === 0) return null;
     return (
       <section style={{ marginBottom: "1.25rem" }}>
@@ -92,7 +110,12 @@ export function MegaMenuMarkets({ lang }: { lang: LangCode }) {
                 onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
               >
                 <Flag code={c.code} width={20} title={c.name} />
-                <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.name}</span>
+                <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {countryDisplayName(c, displayLang)}
+                  {countryDisplayName(c, displayLang) !== c.name && (
+                    <span style={{ opacity: 0.55, fontSize: "0.78em", marginInlineStart: "0.4rem" }}>{c.name}</span>
+                  )}
+                </span>
               </Link>
             </li>
           ))}

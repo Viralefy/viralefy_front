@@ -1445,6 +1445,79 @@ export function getCountry(code: string): Country | undefined {
   return COUNTRIES.find((c) => c.code === code.toLowerCase());
 }
 
+// BUG-114 (QA round 22): países asiáticos vinham em script nativo (الأردن,
+// ישראל, Қазақстан, 日本, भारत…) misturados a países das Américas/Europa em
+// nomes latin. Para o usuário PT/EN/ES isso quebra reconhecimento e ordenação.
+// Mapa de nomes localizados em script latin abaixo cobre 100% dos países
+// non-latin atuais. Países latin (Indonesia, Malaysia, Brunei…) caem no `name`
+// original que já é latin.
+const COUNTRY_LATIN_NAME: Record<string, { pt: string; en: string; es: string }> = {
+  jp: { pt: "Japão", en: "Japan", es: "Japón" },
+  kr: { pt: "Coreia do Sul", en: "South Korea", es: "Corea del Sur" },
+  cn: { pt: "China", en: "China", es: "China" },
+  tw: { pt: "Taiwan", en: "Taiwan", es: "Taiwán" },
+  hk: { pt: "Hong Kong", en: "Hong Kong", es: "Hong Kong" },
+  mo: { pt: "Macau", en: "Macau", es: "Macao" },
+  th: { pt: "Tailândia", en: "Thailand", es: "Tailandia" },
+  vn: { pt: "Vietnã", en: "Vietnam", es: "Vietnam" },
+  in: { pt: "Índia", en: "India", es: "India" },
+  pk: { pt: "Paquistão", en: "Pakistan", es: "Pakistán" },
+  bd: { pt: "Bangladesh", en: "Bangladesh", es: "Bangladés" },
+  sa: { pt: "Arábia Saudita", en: "Saudi Arabia", es: "Arabia Saudita" },
+  ae: { pt: "Emirados Árabes Unidos", en: "United Arab Emirates", es: "Emiratos Árabes Unidos" },
+  qa: { pt: "Catar", en: "Qatar", es: "Catar" },
+  kw: { pt: "Kuwait", en: "Kuwait", es: "Kuwait" },
+  bh: { pt: "Bahrein", en: "Bahrain", es: "Baréin" },
+  om: { pt: "Omã", en: "Oman", es: "Omán" },
+  jo: { pt: "Jordânia", en: "Jordan", es: "Jordania" },
+  lb: { pt: "Líbano", en: "Lebanon", es: "Líbano" },
+  il: { pt: "Israel", en: "Israel", es: "Israel" },
+  iq: { pt: "Iraque", en: "Iraq", es: "Irak" },
+  kz: { pt: "Cazaquistão", en: "Kazakhstan", es: "Kazajistán" },
+  kg: { pt: "Quirguistão", en: "Kyrgyzstan", es: "Kirguistán" },
+  uz: { pt: "Uzbequistão", en: "Uzbekistan", es: "Uzbekistán" },
+  tj: { pt: "Tajiquistão", en: "Tajikistan", es: "Tayikistán" },
+  tm: { pt: "Turcomenistão", en: "Turkmenistan", es: "Turkmenistán" },
+  am: { pt: "Armênia", en: "Armenia", es: "Armenia" },
+  ge: { pt: "Geórgia", en: "Georgia", es: "Georgia" },
+  az: { pt: "Azerbaijão", en: "Azerbaijan", es: "Azerbaiyán" },
+  ru: { pt: "Rússia", en: "Russia", es: "Rusia" },
+  ua: { pt: "Ucrânia", en: "Ukraine", es: "Ucrania" },
+  by: { pt: "Bielorrússia", en: "Belarus", es: "Bielorrusia" },
+  // Africa & Mid-east often in Arabic-ish names too
+  eg: { pt: "Egito", en: "Egypt", es: "Egipto" },
+  ma: { pt: "Marrocos", en: "Morocco", es: "Marruecos" },
+  dz: { pt: "Argélia", en: "Algeria", es: "Argelia" },
+  tn: { pt: "Tunísia", en: "Tunisia", es: "Túnez" },
+  ly: { pt: "Líbia", en: "Libya", es: "Libia" },
+  sd: { pt: "Sudão", en: "Sudan", es: "Sudán" },
+  et: { pt: "Etiópia", en: "Ethiopia", es: "Etiopía" },
+  ye: { pt: "Iêmen", en: "Yemen", es: "Yemen" },
+  sy: { pt: "Síria", en: "Syria", es: "Siria" },
+  ir: { pt: "Irã", en: "Iran", es: "Irán" },
+  af: { pt: "Afeganistão", en: "Afghanistan", es: "Afganistán" },
+};
+
+// countryDisplayName devolve nome em script latin para PT/EN/ES quando
+// disponível, senão cai no `name` original (que já é latin pra Américas
+// e Europa). Garante que listas longas como o modal Mercados ordenem e
+// busquem corretamente para o usuário latin-script.
+export function countryDisplayName(c: Country, lang: "pt" | "en" | "es"): string {
+  const m = COUNTRY_LATIN_NAME[c.code];
+  if (m) return m[lang];
+  return c.name;
+}
+
 export function countriesByRegion(region: Region): Country[] {
   return COUNTRIES.filter((c) => c.region === region).sort((a, b) => a.name.localeCompare(b.name));
+}
+
+// BUG-115 (QA round 22): ordem alfabética dentro da região Ásia ficava
+// quebrada porque `localeCompare` agrupava por codepoint Unicode (latin →
+// árabe → cirílico → CJK). Esta variante ordena pelo nome localizado pra
+// PT/EN/ES, mantendo a lista alfabética em script latin uniformemente.
+export function countriesByRegionLocalized(region: Region, lang: "pt" | "en" | "es"): Country[] {
+  return COUNTRIES.filter((c) => c.region === region).sort((a, b) =>
+    countryDisplayName(a, lang).localeCompare(countryDisplayName(b, lang)),
+  );
 }
