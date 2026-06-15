@@ -8,7 +8,8 @@ import { TrustSignals } from "@/components/TrustSignals";
 import { Flag } from "@/components/Flag";
 import { tr } from "@/i18n/languages";
 import { homeAlternates } from "@/lib/hreflang";
-import { buildHomeJsonLd, safeJsonStringify } from "@/lib/jsonld";
+import { buildHomeJsonLd } from "@/lib/jsonld";
+import { JsonLdScript } from "@/components/JsonLdScript";
 import { indexableMeta } from "@/lib/seo-meta";
 
 const seoMeta = indexableMeta();
@@ -81,7 +82,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonStringify(jsonld) }} />
+      <JsonLdScript data={jsonld} />
 
       <section className="hero container">
         <h1>{t.home.heroTitle}</h1>

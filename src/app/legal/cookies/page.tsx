@@ -3,7 +3,8 @@ import Link from "next/link";
 import { legalDoc, legalMetaDescription } from "@/i18n/legal";
 import { PACKS, type LangCode } from "@/i18n/languages";
 import { renderLegalBody } from "@/lib/legal-render";
-import { withGlobalGraph, safeJsonStringify } from "@/lib/jsonld";
+import { withGlobalGraph } from "@/lib/jsonld";
+import { JsonLdScript } from "@/components/JsonLdScript";
 import { Footer } from "@/components/Footer";
 
 // Página estática `/legal/cookies` — shadow do dynamic `[doc]` para este slug.
@@ -352,10 +353,7 @@ export default async function CookiesLegalPage({
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: safeJsonStringify(jsonLd) }}
-      />
+      <JsonLdScript data={jsonLd} />
       <article className="container" style={{ paddingTop: "2rem", paddingBottom: "3rem", maxWidth: 880 }}>
         <p style={{ fontSize: "0.85rem", color: "var(--muted)", marginBottom: "0.5rem" }}>
           <Link href="/">← {backToHomeLabel(lang)}</Link>

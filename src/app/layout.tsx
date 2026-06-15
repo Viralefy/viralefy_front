@@ -10,6 +10,7 @@ import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { CookieBanner } from "@/components/CookieBanner";
 import { GtmLoader } from "@/components/GtmLoader";
 import { TrackingHydrator } from "@/components/TrackingHydrator";
+import { getNonce } from "@/lib/csp";
 
 // Layout raiz. `<html lang>` é resolvido por request via header `x-locale`
 // que o middleware seta a partir do primeiro segmento do path:
@@ -142,6 +143,11 @@ function readThemeCookie(value: string | undefined): { pref: Theme; effective: R
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const h = await headers();
   const lang = h.get("x-locale") || "en";
+  // CSP nonce setado pelo middleware (round 25 Track CC). O <script> anti-flash
+  // abaixo é inline e exigia `'unsafe-inline'` na CSP antiga (efetivamente
+  // desligando a proteção). Agora carrega o nonce — `'strict-dynamic'` na CSP
+  // bloqueia qualquer outro inline injetado por extensão/XSS.
+  const nonce = await getNonce();
   const ck = await cookies();
   const { pref: themePref, effective: themeEffective } = readThemeCookie(ck.get(THEME_COOKIE)?.value);
   const currencyCookie = ck.get(CURRENCY_COOKIE)?.value ?? null;
@@ -170,8 +176,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link rel="dns-prefetch" href="https://challenges.cloudflare.com" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
 
-        {/* Anti-flash tema — antes de tudo */}
-        <script dangerouslySetInnerHTML={{ __html: ANTI_FLASH_THEME }} />
+        {/* Anti-flash tema — antes de tudo. `nonce` vem do middleware via
+            header `x-nonce`; sem ele, a CSP `script-src 'strict-dynamic'` em
+            prod bloquearia este inline. */}
+        <script nonce={nonce} dangerouslySetInnerHTML={{ __html: ANTI_FLASH_THEME }} />
 
         {/* GTM movido pra <GtmLoader /> client component (LGPD Art. 8 §3).
             Só monta o script tag após consent analytics. Google Consent Mode

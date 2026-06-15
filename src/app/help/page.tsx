@@ -3,7 +3,8 @@ import Link from "next/link";
 import { Footer } from "@/components/Footer";
 import { indexableMeta } from "@/lib/seo-meta";
 import { HELP_CATEGORIES, HELP_TOPICS, helpTopicsByCategory } from "@/lib/help";
-import { withGlobalGraph, safeJsonStringify } from "@/lib/jsonld";
+import { withGlobalGraph } from "@/lib/jsonld";
+import { JsonLdScript } from "@/components/JsonLdScript";
 
 // Help center hub. EN-only por enquanto, standalone (sem variantes por país).
 //
@@ -85,7 +86,7 @@ export default function HelpHub() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonStringify(jsonld) }} />
+      <JsonLdScript data={jsonld} />
 
       <article lang="en">
         <header className="hero container" style={{ paddingTop: "2.5rem", paddingBottom: "1.5rem" }}>

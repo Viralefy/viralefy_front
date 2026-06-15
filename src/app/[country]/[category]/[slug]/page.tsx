@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { AggregateRating, Plan, PublicReview } from "@/lib/api";
-import { buildAggregateRating, buildOfferEnhancements, withGlobalGraph, safeJsonStringify } from "@/lib/jsonld";
+import { buildAggregateRating, buildOfferEnhancements, withGlobalGraph } from "@/lib/jsonld";
+import { JsonLdScript } from "@/components/JsonLdScript";
 import { slugAlternates } from "@/lib/hreflang";
 import { indexableMeta } from "@/lib/seo-meta";
 import { localizedPlanName } from "@/lib/plan-labels";
@@ -284,7 +285,7 @@ export default async function PlanPage({ params }: { params: Promise<Params> }) 
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonStringify(jsonld) }} />
+      <JsonLdScript data={jsonld} />
 
       <article lang={c.htmlLang}>
         <nav aria-label="Breadcrumb" className="container" style={{ paddingTop: "0.5rem", fontSize: "0.85rem", color: "var(--muted)" }}>

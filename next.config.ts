@@ -1,35 +1,12 @@
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
 
-// Headers de segurança — recomendações OWASP + relaxa o que GTM/Flag-CDN/
-// Turnstile precisam:
-//   - flagcdn.com: PNGs de bandeiras de país (img-src). Substituiu emoji
-//     unicode 🇺🇸 que ficava branco em Linux/Win sem fonte color emoji.
-//   - GTM JS: googletagmanager.com (script-src) + dataLayer (frame-src ns.html)
-//   - Turnstile (Cloudflare): challenges.cloudflare.com em script-src (api.js),
-//     frame-src (iframe do desafio) e connect-src (siteverify postback).
-//   - cdn.jsdelivr.net mantido em img-src/script-src por bibliotecas legacy
-//     (storybook, etc.) — pode sair depois de auditoria. NÃO está mais sendo
-//     usado pra Twemoji (removido 2026-06-11).
-//   - Próprio: 'self' pra script/style/conexão de API
+// Headers de segurança estáticos. A CSP foi MOVIDA pro middleware no round 25
+// (Track CC) porque o front passou a gerar `nonce` per-request — não dá pra
+// declarar o nonce estaticamente aqui. Vide `src/middleware.ts` (`buildCsp`).
+// O resto (X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy, COOP)
+// continua estático porque não depende do request.
 const SECURITY_HEADERS = [
-  {
-    key: "Content-Security-Policy",
-    value: [
-      "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://cdn.jsdelivr.net https://challenges.cloudflare.com",
-      "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://flagcdn.com https://cdn.jsdelivr.net https://www.googletagmanager.com https://*.google-analytics.com https://*.google.com",
-      "font-src 'self' data:",
-      "connect-src 'self' https://api.viralefy.com https://auth.viralefy.com https://www.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://challenges.cloudflare.com",
-      "frame-src https://www.googletagmanager.com https://challenges.cloudflare.com",
-      "frame-ancestors 'none'",
-      "base-uri 'self'",
-      "form-action 'self'",
-      "object-src 'none'",
-      "upgrade-insecure-requests",
-    ].join("; "),
-  },
   { key: "X-Frame-Options", value: "DENY" },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },

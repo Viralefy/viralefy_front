@@ -4,7 +4,8 @@ import { notFound } from "next/navigation";
 import { Footer } from "@/components/Footer";
 import { indexableMeta } from "@/lib/seo-meta";
 import { HELP_TOPICS, helpAllSlugs, helpTopicBySlug } from "@/lib/help";
-import { withGlobalGraph, safeJsonStringify } from "@/lib/jsonld";
+import { withGlobalGraph } from "@/lib/jsonld";
+import { JsonLdScript } from "@/components/JsonLdScript";
 
 // Help center detail. EN-only. generateStaticParams + per-slug canonical.
 
@@ -108,7 +109,7 @@ export default async function HelpTopicPage({ params }: { params: Promise<Params
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonStringify(jsonld) }} />
+      <JsonLdScript data={jsonld} />
 
       <article className="container" lang="en" style={{ paddingTop: "2rem", paddingBottom: "3rem", maxWidth: 760 }}>
         <p style={{ fontSize: "0.85rem", color: "var(--muted)", marginBottom: "0.5rem" }}>

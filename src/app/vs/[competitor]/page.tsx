@@ -5,7 +5,8 @@ import { notFound } from "next/navigation";
 import { Footer } from "@/components/Footer";
 import { indexableMeta, indexableDates } from "@/lib/seo-meta";
 import { COMPETITORS, getCompetitor, type Competitor } from "@/lib/competitors";
-import { toJsonLdGraph, safeJsonStringify } from "@/lib/jsonld";
+import { toJsonLdGraph } from "@/lib/jsonld";
+import { JsonLdScript } from "@/components/JsonLdScript";
 // LangCode não importado: Footer aceita o subset "pt"|"en" como compatível.
 
 // Comparison detail: Viralefy vs <Competitor>. Linguagem factual,
@@ -1417,7 +1418,7 @@ export default async function VsCompetitorPage({ params }: { params: Promise<Par
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonStringify(jsonld) }} />
+      <JsonLdScript data={jsonld} />
 
       <article lang={schemaLang(lang)}>
         <nav aria-label="Breadcrumb" className="container" style={{ paddingTop: "0.5rem", fontSize: "0.85rem", color: "var(--muted)" }}>

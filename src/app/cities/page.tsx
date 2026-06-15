@@ -4,7 +4,8 @@ import { headers } from "next/headers";
 import { Footer } from "@/components/Footer";
 import { indexableMeta } from "@/lib/seo-meta";
 import { CITIES, REGION_LABEL, REGION_ORDER, citiesByRegion } from "@/lib/cities";
-import { withGlobalGraph, safeJsonStringify } from "@/lib/jsonld";
+import { withGlobalGraph } from "@/lib/jsonld";
+import { JsonLdScript } from "@/components/JsonLdScript";
 import { Flag } from "@/components/Flag";
 
 // Programmatic SEO hub: lista as 50 cidades top agrupadas por região.
@@ -165,7 +166,7 @@ export default async function CitiesHub() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonStringify(jsonld) }} />
+      <JsonLdScript data={jsonld} />
 
       <article lang={lang}>
         <header className="hero container" style={{ textAlign: "center", maxWidth: 880, margin: "0 auto", padding: "3rem 1rem 1.5rem" }}>

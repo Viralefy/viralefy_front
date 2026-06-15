@@ -40,7 +40,11 @@ test("dangerouslySetInnerHTML only feeds JSON.stringify or known-safe constant",
     let m;
     while ((m = re.exec(src)) !== null) {
       const expr = m[1].trim();
-      const isJsonLd = /JSON\.stringify\s*\(/.test(expr);
+      // safeJsonStringify (lib/jsonld.ts) é o wrapper canônico da casa:
+      // escapa </script>, U+2028, U+2029 etc. antes de delegar pra JSON.stringify.
+      // Toda injeção de JSON-LD passa por ele.
+      const isJsonLd =
+        /JSON\.stringify\s*\(/.test(expr) || /safeJsonStringify\s*\(/.test(expr);
       const isKnownConst =
         expr === "ANTI_FLASH_THEME" ||
         /^[A-Z_][A-Z0-9_]*$/.test(expr); // SCREAMING_SNAKE_CASE constants
@@ -132,20 +136,22 @@ test("viralefy_session storage has expiration validation if present", () => {
   }
 });
 
-test("CSP in next.config.ts includes critical directives", () => {
-  // Auditoria estrutural do CSP: o front por enquanto usa 'unsafe-inline'
-  // pra scripts (necessário pro Next 15 RSC inline hydration + GTM). Esse
-  // teste NÃO falha por isso — but ensures the *hard* boundaries are present:
+test("CSP in middleware.ts includes critical directives", () => {
+  // Round 25 Track CC: CSP foi MOVIDA de next.config.ts pro middleware (gera
+  // nonce per-request via crypto.randomUUID). Auditoria estrutural agora roda
+  // contra o `buildCsp()` do middleware.
+  //
+  // Pisos checados:
   //   - default-src 'self'  (whitelist por padrão)
   //   - frame-ancestors 'none'  (clickjacking)
   //   - object-src 'none'  (Flash/legacy attack surface)
   //   - base-uri 'self'  (base tag hijack)
   //   - form-action 'self'  (form CSRF redirection)
   //   - upgrade-insecure-requests  (HTTPS-only)
-  const cfg = readFileSync(join(ROOT, "next.config.ts"), "utf8");
-  // Captura o array da CSP value.
-  const m = cfg.match(/Content-Security-Policy[\s\S]*?value:\s*\[([\s\S]*?)\]\.join/);
-  assert.ok(m, "Content-Security-Policy block not found in next.config.ts");
+  const mw = readFileSync(join(SRC, "middleware.ts"), "utf8");
+  // Captura o array de directives do buildCsp.
+  const m = mw.match(/function buildCsp[\s\S]*?const directives\s*=\s*\[([\s\S]*?)\];/);
+  assert.ok(m, "buildCsp() directives array not found in middleware.ts");
   const cspBody = m[1];
   const required = [
     "default-src 'self'",
@@ -163,22 +169,28 @@ test("CSP in next.config.ts includes critical directives", () => {
   }
 });
 
-test("CSP unsafe-inline in script-src is documented as conscious tradeoff", () => {
-  // Se 'unsafe-inline' aparece em script-src, deve haver comentário
-  // explicando — ninguém pode reintroduzir isso por acidente. Hoje está
-  // presente (Next 15 RSC + GTM). Documentação serve de gate humano.
-  const cfg = readFileSync(join(ROOT, "next.config.ts"), "utf8");
-  const hasUnsafeInline = /script-src[^"]*'unsafe-inline'/.test(cfg);
-  if (hasUnsafeInline) {
-    // Verifica que o comentário do bloco SECURITY_HEADERS menciona o motivo.
-    const hasJustification = /GTM|Next|hydration|nonce/i.test(
-      cfg.slice(0, cfg.indexOf("SECURITY_HEADERS") + 600),
-    );
-    assert.ok(
-      hasJustification,
-      "next.config.ts has 'unsafe-inline' in script-src but no nearby comment justifying it (must document conscious tradeoff)",
-    );
-  }
+test("CSP script-src uses nonce + strict-dynamic, no 'unsafe-inline'", () => {
+  // Round 25 Track CC: o front passou a emitir CSP com nonce per-request +
+  // 'strict-dynamic'. 'unsafe-inline' em script-src virou regressão e este
+  // teste falha se reintroduzido. style-src ainda usa 'unsafe-inline' (débito
+  // conhecido do Next 15 — sem propagação confiável de nonce em CSS modules
+  // dev, next/font, runtime style insertion). Backoffice tem o mesmo trade-off.
+  const mw = readFileSync(join(SRC, "middleware.ts"), "utf8");
+  const scriptSrcMatch = mw.match(/`script-src[^`]+`/);
+  assert.ok(scriptSrcMatch, "script-src directive not found in middleware.ts buildCsp()");
+  const scriptSrc = scriptSrcMatch[0];
+  assert.ok(
+    scriptSrc.includes("'nonce-${nonce}'"),
+    "script-src must include nonce-${nonce} (per-request CSPRNG)",
+  );
+  assert.ok(
+    scriptSrc.includes("'strict-dynamic'"),
+    "script-src must include 'strict-dynamic' (round 25 Track CC)",
+  );
+  assert.ok(
+    !/script-src[^`]*'unsafe-inline'/.test(scriptSrc),
+    "script-src MUST NOT include 'unsafe-inline' — round 25 eliminated it via nonce + strict-dynamic",
+  );
 });
 
 test("strict security headers present in next.config.ts", () => {
