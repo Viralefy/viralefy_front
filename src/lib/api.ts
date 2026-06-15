@@ -333,6 +333,22 @@ function baseFor(path: string): string {
   return API_URL;
 }
 
+// ApiError preserva status + code da resposta pra UX especializada
+// (e.g. 409 CONFLICT no register → CTA pra login/recuperar senha,
+// 429 RATE_LIMITED → mensagem de "tente em alguns segundos"). Antes era
+// só Error com message — caller não distinguia 409 de 400 e mostrava o
+// mesmo alerta genérico, que parecia bug e o user clicava 3x.
+export class ApiError extends Error {
+  status: number;
+  code: string;
+  constructor(status: number, code: string, message: string) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+    this.code = code;
+  }
+}
+
 async function request<T>(
   path: string,
   init?: RequestInit,
@@ -349,7 +365,9 @@ async function request<T>(
   });
   const json = await res.json().catch(() => ({}));
   if (!res.ok) {
-    throw new Error(json?.error?.message ?? "Request failed");
+    const code = json?.error?.code ?? "REQUEST_FAILED";
+    const message = json?.error?.message ?? "Request failed";
+    throw new ApiError(res.status, code, message);
   }
   // Convenção do dispatcher/core: respostas do core são envelopadas em
   // {"data": ...}; respostas do auth (login/register/2fa) e do dispatcher

@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
-import { userRegister, type Session } from "@/lib/api";
+import { userRegister, type Session, ApiError } from "@/lib/api";
 import { useApp } from "@/components/Providers";
 import { Turnstile } from "@/components/Turnstile";
 import { getTracking } from "@/lib/tracking";
@@ -72,7 +72,10 @@ function RegisterPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { login } = useApp();
-  const [error, setError] = useState<string | null>(null);
+  // error pode ser uma string genérica (validação local) OU um ReactNode
+  // composto (caso CONFLICT, onde queremos CTA pra Sign in / Reset password).
+  // Isso evita o user clicar 3x no submit pq o alerta dizia só "conflict".
+  const [error, setError] = useState<React.ReactNode | null>(null);
   const [loading, setLoading] = useState(false);
   const returnTo = sanitizeReturnTo(searchParams?.get("return_to") ?? null);
   const turnstileTokenRef = useRef<string>("");
@@ -203,7 +206,27 @@ function RegisterPageInner() {
       });
       completeFlow(session);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create account");
+      if (err instanceof ApiError && err.code === "CONFLICT") {
+        // Email já cadastrado: dá ao user um caminho concreto em vez de
+        // só uma mensagem genérica que faz ele clicar de novo.
+        const loginHref = "/login" + (returnTo ? `?return_to=${encodeURIComponent(returnTo)}` : "");
+        setError(
+          <span>
+            This email is already registered.{" "}
+            <a href={loginHref} style={{ textDecoration: "underline", color: "inherit" }}>
+              Sign in
+            </a>{" "}
+            or{" "}
+            <a href="/forgot-password" style={{ textDecoration: "underline", color: "inherit" }}>
+              recover your password
+            </a>.
+          </span>
+        );
+      } else if (err instanceof ApiError && err.code === "RATE_LIMITED") {
+        setError("Too many attempts. Please wait a few seconds and try again.");
+      } else {
+        setError(err instanceof Error ? err.message : "Failed to create account");
+      }
     } finally {
       setLoading(false);
     }

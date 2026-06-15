@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
-import { completeUserLoginTwoFA, userLogin, type Session } from "@/lib/api";
+import { completeUserLoginTwoFA, userLogin, type Session, ApiError } from "@/lib/api";
 import { useApp } from "@/components/Providers";
 import { Turnstile } from "@/components/Turnstile";
 import { AuthLayout } from "@/components/AuthLayout";
@@ -167,7 +167,13 @@ function LoginPageInner() {
       }
       completeFlow(session);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed");
+      if (err instanceof ApiError && err.code === "UNAUTHORIZED") {
+        setError("Incorrect email or password.");
+      } else if (err instanceof ApiError && err.code === "RATE_LIMITED") {
+        setError("Too many attempts. Please wait a few seconds and try again.");
+      } else {
+        setError(err instanceof Error ? err.message : "Login failed");
+      }
     } finally {
       setLoading(false);
     }
