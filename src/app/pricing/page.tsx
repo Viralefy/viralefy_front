@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 import type { Plan } from "@/lib/api";
 import { Footer } from "@/components/Footer";
 import { indexableMeta } from "@/lib/seo-meta";
-import { toJsonLdGraph } from "@/lib/jsonld";
+import { toJsonLdGraph, safeJsonStringify } from "@/lib/jsonld";
 // LangCode importado abaixo apenas pra anotar `lang` recebido pelo Footer.
 
 // Pricing overview — hub público em USDT/USD canônico.
@@ -1043,7 +1043,7 @@ export default async function PricingPage() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonld) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonStringify(jsonld) }} />
 
       <article lang={schemaLang(lang)}>
         <header className="hero container">

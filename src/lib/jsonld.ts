@@ -1,6 +1,23 @@
 import type { Country } from "@/i18n/countries";
 import type { AggregateRating, Plan } from "./api";
 
+// safeJsonStringify — escapa caracteres que permitem breakout do contexto
+// <script type="application/ld+json"> quando o JSON é injetado via
+// dangerouslySetInnerHTML. JSON.stringify nativo NÃO escapa </script>, &, ou
+// os terminadores de linha U+2028/U+2029 (que terminam strings JS no parser
+// HTML inline). Sem essa escapagem, qualquer string controlada por admin
+// (ex.: plan.name) que contenha "</script><script>..." executa no contexto
+// do usuário. Convenção: TODA injeção de JSON-LD via dangerouslySetInnerHTML
+// passa por este helper. Veja OWASP "XSS Prevention in JavaScript Contexts".
+export function safeJsonStringify(obj: unknown): string {
+  return JSON.stringify(obj)
+    .replace(/</g, "\\u003c")
+    .replace(/>/g, "\\u003e")
+    .replace(/&/g, "\\u0026")
+    .replace(/\u2028/g, "\\u2028")
+    .replace(/\u2029/g, "\\u2029");
+}
+
 // Schema.org JSON-LD para landing de país. Blocos emitidos:
 //   - Organization (marca, logo, contactPoint, sameAs)
 //   - WebSite (com SearchAction de país)

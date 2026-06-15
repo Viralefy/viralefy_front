@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Footer } from "@/components/Footer";
 import { getConsent, resetConsent, setConsent, type GdprConsent } from "@/lib/gdpr";
 import { recordConsent } from "@/lib/consent-audit";
-import { withGlobalGraph } from "@/lib/jsonld";
+import { withGlobalGraph, safeJsonStringify } from "@/lib/jsonld";
 
 // Cookie preferences hub. Mostra o estado atual do consentimento e oferece:
 //   - Salvar mudanças nos 3 toggles opt-in (preferences, analytics, marketing).
@@ -229,7 +229,7 @@ export default function CookiePreferencesPage() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonStringify(jsonLd) }}
       />
       <main className="container" style={{ padding: "3rem 1rem", maxWidth: 720 }}>
         <nav aria-label="Breadcrumb" style={{ fontSize: "0.85rem", color: "var(--muted)", marginBottom: "1rem" }}>

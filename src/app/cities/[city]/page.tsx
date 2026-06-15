@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { Footer } from "@/components/Footer";
 import { indexableMeta } from "@/lib/seo-meta";
 import { CITIES, getCity } from "@/lib/cities";
-import { toJsonLdGraph } from "@/lib/jsonld";
+import { toJsonLdGraph, safeJsonStringify } from "@/lib/jsonld";
 import { Flag } from "@/components/Flag";
 import { categorySlug } from "@/i18n/categories";
 import type { LangCode } from "@/i18n/languages";
@@ -1351,7 +1351,7 @@ export default async function CityPage({ params }: { params: Promise<{ city: str
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonld) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonStringify(jsonld) }} />
 
       <article lang={schemaLang(lang)}>
         {/* BUG-164 do QA 2026-06-12: páginas de cidade não tinham breadcrumb,

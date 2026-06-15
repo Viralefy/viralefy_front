@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Plan } from "@/lib/api";
 import { COUNTRIES, getCountry, countriesByRegion } from "@/i18n/countries";
-import { buildCountryJsonLd } from "@/lib/jsonld";
+import { buildCountryJsonLd, safeJsonStringify } from "@/lib/jsonld";
 import { CategoryGroupedGrid } from "@/components/CategoryGroupedGrid";
 import { Footer } from "@/components/Footer";
 import { TrustSignals } from "@/components/TrustSignals";
@@ -101,7 +101,7 @@ export default async function CountryPage({ params }: { params: Promise<Params> 
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonld) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonStringify(jsonld) }} />
 
       <article lang={c.htmlLang}>
         <nav aria-label="Breadcrumb" className="container" style={{ paddingTop: "0.5rem", fontSize: "0.85rem", color: "var(--muted)" }}>

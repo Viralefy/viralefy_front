@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 import { Footer } from "@/components/Footer";
 import { indexableMeta } from "@/lib/seo-meta";
 import { COMPETITORS } from "@/lib/competitors";
-import { withGlobalGraph } from "@/lib/jsonld";
+import { withGlobalGraph, safeJsonStringify } from "@/lib/jsonld";
 
 // Hub de comparações Viralefy vs competidores.
 //
@@ -176,7 +176,7 @@ export default async function VsHubPage() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonld) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonStringify(jsonld) }} />
 
       <article lang={lang}>
         <header className="hero container">

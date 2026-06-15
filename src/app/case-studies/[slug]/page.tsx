@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { Footer } from "@/components/Footer";
 import { indexableMeta } from "@/lib/seo-meta";
 import { CASE_STUDIES, CASE_STUDY_DISCLAIMER, getCaseStudy } from "@/lib/case-studies";
-import { withGlobalGraph } from "@/lib/jsonld";
+import { withGlobalGraph, safeJsonStringify } from "@/lib/jsonld";
 
 // BUG-153/165 do QA 2026-06-12: meta description cortada no meio da frase
 // (slice(0, 150)) terminava em "Pay i". Agora cortamos no último espaço
@@ -106,7 +106,7 @@ export default async function CaseStudyDetailPage({ params }: { params: Promise<
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonld) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonStringify(jsonld) }} />
 
       <article lang="en">
         <nav aria-label="Breadcrumb" className="container" style={{ paddingTop: "0.5rem", fontSize: "0.85rem", color: "var(--muted)" }}>

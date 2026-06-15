@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Footer } from "@/components/Footer";
 import { indexableMeta } from "@/lib/seo-meta";
 import { CASE_STUDIES, CASE_STUDY_DISCLAIMER } from "@/lib/case-studies";
-import { withGlobalGraph } from "@/lib/jsonld";
+import { withGlobalGraph, safeJsonStringify } from "@/lib/jsonld";
 
 // ISR (round 23 Track XX): conteúdo estático (dataset CASE_STUDIES). Sem
 // fetch, sem cookies/headers próprios. revalidate=1800 mantém em sincronia
@@ -95,7 +95,7 @@ export default function CaseStudiesHubPage() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonld) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonStringify(jsonld) }} />
 
       <article lang="en">
         <nav aria-label="Breadcrumb" className="container" style={{ paddingTop: "0.5rem", fontSize: "0.85rem", color: "var(--muted)" }}>

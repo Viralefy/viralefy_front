@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Plan } from "@/lib/api";
-import { buildOfferEnhancements, buildAggregateOffer, withGlobalGraph } from "@/lib/jsonld";
+import { buildOfferEnhancements, buildAggregateOffer, withGlobalGraph, safeJsonStringify } from "@/lib/jsonld";
 import { categoryAlternates } from "@/lib/hreflang";
 import { indexableMeta } from "@/lib/seo-meta";
 import { COUNTRIES, getCountry } from "@/i18n/countries";
@@ -175,7 +175,7 @@ export default async function CategoryPage({ params }: { params: Promise<Params>
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonld) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonStringify(jsonld) }} />
 
       <article lang={c.htmlLang}>
         <nav aria-label="Breadcrumb" className="container" style={{ paddingTop: "0.5rem", fontSize: "0.85rem", color: "var(--muted)" }}>

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Footer } from "@/components/Footer";
 import { indexableMeta } from "@/lib/seo-meta";
-import { withGlobalGraph } from "@/lib/jsonld";
+import { withGlobalGraph, safeJsonStringify } from "@/lib/jsonld";
 
 // Status page público — consome /v1/status do API por request.
 //
@@ -108,7 +108,7 @@ export default async function StatusPage() {
   return (
     <>
       <script type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonld) }} />
+        dangerouslySetInnerHTML={{ __html: safeJsonStringify(jsonld) }} />
 
       <article lang="en">
         <header className="hero container">
