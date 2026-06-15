@@ -36,16 +36,18 @@ test("toggleTheme() flips light -> dark", () => {
   assert.equal(theme.getTheme(), "dark");
 });
 
-test("getTheme returns 'dark' for empty/invalid localStorage", () => {
+test("getTheme returns 'system' for empty/invalid localStorage", () => {
+  // Round 16 mudou default: era hard-coded "dark"; agora cai em "system"
+  // (que o resolveTheme resolve via prefers-color-scheme).
   installShim();
-  assert.equal(theme.getTheme(), "dark");
+  assert.equal(theme.getTheme(), "system");
 });
 
-test("getTheme returns 'dark' when an unknown value is stored", () => {
+test("getTheme returns 'system' when an unknown value is stored", () => {
   const ls = installShim();
   ls.setItem("viralefy_theme", "neon-purple");
-  // theme.ts coerces anything-not-light to dark.
-  assert.equal(theme.getTheme(), "dark");
+  // theme.ts coerces qualquer valor desconhecido para o default "system".
+  assert.equal(theme.getTheme(), "system");
 });
 
 test("setTheme writes the value (even an invalid one — writes are caller-responsible)", () => {
@@ -72,7 +74,8 @@ test("multiple toggleTheme calls cycle (dark -> light -> dark -> light)", () => 
 });
 
 test("getTheme is safe when localStorage is not installed (SSR scenario)", () => {
-  // Remove the shim — emulate SSR / no DOM.
+  // Remove the shim — emulate SSR / no DOM. SSR cai no default "system";
+  // o resolveTheme depois resolve para "dark" porque não há matchMedia.
   delete globalThis.localStorage;
-  assert.equal(theme.getTheme(), "dark");
+  assert.equal(theme.getTheme(), "system");
 });

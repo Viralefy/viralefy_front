@@ -16,9 +16,12 @@ import {
   copyFor,
 } from "../../src/i18n/categories.ts";
 
-test("CATEGORY_CODES expõe 15 códigos (storefront + marketplace + recovery)", () => {
-  // 11 storefront + 4 marketplace/recovery: recuperacao_perfil (LP custom
-  // com formulário), bms_facebook, perfis_redes, emails_validados.
+test("CATEGORY_CODES expõe 12 códigos (storefront + recovery)", () => {
+  // 10 storefront (5 primitivas × 2 plataformas) + servicos + recuperacao_perfil.
+  // Os códigos marketplace (bms_facebook, perfis_redes, emails_validados) foram
+  // planejados para uma fase posterior e ainda não estão no catálogo — quando
+  // forem implementados, este assert (e os companheiros em jsonld-home, plan-slugs,
+  // ru.test) precisam crescer junto.
   assert.deepEqual(CATEGORY_CODES, [
     "seguidores_instagram",
     "seguidores_tiktok",
@@ -32,9 +35,6 @@ test("CATEGORY_CODES expõe 15 códigos (storefront + marketplace + recovery)", 
     "visualizacoes_tiktok",
     "servicos",
     "recuperacao_perfil",
-    "bms_facebook",
-    "perfis_redes",
-    "emails_validados",
   ]);
 });
 
@@ -149,9 +149,26 @@ test("copyFor returns bullets and faq for every category", () => {
   }
 });
 
-test("Instagram and TikTok variants share the same copy", () => {
-  // Platform-split codes intentionally reuse the same LongCopy bundle.
+test("Instagram and TikTok variants share the same base copy bundle but diverge on platform-specific FAQ", () => {
+  // O BUG-179 do QA 2026-06-14 introduziu overrides por-plataforma na FAQ:
+  // /br/seguidores-instagram não pode dizer "Instagram ou TikTok" na pergunta
+  // (polui o sinal semântico). Logo, copyFor() devolve objetos distintos para
+  // IG/TT em seguidores_* — mesmo base (h1/paragraphs/bullets), FAQ separada.
   const igFollowers = copyFor("seguidores_instagram", "en");
   const ttFollowers = copyFor("seguidores_tiktok", "en");
-  assert.equal(igFollowers, ttFollowers);
+  // Base compartilhada: h1, paragraphs e bullets vêm da mesma função.
+  assert.equal(igFollowers.h1, ttFollowers.h1);
+  assert.equal(igFollowers.paragraphs, ttFollowers.paragraphs);
+  assert.equal(igFollowers.bullets, ttFollowers.bullets);
+  // FAQ específica de plataforma — uma menciona Instagram, a outra TikTok.
+  const igFaqText = igFollowers.faq().map((f) => f.q + " " + f.a).join(" ");
+  const ttFaqText = ttFollowers.faq().map((f) => f.q + " " + f.a).join(" ");
+  assert.ok(/Instagram/.test(igFaqText), "IG FAQ should mention Instagram");
+  assert.ok(/TikTok/.test(ttFaqText), "TT FAQ should mention TikTok");
+  assert.notEqual(igFaqText, ttFaqText, "FAQ must differ between platforms");
+
+  // Categorias que NÃO têm overrides ainda compartilham o mesmo bundle.
+  const igLikes = copyFor("curtidas_instagram", "en");
+  const ttLikes = copyFor("curtidas_tiktok", "en");
+  assert.equal(igLikes, ttLikes);
 });

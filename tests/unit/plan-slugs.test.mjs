@@ -16,6 +16,7 @@ import {
   categoryFromSlug,
   categoryLabel,
   categorySlug,
+  copyFor,
 } from "../../src/i18n/categories.ts";
 
 const URL_SAFE = /^[a-z0-9-]+$/;
@@ -81,14 +82,27 @@ test("categorySlug falls back to en when a lang has no entry", () => {
   assert.equal(slug, CATEGORY_SLUG.curtidas_instagram.en);
 });
 
-test("COPY map has at least en/pt/es/ru entries for every category", () => {
+test("COPY resolves to a usable copy for en/pt/es/ru on every category (direct entry OR en fallback)", () => {
+  // O contrato pragmático (após BUG-40/107/132 do QA 2026-06-12): COPY pode
+  // ter apenas en/pt direto para categorias de engagement (comentarios,
+  // compartilhamentos) — os demais idiomas resolvem via fallback explícito
+  // para `en` em copyFor(). O que NÃO pode é a página renderizar `undefined`.
+  // Por isso o invariante real é "copyFor(code, lang) sempre devolve LongCopy
+  // utilizável", não "COPY[code][lang] existe literalmente".
   for (const code of CATEGORY_CODES) {
     for (const lang of ["en", "pt", "es", "ru"]) {
-      assert.ok(
-        COPY[code][lang],
-        `COPY[${code}][${lang}] missing`
-      );
+      const c = copyFor(code, lang);
+      assert.ok(c, `copyFor(${code}, ${lang}) returned nothing`);
+      assert.equal(typeof c.h1, "function", `copyFor(${code}, ${lang}).h1 not callable`);
+      assert.equal(typeof c.paragraphs, "function", `copyFor(${code}, ${lang}).paragraphs not callable`);
     }
+  }
+  // Piso forte: en deve estar SEMPRE presente literalmente (sem ele não há
+  // fallback). pt deve estar presente nas categorias core (storefront +
+  // servicos + recuperacao) — esses são os mercados primários.
+  for (const code of CATEGORY_CODES) {
+    assert.ok(COPY[code].en, `COPY[${code}].en missing — fallback chain broken`);
+    assert.ok(COPY[code].pt, `COPY[${code}].pt missing — PT é mercado primário`);
   }
 });
 
@@ -121,22 +135,21 @@ test("CATEGORY_LABEL has at least en/pt/es/ru entries for every category", () =>
   }
 });
 
-test("CATEGORY_CODES has 15 entries (storefront + marketplace + recovery)", () => {
-  // 11 storefront + 4 marketplace/recovery (recuperacao_perfil,
-  // bms_facebook, perfis_redes, emails_validados).
-  assert.equal(CATEGORY_CODES.length, 15);
+test("CATEGORY_CODES has 12 entries (storefront + recovery)", () => {
+  // 10 storefront (5 primitivas × IG/TT) + servicos + recuperacao_perfil.
+  // Os códigos marketplace (bms_facebook, perfis_redes, emails_validados)
+  // foram planejados mas ainda não estão no catálogo — quando chegarem,
+  // esta lista (e o assert em categories.test.mjs) cresce junto.
+  assert.equal(CATEGORY_CODES.length, 12);
   assert.deepEqual(
     [...CATEGORY_CODES].sort(),
     [
-      "bms_facebook",
       "comentarios_instagram",
       "comentarios_tiktok",
       "compartilhamentos_instagram",
       "compartilhamentos_tiktok",
       "curtidas_instagram",
       "curtidas_tiktok",
-      "emails_validados",
-      "perfis_redes",
       "recuperacao_perfil",
       "seguidores_instagram",
       "seguidores_tiktok",

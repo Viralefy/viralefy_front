@@ -34,9 +34,13 @@ if (!mod) {
     assert.ok(true);
   });
 } else {
-  test("getTheme() defaults to 'dark' when localStorage is empty", () => {
+  // Contrato atual (round 16, Track Q): default = "system" (respeita
+  // prefers-color-scheme). Era hard-coded "dark" e mudou para que o usuário
+  // que prefere modo claro no SO veja light por default sem precisar clicar.
+  // Cookie/LS ausente → "system". "system"/"light"/"dark" salvos → ecoam.
+  test("getTheme() defaults to 'system' when cookie and localStorage are empty", () => {
     installShim();
-    assert.equal(mod.getTheme(), "dark");
+    assert.equal(mod.getTheme(), "system");
   });
 
   test("getTheme() returns 'light' when localStorage has viralefy_theme=light", () => {
@@ -49,6 +53,12 @@ if (!mod) {
     const ls = installShim();
     ls.setItem("viralefy_theme", "dark");
     assert.equal(mod.getTheme(), "dark");
+  });
+
+  test("getTheme() returns 'system' when localStorage has viralefy_theme=system", () => {
+    const ls = installShim();
+    ls.setItem("viralefy_theme", "system");
+    assert.equal(mod.getTheme(), "system");
   });
 
   test("setTheme('light') writes 'light' to localStorage under viralefy_theme", () => {

@@ -1312,12 +1312,20 @@ export const PACKS: Record<LangCode, Pack> = {
   },
 };
 
-export function tr(lang: LangCode): Pack {
-  const pack = PACKS[lang] ?? en;
-  // Subbloco `checkout` é opcional por idioma (rolling translation). Se o
-  // pack atual não tem, usa o de en pra que o consumer nunca veja undefined.
-  if (!pack.checkout) {
-    return { ...pack, checkout: en.checkout };
+// Fallback de `checkout` aplicado uma única vez na inicialização do módulo:
+// idiomas em rolling translation (sem bundle completo de checkout) recebem o
+// bloco do `en` IN PLACE. Isso garante três propriedades importantes:
+//   1. Identidade estável — `tr(x) === PACKS[x]` sempre (sem spread em hot path).
+//   2. Cobertura — nenhum consumer vê `t.checkout === undefined`.
+//   3. PACKS é a fonte canônica — testes que comparam `PACKS[x]` com `tr(x)`
+//      casam exatamente, sem precisar replicar a regra de fallback.
+for (const lang of Object.keys(PACKS) as LangCode[]) {
+  const p = PACKS[lang];
+  if (!p.checkout) {
+    p.checkout = en.checkout;
   }
-  return pack;
+}
+
+export function tr(lang: LangCode): Pack {
+  return PACKS[lang] ?? en;
 }

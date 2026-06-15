@@ -122,16 +122,23 @@ test("CheckoutResultSchema accepts gateway payment with optional fields absent",
 });
 
 test("SessionSchema accepts session with nested user", () => {
+  // Contrato real (round 17+): o auth-service Go retorna access_token /
+  // access_expires_at (não token / expires_at) e UserView usa PascalCase
+  // por causa do encoding/json default do Go (ID/Email/Name/Phone/Telegram).
+  // Login unificado: subject_kind distingue "user" de "admin"; quando 2FA
+  // está ativo, twofa_required=true e token/user vêm omitidos até o
+  // segundo passo (completeUserLoginTwoFA).
   const out = parseOr(
     SessionSchema,
     {
-      token: "tok",
-      expires_at: "2026-12-31T00:00:00Z",
-      user: { id: "u1", email: "a@b.com", name: "Ada", instagram: "@ada" },
+      access_token: "tok",
+      access_expires_at: "2026-12-31T00:00:00Z",
+      subject_kind: "user",
+      user: { ID: "u1", Email: "a@b.com", Name: "Ada" },
     },
     "/v1/auth/user/login",
   );
-  assert.equal(out.user.id, "u1");
+  assert.equal(out.user.ID, "u1");
 });
 
 test("OrderSchema accepts order with ticket_id explicitly null", () => {
@@ -329,12 +336,20 @@ test("CheckoutResultSchema rejects invalid payment_method enum", () => {
   );
 });
 
-test("SessionSchema rejects when user is missing", () => {
+test("SessionSchema rejects when nested user has wrong shape", () => {
+  // No contrato atual `user` é opcional (twofa_required=true pode omiti-lo),
+  // então a ausência não é erro. O que continua sendo erro é um user PRESENTE
+  // com shape errado (faltando ID/Email/Name obrigatórios do UserView do Go).
   assert.throws(
     () =>
       parseOr(
         SessionSchema,
-        { token: "t", expires_at: "2026-01-01T00:00:00Z" },
+        {
+          access_token: "t",
+          access_expires_at: "2026-01-01T00:00:00Z",
+          subject_kind: "user",
+          user: { id: "u1" }, // camelCase + faltam Email/Name → inválido
+        },
         "/v1/auth/user/login",
       ),
     /user/,

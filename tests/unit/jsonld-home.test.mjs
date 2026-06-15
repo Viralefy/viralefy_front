@@ -148,6 +148,10 @@ test("buildHomeJsonLd with empty plans still emits 3 blocks (no AggregateOffer)"
 });
 
 test("categorySlugEn maps every supported category (regression: unsupported keys would break Offer URLs)", () => {
+  // Espelha CATEGORY_CODES em src/i18n/categories.ts — 12 códigos hoje
+  // (10 storefront + servicos + recuperacao_perfil). Os marketplace codes
+  // (bms_facebook, perfis_redes, emails_validados) entram no inventário
+  // quando essa fase for entregue; aqui pinamos o estado atual.
   const supported = [
     "seguidores_instagram", "seguidores_tiktok",
     "curtidas_instagram", "curtidas_tiktok",
@@ -155,7 +159,7 @@ test("categorySlugEn maps every supported category (regression: unsupported keys
     "compartilhamentos_instagram", "compartilhamentos_tiktok",
     "visualizacoes_instagram", "visualizacoes_tiktok",
     "servicos",
-    "recuperacao_perfil", "bms_facebook", "perfis_redes", "emails_validados",
+    "recuperacao_perfil",
   ];
   // Cobre testando que cada categoria produz uma URL contendo '/us/' + algum slug.
   for (const cat of supported) {
