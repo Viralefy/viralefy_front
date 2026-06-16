@@ -19,25 +19,43 @@ async function ts() {
 const REPO_ROOT = dirname(fileURLToPath(import.meta.url)).replace(/\/tests$/, "");
 const SRC_ROOT = join(REPO_ROOT, "src");
 
+async function tryCandidates(candidates) {
+  const { stat } = await import("node:fs/promises");
+  for (const p of candidates) {
+    try {
+      await stat(p);
+      return p;
+    } catch {
+      // try next
+    }
+  }
+  return null;
+}
+
 export async function resolve(specifier, context, nextResolve) {
   // Path alias from tsconfig: "@/*" -> "src/*"
   if (specifier.startsWith("@/")) {
     const rel = specifier.slice(2);
-    // Try variants: as-is, .ts, .tsx, /index.ts
     const candidates = [
       join(SRC_ROOT, rel),
       join(SRC_ROOT, rel + ".ts"),
       join(SRC_ROOT, rel + ".tsx"),
       join(SRC_ROOT, rel, "index.ts"),
     ];
-    for (const p of candidates) {
-      try {
-        const { stat } = await import("node:fs/promises");
-        await stat(p);
-        return nextResolve(pathToFileURL(p).href, context);
-      } catch {
-        // try next
-      }
+    const found = await tryCandidates(candidates);
+    if (found) return nextResolve(pathToFileURL(found).href, context);
+  }
+  // Relative imports sem extensão: "./schemas" -> "./schemas.ts".
+  // Sem isso, value imports relativos (não type-only) explodem porque o Node
+  // não acha o módulo. TS resolve isso no build; aqui resolvemos no loader.
+  if ((specifier.startsWith("./") || specifier.startsWith("../")) && context.parentURL) {
+    const hasExt = /\.[a-z0-9]+$/i.test(specifier);
+    if (!hasExt) {
+      const parentDir = dirname(fileURLToPath(context.parentURL));
+      const base = pathResolve(parentDir, specifier);
+      const candidates = [base + ".ts", base + ".tsx", join(base, "index.ts"), join(base, "index.tsx")];
+      const found = await tryCandidates(candidates);
+      if (found) return nextResolve(pathToFileURL(found).href, context);
     }
   }
   return nextResolve(specifier, context);
