@@ -60,10 +60,11 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: [
-      { url: "/favicon.ico" },
-      { url: "/icon.svg", type: "image/svg+xml" },
-    ],
+    // `/favicon.ico` foi removido daqui: o arquivo nunca existiu em public/ e
+    // o 404 aparecia como erro de console em toda página (reprovava o
+    // `errors-in-console` do Lighthouse). Com um `<link rel="icon">` válido
+    // declarado, o browser nem chega a pedir /favicon.ico.
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
     apple: [{ url: "/logo.png" }],
   },
   openGraph: {

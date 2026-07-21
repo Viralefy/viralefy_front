@@ -52,6 +52,15 @@ jobs:
       - name: Wait for app to be ready
         run: npx wait-on http://localhost:3000 --timeout 120000
 
+      # URLs auditadas: home, /pricing e uma página de categoria. O /login saiu
+      # da lista — desde a identidade unificada ele só redireciona pro SSO em
+      # auth.viralefy.com, e auditar isso rendia `chrome-error://chromewebdata/`
+      # com 29 falhas fantasma.
+      #
+      # Assertions desligadas no lighthouserc.json: lcp-lazy-loaded,
+      # non-composited-animations e prioritize-lcp-image não produzem valor aqui
+      # (o Lighthouse avisa que minScore não é assertion válida pra elas). Os
+      # thresholds de categoria continuam intactos.
       - name: Run Lighthouse CI
         run: npx lhci autorun --upload.target=temporary-public-storage
         env:

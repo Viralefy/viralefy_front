@@ -3,3 +3,6 @@ node_modules/
 .env.local
 .env
 tsconfig.tsbuildinfo
+
+# relatórios locais do Lighthouse CI
+.lighthouseci/
