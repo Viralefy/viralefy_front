@@ -32,7 +32,9 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        # --include=dev: NODE_ENV=production no job faria o npm ci pular as
+        # devDependencies (typescript, playwright).
+        run: npm ci --include=dev
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium

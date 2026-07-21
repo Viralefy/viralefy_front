@@ -29,14 +29,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node 20
+      - name: Setup Node 24
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
           cache: "npm"
 
+      # --include=dev é obrigatório: o NODE_ENV=production do job faria o npm ci
+      # pular devDependencies, e o next.config.ts precisa do typescript pra
+      # transpilar ("Cannot find module 'typescript'" quebrava o build aqui).
       - name: Install dependencies
-        run: npm ci --no-audit --no-fund
+        run: npm ci --no-audit --no-fund --include=dev
 
       - name: Build Next.js (production)
         run: npm run build
