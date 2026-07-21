@@ -81,7 +81,10 @@ export function LiveCounter({ lang = "en" }: { lang?: LangCode }) {
       />
       <span>
         <strong>{stats.today.toLocaleString()}</strong> {t.live.ordersToday}
-        <span style={{ color: "var(--muted)" }}>
+        {/* Mesmo motivo da cor do container: o fundo é escuro FIXO, então o
+            texto secundário não pode usar `--muted` (que clareia/escurece com o
+            tema). #9fb0bd fica em 7.6:1 sobre o pill, nos dois temas. */}
+        <span style={{ color: "#9fb0bd" }}>
           {" · "}
           <strong>{stats.last_hour.toLocaleString()}</strong> {t.live.lastHour}
         </span>
@@ -93,7 +96,7 @@ export function LiveCounter({ lang = "en" }: { lang?: LangCode }) {
         style={{
           background: "transparent",
           border: "none",
-          color: "var(--muted)",
+          color: "#9fb0bd",
           cursor: "pointer",
           padding: "0 0.2rem",
           fontSize: "1rem",

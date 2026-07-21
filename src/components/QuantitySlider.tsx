@@ -134,16 +134,23 @@ export function QuantitySlider({
                 muted dava 4.13:1 no tema escuro, abaixo do mínimo AA de 4.5:1
                 pra texto normal. O strong dá 5.74:1 (dark) e 8.73:1 (light). */}
             <tr style={{ background: "var(--accent-dim)", borderBottom: "1px solid var(--border)" }}>
-              <th style={{ padding: "0.75rem 1rem", textAlign: "start", fontSize: "0.85rem", color: "var(--muted-strong)" }}>
+              <th scope="col" style={{ padding: "0.75rem 1rem", textAlign: "start", fontSize: "0.85rem", color: "var(--muted-strong)" }}>
                 {t.category.table.plan}
               </th>
-              <th style={{ padding: "0.75rem 1rem", textAlign: "end", fontSize: "0.85rem", color: "var(--muted-strong)" }}>
+              <th scope="col" style={{ padding: "0.75rem 1rem", textAlign: "end", fontSize: "0.85rem", color: "var(--muted-strong)" }}>
                 {t.category.table.qty}
               </th>
-              <th style={{ padding: "0.75rem 1rem", textAlign: "end", fontSize: "0.85rem", color: "var(--muted-strong)" }}>
+              <th scope="col" style={{ padding: "0.75rem 1rem", textAlign: "end", fontSize: "0.85rem", color: "var(--muted-strong)" }}>
                 {t.category.table.price}
               </th>
-              <th style={{ padding: "0.75rem 1rem", textAlign: "end" }} />
+              {/* Coluna do botão de ação. `scope="col"` sozinho NÃO bastou: o axe
+                  exige que o cabeçalho tenha nome acessível, senão as células de
+                  dado seguem órfãs (`td-has-header`). Reusamos `cta.buy`, que já
+                  existe em todos os locales, oculto visualmente — a coluna não
+                  tem rótulo visível por design. */}
+              <th scope="col" style={{ padding: "0.75rem 1rem", textAlign: "end" }}>
+                <span className="sr-only">{t.cta.buy}</span>
+              </th>
             </tr>
           </thead>
           <tbody>

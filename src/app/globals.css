@@ -590,6 +590,21 @@ input[type="range"] {
 }
 
 /* ===================== Utility ===================== */
+/* Visível só pra tecnologia assistiva. Usado onde a UI dispensa rótulo visual
+   mas a semântica exige nome acessível (ex.: cabeçalho da coluna de ação numa
+   tabela — sem ele o axe reprova em `td-has-header`). */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .neon-text {
   color: var(--accent);
   text-shadow: var(--glow-soft);
