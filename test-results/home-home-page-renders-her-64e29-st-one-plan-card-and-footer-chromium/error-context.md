@@ -1,0 +1,1634 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: home.spec.ts >> home page >> renders hero, at least one plan card, and footer
+- Location: e2e/home.spec.ts:4:7
+
+# Error details
+
+```
+Error: expect(locator).toBeVisible() failed
+
+Locator: locator('[data-testid="plan-card"], [data-plan], a[href*="/plan"], a[href*="instagram-followers"], a[href*="tiktok-followers"]').first()
+Expected: visible
+Timeout: 10000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "toBeVisible" with timeout 10000ms
+  - waiting for locator('[data-testid="plan-card"], [data-plan], a[href*="/plan"], a[href*="instagram-followers"], a[href*="tiktok-followers"]').first()
+
+```
+
+```yaml
+- link "Skip to content":
+  - /url: "#main"
+- banner:
+  - link "Viralefy":
+    - /url: /
+    - img "Viralefy"
+  - button "Services"
+  - button "Markets"
+  - searchbox "Search services and markets…"
+  - navigation:
+    - button "Toggle theme":
+      - img "Switch to dark"
+    - button "Currency": $ USD
+    - link "Support":
+      - /url: /tickets
+    - link "Sign in":
+      - /url: /login
+    - link "Create account":
+      - /url: /register
+- heading "Grow your Instagram & TikTok" [level=1]
+- paragraph: Real followers, engagement and views with fast delivery. Pay in USDT, USD, EUR or crypto.
+- list "trust signals":
+  - listitem: 30-day refill guarantee
+  - listitem: No password required
+  - listitem: Delivery starts from 1 hour
+- main:
+  - heading "Services" [level=2]
+  - region "Instagram followers":
+    - heading "Instagram followers" [level=3]
+    - article:
+      - heading "100 followers Instagram" [level=4]
+      - paragraph: Ideal for testing
+      - paragraph: $ 2.50
+      - paragraph:
+        - strong: "100"
+        - text: followers
+      - button "Buy now"
+    - article:
+      - heading "250 followers Instagram" [level=4]
+      - paragraph: First push
+      - paragraph: $ 5.00
+      - paragraph:
+        - strong: "250"
+        - text: followers
+      - button "Buy now"
+    - article:
+      - heading "500 followers Instagram" [level=4]
+      - paragraph: First push
+      - paragraph: $ 9.00
+      - paragraph:
+        - strong: "500"
+        - text: followers
+      - button "Buy now"
+    - article:
+      - heading "750 followers Instagram" [level=4]
+      - paragraph: Takeoff
+      - paragraph: $ 13.00
+      - paragraph:
+        - strong: "750"
+        - text: followers
+      - button "Buy now"
+    - article:
+      - heading "1,000 followers Instagram" [level=4]
+      - paragraph: Takeoff
+      - paragraph: $ 15.00
+      - paragraph:
+        - strong: 1,000
+        - text: followers
+      - button "Buy now"
+    - article:
+      - heading "1,500 followers Instagram" [level=4]
+      - paragraph: Initial growth
+      - paragraph: $ 22.00
+      - paragraph:
+        - strong: 1,500
+        - text: followers
+      - button "Buy now"
+    - article:
+      - heading "2,500 followers Instagram" [level=4]
+      - paragraph: Initial growth
+      - paragraph: $ 33.00
+      - paragraph:
+        - strong: 2,500
+        - text: followers
+      - button "Buy now"
+    - article:
+      - heading "5,000 followers Instagram" [level=4]
+      - paragraph: Traction
+      - paragraph: $ 60.00
+      - paragraph:
+        - strong: 5,000
+        - text: followers
+      - button "Buy now"
+    - article:
+      - heading "7,500 followers Instagram" [level=4]
+      - paragraph: Community
+      - paragraph: $ 85.00
+      - paragraph:
+        - strong: 7,500
+        - text: followers
+      - button "Buy now"
+    - article:
+      - heading "10,000 followers Instagram" [level=4]
+      - paragraph: Community
+      - paragraph: $ 100.00
+      - paragraph:
+        - strong: 10,000
+        - text: followers
+      - button "Buy now"
+    - article:
+      - heading "15,000 followers Instagram" [level=4]
+      - paragraph: Micro-influencer
+      - paragraph: $ 135.00
+      - paragraph:
+        - strong: 15,000
+        - text: followers
+      - button "Buy now"
+    - article:
+      - heading "25,000 followers Instagram" [level=4]
+      - paragraph: Micro-influencer
+      - paragraph: $ 200.00
+      - paragraph:
+        - strong: 25,000
+        - text: followers
+      - button "Buy now"
+    - article:
+      - heading "50,000 followers Instagram" [level=4]
+      - paragraph: Real audience
+      - paragraph: $ 350.00
+      - paragraph:
+        - strong: 50,000
+        - text: followers
+      - button "Buy now"
+    - article:
+      - heading "75,000 followers Instagram" [level=4]
+      - paragraph: Scale
+      - paragraph: $ 475.00
+      - paragraph:
+        - strong: 75,000
+        - text: followers
+      - button "Buy now"
+    - article:
+      - heading "100,000 followers Instagram" [level=4]
+      - paragraph: Scale
+      - paragraph: $ 600.00
+      - paragraph:
+        - strong: 100,000
+        - text: followers
+      - button "Buy now"
+    - article:
+      - heading "250,000 followers Instagram" [level=4]
+      - paragraph: Mega
+      - paragraph: $ 1250.00
+      - paragraph:
+        - strong: 250,000
+        - text: followers
+      - button "Buy now"
+    - article:
+      - heading "500,000 followers Instagram" [level=4]
+      - paragraph: Mass
+      - paragraph: $ 2250.00
+      - paragraph:
+        - strong: 500,000
+        - text: followers
+      - button "Buy now"
+    - article:
+      - heading "1,000,000 followers Instagram" [level=4]
+      - paragraph: Mass
+      - paragraph: $ 4000.00
+      - paragraph:
+        - strong: 1,000,000
+        - text: followers
+      - button "Buy now"
+  - region "TikTok followers":
+    - heading "TikTok followers" [level=3]
+    - article:
+      - heading "100 followers TikTok" [level=4]
+      - paragraph: Ideal for testing
+      - paragraph: $ 5.00
+      - paragraph:
+        - strong: "100"
+        - text: followers
+      - button "Buy now"
+    - article:
+      - heading "250 followers TikTok" [level=4]
+      - paragraph: First push
+      - paragraph: $ 10.00
+      - paragraph:
+        - strong: "250"
+        - text: followers
+      - button "Buy now"
+    - article:
+      - heading "500 followers TikTok" [level=4]
+      - paragraph: First push
+      - paragraph: $ 18.00
+      - paragraph:
+        - strong: "500"
+        - text: followers
+      - button "Buy now"
+    - article:
+      - heading "750 followers TikTok" [level=4]
+      - paragraph: Takeoff
+      - paragraph: $ 26.00
+      - paragraph:
+        - strong: "750"
+        - text: followers
+      - button "Buy now"
+    - article:
+      - heading "1,000 followers TikTok" [level=4]
+      - paragraph: Takeoff
+      - paragraph: $ 30.00
+      - paragraph:
+        - strong: 1,000
+        - text: followers
+      - button "Buy now"
+    - article:
+      - heading "1,500 followers TikTok" [level=4]
+      - paragraph: Initial growth
+      - paragraph: $ 44.00
+      - paragraph:
+        - strong: 1,500
+        - text: followers
+      - button "Buy now"
+    - article:
+      - heading "2,500 followers TikTok" [level=4]
+      - paragraph: Initial growth
+      - paragraph: $ 66.00
+      - paragraph:
+        - strong: 2,500
+        - text: followers
+      - button "Buy now"
+    - article:
+      - heading "5,000 followers TikTok" [level=4]
+      - paragraph: Traction
+      - paragraph: $ 120.00
+      - paragraph:
+        - strong: 5,000
+        - text: followers
+      - button "Buy now"
+    - article:
+      - heading "7,500 followers TikTok" [level=4]
+      - paragraph: Community
+      - paragraph: $ 170.00
+      - paragraph:
+        - strong: 7,500
+        - text: followers
+      - button "Buy now"
+    - article:
+      - heading "10,000 followers TikTok" [level=4]
+      - paragraph: Community
+      - paragraph: $ 200.00
+      - paragraph:
+        - strong: 10,000
+        - text: followers
+      - button "Buy now"
+  - region "Instagram likes":
+    - heading "Instagram likes" [level=3]
+    - article:
+      - heading "100 likes Instagram" [level=4]
+      - paragraph: First push
+      - paragraph: $ 1.00
+      - paragraph:
+        - strong: "100"
+        - text: likes
+      - button "Buy now"
+    - article:
+      - heading "250 likes Instagram" [level=4]
+      - paragraph: Initial growth
+      - paragraph: $ 2.00
+      - paragraph:
+        - strong: "250"
+        - text: likes
+      - button "Buy now"
+    - article:
+      - heading "500 likes Instagram" [level=4]
+      - paragraph: Initial growth
+      - paragraph: $ 3.00
+      - paragraph:
+        - strong: "500"
+        - text: likes
+      - button "Buy now"
+    - article:
+      - heading "1,000 likes Instagram" [level=4]
+      - paragraph: Steady boost
+      - paragraph: $ 5.00
+      - paragraph:
+        - strong: 1,000
+        - text: likes
+      - button "Buy now"
+    - article:
+      - heading "2,500 likes Instagram" [level=4]
+      - paragraph: More reach
+      - paragraph: $ 11.00
+      - paragraph:
+        - strong: 2,500
+        - text: likes
+      - button "Buy now"
+    - article:
+      - heading "5,000 likes Instagram" [level=4]
+      - paragraph: More reach
+      - paragraph: $ 20.00
+      - paragraph:
+        - strong: 5,000
+        - text: likes
+      - button "Buy now"
+    - article:
+      - heading "7,500 likes Instagram" [level=4]
+      - paragraph: Spread the word
+      - paragraph: $ 28.00
+      - paragraph:
+        - strong: 7,500
+        - text: likes
+      - button "Buy now"
+    - article:
+      - heading "10,000 likes Instagram" [level=4]
+      - paragraph: Spread the word
+      - paragraph: $ 35.00
+      - paragraph:
+        - strong: 10,000
+        - text: likes
+      - button "Buy now"
+    - article:
+      - heading "25,000 likes Instagram" [level=4]
+      - paragraph: Scale
+      - paragraph: $ 80.00
+      - paragraph:
+        - strong: 25,000
+        - text: likes
+      - button "Buy now"
+    - article:
+      - heading "50,000 likes Instagram" [level=4]
+      - paragraph: Scale
+      - paragraph: $ 150.00
+      - paragraph:
+        - strong: 50,000
+        - text: likes
+      - button "Buy now"
+    - article:
+      - heading "100,000 likes Instagram" [level=4]
+      - paragraph: Mass
+      - paragraph: $ 280.00
+      - paragraph:
+        - strong: 100,000
+        - text: likes
+      - button "Buy now"
+  - region "TikTok likes":
+    - heading "TikTok likes" [level=3]
+    - article:
+      - heading "100 likes TikTok" [level=4]
+      - paragraph: First push
+      - paragraph: $ 2.00
+      - paragraph:
+        - strong: "100"
+        - text: likes
+      - button "Buy now"
+    - article:
+      - heading "250 likes TikTok" [level=4]
+      - paragraph: Initial growth
+      - paragraph: $ 4.00
+      - paragraph:
+        - strong: "250"
+        - text: likes
+      - button "Buy now"
+    - article:
+      - heading "500 likes TikTok" [level=4]
+      - paragraph: Initial growth
+      - paragraph: $ 6.00
+      - paragraph:
+        - strong: "500"
+        - text: likes
+      - button "Buy now"
+    - article:
+      - heading "1,000 likes TikTok" [level=4]
+      - paragraph: Steady boost
+      - paragraph: $ 10.00
+      - paragraph:
+        - strong: 1,000
+        - text: likes
+      - button "Buy now"
+    - article:
+      - heading "2,500 likes TikTok" [level=4]
+      - paragraph: More reach
+      - paragraph: $ 22.00
+      - paragraph:
+        - strong: 2,500
+        - text: likes
+      - button "Buy now"
+    - article:
+      - heading "5,000 likes TikTok" [level=4]
+      - paragraph: More reach
+      - paragraph: $ 40.00
+      - paragraph:
+        - strong: 5,000
+        - text: likes
+      - button "Buy now"
+    - article:
+      - heading "7,500 likes TikTok" [level=4]
+      - paragraph: Spread the word
+      - paragraph: $ 56.00
+      - paragraph:
+        - strong: 7,500
+        - text: likes
+      - button "Buy now"
+    - article:
+      - heading "10,000 likes TikTok" [level=4]
+      - paragraph: Spread the word
+      - paragraph: $ 70.00
+      - paragraph:
+        - strong: 10,000
+        - text: likes
+      - button "Buy now"
+    - article:
+      - heading "25,000 likes TikTok" [level=4]
+      - paragraph: Scale
+      - paragraph: $ 160.00
+      - paragraph:
+        - strong: 25,000
+        - text: likes
+      - button "Buy now"
+    - article:
+      - heading "50,000 likes TikTok" [level=4]
+      - paragraph: Scale
+      - paragraph: $ 549.90
+      - paragraph:
+        - strong: 50,000
+        - text: likes
+      - button "Buy now"
+    - article:
+      - heading "100,000 likes TikTok" [level=4]
+      - paragraph: Mass
+      - paragraph: $ 899.90
+      - paragraph:
+        - strong: 100,000
+        - text: likes
+      - button "Buy now"
+  - region "Instagram comments":
+    - heading "Instagram comments" [level=3]
+    - article:
+      - heading "25 comments Instagram" [level=4]
+      - paragraph: Light conversation
+      - paragraph: $ 5.00
+      - paragraph:
+        - strong: "25"
+        - text: comments
+      - button "Buy now"
+    - article:
+      - heading "50 comments Instagram" [level=4]
+      - paragraph: Light conversation
+      - paragraph: $ 9.00
+      - paragraph:
+        - strong: "50"
+        - text: comments
+      - button "Buy now"
+    - article:
+      - heading "100 comments Instagram" [level=4]
+      - paragraph: First push
+      - paragraph: $ 15.00
+      - paragraph:
+        - strong: "100"
+        - text: comments
+      - button "Buy now"
+    - article:
+      - heading "250 comments Instagram" [level=4]
+      - paragraph: Initial growth
+      - paragraph: $ 35.00
+      - paragraph:
+        - strong: "250"
+        - text: comments
+      - button "Buy now"
+    - article:
+      - heading "500 comments Instagram" [level=4]
+      - paragraph: Initial growth
+      - paragraph: $ 65.00
+      - paragraph:
+        - strong: "500"
+        - text: comments
+      - button "Buy now"
+    - article:
+      - heading "1,000 comments Instagram" [level=4]
+      - paragraph: Steady boost
+      - paragraph: $ 120.00
+      - paragraph:
+        - strong: 1,000
+        - text: comments
+      - button "Buy now"
+  - region "TikTok comments":
+    - heading "TikTok comments" [level=3]
+    - article:
+      - heading "25 comments TikTok" [level=4]
+      - paragraph: Light conversation
+      - paragraph: $ 10.00
+      - paragraph:
+        - strong: "25"
+        - text: comments
+      - button "Buy now"
+    - article:
+      - heading "50 comments TikTok" [level=4]
+      - paragraph: Light conversation
+      - paragraph: $ 18.00
+      - paragraph:
+        - strong: "50"
+        - text: comments
+      - button "Buy now"
+    - article:
+      - heading "100 comments TikTok" [level=4]
+      - paragraph: First push
+      - paragraph: $ 30.00
+      - paragraph:
+        - strong: "100"
+        - text: comments
+      - button "Buy now"
+    - article:
+      - heading "250 comments TikTok" [level=4]
+      - paragraph: Initial growth
+      - paragraph: $ 70.00
+      - paragraph:
+        - strong: "250"
+        - text: comments
+      - button "Buy now"
+    - article:
+      - heading "500 comments TikTok" [level=4]
+      - paragraph: Initial growth
+      - paragraph: $ 130.00
+      - paragraph:
+        - strong: "500"
+        - text: comments
+      - button "Buy now"
+  - region "Instagram shares":
+    - heading "Instagram shares" [level=3]
+    - article:
+      - heading "100 shares Instagram" [level=4]
+      - paragraph: First push
+      - paragraph: $ 4.00
+      - paragraph:
+        - strong: "100"
+        - text: shares
+      - button "Buy now"
+    - article:
+      - heading "100 shares Instagram" [level=4]
+      - paragraph: First push
+      - paragraph: $ 3.00
+      - paragraph:
+        - strong: "100"
+        - text: shares
+      - button "Buy now"
+    - article:
+      - heading "250 shares Instagram" [level=4]
+      - paragraph: Initial growth
+      - paragraph: $ 9.00
+      - paragraph:
+        - strong: "250"
+        - text: shares
+      - button "Buy now"
+    - article:
+      - heading "250 shares Instagram" [level=4]
+      - paragraph: Initial growth
+      - paragraph: $ 7.00
+      - paragraph:
+        - strong: "250"
+        - text: shares
+      - button "Buy now"
+    - article:
+      - heading "500 shares Instagram" [level=4]
+      - paragraph: Initial growth
+      - paragraph: $ 16.00
+      - paragraph:
+        - strong: "500"
+        - text: shares
+      - button "Buy now"
+    - article:
+      - heading "500 shares Instagram" [level=4]
+      - paragraph: Initial growth
+      - paragraph: $ 13.00
+      - paragraph:
+        - strong: "500"
+        - text: shares
+      - button "Buy now"
+    - article:
+      - heading "1,000 shares Instagram" [level=4]
+      - paragraph: Steady boost
+      - paragraph: $ 30.00
+      - paragraph:
+        - strong: 1,000
+        - text: shares
+      - button "Buy now"
+    - article:
+      - heading "1,000 shares Instagram" [level=4]
+      - paragraph: Steady boost
+      - paragraph: $ 25.00
+      - paragraph:
+        - strong: 1,000
+        - text: shares
+      - button "Buy now"
+    - article:
+      - heading "2,500 shares Instagram" [level=4]
+      - paragraph: More reach
+      - paragraph: $ 70.00
+      - paragraph:
+        - strong: 2,500
+        - text: shares
+      - button "Buy now"
+    - article:
+      - heading "2,500 shares Instagram" [level=4]
+      - paragraph: More reach
+      - paragraph: $ 55.00
+      - paragraph:
+        - strong: 2,500
+        - text: shares
+      - button "Buy now"
+    - article:
+      - heading "5,000 shares Instagram" [level=4]
+      - paragraph: More reach
+      - paragraph: $ 130.00
+      - paragraph:
+        - strong: 5,000
+        - text: shares
+      - button "Buy now"
+    - article:
+      - heading "5,000 shares Instagram" [level=4]
+      - paragraph: More reach
+      - paragraph: $ 100.00
+      - paragraph:
+        - strong: 5,000
+        - text: shares
+      - button "Buy now"
+  - region "TikTok shares":
+    - heading "TikTok shares" [level=3]
+    - article:
+      - heading "100 shares TikTok" [level=4]
+      - paragraph: First push
+      - paragraph: $ 8.00
+      - paragraph:
+        - strong: "100"
+        - text: shares
+      - button "Buy now"
+    - article:
+      - heading "250 shares TikTok" [level=4]
+      - paragraph: Initial growth
+      - paragraph: $ 18.00
+      - paragraph:
+        - strong: "250"
+        - text: shares
+      - button "Buy now"
+    - article:
+      - heading "500 shares TikTok" [level=4]
+      - paragraph: Initial growth
+      - paragraph: $ 32.00
+      - paragraph:
+        - strong: "500"
+        - text: shares
+      - button "Buy now"
+    - article:
+      - heading "1,000 shares TikTok" [level=4]
+      - paragraph: Steady boost
+      - paragraph: $ 60.00
+      - paragraph:
+        - strong: 1,000
+        - text: shares
+      - button "Buy now"
+    - article:
+      - heading "2,500 shares TikTok" [level=4]
+      - paragraph: More reach
+      - paragraph: $ 140.00
+      - paragraph:
+        - strong: 2,500
+        - text: shares
+      - button "Buy now"
+    - article:
+      - heading "5,000 shares TikTok" [level=4]
+      - paragraph: More reach
+      - paragraph: $ 260.00
+      - paragraph:
+        - strong: 5,000
+        - text: shares
+      - button "Buy now"
+  - region "Instagram views":
+    - heading "Instagram views" [level=3]
+    - article:
+      - heading "500 views Instagram" [level=4]
+      - paragraph: Ignition
+      - paragraph: $ 3.00
+      - paragraph:
+        - strong: "500"
+        - text: views
+      - button "Buy now"
+    - article:
+      - heading "1,000 views Instagram" [level=4]
+      - paragraph: First push
+      - paragraph: $ 5.00
+      - paragraph:
+        - strong: 1,000
+        - text: views
+      - button "Buy now"
+    - article:
+      - heading "1,000 views Instagram" [level=4]
+      - paragraph: First push
+      - paragraph: $ 1.50
+      - paragraph:
+        - strong: 1,000
+        - text: views
+      - button "Buy now"
+    - article:
+      - heading "2,500 views Instagram" [level=4]
+      - paragraph: More reach
+      - paragraph: $ 11.00
+      - paragraph:
+        - strong: 2,500
+        - text: views
+      - button "Buy now"
+    - article:
+      - heading "5,000 views Instagram" [level=4]
+      - paragraph: More reach
+      - paragraph: $ 20.00
+      - paragraph:
+        - strong: 5,000
+        - text: views
+      - button "Buy now"
+    - article:
+      - heading "5,000 views Instagram" [level=4]
+      - paragraph: More reach
+      - paragraph: $ 7.00
+      - paragraph:
+        - strong: 5,000
+        - text: views
+      - button "Buy now"
+    - article:
+      - heading "10,000 views Instagram" [level=4]
+      - paragraph: Steady growth
+      - paragraph: $ 13.00
+      - paragraph:
+        - strong: 10,000
+        - text: views
+      - button "Buy now"
+    - article:
+      - heading "10,000 views Instagram" [level=4]
+      - paragraph: Steady growth
+      - paragraph: $ 35.00
+      - paragraph:
+        - strong: 10,000
+        - text: views
+      - button "Buy now"
+    - article:
+      - heading "25,000 views Instagram" [level=4]
+      - paragraph: Scale
+      - paragraph: $ 80.00
+      - paragraph:
+        - strong: 25,000
+        - text: views
+      - button "Buy now"
+    - article:
+      - heading "25,000 views Instagram" [level=4]
+      - paragraph: Scale
+      - paragraph: $ 30.00
+      - paragraph:
+        - strong: 25,000
+        - text: views
+      - button "Buy now"
+    - article:
+      - heading "50,000 views Instagram" [level=4]
+      - paragraph: Scale
+      - paragraph: $ 55.00
+      - paragraph:
+        - strong: 50,000
+        - text: views
+      - button "Buy now"
+    - article:
+      - heading "100,000 views Instagram" [level=4]
+      - paragraph: Mass
+      - paragraph: $ 100.00
+      - paragraph:
+        - strong: 100,000
+        - text: views
+      - button "Buy now"
+    - article:
+      - heading "250,000 views Instagram" [level=4]
+      - paragraph: Viral
+      - paragraph: $ 230.00
+      - paragraph:
+        - strong: 250,000
+        - text: views
+      - button "Buy now"
+    - article:
+      - heading "500,000 views Instagram" [level=4]
+      - paragraph: Viral
+      - paragraph: $ 450.00
+      - paragraph:
+        - strong: 500,000
+        - text: views
+      - button "Buy now"
+    - article:
+      - heading "1,000,000 views Instagram" [level=4]
+      - paragraph: Viral
+      - paragraph: $ 800.00
+      - paragraph:
+        - strong: 1,000,000
+        - text: views
+      - button "Buy now"
+  - region "TikTok views":
+    - heading "TikTok views" [level=3]
+    - article:
+      - heading "10,000 views TikTok" [level=4]
+      - paragraph: Steady growth
+      - paragraph: $ 20.00
+      - paragraph:
+        - strong: 10,000
+        - text: views
+      - button "Buy now"
+    - article:
+      - heading "25,000 views TikTok" [level=4]
+      - paragraph: Scale
+      - paragraph: $ 45.00
+      - paragraph:
+        - strong: 25,000
+        - text: views
+      - button "Buy now"
+    - article:
+      - heading "50,000 views TikTok" [level=4]
+      - paragraph: Scale
+      - paragraph: $ 85.00
+      - paragraph:
+        - strong: 50,000
+        - text: views
+      - button "Buy now"
+    - article:
+      - heading "100,000 views TikTok" [level=4]
+      - paragraph: Mass
+      - paragraph: $ 160.00
+      - paragraph:
+        - strong: 100,000
+        - text: views
+      - button "Buy now"
+    - article:
+      - heading "250,000 views TikTok" [level=4]
+      - paragraph: Viral
+      - paragraph: $ 380.00
+      - paragraph:
+        - strong: 250,000
+        - text: views
+      - button "Buy now"
+    - article:
+      - heading "500,000 views TikTok" [level=4]
+      - paragraph: Viral
+      - paragraph: $ 750.00
+      - paragraph:
+        - strong: 500,000
+        - text: views
+      - button "Buy now"
+    - article:
+      - heading "1,000,000 views TikTok" [level=4]
+      - paragraph: Viral
+      - paragraph: $ 1400.00
+      - paragraph:
+        - strong: 1,000,000
+        - text: views
+      - button "Buy now"
+  - region "Premium services":
+    - heading "Premium services" [level=3]
+    - article:
+      - heading "Profile audit" [level=4]
+      - paragraph: Diagnosis + recommendations
+      - paragraph: $ 39.00
+      - button "Buy now"
+    - article:
+      - heading "Monthly management" [level=4]
+      - paragraph: Profile management + strategy
+      - paragraph: $ 99.00
+      - button "Buy now"
+    - article:
+      - heading "Product launch" [level=4]
+      - paragraph: Integrated 30-day campaign
+      - paragraph: $ 499.00
+      - button "Buy now"
+    - article:
+      - heading "New account setup" [level=4]
+      - paragraph: Full setup and optimization for a new account
+      - paragraph: $ 149.00
+      - button "Buy now"
+    - article:
+      - heading "Anti-shadowban package" [level=4]
+      - paragraph: Shadowban diagnosis and removal plan
+      - paragraph: $ 129.00
+      - button "Buy now"
+    - article:
+      - heading "Competitor analysis" [level=4]
+      - paragraph: In-depth analysis of direct competitors
+      - paragraph: $ 79.00
+      - button "Buy now"
+    - article:
+      - heading "Verification support" [level=4]
+      - paragraph: Support to apply for the verified badge
+      - paragraph: $ 299.00
+      - button "Buy now"
+  - region "Account recovery":
+    - heading "Account recovery" [level=3]
+    - article:
+      - heading "Account recovery" [level=4]
+      - paragraph: Full account recovery — Instagram/TikTok suspended, hacked or restricted
+      - paragraph: $ 10000.00
+      - paragraph:
+        - strong: "1"
+        - text: views
+      - button "Buy now"
+  - heading "Markets & languages (130)" [level=2]
+  - heading "Americas (30)" [level=3]
+  - link "Argentina Argentina":
+    - /url: /ar
+    - img "Argentina"
+    - text: Argentina
+  - link "Bahamas Bahamas":
+    - /url: /bs
+    - img "Bahamas"
+    - text: Bahamas
+  - link "Barbados Barbados":
+    - /url: /bb
+    - img "Barbados"
+    - text: Barbados
+  - link "Belize Belize":
+    - /url: /bz
+    - img "Belize"
+    - text: Belize
+  - link "Bolivia Bolivia":
+    - /url: /bo
+    - img "Bolivia"
+    - text: Bolivia
+  - link "Brasil Brasil":
+    - /url: /br
+    - img "Brasil"
+    - text: Brasil
+  - link "Canada Canada":
+    - /url: /ca
+    - img "Canada"
+    - text: Canada
+  - link "Chile Chile":
+    - /url: /cl
+    - img "Chile"
+    - text: Chile
+  - link "Colombia Colombia":
+    - /url: /co
+    - img "Colombia"
+    - text: Colombia
+  - link "Costa Rica Costa Rica":
+    - /url: /cr
+    - img "Costa Rica"
+    - text: Costa Rica
+  - link "Cuba Cuba":
+    - /url: /cu
+    - img "Cuba"
+    - text: Cuba
+  - link "Ecuador Ecuador":
+    - /url: /ec
+    - img "Ecuador"
+    - text: Ecuador
+  - link "El Salvador El Salvador":
+    - /url: /sv
+    - img "El Salvador"
+    - text: El Salvador
+  - link "Guatemala Guatemala":
+    - /url: /gt
+    - img "Guatemala"
+    - text: Guatemala
+  - link "Guyana Guyana":
+    - /url: /gy
+    - img "Guyana"
+    - text: Guyana
+  - link "Haïti Haïti":
+    - /url: /ht
+    - img "Haïti"
+    - text: Haïti
+  - link "Honduras Honduras":
+    - /url: /hn
+    - img "Honduras"
+    - text: Honduras
+  - link "Jamaica Jamaica":
+    - /url: /jm
+    - img "Jamaica"
+    - text: Jamaica
+  - link "México México":
+    - /url: /mx
+    - img "México"
+    - text: México
+  - link "Nicaragua Nicaragua":
+    - /url: /ni
+    - img "Nicaragua"
+    - text: Nicaragua
+  - link "Panamá Panamá":
+    - /url: /pa
+    - img "Panamá"
+    - text: Panamá
+  - link "Paraguay Paraguay":
+    - /url: /py
+    - img "Paraguay"
+    - text: Paraguay
+  - link "Perú Perú":
+    - /url: /pe
+    - img "Perú"
+    - text: Perú
+  - link "Puerto Rico Puerto Rico":
+    - /url: /pr
+    - img "Puerto Rico"
+    - text: Puerto Rico
+  - link "República Dominicana República Dominicana":
+    - /url: /do
+    - img "República Dominicana"
+    - text: República Dominicana
+  - link "Suriname Suriname":
+    - /url: /sr
+    - img "Suriname"
+    - text: Suriname
+  - link "Trinidad and Tobago Trinidad and Tobago":
+    - /url: /tt
+    - img "Trinidad and Tobago"
+    - text: Trinidad and Tobago
+  - link "United States United States":
+    - /url: /us
+    - img "United States"
+    - text: United States
+  - link "Uruguay Uruguay":
+    - /url: /uy
+    - img "Uruguay"
+    - text: Uruguay
+  - link "Venezuela Venezuela":
+    - /url: /ve
+    - img "Venezuela"
+    - text: Venezuela
+  - heading "Europe / SEPA (37)" [level=3]
+  - link "Andorra Andorra":
+    - /url: /ad
+    - img "Andorra"
+    - text: Andorra
+  - link "België België":
+    - /url: /be
+    - img "België"
+    - text: België
+  - link "Česko Česko":
+    - /url: /cz
+    - img "Česko"
+    - text: Česko
+  - link "Danmark Danmark":
+    - /url: /dk
+    - img "Danmark"
+    - text: Danmark
+  - link "Deutschland Deutschland":
+    - /url: /de
+    - img "Deutschland"
+    - text: Deutschland
+  - link "Eesti Eesti":
+    - /url: /ee
+    - img "Eesti"
+    - text: Eesti
+  - link "España España":
+    - /url: /es
+    - img "España"
+    - text: España
+  - link "France France":
+    - /url: /fr
+    - img "France"
+    - text: France
+  - link "Gibraltar Gibraltar":
+    - /url: /gi
+    - img "Gibraltar"
+    - text: Gibraltar
+  - link "Hrvatska Hrvatska":
+    - /url: /hr
+    - img "Hrvatska"
+    - text: Hrvatska
+  - link "Ireland Ireland":
+    - /url: /ie
+    - img "Ireland"
+    - text: Ireland
+  - link "Ísland Ísland":
+    - /url: /is
+    - img "Ísland"
+    - text: Ísland
+  - link "Italia Italia":
+    - /url: /it
+    - img "Italia"
+    - text: Italia
+  - link "Latvija Latvija":
+    - /url: /lv
+    - img "Latvija"
+    - text: Latvija
+  - link "Liechtenstein Liechtenstein":
+    - /url: /li
+    - img "Liechtenstein"
+    - text: Liechtenstein
+  - link "Lietuva Lietuva":
+    - /url: /lt
+    - img "Lietuva"
+    - text: Lietuva
+  - link "Luxembourg Luxembourg":
+    - /url: /lu
+    - img "Luxembourg"
+    - text: Luxembourg
+  - link "Magyarország Magyarország":
+    - /url: /hu
+    - img "Magyarország"
+    - text: Magyarország
+  - link "Malta Malta":
+    - /url: /mt
+    - img "Malta"
+    - text: Malta
+  - link "Monaco Monaco":
+    - /url: /mc
+    - img "Monaco"
+    - text: Monaco
+  - link "Nederland Nederland":
+    - /url: /nl
+    - img "Nederland"
+    - text: Nederland
+  - link "Norge Norge":
+    - /url: /no
+    - img "Norge"
+    - text: Norge
+  - link "Österreich Österreich":
+    - /url: /at
+    - img "Österreich"
+    - text: Österreich
+  - link "Polska Polska":
+    - /url: /pl
+    - img "Polska"
+    - text: Polska
+  - link "Portugal Portugal":
+    - /url: /pt
+    - img "Portugal"
+    - text: Portugal
+  - link "România România":
+    - /url: /ro
+    - img "România"
+    - text: România
+  - link "San Marino San Marino":
+    - /url: /sm
+    - img "San Marino"
+    - text: San Marino
+  - link "Schweiz Schweiz":
+    - /url: /ch
+    - img "Schweiz"
+    - text: Schweiz
+  - link "Slovenija Slovenija":
+    - /url: /si
+    - img "Slovenija"
+    - text: Slovenija
+  - link "Slovensko Slovensko":
+    - /url: /sk
+    - img "Slovensko"
+    - text: Slovensko
+  - link "Suomi Suomi":
+    - /url: /fi
+    - img "Suomi"
+    - text: Suomi
+  - link "Sverige Sverige":
+    - /url: /se
+    - img "Sverige"
+    - text: Sverige
+  - link "United Kingdom United Kingdom":
+    - /url: /gb
+    - img "United Kingdom"
+    - text: United Kingdom
+  - link "Vaticano Vaticano":
+    - /url: /va
+    - img "Vaticano"
+    - text: Vaticano
+  - link "Ελλάδα Ελλάδα":
+    - /url: /gr
+    - img "Ελλάδα"
+    - text: Ελλάδα
+  - link "Κύπρος Κύπρος":
+    - /url: /cy
+    - img "Κύπρος"
+    - text: Κύπρος
+  - link "България България":
+    - /url: /bg
+    - img "България"
+    - text: България
+  - heading "Asia (32)" [level=3]
+  - link "Brunei Brunei":
+    - /url: /bn
+    - img "Brunei"
+    - text: Brunei
+  - link "Cambodia Cambodia":
+    - /url: /kh
+    - img "Cambodia"
+    - text: Cambodia
+  - link "Indonesia Indonesia":
+    - /url: /id
+    - img "Indonesia"
+    - text: Indonesia
+  - link "Laos Laos":
+    - /url: /la
+    - img "Laos"
+    - text: Laos
+  - link "Malaysia Malaysia":
+    - /url: /my
+    - img "Malaysia"
+    - text: Malaysia
+  - link "Myanmar Myanmar":
+    - /url: /mm
+    - img "Myanmar"
+    - text: Myanmar
+  - link "Nepal Nepal":
+    - /url: /np
+    - img "Nepal"
+    - text: Nepal
+  - link "Philippines Philippines":
+    - /url: /ph
+    - img "Philippines"
+    - text: Philippines
+  - link "Singapore Singapore":
+    - /url: /sg
+    - img "Singapore"
+    - text: Singapore
+  - link "Sri Lanka Sri Lanka":
+    - /url: /lk
+    - img "Sri Lanka"
+    - text: Sri Lanka
+  - link "Việt Nam Việt Nam":
+    - /url: /vn
+    - img "Việt Nam"
+    - text: Việt Nam
+  - link "Кыргызстан Кыргызстан":
+    - /url: /kg
+    - img "Кыргызстан"
+    - text: Кыргызстан
+  - link "Қазақстан Қазақстан":
+    - /url: /kz
+    - img "Қазақстан"
+    - text: Қазақстан
+  - link "ישראל ישראל":
+    - /url: /il
+    - img "ישראל"
+    - text: ישראל
+  - link "الأردن الأردن":
+    - /url: /jo
+    - img "الأردن"
+    - text: الأردن
+  - link "الإمارات الإمارات":
+    - /url: /ae
+    - img "الإمارات"
+    - text: الإمارات
+  - link "البحرين البحرين":
+    - /url: /bh
+    - img "البحرين"
+    - text: البحرين
+  - link "السعودية السعودية":
+    - /url: /sa
+    - img "السعودية"
+    - text: السعودية
+  - link "العراق العراق":
+    - /url: /iq
+    - img "العراق"
+    - text: العراق
+  - link "الكويت الكويت":
+    - /url: /kw
+    - img "الكويت"
+    - text: الكويت
+  - link "پاکستان پاکستان":
+    - /url: /pk
+    - img "پاکستان"
+    - text: پاکستان
+  - link "عُمان عُمان":
+    - /url: /om
+    - img "عُمان"
+    - text: عُمان
+  - link "قطر قطر":
+    - /url: /qa
+    - img "قطر"
+    - text: قطر
+  - link "لبنان لبنان":
+    - /url: /lb
+    - img "لبنان"
+    - text: لبنان
+  - link "भारत भारत":
+    - /url: /in
+    - img "भारत"
+    - text: भारत
+  - link "বাংলাদেশ বাংলাদেশ":
+    - /url: /bd
+    - img "বাংলাদেশ"
+    - text: বাংলাদেশ
+  - link "ประเทศไทย ประเทศไทย":
+    - /url: /th
+    - img "ประเทศไทย"
+    - text: ประเทศไทย
+  - link "대한민국 대한민국":
+    - /url: /kr
+    - img "대한민국"
+    - text: 대한민국
+  - link "台灣 台灣":
+    - /url: /tw
+    - img "台灣"
+    - text: 台灣
+  - link "日本 日本":
+    - /url: /jp
+    - img "日本"
+    - text: 日本
+  - link "澳門 澳門":
+    - /url: /mo
+    - img "澳門"
+    - text: 澳門
+  - link "香港 香港":
+    - /url: /hk
+    - img "香港"
+    - text: 香港
+  - heading "Africa (16)" [level=3]
+  - link "Angola Angola":
+    - /url: /ao
+    - img "Angola"
+    - text: Angola
+  - link "Cameroun Cameroun":
+    - /url: /cm
+    - img "Cameroun"
+    - text: Cameroun
+  - link "Côte d'Ivoire Côte d'Ivoire":
+    - /url: /ci
+    - img "Côte d'Ivoire"
+    - text: Côte d'Ivoire
+  - link "Ghana Ghana":
+    - /url: /gh
+    - img "Ghana"
+    - text: Ghana
+  - link "Kenya Kenya":
+    - /url: /ke
+    - img "Kenya"
+    - text: Kenya
+  - link "Moçambique Moçambique":
+    - /url: /mz
+    - img "Moçambique"
+    - text: Moçambique
+  - link "Nigeria Nigeria":
+    - /url: /ng
+    - img "Nigeria"
+    - text: Nigeria
+  - link "Sénégal Sénégal":
+    - /url: /sn
+    - img "Sénégal"
+    - text: Sénégal
+  - link "South Africa South Africa":
+    - /url: /za
+    - img "South Africa"
+    - text: South Africa
+  - link "Tanzania Tanzania":
+    - /url: /tz
+    - img "Tanzania"
+    - text: Tanzania
+  - link "Uganda Uganda":
+    - /url: /ug
+    - img "Uganda"
+    - text: Uganda
+  - link "الجزائر الجزائر":
+    - /url: /dz
+    - img "الجزائر"
+    - text: الجزائر
+  - link "المغرب المغرب":
+    - /url: /ma
+    - img "المغرب"
+    - text: المغرب
+  - link "تونس تونس":
+    - /url: /tn
+    - img "تونس"
+    - text: تونس
+  - link "مصر مصر":
+    - /url: /eg
+    - img "مصر"
+    - text: مصر
+  - link "ኢትዮጵያ ኢትዮጵያ":
+    - /url: /et
+    - img "ኢትዮጵያ"
+    - text: ኢትዮጵያ
+  - heading "Oceania (4)" [level=3]
+  - link "Australia Australia":
+    - /url: /au
+    - img "Australia"
+    - text: Australia
+  - link "Fiji Fiji":
+    - /url: /fj
+    - img "Fiji"
+    - text: Fiji
+  - link "New Zealand New Zealand":
+    - /url: /nz
+    - img "New Zealand"
+    - text: New Zealand
+  - link "Papua New Guinea Papua New Guinea":
+    - /url: /pg
+    - img "Papua New Guinea"
+    - text: Papua New Guinea
+  - heading "Europe (other) (11)" [level=3]
+  - link "Bosna i Hercegovina Bosna i Hercegovina":
+    - /url: /ba
+    - img "Bosna i Hercegovina"
+    - text: Bosna i Hercegovina
+  - link "Kosovë Kosovë":
+    - /url: /xk
+    - img "Kosovë"
+    - text: Kosovë
+  - link "Maqedoni e Veriut Maqedoni e Veriut":
+    - /url: /mk
+    - img "Maqedoni e Veriut"
+    - text: Maqedoni e Veriut
+  - link "Moldova Moldova":
+    - /url: /md
+    - img "Moldova"
+    - text: Moldova
+  - link "Shqipëri Shqipëri":
+    - /url: /al
+    - img "Shqipëri"
+    - text: Shqipëri
+  - link "Türkiye Türkiye":
+    - /url: /tr
+    - img "Türkiye"
+    - text: Türkiye
+  - link "Беларусь Беларусь":
+    - /url: /by
+    - img "Беларусь"
+    - text: Беларусь
+  - link "Россия Россия":
+    - /url: /ru
+    - img "Россия"
+    - text: Россия
+  - link "Србија Србија":
+    - /url: /rs
+    - img "Србија"
+    - text: Србија
+  - link "Україна Україна":
+    - /url: /ua
+    - img "Україна"
+    - text: Україна
+  - link "Црна Гора Црна Гора":
+    - /url: /me
+    - img "Црна Гора"
+    - text: Црна Гора
+- contentinfo:
+  - paragraph: Viralefy
+  - paragraph: Responsible social media growth.
+  - navigation "Discover":
+    - heading "Discover" [level=3]
+    - list:
+      - listitem:
+        - link "Pricing":
+          - /url: /pricing
+      - listitem:
+        - link "Cities":
+          - /url: /cities
+      - listitem:
+        - link "Compare Viralefy":
+          - /url: /vs
+      - listitem:
+        - link "Help center":
+          - /url: /help
+      - listitem:
+        - link "Case studies":
+          - /url: /case-studies
+      - listitem:
+        - link "System status":
+          - /url: /status
+      - listitem:
+        - link "Cookie preferences":
+          - /url: /legal/cookie-preferences?lang=en
+      - listitem:
+        - link "Refer & earn":
+          - /url: /account/referral
+      - listitem:
+        - link "Subscriptions":
+          - /url: /account/subscriptions
+      - listitem:
+        - link "Developer API":
+          - /url: /account/api-keys
+  - navigation "Legal":
+    - heading "Legal" [level=3]
+    - list:
+      - listitem:
+        - link "Privacy Policy":
+          - /url: /legal/privacy?lang=en
+      - listitem:
+        - link "Terms of Service":
+          - /url: /legal/terms?lang=en
+      - listitem:
+        - link "Cookie Policy":
+          - /url: /legal/cookies?lang=en
+      - listitem:
+        - link "Refund Policy":
+          - /url: /legal/refund?lang=en
+      - listitem:
+        - link "About Viralefy":
+          - /url: /legal/about?lang=en
+      - listitem:
+        - link "Contact support":
+          - /url: /legal/contact?lang=en
+  - navigation "Markets":
+    - heading "Markets" [level=3]
+    - link "Argentina Argentina":
+      - /url: /ar
+      - img "Argentina"
+      - text: Argentina
+    - link "Bahamas Bahamas":
+      - /url: /bs
+      - img "Bahamas"
+      - text: Bahamas
+    - link "Barbados Barbados":
+      - /url: /bb
+      - img "Barbados"
+      - text: Barbados
+    - link "Belize Belize":
+      - /url: /bz
+      - img "Belize"
+      - text: Belize
+    - link "Bolivia Bolivia":
+      - /url: /bo
+      - img "Bolivia"
+      - text: Bolivia
+    - link "Brasil Brasil":
+      - /url: /br
+      - img "Brasil"
+      - text: Brasil
+    - link "Canada Canada":
+      - /url: /ca
+      - img "Canada"
+      - text: Canada
+    - link "Chile Chile":
+      - /url: /cl
+      - img "Chile"
+      - text: Chile
+    - link "Colombia Colombia":
+      - /url: /co
+      - img "Colombia"
+      - text: Colombia
+    - link "Costa Rica Costa Rica":
+      - /url: /cr
+      - img "Costa Rica"
+      - text: Costa Rica
+    - link "Cuba Cuba":
+      - /url: /cu
+      - img "Cuba"
+      - text: Cuba
+    - link "Ecuador Ecuador":
+      - /url: /ec
+      - img "Ecuador"
+      - text: Ecuador
+    - link "El Salvador El Salvador":
+      - /url: /sv
+      - img "El Salvador"
+      - text: El Salvador
+    - link "Guatemala Guatemala":
+      - /url: /gt
+      - img "Guatemala"
+      - text: Guatemala
+    - link "Guyana Guyana":
+      - /url: /gy
+      - img "Guyana"
+      - text: Guyana
+    - link "Haïti Haïti":
+      - /url: /ht
+      - img "Haïti"
+      - text: Haïti
+    - link "Honduras Honduras":
+      - /url: /hn
+      - img "Honduras"
+      - text: Honduras
+    - link "Jamaica Jamaica":
+      - /url: /jm
+      - img "Jamaica"
+      - text: Jamaica
+  - text: © 2026 Viralefy. All rights reserved. Viralefy is not affiliated with Instagram, TikTok or Meta Platforms.
+- alert
+- dialog "Cookie consent":
+  - paragraph: Your privacy
+  - paragraph:
+    - text: We use essential cookies to make the site work and — only with your consent — analytics and marketing cookies. You can revoke anytime.
+    - link "privacy policy":
+      - /url: /legal/privacy
+    - text: and
+    - link "cookie policy":
+      - /url: /legal/cookies
+    - text: .
+  - button "Customize"
+  - button "Essential only"
+  - button "Accept all"
+```
+
+# Test source
+
+```ts
+  1  | import { test, expect } from '@playwright/test';
+  2  | 
+  3  | test.describe('home page', () => {
+  4  |   test('renders hero, at least one plan card, and footer', async ({ page }) => {
+  5  |     await page.goto('/');
+  6  | 
+  7  |     const h1 = page.locator('h1').first();
+  8  |     await expect(h1).toBeVisible();
+  9  |     const h1Text = (await h1.textContent()) || '';
+  10 |     expect(h1Text).toMatch(/Instagram|TikTok/i);
+  11 | 
+  12 |     // At least one plan card should render somewhere on the homepage.
+  13 |     // Cards are typically anchors/buttons linking into the plan flow.
+  14 |     const planCandidates = page.locator(
+  15 |       '[data-testid="plan-card"], [data-plan], a[href*="/plan"], a[href*="instagram-followers"], a[href*="tiktok-followers"]'
+  16 |     );
+> 17 |     await expect(planCandidates.first()).toBeVisible();
+     |                                          ^ Error: expect(locator).toBeVisible() failed
+  18 | 
+  19 |     // Footer is shared layout — assert by role or tag.
+  20 |     const footer = page.locator('footer').first();
+  21 |     await expect(footer).toBeVisible();
+  22 |   });
+  23 | });
+  24 | 
+```

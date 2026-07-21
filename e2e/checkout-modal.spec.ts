@@ -398,8 +398,14 @@ test.describe('checkout modal — desktop', () => {
 // Mobile viewport — exercita responsividade do modal
 // ---------------------------------------------------------------------------
 
+// `devices['Pixel 5']` traz `defaultBrowserType`, e o Playwright recusa esse
+// campo dentro de um describe (forçaria um worker novo). O projeto já roda em
+// chromium (playwright.config.ts), então descartamos o campo e ficamos com o
+// que interessa aqui: viewport, userAgent, isMobile, hasTouch e deviceScaleFactor.
+const { defaultBrowserType: _unusedBrowserType, ...PIXEL_5 } = devices['Pixel 5'];
+
 test.describe('checkout modal — mobile (Pixel 5)', () => {
-  test.use({ ...devices['Pixel 5'] });
+  test.use(PIXEL_5);
 
   test('modal abre, é scrollável e completa o fluxo em viewport mobile', async ({ page }) => {
     await installApiMocks(page);
