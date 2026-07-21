@@ -70,7 +70,7 @@ export function QuantitySlider({
         <h3 style={{ marginBottom: "0.5rem", fontSize: "1.15rem" }}>{t.category.chooseQty}</h3>
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "0.5rem" }}>
-          <span style={{ fontSize: "0.85rem", color: "var(--muted)" }}>{unitLabel}</span>
+          <span style={{ fontSize: "0.85rem", color: "var(--muted-strong)" }}>{unitLabel}</span>
           <strong style={{ fontSize: "2rem" }}>{formatQty(qty, lang)}</strong>
         </div>
         <input
@@ -123,21 +123,24 @@ export function QuantitySlider({
         </button>
       </section>
 
-      <h4 style={{ marginBottom: "1rem", fontSize: "0.85rem", color: "var(--muted)", textAlign: "center", textTransform: "uppercase", letterSpacing: ".5px" }}>
+      <h4 style={{ marginBottom: "1rem", fontSize: "0.85rem", color: "var(--muted-strong)", textAlign: "center", textTransform: "uppercase", letterSpacing: ".5px" }}>
         {t.category.compareAll}
       </h4>
 
       <div className="card" style={{ padding: 0, overflow: "hidden" }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
+            {/* `--muted-strong` e não `--muted`: sobre o fundo `--accent-dim` o
+                muted dava 4.13:1 no tema escuro, abaixo do mínimo AA de 4.5:1
+                pra texto normal. O strong dá 5.74:1 (dark) e 8.73:1 (light). */}
             <tr style={{ background: "var(--accent-dim)", borderBottom: "1px solid var(--border)" }}>
-              <th style={{ padding: "0.75rem 1rem", textAlign: "start", fontSize: "0.85rem", color: "var(--muted)" }}>
+              <th style={{ padding: "0.75rem 1rem", textAlign: "start", fontSize: "0.85rem", color: "var(--muted-strong)" }}>
                 {t.category.table.plan}
               </th>
-              <th style={{ padding: "0.75rem 1rem", textAlign: "end", fontSize: "0.85rem", color: "var(--muted)" }}>
+              <th style={{ padding: "0.75rem 1rem", textAlign: "end", fontSize: "0.85rem", color: "var(--muted-strong)" }}>
                 {t.category.table.qty}
               </th>
-              <th style={{ padding: "0.75rem 1rem", textAlign: "end", fontSize: "0.85rem", color: "var(--muted)" }}>
+              <th style={{ padding: "0.75rem 1rem", textAlign: "end", fontSize: "0.85rem", color: "var(--muted-strong)" }}>
                 {t.category.table.price}
               </th>
               <th style={{ padding: "0.75rem 1rem", textAlign: "end" }} />

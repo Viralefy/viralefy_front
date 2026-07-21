@@ -51,7 +51,11 @@ export function LiveCounter({ lang = "en" }: { lang?: LangCode }) {
         zIndex: 40,
         padding: "0.6rem 0.9rem",
         background: "rgba(20, 20, 31, 0.92)",
-        color: "var(--text)",
+        // O fundo deste pill é escuro SEMPRE (não segue o tema), então a cor do
+        // texto não pode vir de `--text`: no tema claro o token vira quase-preto
+        // e o contraste caía pra 1.27:1 — texto invisível. Cor clara fixa,
+        // pareada com o fundo fixo (14.5:1).
+        color: "#f0f9ff",
         border: "1px solid var(--accent)",
         borderRadius: "0.6rem",
         boxShadow: "0 6px 20px rgba(0, 0, 0, 0.35)",
