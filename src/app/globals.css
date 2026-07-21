@@ -49,6 +49,10 @@
   --neon-deep: #00c9aa;
   --accent: #00fed6;
   --accent-hover: #5bffe1;
+  /* Cor do texto QUANDO o fundo é --accent. Existe porque o accent é claro no
+     tema dark e escuro no light: preto fixo por cima reprovava AA em um dos
+     dois. Ver [data-theme="light"]. */
+  --on-accent: #04080c;
   --accent-dim: rgba(0, 254, 214, 0.12);
   --accent-dimmer: rgba(0, 254, 214, 0.06);
   --accent-glow: rgba(0, 254, 214, 0.35);
@@ -89,12 +93,20 @@
   --muted: #5a6878;
   --muted-strong: #3b4654;
 
-  /* Neon precisa ser um pouco mais escuro para legibilidade em fundo claro */
-  --neon: #00b89a;
+  /* Neon precisa ser mais escuro para legibilidade em fundo claro.
+     #00b89a (valor anterior) dava apenas 2.52:1 sobre #ffffff — reprovava
+     WCAG AA (4.5:1 pra texto normal) em qualquer link com cor de destaque, e
+     o tema claro é o default de quem tem o SO em claro (`prefers-color-scheme`).
+     #00806b dá 4.88:1 sobre branco e 4.61:1 sobre o --bg (#f5f9fc);
+     o hover escurece mais (7.5:1), que é o comportamento esperado em tema claro. */
+  --neon: #00806b;
   --neon-soft: #00d4b0;
   --neon-deep: #008c75;
-  --accent: #00b89a;
-  --accent-hover: #00d4b0;
+  --accent: #00806b;
+  --accent-hover: #00604f;
+  /* Accent escuro no tema claro → texto por cima tem que ser branco
+     (4.88:1). Com preto dava 4.29:1 e reprovava AA. */
+  --on-accent: #ffffff;
   --accent-dim: rgba(0, 184, 154, 0.10);
   --accent-dimmer: rgba(0, 184, 154, 0.04);
   --accent-glow: rgba(0, 184, 154, 0.25);

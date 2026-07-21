@@ -632,7 +632,7 @@ function StepHeader({ step, onBack }: { step: Step; onBack: (() => void) | null 
               padding: "0.15rem 0.5rem",
               borderRadius: 999,
               background: i === currentIdx ? "var(--accent)" : i < currentIdx ? "rgba(60,216,125,0.18)" : "rgba(255,255,255,0.06)",
-              color: i === currentIdx ? "#000" : i < currentIdx ? "#3cd87d" : "var(--muted)",
+              color: i === currentIdx ? "var(--on-accent)" : i < currentIdx ? "#3cd87d" : "var(--muted)",
               fontWeight: i === currentIdx ? 600 : 400,
             }}
           >
