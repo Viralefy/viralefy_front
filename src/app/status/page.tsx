@@ -168,6 +168,11 @@ export default async function StatusPage() {
                       </span>
                     )}
                     <span
+                      // Hooks estáveis pro e2e: o badge é o sinal visível do
+                      // estado do serviço, e `data-status` deixa o teste
+                      // assertar o estado, não só a presença.
+                      data-testid="status-badge"
+                      data-status={s.status}
                       style={{
                         padding: "0.3rem 0.75rem",
                         borderRadius: "999px",

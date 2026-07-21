@@ -1368,7 +1368,7 @@ export default async function CityPage({ params }: { params: Promise<{ city: str
         </nav>
         <header className="hero container" style={{ textAlign: "center", maxWidth: 820, margin: "0 auto", padding: "1.5rem 1rem 1.5rem" }}>
           <div style={{ marginBottom: "0.75rem" }}>
-            <Flag code={city.country} width={80} title={city.name} style={{ borderRadius: "4px" }} />
+            <Flag code={city.country} width={80} title={city.name} style={{ borderRadius: "4px" }} nameIsAdjacent />
           </div>
           <h1 style={{ fontSize: "2.4rem", lineHeight: 1.15, margin: "0 0 1rem" }}>
             {tt.heroTitle(city.name)}

@@ -281,7 +281,7 @@ export function SearchBar({ lang, currentCountry = "" }: { lang: LangCode; curre
                   textAlign: "start",
                 }}
               >
-                <Flag code={h.flagCode} width={20} title={h.market} />
+                <Flag code={h.flagCode} width={20} title={h.market} nameIsAdjacent />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontWeight: 600, fontSize: "0.9rem" }}>{h.label}</div>
                   <div style={{ color: "var(--muted)", fontSize: "0.8rem" }}>{h.market}</div>

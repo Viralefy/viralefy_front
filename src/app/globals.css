@@ -517,6 +517,16 @@ tbody tr:hover {
   .site-header__drawer.open {
     display: flex;
   }
+  /* A busca é desenhada pra cair numa SEGUNDA linha no mobile (order 99 +
+     flex-basis 100%). Isso exige wrap: com o `flex-wrap: nowrap` herdado (fix
+     do BUG-13, que vale nas larguras intermediárias ~900-1100px), a busca era
+     empurrada pra mesma linha com base de 100% e somava à logo/hamburger —
+     estourando a página em ~131px na horizontal (documentElement.scrollWidth
+     524 num viewport de 393). Isso quebrava layout, Core Web Vitals e deixava
+     controles inalcançáveis sob o overlay do checkout. */
+  .site-header__row {
+    flex-wrap: wrap;
+  }
   .site-header__search {
     order: 99;
     flex: 1 0 100%;

@@ -79,7 +79,11 @@ export function CurrencyPicker({
         type="button"
         className="btn btn-outline"
         data-testid="currency-picker"
-        aria-label={label}
+        // WCAG 2.5.3 (Label in Name): o nome acessível precisa CONTER o texto
+        // visível. Com `aria-label="Currency"` puro, o rótulo falado ignorava o
+        // "$ USD" que o usuário vê — quem usa controle por voz dizia "clicar em
+        // $ USD" e nada acontecia. Prefixar mantém o contexto e inclui o texto.
+        aria-label={`${label ?? "Currency"}: ${display}`}
         aria-haspopup="dialog"
         aria-expanded={open}
         onClick={() => setOpen(true)}

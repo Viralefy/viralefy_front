@@ -104,7 +104,7 @@ export default async function NotFound() {
               className="btn btn-outline"
               style={{ padding: "0.45rem 0.9rem", fontSize: "0.9rem", display: "inline-flex", alignItems: "center", gap: "0.45rem" }}
             >
-              <Flag code={c.code} width={20} title={c.name} />
+              <Flag code={c.code} width={20} title={c.name} nameIsAdjacent />
               {c.name}
             </Link>
           ))}
@@ -144,7 +144,7 @@ export default async function NotFound() {
                   gap: "0.4rem",
                 }}
               >
-                <Flag code={c.code} width={18} title={c.name} />
+                <Flag code={c.code} width={18} title={c.name} nameIsAdjacent />
                 {c.name}
               </Link>
             ))}
@@ -169,7 +169,7 @@ export default async function NotFound() {
                   gap: "0.4rem",
                 }}
               >
-                <Flag code={c.code} width={18} title={c.name} />
+                <Flag code={c.code} width={18} title={c.name} nameIsAdjacent />
                 {c.name}
               </Link>
             ))}

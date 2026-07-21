@@ -120,7 +120,7 @@ export default async function HomePage() {
                       hrefLang={c.htmlLang}
                       style={{ fontSize: "0.85rem", padding: "0.3rem 0.55rem", border: "1px solid var(--border)", borderRadius: "0.4rem", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "0.4rem" }}
                     >
-                      <Flag code={c.code} width={20} title={c.name} />
+                      <Flag code={c.code} width={20} title={c.name} nameIsAdjacent />
                       {c.name}
                     </Link>
                   ))}

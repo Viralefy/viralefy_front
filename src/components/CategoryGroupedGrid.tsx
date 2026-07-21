@@ -77,7 +77,7 @@ export function CategoryGroupedGrid({
 
             <div className="grid-plans">
               {g.items.map((plan) => (
-                <article key={plan.id} className="card plan-card">
+                <article key={plan.id} className="card plan-card" data-testid="plan-card">
                   <h4 style={{ fontSize: "1rem" }}>{localizedPlanName(plan, lang)}</h4>
                   <p style={{ color: "var(--muted)", fontSize: "0.85rem" }}>{localizedPlanDescription(plan, lang)}</p>
                   <p className="plan-price">{priceFor(plan, currency)}</p>

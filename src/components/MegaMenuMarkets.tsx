@@ -109,7 +109,7 @@ export function MegaMenuMarkets({ lang }: { lang: LangCode }) {
                 onMouseEnter={(e) => (e.currentTarget.style.background = "var(--accent-dim, rgba(0,254,214,0.08))")}
                 onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
               >
-                <Flag code={c.code} width={20} title={c.name} />
+                <Flag code={c.code} width={20} title={c.name} nameIsAdjacent />
                 <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {countryDisplayName(c, displayLang)}
                   {countryDisplayName(c, displayLang) !== c.name && (

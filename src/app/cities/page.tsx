@@ -188,7 +188,7 @@ export default async function CitiesHub() {
                     className="card"
                     style={{ textDecoration: "none", color: "var(--text)", display: "flex", flexDirection: "column", gap: "0.25rem", padding: "1rem" }}
                   >
-                    <Flag code={city.country} width={40} title={city.name} />
+                    <Flag code={city.country} width={40} title={city.name} nameIsAdjacent />
                     <strong style={{ fontSize: "1rem" }}>{city.name}</strong>
                     <span style={{ color: "var(--muted)", fontSize: "0.85rem" }}>
                       {city.country.toUpperCase()} · {(city.population / 1_000_000).toFixed(1)}M

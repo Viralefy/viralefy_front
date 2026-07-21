@@ -1,5 +1,6 @@
 import { test, expect, devices, type Page, type Route } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { seedCookieConsent } from './helpers/consent';
 
 // E2E hardened para o fluxo de CheckoutModal.
 //
@@ -20,10 +21,10 @@ import AxeBuilder from '@axe-core/playwright';
 // Usamos glob `**/v1/...` pra cobrir tanto same-origin (proxy) quanto cross-origin
 // (8080 direto). Caso o backend esteja num outro host, o glob ainda casa.
 //
-// TODO(infra): o teste assume que a página /us/instagram-followers renderiza
-// pelo menos UM CTA "Buy now" (BuyPlanCta) sem dependência de API. Se a build
-// SSR estiver bloqueada por fetchPlans() falhando, precisamos mockar também
-// /v1/plans em globalSetup ou trocar a rota de entrada por uma estática.
+// Entrada dos testes: a categoria /us/instagram-followers lista os planos e o
+// CTA de compra (BuyPlanCta) fica na página de plano — ver gotoPlanPage(). O
+// catálogo vem do SSR; se fetchPlans() falhar no build, a lista fica vazia e os
+// testes falham cedo, no clique do primeiro plano.
 
 // ---------------------------------------------------------------------------
 // Fixtures de resposta
@@ -132,6 +133,40 @@ async function installApiMocks(page: Page, overrides: MockOverrides = {}) {
   return { checkoutRequests };
 }
 
+/**
+ * Navega até uma página de PLANO, que é onde vive o `buy-now-cta`.
+ *
+ * `/us/instagram-followers` é a página de CATEGORIA (`[country]/[category]`):
+ * ela lista os planos e linka pra cada um, mas não tem botão de compra. O CTA
+ * está na página de plano (`[country]/[category]/[slug]`). Em vez de fixar um
+ * slug — que amarraria o teste ao catálogo em produção —, entramos pela
+ * categoria e clicamos no primeiro plano, que é o caminho real do usuário.
+ */
+async function gotoPlanPage(page: Page) {
+  // Sem isto o banner LGPD cobre a página e intercepta os cliques do modal.
+  await seedCookieConsent(page);
+  await page.goto('/us/instagram-followers');
+  const firstPlan = page.locator('a[href^="/us/instagram-followers/"]').first();
+  await expect(firstPlan).toBeVisible();
+  await firstPlan.click();
+  await page.waitForURL(/\/us\/instagram-followers\/.+/);
+}
+
+/**
+ * Avança o passo "Review" (2 de 5), que fica entre o formulário e a lista de
+ * métodos de pagamento.
+ *
+ * O modal virou um fluxo de 5 passos — Details → Review → Payment method →
+ * Complete payment → Done. O review existe de propósito: mostra destinatário,
+ * plano e total antes de qualquer cobrança. Pular no teste esconderia uma
+ * regressão nessa tela, então confirmamos explicitamente.
+ */
+async function confirmReview(modal: ReturnType<Page['locator']>) {
+  const review = modal.locator('[data-testid="checkout-review"]').first();
+  await expect(review).toBeVisible();
+  await modal.locator('[data-testid="checkout-review-confirm"]').first().click();
+}
+
 /** Abre o modal a partir do CTA principal da página de plano. */
 async function openCheckoutModal(page: Page) {
   const planTrigger = page.locator('[data-testid="buy-now-cta"]').first();
@@ -172,7 +207,7 @@ async function fillStepOne(modal: ReturnType<Page['locator']>) {
 test.describe('checkout modal — desktop', () => {
   test('opens, accepts customer fields, exposes coupon input, closes', async ({ page }) => {
     await installApiMocks(page);
-    await page.goto('/us/instagram-followers');
+    await gotoPlanPage(page);
 
     const modal = await openCheckoutModal(page);
     await fillStepOne(modal);
@@ -201,7 +236,7 @@ test.describe('checkout modal — desktop', () => {
 
   test('successful submit → goes through method picker → instructions/success step', async ({ page }) => {
     const { checkoutRequests } = await installApiMocks(page);
-    await page.goto('/us/instagram-followers');
+    await gotoPlanPage(page);
 
     const modal = await openCheckoutModal(page);
     await fillStepOne(modal);
@@ -210,6 +245,7 @@ test.describe('checkout modal — desktop', () => {
     const submitBtn = modal.locator('[data-testid="checkout-submit"]').first();
     await expect(submitBtn).toBeEnabled();
     await submitBtn.click();
+    await confirmReview(modal);
 
     // Method picker renderiza um card por gateway. Selecionamos o primeiro.
     const methodCard = modal.locator('[data-testid="payment-method-card"]').first();
@@ -255,11 +291,12 @@ test.describe('checkout modal — desktop', () => {
         });
       },
     });
-    await page.goto('/us/instagram-followers');
+    await gotoPlanPage(page);
 
     const modal = await openCheckoutModal(page);
     await fillStepOne(modal);
     await modal.locator('[data-testid="checkout-submit"]').first().click();
+    await confirmReview(modal);
 
     const methodCard = modal.locator('[data-testid="payment-method-card"]').first();
     await methodCard.click();
@@ -279,19 +316,30 @@ test.describe('checkout modal — desktop', () => {
           body: JSON.stringify({ error: { message: 'Invalid email format' } }),
         }),
     });
-    await page.goto('/us/instagram-followers');
+    await gotoPlanPage(page);
 
     const modal = await openCheckoutModal(page);
     await fillStepOne(modal);
     await modal.locator('[data-testid="checkout-submit"]').first().click();
+    await confirmReview(modal);
 
     await modal.locator('[data-testid="payment-method-card"]').first().click();
     await modal.locator('[data-testid="checkout-confirm"]').first().click();
 
     // Volta pro step "form" e mostra alert.
+    //
+    // Contrato do BUG-29 (QA round 22): erro de validação do backend NÃO é
+    // jogado solto no alerta. O modal detecta o campo citado na mensagem
+    // ("Invalid email format" → email), destaca o campo com a mensagem
+    // traduzida inline, e o alerta traz o resumo. Asserimos os dois lados —
+    // é isso que prova que a correção continua de pé.
     const alert = modal.locator('.alert-error, [role="alert"]').first();
     await expect(alert).toBeVisible({ timeout: 10_000 });
-    await expect(alert).toContainText(/Invalid email|invalid/i);
+    await expect(alert).toContainText(/fix the highlighted fields/i);
+
+    const emailField = modal.locator('input[type="email"], input[name="email"]').first();
+    await expect(emailField).toHaveAttribute('aria-invalid', 'true');
+    await expect(modal).toContainText(/Enter a valid email address/i);
     await expect(modal).toBeVisible(); // não fechou
   });
 
@@ -304,11 +352,12 @@ test.describe('checkout modal — desktop', () => {
           body: JSON.stringify({ error: { message: 'Please sign in to continue' } }),
         }),
     });
-    await page.goto('/us/instagram-followers');
+    await gotoPlanPage(page);
 
     const modal = await openCheckoutModal(page);
     await fillStepOne(modal);
     await modal.locator('[data-testid="checkout-submit"]').first().click();
+    await confirmReview(modal);
     await modal.locator('[data-testid="payment-method-card"]').first().click();
     await modal.locator('[data-testid="checkout-confirm"]').first().click();
 
@@ -326,11 +375,12 @@ test.describe('checkout modal — desktop', () => {
           body: JSON.stringify({ error: { message: 'Payment declined by gateway' } }),
         }),
     });
-    await page.goto('/us/instagram-followers');
+    await gotoPlanPage(page);
 
     const modal = await openCheckoutModal(page);
     await fillStepOne(modal);
     await modal.locator('[data-testid="checkout-submit"]').first().click();
+    await confirmReview(modal);
     await modal.locator('[data-testid="payment-method-card"]').first().click();
     await modal.locator('[data-testid="checkout-confirm"]').first().click();
 
@@ -348,11 +398,12 @@ test.describe('checkout modal — desktop', () => {
           body: JSON.stringify({ error: { message: 'Internal server error' } }),
         }),
     });
-    await page.goto('/us/instagram-followers');
+    await gotoPlanPage(page);
 
     const modal = await openCheckoutModal(page);
     await fillStepOne(modal);
     await modal.locator('[data-testid="checkout-submit"]').first().click();
+    await confirmReview(modal);
     await modal.locator('[data-testid="payment-method-card"]').first().click();
     await modal.locator('[data-testid="checkout-confirm"]').first().click();
 
@@ -369,18 +420,19 @@ test.describe('checkout modal — desktop', () => {
           body: JSON.stringify({ data: [] }),
         }),
     });
-    await page.goto('/us/instagram-followers');
+    await gotoPlanPage(page);
 
     const modal = await openCheckoutModal(page);
     await fillStepOne(modal);
     await modal.locator('[data-testid="checkout-submit"]').first().click();
+    await confirmReview(modal);
 
     await expect(modal).toContainText(/No payment methods available/i, { timeout: 10_000 });
   });
 
   test('currency picker (if present) is selectable', async ({ page }) => {
     await installApiMocks(page);
-    await page.goto('/us/instagram-followers');
+    await gotoPlanPage(page);
 
     // Currency picker mora no header — não no modal. Em desktop ele renderiza
     // inline; em mobile fica atrás do drawer. Aqui validamos só que existe
@@ -388,6 +440,14 @@ test.describe('checkout modal — desktop', () => {
     const picker = page.locator('[data-testid="currency-picker"]').first();
     if (await picker.isVisible().catch(() => false)) {
       await picker.click().catch(() => undefined);
+      // O picker abre um dialog próprio (aria-label="Currency") que cobre a
+      // página. Sem fechar, ele intercepta o clique no CTA e o teste falha por
+      // motivo alheio ao que se quer verificar.
+      const currencyDialog = page.locator('[role="dialog"][aria-label="Currency"]');
+      if (await currencyDialog.isVisible().catch(() => false)) {
+        await page.keyboard.press('Escape');
+        await expect(currencyDialog).toBeHidden();
+      }
     }
     const modal = await openCheckoutModal(page);
     await expect(modal).toBeVisible();
@@ -409,7 +469,7 @@ test.describe('checkout modal — mobile (Pixel 5)', () => {
 
   test('modal abre, é scrollável e completa o fluxo em viewport mobile', async ({ page }) => {
     await installApiMocks(page);
-    await page.goto('/us/instagram-followers');
+    await gotoPlanPage(page);
 
     const modal = await openCheckoutModal(page);
     await fillStepOne(modal);
@@ -419,6 +479,7 @@ test.describe('checkout modal — mobile (Pixel 5)', () => {
     const submitBtn = modal.locator('[data-testid="checkout-submit"]').first();
     await submitBtn.scrollIntoViewIfNeeded();
     await submitBtn.click();
+    await confirmReview(modal);
 
     const methodCard = modal.locator('[data-testid="payment-method-card"]').first();
     await expect(methodCard).toBeVisible({ timeout: 10_000 });
@@ -445,7 +506,7 @@ test.describe('checkout modal — mobile (Pixel 5)', () => {
 test.describe('checkout modal — accessibility', () => {
   test('modal aberto não tem violações axe críticas/sérias', async ({ page }) => {
     await installApiMocks(page);
-    await page.goto('/us/instagram-followers');
+    await gotoPlanPage(page);
     await openCheckoutModal(page);
 
     const results = await new AxeBuilder({ page })

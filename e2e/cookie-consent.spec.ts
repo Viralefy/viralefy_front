@@ -117,18 +117,25 @@ test.describe('Cookie consent gate (LGPD)', () => {
     expect(parsed.marketing).toBe(true);
 
     // GTM agora carrega — script tag inserido pelo GtmLoader.
-    // Espera até a request bater (lazyOnload pode demorar).
-    await page.waitForRequest(
-      (req) => req.url().includes('googletagmanager.com/gtm.js'),
-      { timeout: 10_000 },
-    );
-    expect(gtmRequests.length).toBeGreaterThan(0);
+    //
+    // Usamos o array alimentado pelo listener registrado ANTES do goto, e não
+    // `waitForRequest`: o `waitForRequest` só enxerga requests futuras, e com
+    // `strategy="lazyOnload"` o gtm.js às vezes dispara entre o clique e a
+    // linha do wait — a request acontecia, o teste não via, e falhava por
+    // corrida, não por bug. `expect.poll` observa o que já foi capturado.
+    await expect
+      .poll(() => gtmRequests.filter((u) => u.includes('gtm.js')).length, { timeout: 15_000 })
+      .toBeGreaterThan(0);
 
     // Qualquer chamada subsequente em /v1/track deve enviar consent=1.
-    // Navega pra forçar pageview.
-    await page.goto('/about').catch(() => undefined);
-    const post = trackHeaders.find((h) => h['x-analytics-consent'] === '1');
-    expect(post).toBeDefined();
+    //
+    // Navega pra uma rota REAL (`/about` não existe e devolvia 404) e espera o
+    // POST: o track.ts enfileira e libera em batch a cada 10s, então checar o
+    // array logo após a navegação testava o relógio, não o consentimento.
+    await page.goto('/pricing');
+    await expect
+      .poll(() => trackHeaders.some((h) => h['x-analytics-consent'] === '1'), { timeout: 20_000 })
+      .toBe(true);
   });
 
   test('"Personalizar" → toggle analytics only', async ({ page }) => {

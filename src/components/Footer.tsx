@@ -89,7 +89,7 @@ export function Footer({ lang = "en", compact = false }: { lang?: LangCode; comp
                   .slice(0, 18)
                   .map((c) => (
                     <Link key={c.code} href={`/${c.code}`} hrefLang={c.htmlLang} style={{ color: "var(--muted)", display: "inline-flex", alignItems: "center", gap: "0.3rem" }}>
-                      <Flag code={c.code} width={16} title={c.name} />
+                      <Flag code={c.code} width={16} title={c.name} nameIsAdjacent />
                       {c.name}
                     </Link>
                   ))}

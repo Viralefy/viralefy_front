@@ -25,10 +25,27 @@ type FlagProps = {
   width?: number;
   /** Title atribuído à imagem (tooltip). */
   title?: string;
+  /**
+   * `true` quando o NOME do país já aparece como texto ao lado da bandeira
+   * (caso da lista de mercados, footer, megamenu e busca). Aí a imagem é
+   * decorativa: `alt` repetindo o nome faz o leitor de tela anunciar
+   * "Argentina Argentina" e o Lighthouse reprovar em `image-redundant-alt`.
+   * O tooltip (`title`) continua, porque ele é visual, não de acessibilidade.
+   */
+  nameIsAdjacent?: boolean;
   style?: CSSProperties;
   className?: string;
 };
 
+// Canvas de tamanho FIXO (4:3) da flagcdn — `/{W}x{H}/xx.png`.
+//
+// Antes usávamos os tiers `/w20/`, que preservam a proporção ORIGINAL de cada
+// bandeira: Canadá vem 20x10, EUA 20x11, Argentina 20x13, Nepal 20x24, Suíça
+// 20x20. Como o componente declarava altura fixa (3:2), width/height mentiam
+// pra quase toda bandeira — o Lighthouse reprovava em `image-aspect-ratio` e o
+// navegador reservava espaço errado. Com o canvas fixo, a imagem vem
+// letterboxed no MESMO tamanho declarado, então width/height são sempre a
+// verdade: zero distorção e zero layout shift.
 const FLAGCDN_TIERS = [20, 40, 80, 160, 320, 640];
 
 function nearestTier(w: number): number {
@@ -38,7 +55,12 @@ function nearestTier(w: number): number {
   return FLAGCDN_TIERS[FLAGCDN_TIERS.length - 1];
 }
 
-export function Flag({ code, width = 20, title, style, className }: FlagProps) {
+/** Caminho do canvas fixo 4:3 pra uma largura de tier (20 → "20x15"). */
+function fixedCanvas(tierWidth: number): string {
+  return `${tierWidth}x${Math.round((tierWidth / 4) * 3)}`;
+}
+
+export function Flag({ code, width = 20, title, style, className, nameIsAdjacent = false }: FlagProps) {
   if (!code || code.length !== 2) {
     return (
       <span
@@ -57,19 +79,22 @@ export function Flag({ code, width = 20, title, style, className }: FlagProps) {
     );
   }
   const c = code.toLowerCase();
-  // Aspect ratio 3:2 padrão da flagcdn.
-  const height = Math.round((width / 3) * 2);
+  // Canvas 4:3 — é o formato que a flagcdn entrega em `/{W}x{H}/`, e é o que
+  // torna width/height declarados verdadeiros pra qualquer país.
+  const height = Math.round((width / 4) * 3);
   const x1 = nearestTier(width);
   const x2 = nearestTier(width * 2);
   // a11y BUG-66 do QA 2026-06-12: leitores de tela ignoravam todas as flags
-  // (alt=""). Agora usa o `title` (nome do país) como alt quando fornecido —
-  // mesmo redundante com o texto adjacente, é melhor que mudo. Quando não
-  // há title (uso decorativo puro), mantém alt="" + aria-hidden.
-  const hasName = typeof title === "string" && title.length > 0;
+  // (alt=""). Passou-se a usar o `title` (nome do país) como alt. Refinado
+  // depois: quando o nome JÁ está escrito ao lado (`nameIsAdjacent`), repetir
+  // no alt não ajuda ninguém — anuncia duas vezes e viola a diretriz de texto
+  // redundante. Nesses casos a imagem volta a ser decorativa; nos demais
+  // (bandeira sozinha) o alt com o nome continua sendo o certo.
+  const hasName = typeof title === "string" && title.length > 0 && !nameIsAdjacent;
   return (
     <img
-      src={`${FLAG_CDN_BASE}/w${x1}/${c}.png`}
-      srcSet={`${FLAG_CDN_BASE}/w${x1}/${c}.png 1x, ${FLAG_CDN_BASE}/w${x2}/${c}.png 2x`}
+      src={`${FLAG_CDN_BASE}/${fixedCanvas(x1)}/${c}.png`}
+      srcSet={`${FLAG_CDN_BASE}/${fixedCanvas(x1)}/${c}.png 1x, ${FLAG_CDN_BASE}/${fixedCanvas(x2)}/${c}.png 2x`}
       width={width}
       height={height}
       alt={hasName ? title! : ""}

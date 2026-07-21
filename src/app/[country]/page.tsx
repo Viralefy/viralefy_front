@@ -110,7 +110,7 @@ export default async function CountryPage({ params }: { params: Promise<Params> 
             <li><Link href="/">{t.category.breadcrumb}</Link></li>
             <li aria-hidden>›</li>
             <li aria-current="page" style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem" }}>
-              <Flag code={c.code} width={20} title={c.name} />
+              <Flag code={c.code} width={20} title={c.name} nameIsAdjacent />
               {c.name}
             </li>
           </ol>
@@ -118,7 +118,7 @@ export default async function CountryPage({ params }: { params: Promise<Params> 
 
         <header className="hero container">
           <h1 style={{ display: "inline-flex", alignItems: "center", gap: "0.6rem", flexWrap: "wrap", justifyContent: "center" }}>
-            <Flag code={c.code} width={40} title={c.name} />
+            <Flag code={c.code} width={40} title={c.name} nameIsAdjacent />
             <span>{c.h1}</span>
           </h1>
           <p>{c.intro}</p>
@@ -159,7 +159,7 @@ export default async function CountryPage({ params }: { params: Promise<Params> 
             <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
               {sameRegion.map((o) => (
                 <Link key={o.code} href={`/${o.code}`} hrefLang={o.htmlLang} style={{ fontSize: "0.85rem", display: "inline-flex", alignItems: "center", gap: "0.35rem" }}>
-                  <Flag code={o.code} width={18} title={o.name} />
+                  <Flag code={o.code} width={18} title={o.name} nameIsAdjacent />
                   {o.name}
                 </Link>
               ))}
@@ -170,7 +170,7 @@ export default async function CountryPage({ params }: { params: Promise<Params> 
             <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
               {otherRegion.map((o) => (
                 <Link key={o.code} href={`/${o.code}`} hrefLang={o.htmlLang} style={{ fontSize: "0.85rem", display: "inline-flex", alignItems: "center", gap: "0.35rem" }}>
-                  <Flag code={o.code} width={18} title={o.name} />
+                  <Flag code={o.code} width={18} title={o.name} nameIsAdjacent />
                   {o.name}
                 </Link>
               ))}
