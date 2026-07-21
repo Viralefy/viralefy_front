@@ -22,7 +22,8 @@
     "e2e:install": "playwright install --with-deps chromium",
     "lighthouse": "lhci autorun",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "test:api-stub": "node scripts/test-api-stub.mjs"
   },
   "dependencies": {
     "@sentry/nextjs": "^10.56.0",

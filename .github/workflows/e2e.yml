@@ -20,6 +20,10 @@ jobs:
     timeout-minutes: 30
     env:
       NODE_ENV: production
+      # TODO: trocar por http://localhost:4010 (npm run test:api-stub) quando o
+      # teste mobile do checkout for validado contra as fixtures — hoje ele
+      # regride com o stub por motivo ainda não isolado. Ver archive 2026-07-21.
+      NEXT_PUBLIC_API_URL: https://api.viralefy.com
       PLAYWRIGHT_BASE_URL: ${{ github.event.inputs.base_url || 'http://localhost:3000' }}
     steps:
       - name: Checkout

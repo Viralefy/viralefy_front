@@ -22,9 +22,12 @@ jobs:
       # deploy preview. Public envs are inlined at build time, so set them here
       # to match what the storefront expects at runtime.
       NEXT_PUBLIC_SITE_URL: http://localhost:3000
-      NEXT_PUBLIC_API_URL: https://api.viralefy.com
       NEXT_TELEMETRY_DISABLED: "1"
       NODE_ENV: production
+      # TODO: trocar por http://localhost:4010 (npm run test:api-stub) quando o
+      # teste mobile do checkout for validado contra as fixtures — hoje ele
+      # regride com o stub por motivo ainda não isolado. Ver archive 2026-07-21.
+      NEXT_PUBLIC_API_URL: https://api.viralefy.com
     steps:
       - name: Checkout
         uses: actions/checkout@v4

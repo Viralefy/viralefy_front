@@ -6,3 +6,7 @@ tsconfig.tsbuildinfo
 
 # relatórios locais do Lighthouse CI
 .lighthouseci/
+
+# artefatos de execução do Playwright
+test-results/
+playwright-report/
