@@ -137,9 +137,9 @@ test("viralefy_session storage has expiration validation if present", () => {
 });
 
 test("CSP in middleware.ts includes critical directives", () => {
-  // Round 25 Track CC: CSP foi MOVIDA de next.config.ts pro middleware (gera
-  // nonce per-request via crypto.randomUUID). Auditoria estrutural agora roda
-  // contra o `buildCsp()` do middleware.
+  // A CSP agora é ESTÁTICA (`CSP_STATIC` no middleware) — sem nonce per-request
+  // (nonce forçaria render dinâmico e mataria o ISR). Auditoria estrutural roda
+  // contra o `CSP_STATIC`.
   //
   // Pisos checados:
   //   - default-src 'self'  (whitelist por padrão)
@@ -149,9 +149,8 @@ test("CSP in middleware.ts includes critical directives", () => {
   //   - form-action 'self'  (form CSRF redirection)
   //   - upgrade-insecure-requests  (HTTPS-only)
   const mw = readFileSync(join(SRC, "middleware.ts"), "utf8");
-  // Captura o array de directives do buildCsp.
-  const m = mw.match(/function buildCsp[\s\S]*?const directives\s*=\s*\[([\s\S]*?)\];/);
-  assert.ok(m, "buildCsp() directives array not found in middleware.ts");
+  const m = mw.match(/const CSP_STATIC[^=]*=\s*\[([\s\S]*?)\]\.join/);
+  assert.ok(m, "CSP_STATIC array not found in middleware.ts");
   const cspBody = m[1];
   const required = [
     "default-src 'self'",
@@ -169,28 +168,25 @@ test("CSP in middleware.ts includes critical directives", () => {
   }
 });
 
-test("CSP script-src uses nonce + strict-dynamic, no 'unsafe-inline'", () => {
-  // Round 25 Track CC: o front passou a emitir CSP com nonce per-request +
-  // 'strict-dynamic'. 'unsafe-inline' em script-src virou regressão e este
-  // teste falha se reintroduzido. style-src ainda usa 'unsafe-inline' (débito
-  // conhecido do Next 15 — sem propagação confiável de nonce em CSS modules
-  // dev, next/font, runtime style insertion). Backoffice tem o mesmo trade-off.
+test("CSP script-src (prod): host allowlist + no nonce/strict-dynamic; unsafe-inline é o custo do ISR", () => {
+  // CONTRATO ATUAL (ADR-0015/0016): nonce e ISR são mutuamente exclusivos (nonce
+  // força render dinâmico). O App Router do Next 15 emite scripts INLINE por
+  // página (`self.__next_f.push`) cujo conteúdo varia — hash estático não cobre.
+  // Sem nonce, a única forma de servir estático/ISR é `'unsafe-inline'` em
+  // script-src (que a round 25 havia removido). O que PROTEGE ainda:
+  //   - allowlist de host ('self' + gtm/jsdelivr/cloudflare) — externo arbitrário barrado
+  //   - SEM 'strict-dynamic' e SEM nonce (ambos incompatíveis com ISR)
+  // Este teste trava o contrato: se alguém tirar a allowlist ou adicionar
+  // wildcard/nonce, falha. NÃO é silenciamento — é o novo piso, documentado.
   const mw = readFileSync(join(SRC, "middleware.ts"), "utf8");
-  const scriptSrcMatch = mw.match(/`script-src[^`]+`/);
-  assert.ok(scriptSrcMatch, "script-src directive not found in middleware.ts buildCsp()");
-  const scriptSrc = scriptSrcMatch[0];
-  assert.ok(
-    scriptSrc.includes("'nonce-${nonce}'"),
-    "script-src must include nonce-${nonce} (per-request CSPRNG)",
-  );
-  assert.ok(
-    scriptSrc.includes("'strict-dynamic'"),
-    "script-src must include 'strict-dynamic' (round 25 Track CC)",
-  );
-  assert.ok(
-    !/script-src[^`]*'unsafe-inline'/.test(scriptSrc),
-    "script-src MUST NOT include 'unsafe-inline' — round 25 eliminated it via nonce + strict-dynamic",
-  );
+  const prodMatch = mw.match(/:\s*"(script-src 'self'[^"]*)"/); // a branch não-dev (prod)
+  assert.ok(prodMatch, "prod script-src string not found in middleware.ts");
+  const prod = prodMatch[1];
+  assert.ok(prod.includes("'self'"), "script-src must keep 'self'");
+  assert.ok(prod.includes("https://www.googletagmanager.com"), "script-src must keep the host allowlist");
+  assert.ok(!prod.includes("'strict-dynamic'"), "script-src MUST NOT include 'strict-dynamic' (incompatível com ISR)");
+  assert.ok(!prod.includes("nonce-"), "script-src MUST NOT include a nonce (forçaria render dinâmico)");
+  assert.ok(!/\shttps:\/\/\*|['"]unsafe-eval['"]/.test(prod), "prod script-src must not widen to host wildcard or unsafe-eval");
 });
 
 test("strict security headers present in next.config.ts", () => {

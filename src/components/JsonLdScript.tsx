@@ -16,14 +16,17 @@
 // U+2029 etc. (ver `@/lib/jsonld`) — convenção da casa pra injeção segura.
 
 import { safeJsonStringify } from "@/lib/jsonld";
-import { getNonce } from "@/lib/csp";
 
-export async function JsonLdScript({ data }: { data: unknown }) {
-  const nonce = await getNonce();
+// `type="application/ld+json"` é DADO, não script executável — a CSP
+// `script-src` não se aplica a ele, então NÃO precisa de nonce/hash. Antes
+// carregava um nonce per-request (`getNonce`), o que obrigava a página a ler
+// `headers()` e virava render dinâmico. Sem nonce, o componente é síncrono e
+// não toca o request context — pré-renderizável (ISR). Ver `@/lib/theme-bootstrap`
+// e o middleware pra a CSP estática.
+export function JsonLdScript({ data }: { data: unknown }) {
   return (
     <script
       type="application/ld+json"
-      nonce={nonce}
       dangerouslySetInnerHTML={{ __html: safeJsonStringify(data) }}
     />
   );

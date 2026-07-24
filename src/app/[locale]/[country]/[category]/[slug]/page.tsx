@@ -10,6 +10,7 @@ import { localizedPlanName } from "@/lib/plan-labels";
 import { COUNTRIES, getCountry } from "@/i18n/countries";
 import { langOfCountry, tr } from "@/i18n/languages";
 import {
+  CATEGORY_CODES,
   categoryFromSlug,
   categoryLabel,
   categorySlug,
@@ -26,13 +27,39 @@ import { Flag } from "@/components/Flag";
 // o nome do plano e do país, body com explicação do tamanho, comparação com
 // vizinhos e CTA pro checkout.
 
-// ISR (round 23 Track XX): plano específico por país. Cardinalidade alta
-// (~60 países × 5 categorias × ~6 quantidades ≈ 1.800 rotas). Sem
-// `generateStaticParams` — Next gera on-demand e cacheia por 30min.
-// Reviews têm TTL próprio (5min) via `next.revalidate` no fetch.
+// ISR. CORREÇÃO (mesmo bug do category): sem generateStaticParams NÃO-vazio o
+// Next 15 serve fully-dynamic (no-store), nunca cacheia. Seedamos os planos
+// REAIS dos FEATURED markets buscados no build (getPlans é gracioso). Se a API
+// está fora no build, o seed fica vazio → estas rotas caem em dynamic (débito de
+// infra: build com API alcançável habilita o ISR completo do slug). Não usamos
+// quantidades hardcoded pra NÃO cachear 404 de URL que na verdade é válida.
+// Reviews têm TTL próprio (5min) via `next.revalidate` no fetch. Ver ADR.
 export const revalidate = 1800;
 
-type Params = { country: string; category: string; slug: string };
+const SEED_COUNTRIES = ["us", "br", "es", "mx", "de", "fr", "gb", "it", "ar", "in", "id", "tr"];
+
+export async function generateStaticParams(): Promise<{ locale: string; country: string; category: string; slug: string }[]> {
+  const plans = await getPlans();
+  if (plans.length === 0) return []; // API fora no build → slug fica on-demand
+  const out: { locale: string; country: string; category: string; slug: string }[] = [];
+  for (const code of SEED_COUNTRIES) {
+    const c = getCountry(code);
+    if (!c) continue;
+    const lang = langOfCountry(c.code);
+    for (const cat of CATEGORY_CODES) {
+      const cslug = categorySlug(cat, lang);
+      const seen = new Set<number>();
+      for (const p of plans.filter((pl) => pl.category === cat)) {
+        if (seen.has(p.followers_qty)) continue;
+        seen.add(p.followers_qty);
+        out.push({ locale: c.htmlLang.toLowerCase(), country: c.code, category: cslug, slug: `${p.followers_qty}-${cslug}` });
+      }
+    }
+  }
+  return out;
+}
+
+type Params = { locale: string; country: string; category: string; slug: string };
 
 function siteUrl() {
   return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";

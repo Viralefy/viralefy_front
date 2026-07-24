@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { headers } from "next/headers";
 import { Footer } from "@/components/Footer";
 import { indexableMeta } from "@/lib/seo-meta";
 import { COMPETITORS } from "@/lib/competitors";
@@ -21,9 +20,9 @@ export const revalidate = 1800;
 
 type PageLang = "pt" | "en" | "es";
 
-async function resolveLang(): Promise<PageLang> {
-  const h = await headers();
-  const locale = (h.get("x-locale") || "en").toLowerCase();
+// `headers()` REMOVIDO — anulava o ISR. Idioma vem de `params.locale`. Ver ADR.
+function resolveLang(rawLocale: string): PageLang {
+  const locale = rawLocale.toLowerCase();
   if (locale.startsWith("pt")) return "pt";
   if (locale.startsWith("es")) return "es";
   return "en";
@@ -109,10 +108,11 @@ const TEXT: Record<PageLang, {
   },
 };
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const meta = indexableMeta();
   const canonical = "/vs";
-  const lang = await resolveLang();
+  const { locale } = await params;
+  const lang = resolveLang(locale);
   const t = TEXT[lang];
   const localeOg = lang === "pt" ? "pt_BR" : lang === "es" ? "es_ES" : "en_US";
   return {
@@ -135,8 +135,9 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function VsHubPage() {
-  const lang = await resolveLang();
+export default async function VsHubPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const lang = resolveLang(locale);
   const t = TEXT[lang];
   const url = siteUrl();
   const pageUrl = `${url}/vs`;
