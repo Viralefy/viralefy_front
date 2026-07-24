@@ -8,11 +8,11 @@
 //   que antes lia `cookies()` no layout — leitura essa que tornava a árvore
 //   inteira dinâmica e matava o ISR das landing pages (tráfego orgânico e pago).
 //
-// Por que STRING ESTÁTICA e não interpolada: o conteúdo tem que ser byte-a-byte
-// constante pra o `sha256` abaixo casar com o que o browser vê. A CSP autoriza
-// este inline via `'sha256-…'` (não via nonce) — nonce forçaria render dinâmico.
-// Qualquer edição AQUI muda o hash: o teste `security.test.mjs` recomputa e
-// falha se `BOOTSTRAP_SHA256` sair de sincronia (piso 5 — não silenciar teste).
+// Autorizado pela CSP via `'unsafe-inline'` em script-src (ver middleware /
+// ADR-0016): o App Router emite scripts inline por página (`self.__next_f.push`)
+// que um hash estático não cobre, então a CSP estática precisa de `'unsafe-inline'`
+// e este bootstrap entra junto. Mantido como STRING estática por higiene (fácil
+// de auditar / mover pra externo depois).
 //
 // Nomes de cookie/LS são literais de propósito (o inline não importa módulos):
 //   vf_theme / viralefy_theme  → ver src/lib/theme.ts
@@ -27,8 +27,3 @@ export const BOOTSTRAP_JS =
   "d.setAttribute('data-theme',eff);d.setAttribute('data-theme-pref',t);" +
   "var cm=c.match(/(?:^|; )vf_currency=([^;]*)/);if(cm)window.__vf_currency=decodeURIComponent(cm[1]);" +
   "}catch(e){}})();";
-
-// sha256 (base64) do BOOTSTRAP_JS acima, no formato de source-expression da CSP.
-// Gerado por:  node -e "import('crypto').then(c=>console.log('sha256-'+c.createHash('sha256').update(require('./src/lib/theme-bootstrap.ts').BOOTSTRAP_JS).digest('base64')))"
-// (na prática o valor é fixado abaixo e o teste de segurança garante o sync).
-export const BOOTSTRAP_SHA256 = "sha256-XqMsvR87A3zwR25kZkzATrJXfLoWXJI8Qh5jCqQvTYk=";

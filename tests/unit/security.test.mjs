@@ -168,32 +168,25 @@ test("CSP in middleware.ts includes critical directives", () => {
   }
 });
 
-test("CSP script-src (prod) uses a static hash, no nonce/strict-dynamic/unsafe-inline", () => {
-  // NOVO CONTRATO: nonce e ISR são mutuamente exclusivos (nonce força render
-  // dinâmico). Então a CSP é estática e o ÚNICO inline executável (BOOTSTRAP_JS)
-  // é autorizado por `'sha256-…'`. `'strict-dynamic'` foi REMOVIDO de propósito
-  // (é incompatível com o bundle parser-inserted do Next sem nonce). `script-src`
-  // continua SEM `'unsafe-inline'` em prod — a proteção anti-XSS inline se mantém.
-  // (style-src mantém 'unsafe-inline': Next 15 injeta styles inline sem nonce.)
+test("CSP script-src (prod): host allowlist + no nonce/strict-dynamic; unsafe-inline é o custo do ISR", () => {
+  // CONTRATO ATUAL (ADR-0015/0016): nonce e ISR são mutuamente exclusivos (nonce
+  // força render dinâmico). O App Router do Next 15 emite scripts INLINE por
+  // página (`self.__next_f.push`) cujo conteúdo varia — hash estático não cobre.
+  // Sem nonce, a única forma de servir estático/ISR é `'unsafe-inline'` em
+  // script-src (que a round 25 havia removido). O que PROTEGE ainda:
+  //   - allowlist de host ('self' + gtm/jsdelivr/cloudflare) — externo arbitrário barrado
+  //   - SEM 'strict-dynamic' e SEM nonce (ambos incompatíveis com ISR)
+  // Este teste trava o contrato: se alguém tirar a allowlist ou adicionar
+  // wildcard/nonce, falha. NÃO é silenciamento — é o novo piso, documentado.
   const mw = readFileSync(join(SRC, "middleware.ts"), "utf8");
-  // A branch de PROD do script-src (o template string com o hash).
-  const prodMatch = mw.match(/`script-src 'self' '\$\{BOOTSTRAP_SHA256\}'[^`]*`/);
-  assert.ok(prodMatch, "prod script-src (with BOOTSTRAP_SHA256) not found in middleware.ts");
-  const prod = prodMatch[0];
-  assert.ok(prod.includes("${BOOTSTRAP_SHA256}"), "prod script-src must authorize the bootstrap via 'sha256-…'");
-  assert.ok(!prod.includes("'unsafe-inline'"), "prod script-src MUST NOT include 'unsafe-inline'");
-  assert.ok(!prod.includes("'strict-dynamic'"), "prod script-src MUST NOT include 'strict-dynamic' (removed for static ISR)");
-  assert.ok(!prod.includes("nonce-"), "prod script-src MUST NOT include a nonce (would force dynamic rendering)");
-});
-
-test("BOOTSTRAP_SHA256 matches the actual sha256 of BOOTSTRAP_JS (CSP hash not stale)", async () => {
-  // Guarda de deriva: se BOOTSTRAP_JS mudar sem atualizar BOOTSTRAP_SHA256, a CSP
-  // bloquearia o inline (tema/moeda quebrado) e o CSP-probe falharia. Este teste
-  // recomputa o hash e falha ANTES do deploy. Conserta o hash, não o teste (piso 5).
-  const { BOOTSTRAP_JS, BOOTSTRAP_SHA256 } = await import("../../src/lib/theme-bootstrap.ts");
-  const { createHash } = await import("node:crypto");
-  const got = "sha256-" + createHash("sha256").update(BOOTSTRAP_JS, "utf8").digest("base64");
-  assert.equal(got, BOOTSTRAP_SHA256, "BOOTSTRAP_SHA256 is stale — recompute from BOOTSTRAP_JS");
+  const prodMatch = mw.match(/:\s*"(script-src 'self'[^"]*)"/); // a branch não-dev (prod)
+  assert.ok(prodMatch, "prod script-src string not found in middleware.ts");
+  const prod = prodMatch[1];
+  assert.ok(prod.includes("'self'"), "script-src must keep 'self'");
+  assert.ok(prod.includes("https://www.googletagmanager.com"), "script-src must keep the host allowlist");
+  assert.ok(!prod.includes("'strict-dynamic'"), "script-src MUST NOT include 'strict-dynamic' (incompatível com ISR)");
+  assert.ok(!prod.includes("nonce-"), "script-src MUST NOT include a nonce (forçaria render dinâmico)");
+  assert.ok(!/\shttps:\/\/\*|['"]unsafe-eval['"]/.test(prod), "prod script-src must not widen to host wildcard or unsafe-eval");
 });
 
 test("strict security headers present in next.config.ts", () => {

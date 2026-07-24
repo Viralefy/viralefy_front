@@ -25,7 +25,6 @@ import { NextRequest, NextResponse } from "next/server";
 // Custo: ~0.1ms por request (locale resolve + rewrite). Sem fetch.
 
 import { COUNTRIES } from "@/i18n/countries";
-import { BOOTSTRAP_SHA256 } from "@/lib/theme-bootstrap";
 import { allLocaleSegments, localeSegment } from "@/i18n/locales";
 
 // Conjunto de segmentos de locale já-válidos (`en`, `pt-br`, `en-us`…). Se o
@@ -49,32 +48,32 @@ const IS_DEV = process.env.NODE_ENV === "development";
 
 // CSP ESTÁTICA (sem nonce) — o preço de habilitar ISR nas landing pages.
 //
-// Antes (round 25) a CSP usava `nonce` per-request + `'strict-dynamic'`. Mas
-// nonce é um valor por-request que precisa ser lido no render (`headers()`),
-// e QUALQUER `headers()` no root layout torna a árvore inteira DINÂMICA —
-// matando o ISR de todo o tráfego orgânico/pago. nonce e ISR são mutuamente
-// exclusivos, e o ISR é o objetivo. Então voltamos à CSP clássica:
+// Antes (round 25) a CSP usava `nonce` per-request + `'strict-dynamic'`, SEM
+// `'unsafe-inline'`. Mas nonce é um valor per-request lido no render
+// (`headers()`), e QUALQUER `headers()` no root layout torna a árvore inteira
+// DINÂMICA — matando o ISR de todo o tráfego orgânico/pago. nonce e ISR são
+// mutuamente exclusivos, e o ISR é o objetivo.
 //
-//   - inline executável: exatamente UM (`BOOTSTRAP_JS`), autorizado por
-//     `'sha256-…'` estático. O resto é JSON-LD (`type="application/ld+json"`,
-//     dado não-executável → fora de script-src).
-//   - scripts do próprio Next (`/_next/static/*`): cobertos por `'self'`.
-//   - `'strict-dynamic'` REMOVIDO: ele é incompatível com scripts
-//     parser-inserted sem nonce (bloquearia o bundle do Next). Sem ele, a
-//     confiança volta a ser por ALLOWLIST DE HOST. Consequência p/ tráfego
-//     pago: tags que o GTM injeta de TERCEIROS (Meta/TikTok/Google Ads) não
-//     herdam mais confiança automática — cada host precisa ser adicionado
-//     ABAIXO antes de habilitar esses pixels em prod. Hoje (HML/POC) o GTM
-//     carrega só gtm.js (googletagmanager) + GA, ambos já na allowlist.
-//   - `'unsafe-inline'` continua AUSENTE de script-src (o hash cobre o único
-//     inline) — a proteção contra XSS inline se mantém.
-// Em dev NÃO incluímos o hash: HMR/overlay do Next injeta inline scripts sem
-// hash, e a REGRA da CSP2+ é que a presença de um hash/nonce faz o browser
-// IGNORAR `'unsafe-inline'`. Então dev usa `'unsafe-inline' 'unsafe-eval'`
-// (sem hash) pra DX; prod usa o hash estrito (sem unsafe-inline).
+// TRADE-OFF INEVITÁVEL: o App Router do Next 15 emite scripts INLINE por página
+// (`<script>self.__next_f.push(...)` — streaming do RSC + hidratação). O conteúdo
+// varia por página, então `'sha256-'` estático NÃO os cobre; sem nonce (que
+// forçaria dinâmico) a única forma de não bloqueá-los é `'unsafe-inline'`. Logo
+// `script-src` volta a ter `'unsafe-inline'` (que a round 25 havia removido) —
+// é o custo de servir estático/ISR no App Router. Ver ADR-0016.
+//
+// O que se MANTÉM (a CSP continua sendo defesa real):
+//   - `default-src 'self'`, `object-src 'none'`, `frame-ancestors 'none'`,
+//     `base-uri 'self'`, `form-action 'self'` — intactos.
+//   - `script-src` mantém a ALLOWLIST DE HOST ('self' + gtm/jsdelivr/cloudflare):
+//     script EXTERNO de host arbitrário continua bloqueado.
+//   - `'strict-dynamic'` REMOVIDO (incompatível com bundle parser-inserted sem
+//     nonce). Consequência p/ tráfego pago: pixels de TERCEIROS injetados pelo
+//     GTM (Meta/TikTok/Ads) precisam do host na allowlist antes de prod (ADR-0016).
+// Compensações contra XSS inline: React escapa por padrão; JSON-LD via
+// safeJsonStringify; sem dangerouslySetInnerHTML com dado de usuário.
 const SCRIPT_SRC = IS_DEV
   ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://cdn.jsdelivr.net https://challenges.cloudflare.com"
-  : `script-src 'self' '${BOOTSTRAP_SHA256}' https://www.googletagmanager.com https://cdn.jsdelivr.net https://challenges.cloudflare.com`;
+  : "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://cdn.jsdelivr.net https://challenges.cloudflare.com";
 
 const CSP_STATIC: string = [
   "default-src 'self'",
