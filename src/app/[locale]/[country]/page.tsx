@@ -22,11 +22,17 @@ import { indexableMeta } from "@/lib/seo-meta";
 // idêntico à home — até 30min de defasagem nos preços do catálogo.
 export const revalidate = 1800;
 
-export function generateStaticParams(): { country: string }[] {
-  return COUNTRIES.map((c) => ({ country: c.code }));
+// generateStaticParams BOTTOM-UP: devolve o par COMPLETO {locale, country}. Não
+// depende da propagação do param do `[locale]` pai (o Next 15 não passa o param
+// do layout-pai pro generateStaticParams do filho de forma confiável — testado:
+// chega `undefined`). Aqui cada país gera exatamente 1 par sob o SEU locale
+// (htmlLang lowercased) — sem produto cartesiano locale×país. Pares fora disso
+// (ex.: /en-us/br) renderizam on-demand (dynamicParams). Ver ADR.
+export function generateStaticParams(): { locale: string; country: string }[] {
+  return COUNTRIES.map((c) => ({ locale: c.htmlLang.toLowerCase(), country: c.code }));
 }
 
-type Params = { country: string };
+type Params = { locale: string; country: string };
 
 function siteUrl() {
   return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";

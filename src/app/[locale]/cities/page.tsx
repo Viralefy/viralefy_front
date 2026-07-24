@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { headers } from "next/headers";
 import { Footer } from "@/components/Footer";
 import { indexableMeta } from "@/lib/seo-meta";
 import { CITIES, REGION_LABEL, REGION_ORDER, citiesByRegion } from "@/lib/cities";
@@ -22,9 +21,10 @@ export const revalidate = 1800;
 
 type PageLang = "pt" | "en" | "es";
 
-async function resolveLang(): Promise<PageLang> {
-  const h = await headers();
-  const locale = (h.get("x-locale") || "en").toLowerCase();
+// `headers()` REMOVIDO — lê-lo anulava o ISR (SSR por request). Idioma vem do
+// segmento `params.locale`. Ver ADR front-locale-segment-isr.
+function resolveLang(rawLocale: string): PageLang {
+  const locale = rawLocale.toLowerCase();
   if (locale.startsWith("pt")) return "pt";
   if (locale.startsWith("es")) return "es";
   return "en";
@@ -97,10 +97,11 @@ const TEXT: Record<PageLang, {
   },
 };
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const url = siteUrl();
   const meta = indexableMeta();
-  const lang = await resolveLang();
+  const { locale } = await params;
+  const lang = resolveLang(locale);
   const t = TEXT[lang];
   const localeOg = lang === "pt" ? "pt_BR" : lang === "es" ? "es_ES" : "en_US";
   return {
@@ -123,8 +124,9 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function CitiesHub() {
-  const lang = await resolveLang();
+export default async function CitiesHub({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const lang = resolveLang(locale);
   const t = TEXT[lang];
   const url = siteUrl();
   const pageUrl = `${url}/cities`;

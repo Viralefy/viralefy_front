@@ -17,7 +17,7 @@ function smartTrim(s: string, max: number): string {
   return (lastSpace > max * 0.6 ? cut.slice(0, lastSpace) : cut).trimEnd() + "…";
 }
 
-type Params = { slug: string };
+type Params = { locale: string; slug: string };
 
 function siteUrl() {
   return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
@@ -27,8 +27,11 @@ function siteUrl() {
 // revalidate=1800 pra permitir refresh em background se o dataset crescer.
 export const revalidate = 1800;
 
-export async function generateStaticParams(): Promise<Params[]> {
-  return CASE_STUDIES.map((c) => ({ slug: c.slug }));
+// Rota GLOBAL (copy EN-only, ver sitemap). BOTTOM-UP {locale:"en", slug}: só o
+// locale canônico `en` (o Next não propaga o param do `[locale]` pai — testado).
+// Outros locales (usuário chega por Accept-Language) ficam on-demand (ISR).
+export async function generateStaticParams(): Promise<{ locale: string; slug: string }[]> {
+  return CASE_STUDIES.map((c) => ({ locale: "en", slug: c.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {

@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { headers } from "next/headers";
 import type { Plan } from "@/lib/api";
 import { Footer } from "@/components/Footer";
+// `headers()` foi REMOVIDO: lê-lo aqui tornava a página dinâmica e anulava o
+// `revalidate` (a home inteira era SSR por request). O idioma agora vem de
+// `params.locale` (o segmento de rota), que é estático/ISR. Ver ADR.
 import { indexableMeta } from "@/lib/seo-meta";
 import { toJsonLdGraph } from "@/lib/jsonld";
 import { JsonLdScript } from "@/components/JsonLdScript";
@@ -32,9 +34,8 @@ function siteUrl() {
 // Tipo local PageLang (subset de LangCode) garante index seguro no PRICING.
 type PageLang = "pt" | "en" | "es" | "fr" | "de" | "ja" | "it" | "ru" | "nl" | "ko" | "ar" | "zh" | "hi" | "tr" | "pl" | "sv" | "da" | "no" | "fi" | "he" | "uk" | "cs" | "sk" | "th" | "vi" | "id";
 
-async function resolveLang(): Promise<PageLang> {
-  const h = await headers();
-  const locale = (h.get("x-locale") || "en").toLowerCase();
+function resolveLang(rawLocale: string): PageLang {
+  const locale = rawLocale.toLowerCase();
   if (locale.startsWith("pt")) return "pt";
   if (locale.startsWith("es")) return "es";
   if (locale.startsWith("fr")) return "fr";
@@ -805,11 +806,12 @@ function schemaLang(lang: PageLang): string {
   }
 }
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const meta = indexableMeta();
   const url = siteUrl();
   const canonical = "/pricing";
-  const lang = await resolveLang();
+  const { locale } = await params;
+  const lang = resolveLang(locale);
   const t = PRICING[lang];
   return {
     title: { absolute: t.metaTitle },
@@ -982,11 +984,12 @@ function uspsFor(t: PricingPack) {
   ];
 }
 
-export default async function PricingPage() {
+export default async function PricingPage({ params }: { params: Promise<{ locale: string }> }) {
   const plans = await getPlans();
   const url = siteUrl();
   const pageUrl = `${url}/pricing`;
-  const lang = await resolveLang();
+  const { locale } = await params;
+  const lang = resolveLang(locale);
   const t = PRICING[lang];
   const usps = uspsFor(t);
 

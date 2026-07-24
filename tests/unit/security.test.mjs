@@ -137,9 +137,9 @@ test("viralefy_session storage has expiration validation if present", () => {
 });
 
 test("CSP in middleware.ts includes critical directives", () => {
-  // Round 25 Track CC: CSP foi MOVIDA de next.config.ts pro middleware (gera
-  // nonce per-request via crypto.randomUUID). Auditoria estrutural agora roda
-  // contra o `buildCsp()` do middleware.
+  // A CSP agora é ESTÁTICA (`CSP_STATIC` no middleware) — sem nonce per-request
+  // (nonce forçaria render dinâmico e mataria o ISR). Auditoria estrutural roda
+  // contra o `CSP_STATIC`.
   //
   // Pisos checados:
   //   - default-src 'self'  (whitelist por padrão)
@@ -149,9 +149,8 @@ test("CSP in middleware.ts includes critical directives", () => {
   //   - form-action 'self'  (form CSRF redirection)
   //   - upgrade-insecure-requests  (HTTPS-only)
   const mw = readFileSync(join(SRC, "middleware.ts"), "utf8");
-  // Captura o array de directives do buildCsp.
-  const m = mw.match(/function buildCsp[\s\S]*?const directives\s*=\s*\[([\s\S]*?)\];/);
-  assert.ok(m, "buildCsp() directives array not found in middleware.ts");
+  const m = mw.match(/const CSP_STATIC[^=]*=\s*\[([\s\S]*?)\]\.join/);
+  assert.ok(m, "CSP_STATIC array not found in middleware.ts");
   const cspBody = m[1];
   const required = [
     "default-src 'self'",
@@ -169,28 +168,32 @@ test("CSP in middleware.ts includes critical directives", () => {
   }
 });
 
-test("CSP script-src uses nonce + strict-dynamic, no 'unsafe-inline'", () => {
-  // Round 25 Track CC: o front passou a emitir CSP com nonce per-request +
-  // 'strict-dynamic'. 'unsafe-inline' em script-src virou regressão e este
-  // teste falha se reintroduzido. style-src ainda usa 'unsafe-inline' (débito
-  // conhecido do Next 15 — sem propagação confiável de nonce em CSS modules
-  // dev, next/font, runtime style insertion). Backoffice tem o mesmo trade-off.
+test("CSP script-src (prod) uses a static hash, no nonce/strict-dynamic/unsafe-inline", () => {
+  // NOVO CONTRATO: nonce e ISR são mutuamente exclusivos (nonce força render
+  // dinâmico). Então a CSP é estática e o ÚNICO inline executável (BOOTSTRAP_JS)
+  // é autorizado por `'sha256-…'`. `'strict-dynamic'` foi REMOVIDO de propósito
+  // (é incompatível com o bundle parser-inserted do Next sem nonce). `script-src`
+  // continua SEM `'unsafe-inline'` em prod — a proteção anti-XSS inline se mantém.
+  // (style-src mantém 'unsafe-inline': Next 15 injeta styles inline sem nonce.)
   const mw = readFileSync(join(SRC, "middleware.ts"), "utf8");
-  const scriptSrcMatch = mw.match(/`script-src[^`]+`/);
-  assert.ok(scriptSrcMatch, "script-src directive not found in middleware.ts buildCsp()");
-  const scriptSrc = scriptSrcMatch[0];
-  assert.ok(
-    scriptSrc.includes("'nonce-${nonce}'"),
-    "script-src must include nonce-${nonce} (per-request CSPRNG)",
-  );
-  assert.ok(
-    scriptSrc.includes("'strict-dynamic'"),
-    "script-src must include 'strict-dynamic' (round 25 Track CC)",
-  );
-  assert.ok(
-    !/script-src[^`]*'unsafe-inline'/.test(scriptSrc),
-    "script-src MUST NOT include 'unsafe-inline' — round 25 eliminated it via nonce + strict-dynamic",
-  );
+  // A branch de PROD do script-src (o template string com o hash).
+  const prodMatch = mw.match(/`script-src 'self' '\$\{BOOTSTRAP_SHA256\}'[^`]*`/);
+  assert.ok(prodMatch, "prod script-src (with BOOTSTRAP_SHA256) not found in middleware.ts");
+  const prod = prodMatch[0];
+  assert.ok(prod.includes("${BOOTSTRAP_SHA256}"), "prod script-src must authorize the bootstrap via 'sha256-…'");
+  assert.ok(!prod.includes("'unsafe-inline'"), "prod script-src MUST NOT include 'unsafe-inline'");
+  assert.ok(!prod.includes("'strict-dynamic'"), "prod script-src MUST NOT include 'strict-dynamic' (removed for static ISR)");
+  assert.ok(!prod.includes("nonce-"), "prod script-src MUST NOT include a nonce (would force dynamic rendering)");
+});
+
+test("BOOTSTRAP_SHA256 matches the actual sha256 of BOOTSTRAP_JS (CSP hash not stale)", async () => {
+  // Guarda de deriva: se BOOTSTRAP_JS mudar sem atualizar BOOTSTRAP_SHA256, a CSP
+  // bloquearia o inline (tema/moeda quebrado) e o CSP-probe falharia. Este teste
+  // recomputa o hash e falha ANTES do deploy. Conserta o hash, não o teste (piso 5).
+  const { BOOTSTRAP_JS, BOOTSTRAP_SHA256 } = await import("../../src/lib/theme-bootstrap.ts");
+  const { createHash } = await import("node:crypto");
+  const got = "sha256-" + createHash("sha256").update(BOOTSTRAP_JS, "utf8").digest("base64");
+  assert.equal(got, BOOTSTRAP_SHA256, "BOOTSTRAP_SHA256 is stale — recompute from BOOTSTRAP_JS");
 });
 
 test("strict security headers present in next.config.ts", () => {

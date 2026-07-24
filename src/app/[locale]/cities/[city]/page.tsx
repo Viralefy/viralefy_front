@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { Footer } from "@/components/Footer";
 import { indexableMeta } from "@/lib/seo-meta";
@@ -21,9 +20,9 @@ import type { LangCode } from "@/i18n/languages";
 
 type PageLang = "pt" | "en" | "es" | "fr" | "de" | "ja" | "it" | "ru" | "nl" | "ko" | "ar" | "zh" | "hi" | "tr" | "pl" | "sv" | "da" | "no" | "fi" | "he" | "uk" | "cs" | "sk" | "th" | "vi" | "id";
 
-async function resolveLang(): Promise<PageLang> {
-  const h = await headers();
-  const locale = (h.get("x-locale") || "en").toLowerCase();
+// `headers()` REMOVIDO — anulava o ISR. Idioma vem de `params.locale`. Ver ADR.
+function resolveLang(rawLocale: string): PageLang {
+  const locale = rawLocale.toLowerCase();
   if (locale.startsWith("pt")) return "pt";
   if (locale.startsWith("es")) return "es";
   if (locale.startsWith("fr")) return "fr";
@@ -1120,18 +1119,21 @@ const LOCAL_FLAVOR: Record<string, { neighborhoods: string[]; landmark: string }
 // Cache via Caddy compensa (Track JJ).
 export const revalidate = 1800;
 
-export async function generateStaticParams() {
-  return CITIES.map((c) => ({ city: c.slug }));
+// Rota GLOBAL (EN-only). BOTTOM-UP {locale:"en", city}: só o locale canônico `en`
+// (o Next não propaga o param do `[locale]` pai — testado). Demais locales
+// on-demand (ISR). Evita city×locale no build.
+export async function generateStaticParams(): Promise<{ locale: string; city: string }[]> {
+  return CITIES.map((c) => ({ locale: "en", city: c.slug }));
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ city: string }> }): Promise<Metadata> {
-  const { city: slug } = await params;
+export async function generateMetadata({ params }: { params: Promise<{ locale: string; city: string }> }): Promise<Metadata> {
+  const { locale, city: slug } = await params;
   const city = getCity(slug);
   if (!city) return { title: "City not found" };
 
   const url = siteUrl();
   const meta = indexableMeta();
-  const lang = await resolveLang();
+  const lang = resolveLang(locale);
   // Fallback EN pra langs sem pack (he/uk/cs/sk/th/vi/id — débito Track XX).
   const tt = CITY_T[lang] ?? CITY_T.en!;
   const title = tt.metaTitle(city.name);
@@ -1264,14 +1266,14 @@ function neighborhoodsText(
   };
 }
 
-export default async function CityPage({ params }: { params: Promise<{ city: string }> }) {
-  const { city: slug } = await params;
+export default async function CityPage({ params }: { params: Promise<{ locale: string; city: string }> }) {
+  const { locale, city: slug } = await params;
   const city = getCity(slug);
   if (!city) notFound();
 
   const url = siteUrl();
   const pageUrl = `${url}/cities/${city.slug}`;
-  const lang = await resolveLang();
+  const lang = resolveLang(locale);
   // Fallback EN pra langs sem pack (he/uk/cs/sk/th/vi/id — débito Track XX).
   const tt = CITY_T[lang] ?? CITY_T.en!;
   // Locale do toLocaleString segue lang (BUG-89): em PT vira "12.300.000".

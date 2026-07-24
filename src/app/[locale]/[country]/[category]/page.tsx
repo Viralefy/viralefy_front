@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Plan } from "@/lib/api";
@@ -32,15 +33,29 @@ import { Flag } from "@/components/Flag";
 //   - FAQ rico (JSON-LD FAQPage)
 //   - JSON-LD Service + AggregateOffer + BreadcrumbList
 
-// ISR (round 23 Track XX): combinação países × categorias gera cardinalidade
-// alta (~60 × 5 = 300 rotas). NÃO usamos `generateStaticParams` aqui pra não
-// alongar o build — Next gera on-demand no primeiro hit e cacheia por 30min.
-// SEO/crawlers veem HTML pré-rendado a partir do 2º hit (cache hit). Trade-off:
-// primeiro hit numa combinação fria ainda paga o custo SSR (~1.5-2s), mas
-// crawlers e tráfego repetido pagam ~5ms (CDN/edge).
+// ISR. CORREÇÃO: o comentário antigo dizia "sem generateStaticParams o Next gera
+// on-demand e cacheia" — FALSO. No Next 15, rota de param dinâmico SEM
+// generateStaticParams é FULLY DYNAMIC (no-store), nunca cacheia. E, com o
+// middleware fazendo REWRITE de locale, o ISR-*fallback* (params não listados)
+// também NÃO cacheia — só os caminhos EXPLICITAMENTE pré-renderizados viram
+// cache HIT. Então pré-renderizamos TODAS as (país × categoria): categorySlug é
+// função pura (sem dependência de API), custo de build baixo (~130×5=650 páginas
+// pequenas), e é o que garante que TODA landing de categoria (orgânica/paga)
+// sirva do cache. Ver ADR front-locale-segment-isr.
 export const revalidate = 1800;
 
-type Params = { country: string; category: string };
+export function generateStaticParams(): { locale: string; country: string; category: string }[] {
+  const out: { locale: string; country: string; category: string }[] = [];
+  for (const c of COUNTRIES) {
+    const lang = langOfCountry(c.code);
+    for (const cat of CATEGORY_CODES) {
+      out.push({ locale: c.htmlLang.toLowerCase(), country: c.code, category: categorySlug(cat, lang) });
+    }
+  }
+  return out;
+}
+
+type Params = { locale: string; country: string; category: string };
 
 function siteUrl() {
   return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
@@ -224,13 +239,19 @@ export default async function CategoryPage({ params }: { params: Promise<Params>
               {/* Variante A — cards */}
               <section aria-labelledby="plans-cards">
                 <h2 id="plans-cards" style={{ textAlign: "center", marginBottom: "1rem" }}>{t.category.intro}</h2>
-                <CategoryCardGrid
-                  plans={sortedPlans}
-                  lang={lang}
-                  countryCode={c.code}
-                  category={cat}
-                  unitLabel={unitLabel}
-                />
+                {/* CategoryCardGrid usa useSearchParams (client). Agora que a
+                    página é PRÉ-RENDERIZADA (ISR), esse hook exige um boundary
+                    de Suspense — sem ele o build falha o CSR bailout. Antes a
+                    página era 100% dinâmica e o Next não cobrava. */}
+                <Suspense fallback={null}>
+                  <CategoryCardGrid
+                    plans={sortedPlans}
+                    lang={lang}
+                    countryCode={c.code}
+                    category={cat}
+                    unitLabel={unitLabel}
+                  />
+                </Suspense>
               </section>
 
               {/* Variante B — slider só faz sentido em categorias com ladder. */}

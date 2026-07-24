@@ -9,7 +9,7 @@ import { JsonLdScript } from "@/components/JsonLdScript";
 
 // Help center detail. EN-only. generateStaticParams + per-slug canonical.
 
-type Params = { slug: string };
+type Params = { locale: string; slug: string };
 
 function siteUrl() {
   return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
@@ -18,8 +18,11 @@ function siteUrl() {
 // ISR (round 23 Track XX): SSG via generateStaticParams + revalidate.
 export const revalidate = 1800;
 
-export function generateStaticParams(): { slug: string }[] {
-  return helpAllSlugs().map((slug) => ({ slug }));
+// Rota GLOBAL (EN-only). BOTTOM-UP {locale:"en", slug}: pré-renderiza só o locale
+// canônico `en` (o Next não propaga o param do `[locale]` pai — testado). Demais
+// locales renderizam on-demand (ISR). Ver ADR front-locale-segment-isr.
+export function generateStaticParams(): { locale: string; slug: string }[] {
+  return helpAllSlugs().map((slug) => ({ locale: "en", slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {

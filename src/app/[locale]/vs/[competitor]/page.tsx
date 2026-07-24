@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { Footer } from "@/components/Footer";
 import { indexableMeta, indexableDates } from "@/lib/seo-meta";
@@ -16,7 +15,7 @@ import { JsonLdScript } from "@/components/JsonLdScript";
 // Agora detecta lang via header x-locale (setado pelo middleware),
 // e usa um pack local com PT + fallback EN. EN intacto.
 
-type Params = { competitor: string };
+type Params = { locale: string; competitor: string };
 
 function siteUrl() {
   return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
@@ -24,9 +23,9 @@ function siteUrl() {
 
 type PageLang = "pt" | "en" | "es" | "fr" | "de" | "ja" | "it" | "ru" | "nl" | "ko" | "ar" | "zh" | "hi" | "tr" | "pl" | "sv" | "da" | "no" | "fi" | "he" | "uk" | "cs" | "sk" | "th" | "vi" | "id";
 
-async function resolveLang(): Promise<PageLang> {
-  const h = await headers();
-  const locale = (h.get("x-locale") || "en").toLowerCase();
+// `headers()` REMOVIDO — anulava o ISR. Idioma vem de `params.locale`. Ver ADR.
+function resolveLang(rawLocale: string): PageLang {
+  const locale = rawLocale.toLowerCase();
   if (locale.startsWith("pt")) return "pt";
   if (locale.startsWith("es")) return "es";
   if (locale.startsWith("fr")) return "fr";
@@ -1230,17 +1229,20 @@ const VS: Record<PageLang, VsPack> = {
 // até refactor de i18n. Cache via Caddy compensa enquanto isso.
 export const revalidate = 1800;
 
-export function generateStaticParams(): Params[] {
-  return COMPETITORS.map((c) => ({ competitor: c.slug }));
+// Rota GLOBAL (EN-only). BOTTOM-UP {locale:"en", competitor}: só o locale canônico
+// `en` (o Next não propaga o param do `[locale]` pai — testado). Demais locales
+// on-demand (ISR).
+export function generateStaticParams(): { locale: string; competitor: string }[] {
+  return COMPETITORS.map((c) => ({ locale: "en", competitor: c.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
-  const { competitor } = await params;
+  const { locale, competitor } = await params;
   const c = getCompetitor(competitor);
   if (!c) return { title: "Not found" };
   const meta = indexableMeta();
   const canonical = `/vs/${c.slug}`;
-  const lang = await resolveLang();
+  const lang = resolveLang(locale);
   const tt = VS[lang];
   const title = tt.metaTitle(c.name);
   const description = tt.metaDescription(c.name);
@@ -1379,13 +1381,13 @@ function buildRows(c: Competitor, lang: PageLang): Row[] {
 }
 
 export default async function VsCompetitorPage({ params }: { params: Promise<Params> }) {
-  const { competitor } = await params;
+  const { locale, competitor } = await params;
   const c = getCompetitor(competitor);
   if (!c) notFound();
 
   const url = siteUrl();
   const pageUrl = `${url}/vs/${c.slug}`;
-  const lang = await resolveLang();
+  const lang = resolveLang(locale);
   const tt = VS[lang];
   const rows = buildRows(c, lang);
   const dates = indexableDates();

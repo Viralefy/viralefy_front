@@ -22,9 +22,8 @@
 // layout porque, sem JS, não temos como respeitar consent — e LGPD
 // não tem exceção pra "sem JS, beleza".
 
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import Script from "next/script";
-import { useState } from "react";
 import { GDPR_EVENT, getConsent } from "@/lib/gdpr";
 
 declare global {
@@ -40,6 +39,9 @@ const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID ?? "GTM-K7GQ4H32";
 export function GtmLoader() {
   const [analyticsOk, setAnalyticsOk] = useState(false);
   const [marketingOk, setMarketingOk] = useState(false);
+  // Guarda pra empurrar `gtm.start` UMA vez quando o consent libera (evita
+  // eventos duplicados em re-render). Ref, não state — não deve re-renderizar.
+  const startedRef = useRef(false);
 
   useEffect(() => {
     // 1. Initial state — denied por padrão (Google Consent Mode v2).
@@ -85,20 +87,24 @@ export function GtmLoader() {
   // nem o script-tag entra no DOM (network tab fica limpa, fácil de auditar).
   if (!analyticsOk && !marketingOk) return null;
 
+  // ANTES o loader era um <script> INLINE (o IIFE clássico do GTM que injeta
+  // gtm.js). Sob a CSP estática (sem nonce, sem strict-dynamic) um inline sem
+  // hash é bloqueado. Trocamos pelo carregamento DIRETO do gtm.js EXTERNO —
+  // coberto pela allowlist `googletagmanager.com` em script-src, sem inline.
+  // O evento `gtm.start` (só métrica de tempo de carga do container) é
+  // empurrado pro dataLayer uma única vez, antes do gtm.js executar.
+  if (typeof window !== "undefined" && !startedRef.current) {
+    startedRef.current = true;
+    window.dataLayer = window.dataLayer ?? [];
+    window.dataLayer.push({ "gtm.start": Date.now(), event: "gtm.js" });
+  }
+
   return (
-    <>
-      <Script
-        id="gtm-loader"
-        strategy="lazyOnload"
-        data-testid="gtm-loader"
-        dangerouslySetInnerHTML={{
-          __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','${GTM_ID}');`,
-        }}
-      />
-    </>
+    <Script
+      id="gtm-loader"
+      strategy="lazyOnload"
+      data-testid="gtm-loader"
+      src={`https://www.googletagmanager.com/gtm.js?id=${encodeURIComponent(GTM_ID)}`}
+    />
   );
 }

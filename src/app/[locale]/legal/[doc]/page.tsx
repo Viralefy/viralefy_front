@@ -11,7 +11,7 @@ import { Footer } from "@/components/Footer";
 
 export const dynamic = "force-dynamic";
 
-type Params = { doc: string };
+type Params = { locale: string; doc: string };
 type Search = { lang?: string };
 
 function siteUrl() {

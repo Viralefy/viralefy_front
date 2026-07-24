@@ -1,11 +1,19 @@
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
 
-// Headers de segurança estáticos. A CSP foi MOVIDA pro middleware no round 25
-// (Track CC) porque o front passou a gerar `nonce` per-request — não dá pra
-// declarar o nonce estaticamente aqui. Vide `src/middleware.ts` (`buildCsp`).
-// O resto (X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy, COOP)
-// continua estático porque não depende do request.
+// Sentry só entra no build (e no bundle client) quando há como reportar: token
+// de upload OU DSN. Em HML/POC ambos são vazios, então `withSentryConfig` NÃO é
+// aplicado — o SDK `@sentry/nextjs` fica FORA do bundle client (era ~JS morto
+// que o Lighthouse flagava como `unused-javascript`). Ligar Sentry = setar
+// SENTRY_AUTH_TOKEN (upload de source maps) e/ou NEXT_PUBLIC_SENTRY_DSN.
+const SENTRY_ENABLED = Boolean(
+  process.env.SENTRY_AUTH_TOKEN || process.env.NEXT_PUBLIC_SENTRY_DSN,
+);
+
+// Headers de segurança estáticos. A CSP mora no middleware (`src/middleware.ts`,
+// `CSP_STATIC`) — agora ESTÁTICA (hash, sem nonce), pra não forçar render
+// dinâmico. O resto (X-Frame-Options, nosniff, Referrer-Policy,
+// Permissions-Policy, COOP) continua estático porque não depende do request.
 const SECURITY_HEADERS = [
   { key: "X-Frame-Options", value: "DENY" },
   { key: "X-Content-Type-Options", value: "nosniff" },
@@ -21,10 +29,10 @@ const SECURITY_HEADERS = [
 const nextConfig: NextConfig = {
   poweredByHeader: false,
 
-  // Sobe sourcemaps no client bundle pra Sentry conseguir des-minificar
-  // stack traces. Sentry CLI faz upload + remove os .map do output final
-  // no CI (passo `releases finalize`), então não vazam pro CDN público.
-  productionBrowserSourceMaps: true,
+  // Source maps de client só quando o Sentry está ligado (há token/DSN) — eles
+  // existem pra o Sentry des-minificar stack traces. Sem Sentry (HML/POC) gerar
+  // .map é trabalho de build desperdiçado e risco de vazamento; desligado.
+  productionBrowserSourceMaps: SENTRY_ENABLED,
 
   async headers() {
     // Vary: Accept-Language em rotas globais (sem country prefix). O
@@ -79,15 +87,17 @@ const nextConfig: NextConfig = {
   },
 };
 
-// withSentryConfig integra source maps + tunnel route + auto-instrument SDK.
-// Sem SENTRY_AUTH_TOKEN, o upload de source maps é skipped (build não falha).
-export default withSentryConfig(nextConfig, {
-  silent: true,
-  org: process.env.SENTRY_ORG,
-  project: process.env.SENTRY_PROJECT_FRONT,
-  authToken: process.env.SENTRY_AUTH_TOKEN,
-  // Bundle só sobe se houver token; sem ele, build segue sem upload.
-  disableLogger: true,
-  tunnelRoute: "/monitoring",
-  // sourcemaps: { disable: true } se quiser pular upload no build CI.
-});
+// withSentryConfig integra source maps + tunnel route + auto-instrument do SDK
+// client. Aplicá-lo é o que INJETA o `@sentry/nextjs` no bundle client. Por isso
+// só aplicamos quando SENTRY_ENABLED — senão o SDK nem entra no bundle (o ganho
+// de peso pro Lighthouse). Ligado, mantém o comportamento anterior.
+export default SENTRY_ENABLED
+  ? withSentryConfig(nextConfig, {
+      silent: true,
+      org: process.env.SENTRY_ORG,
+      project: process.env.SENTRY_PROJECT_FRONT,
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+      disableLogger: true,
+      tunnelRoute: "/monitoring",
+    })
+  : nextConfig;
