@@ -238,12 +238,18 @@ export function middleware(req: NextRequest) {
   return res;
 }
 
-// Roda em TODAS as rotas de PÁGINA exceto assets/handlers. `api`, `og`,
-// `sitemap*`, `robots`, `monitoring` ficam FORA porque são route handlers no
-// top-level (não sob `[locale]`) — reescrevê-los pra `/{locale}/api/…` quebraria
-// a rota. Sem esses excludes o rewrite mataria as APIs e o sitemap.
+// Roda só em rotas de PÁGINA (candidatas ao rewrite de locale). Exclui:
+//   - `_next` (assets do framework), `api`/`og`/`monitoring` (route handlers no
+//     top-level, sem extensão — reescrevê-los quebraria a rota).
+//   - `.*\.` → QUALQUER caminho com extensão de arquivo. Isto cobre TODO arquivo
+//     estático de `public/` (robots.txt, sitemap.xml, favicon.ico, icon.svg,
+//     logo.png, sw.js, llms.txt, a chave IndexNow `<hash>.txt`, …). O matcher
+//     antigo listava arquivos um a um e DEIXAVA PASSAR os demais — o rewrite
+//     então mandava `<hash>.txt` pra `/{locale}/<hash>.txt` → 404, quebrando a
+//     verificação do IndexNow. Rotas de página nunca têm ponto, então excluir
+//     tudo com ponto é seguro.
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|api|favicon.ico|robots.txt|sitemap.xml|sitemap|og|icon.svg|logo.png|sw.js|monitoring).*)",
+    "/((?!_next|api|og|monitoring|.*\\.).*)",
   ],
 };

@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@sentry/nextjs": "^10.56.0",
-    "next": "^15.3.0",
+    "next": "^15.5.21",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "zod": "^3.25.76"
@@ -45,7 +45,11 @@
     "typescript": "^5.8.0"
   },
   "overrides": {
-    "tmp": "^0.2.6"
+    "tmp": "^0.2.6",
+    "postcss": "^8.5.23",
+    "brace-expansion": "^5.0.8",
+    "fast-uri": "^3.1.4",
+    "sharp": "^0.35.3"
   },
   "browserslist": [
     "Chrome >= 93",
