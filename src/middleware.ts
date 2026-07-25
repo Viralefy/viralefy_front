@@ -75,13 +75,25 @@ const SCRIPT_SRC = IS_DEV
   ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://cdn.jsdelivr.net https://challenges.cloudflare.com"
   : "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://cdn.jsdelivr.net https://challenges.cloudflare.com";
 
+// Origem da API derivada do env (inlinado no build). Em prod é
+// https://api.viralefy.com; em dev/CI (stub) é http://localhost:4010. Sem isto,
+// connect-src ficava fixo nos hosts de prod e BLOQUEAVA os fetches ao stub na CI
+// (erro no console → reprovava errors-in-console/inspector-issues do Lighthouse).
+const API_ORIGIN = (() => {
+  try {
+    return new URL(process.env.NEXT_PUBLIC_API_URL ?? "https://api.viralefy.com").origin;
+  } catch {
+    return "https://api.viralefy.com";
+  }
+})();
+
 const CSP_STATIC: string = [
   "default-src 'self'",
   SCRIPT_SRC,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://flagcdn.com https://cdn.jsdelivr.net https://www.googletagmanager.com https://*.google-analytics.com https://*.google.com",
   "font-src 'self' data:",
-  "connect-src 'self' https://api.viralefy.com https://auth.viralefy.com https://www.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://challenges.cloudflare.com",
+  `connect-src 'self' ${API_ORIGIN} https://api.viralefy.com https://auth.viralefy.com https://www.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://challenges.cloudflare.com`,
   "frame-src https://www.googletagmanager.com https://challenges.cloudflare.com",
   "frame-ancestors 'none'",
   "base-uri 'self'",
