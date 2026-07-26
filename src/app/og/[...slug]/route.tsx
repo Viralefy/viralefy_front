@@ -30,7 +30,12 @@ function isOgSafeLang(lang: LangCode): boolean {
   return OG_SAFE_LANGS.has(lang);
 }
 
-export const dynamic = "force-dynamic";
+// ISR 1h por path (antes `force-dynamic`): a OG image de cada URL é
+// determinística e muda devagar (só quando o preço do catálogo muda). Cachear
+// evita re-renderizar o PNG + re-bater a API a cada hit de scraper social
+// (Twitter/Facebook/LinkedIn retentam bastante). Preview de share mais rápido,
+// menos carga no backend.
+export const revalidate = 3600;
 export const runtime = "nodejs";
 
 const SIZE = { width: 1200, height: 630 };
@@ -38,7 +43,7 @@ const SIZE = { width: 1200, height: 630 };
 async function getPlans(): Promise<Plan[]> {
   const base = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
   try {
-    const res = await fetch(`${base}/v1/plans`, { cache: "no-store" });
+    const res = await fetch(`${base}/v1/plans`, { next: { revalidate: 3600 } });
     const json = await res.json();
     return (json.data as Plan[]) ?? [];
   } catch {

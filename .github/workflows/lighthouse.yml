@@ -24,10 +24,14 @@ jobs:
       NEXT_PUBLIC_SITE_URL: http://localhost:3000
       NEXT_TELEMETRY_DISABLED: "1"
       NODE_ENV: production
-      # TODO: trocar por http://localhost:4010 (npm run test:api-stub) quando o
-      # teste mobile do checkout for validado contra as fixtures — hoje ele
-      # regride com o stub por motivo ainda não isolado. Ver archive 2026-07-21.
-      NEXT_PUBLIC_API_URL: https://api.viralefy.com
+      # API stub local (npm run test:api-stub). Antes apontava pra API de prod, o
+      # que fazia o browser buscar https://api.viralefy.com a partir de localhost
+      # → erro de CORS no console → `errors-in-console` reprovava e derrubava
+      # best-practices. O stub serve as fixtures com `Access-Control-Allow-Origin: *`
+      # e é EXATAMENTE pra isso que ele existe. (A ressalva do TODO antigo era o
+      # e2e de checkout mobile — o Lighthouse audita só home/pricing/categoria,
+      # não o checkout, então não é afetado.)
+      NEXT_PUBLIC_API_URL: http://localhost:4010
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -46,6 +50,15 @@ jobs:
 
       - name: Build Next.js (production)
         run: npm run build
+
+      # Sobe o stub ANTES do Next: o bundle client (NEXT_PUBLIC_API_URL inlinado
+      # no build) vai buscar http://localhost:4010, então ele precisa responder
+      # quando o Lighthouse carregar as páginas.
+      - name: Start API stub (background)
+        run: npm run test:api-stub &
+
+      - name: Wait for API stub
+        run: npx wait-on http://localhost:4010 --timeout 60000
 
       - name: Start Next.js (background)
         run: npm start &

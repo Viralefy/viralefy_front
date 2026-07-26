@@ -82,7 +82,11 @@ export default async function sitemap({ id }: { id: string }): Promise<MetadataR
     const languages = alternatesFor(u.url);
     return {
       url: u.url,
-      lastModified: u.lastModified ? new Date(u.lastModified) : new Date(),
+      // lastModified: data REAL da entrada (versão do conteúdo ou data por
+      // entidade). Quando desconhecida, OMITE o campo — nunca `new Date()`,
+      // que fazia toda URL reportar "mudou agora" a cada regeneração e treinava
+      // o crawler a ignorar o lastmod (freshness signal morto).
+      ...(u.lastModified ? { lastModified: new Date(u.lastModified) } : {}),
       changeFrequency: u.changeFrequency,
       priority: u.priority,
       ...(languages ? { alternates: { languages } } : {}),

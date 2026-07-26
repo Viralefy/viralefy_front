@@ -8,9 +8,14 @@
 // shards reais — usar a mesma função de paginatedBuckets garante que o
 // crawler nunca veja um <loc> pra sitemap inexistente.
 
-import { allSiteUrls, paginatedBuckets } from "@/lib/site-urls";
+import { allSiteUrls, paginatedBuckets, urlsForBucket } from "@/lib/site-urls";
+import { SITE_CONTENT_VERSION } from "@/lib/seo-meta";
 
-export const dynamic = "force-dynamic";
+// Cacheado 1h (igual aos shards em sitemap.ts). ANTES era `force-dynamic` +
+// `new Date()` no <lastmod> → o índice mudava a cada request e reportava
+// "agora", frescor falso. Agora cada shard reporta o lastmod REAL da sua
+// entrada mais recente (estável entre regenerações).
+export const revalidate = 3600;
 
 function siteUrl(): string {
   return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
@@ -20,16 +25,27 @@ function xmlEscape(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
+// bucketLastmod — o lastmod do shard é a data mais recente entre as URLs que
+// ele contém (max lastModified). Reflete a verdade: o shard "mudou" quando sua
+// entrada mais nova mudou. Fallback pra versão do conteúdo quando nenhuma URL
+// do bucket declara data.
+function bucketLastmod(urls: { lastModified?: string }[]): string {
+  let max = "";
+  for (const u of urls) {
+    if (u.lastModified && u.lastModified > max) max = u.lastModified;
+  }
+  return (max || SITE_CONTENT_VERSION).slice(0, 10);
+}
+
 export async function GET() {
   const base = siteUrl();
-  const today = new Date().toISOString().slice(0, 10);
   const all = await allSiteUrls();
   const buckets = paginatedBuckets(all);
 
   const entries = buckets.map((b) => `
   <sitemap>
     <loc>${xmlEscape(`${base}/sitemap/${b.id}.xml`)}</loc>
-    <lastmod>${today}</lastmod>
+    <lastmod>${bucketLastmod(urlsForBucket(all, b))}</lastmod>
   </sitemap>`).join("");
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>

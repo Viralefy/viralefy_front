@@ -10,6 +10,11 @@ export type HelpTopic = {
   sections: { heading: string; body: string }[];
   relatedSlugs: string[];
   updatedAt: string;
+  // procedural: tópico cujas `sections` são passos SEQUENCIAIS de uma tarefa
+  // (comprar, pedir refill/refund, escolher plano). Emite HowTo (passos
+  // ordenados) em vez de FAQPage — structured data válido e forte pra citação
+  // por IA (GEO §64). Tópicos em formato pergunta→resposta ficam FAQPage.
+  procedural?: boolean;
 };
 
 const UPDATED = "2026-06-05";
@@ -25,6 +30,7 @@ export const HELP_CATEGORIES: { code: HelpCategory; label: string; blurb: string
 export const HELP_TOPICS: HelpTopic[] = [
   {
     slug: "how-to-buy",
+    procedural: true,
     title: "How to buy on Viralefy",
     category: "buying",
     updatedAt: UPDATED,
@@ -300,6 +306,7 @@ export const HELP_TOPICS: HelpTopic[] = [
   },
   {
     slug: "choose-the-right-plan",
+    procedural: true,
     title: "How to choose the right plan",
     category: "buying",
     updatedAt: UPDATED,
