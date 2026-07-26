@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { LEGAL_SLUGS, legalDoc, legalMetaDescription, type LegalSlug } from "@/i18n/legal";
 import { PACKS, tr, type LangCode } from "@/i18n/languages";
 import { renderLegalBody } from "@/lib/legal-render";
+import { ogFallbackImages, OG_FALLBACK_IMAGE } from "@/lib/seo-meta";
 import { Footer } from "@/components/Footer";
 
 // Página legal. `?lang=pt` controla o idioma. Sem param cai no en.
@@ -72,6 +73,26 @@ export async function generateMetadata({
     alternates: {
       canonical: `/legal/${doc}?lang=${lang}`,
       languages,
+    },
+    // OG/Twitter próprios da page. ANTES a legal não definia openGraph, então
+    // herdava o default do root layout — cujo `og:url` é a HOME e o título é
+    // genérico: as páginas legais anunciavam a URL errada e sem título único.
+    // Agora cada uma tem og:url/título/descrição próprios + card branded.
+    openGraph: {
+      title: d.title,
+      description: legalMetaDescription(lang, doc),
+      url: `${siteUrl()}/legal/${doc}?lang=${lang}`,
+      type: "article",
+      siteName: "Viralefy",
+      images: ogFallbackImages(d.title),
+    },
+    twitter: {
+      card: "summary_large_image",
+      site: "@viralefy",
+      creator: "@viralefy",
+      title: d.title,
+      description: legalMetaDescription(lang, doc),
+      images: [OG_FALLBACK_IMAGE],
     },
   };
 }

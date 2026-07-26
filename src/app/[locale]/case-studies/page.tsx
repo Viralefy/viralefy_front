@@ -33,6 +33,8 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: {
       canonical: PATH,
       languages: { "x-default": PATH, en: PATH },
+      // Autodiscovery do RSS — este hub é o conteúdo serial que o feed cobre.
+      types: { "application/rss+xml": "/feed.xml" },
     },
     robots: meta.robots,
     other: meta.other,

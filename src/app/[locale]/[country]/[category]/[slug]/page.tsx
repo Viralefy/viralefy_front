@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { AggregateRating, Plan, PublicReview } from "@/lib/api";
-import { buildAggregateRating, buildOfferEnhancements, withGlobalGraph } from "@/lib/jsonld";
+import { buildAggregateRating, buildOfferEnhancements, buildFaqPageNode, buildReviewNodes, withGlobalGraph } from "@/lib/jsonld";
 import { JsonLdScript } from "@/components/JsonLdScript";
 import { slugAlternates } from "@/lib/hreflang";
 import { indexableMeta } from "@/lib/seo-meta";
@@ -291,6 +291,10 @@ export default async function PlanPage({ params }: { params: Promise<Params> }) 
       // (ListPublicPlans) devolve null quando review_count=0; buildAggregateRating
       // também devolve null nesse caso. Spread condicional pra omitir a key.
       ...(buildAggregateRating(aggregate ?? plan.aggregate_rating) ? { aggregateRating: buildAggregateRating(aggregate ?? plan.aggregate_rating) } : {}),
+      // review[]: nós Review individuais das reviews REAIS visíveis na página
+      // (ReviewsSection). Reforça o Product pra citação por IA e elegibilidade
+      // de estrelas, além do aggregateRating. Omitido quando não há reviews.
+      ...(reviews.length > 0 ? { review: buildReviewNodes(reviews) } : {}),
       offers: {
         "@type": "Offer",
         price: plan.prices?.["USD"] ?? (plan.price_cents / 100).toFixed(2),
@@ -306,9 +310,15 @@ export default async function PlanPage({ params }: { params: Promise<Params> }) 
         ...offerEnhancements,
       },
     },
+    // FAQPage da categoria do plano (mesmo FAQ localizado da página de
+    // categoria) — rich result de FAQ na página do produto + respostas
+    // citáveis pela IA. Renderizado visível abaixo. buildFaqPageNode devolve
+    // null se vazio (filtrado pelo @graph).
+    buildFaqPageNode(copy.faq()),
     ],
     { siteUrl: url, inLanguage: c.htmlLang },
   );
+  const faq = copy.faq();
 
   return (
     <>
@@ -377,6 +387,21 @@ export default async function PlanPage({ params }: { params: Promise<Params> }) 
                   </Link>
                 ))}
               </div>
+            </section>
+          )}
+
+          {/* FAQ visível — mesmo conteúdo do FAQPage JSON-LD (categoria do
+              plano). Resposta direta às dúvidas de compra na própria página do
+              produto; alimenta rich result de FAQ + citação por IA. */}
+          {faq.length > 0 && (
+            <section aria-labelledby="faq-heading" style={{ marginTop: "3rem", maxWidth: 760, marginInline: "auto" }}>
+              <h2 id="faq-heading" style={{ marginBottom: "1rem", fontSize: "1.2rem" }}>{t.category.faq}</h2>
+              {faq.map((q, i) => (
+                <details key={i} style={{ borderBottom: "1px solid var(--border)", padding: "0.75rem 0" }}>
+                  <summary style={{ cursor: "pointer", fontWeight: 600 }}>{q.q}</summary>
+                  <p style={{ color: "var(--muted)", marginTop: "0.5rem" }}>{q.a}</p>
+                </details>
+              ))}
             </section>
           )}
 

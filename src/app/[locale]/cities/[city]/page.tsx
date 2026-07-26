@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Footer } from "@/components/Footer";
-import { indexableMeta } from "@/lib/seo-meta";
+import { indexableMeta, ogFallbackImages, OG_FALLBACK_IMAGE } from "@/lib/seo-meta";
 import { CITIES, getCity } from "@/lib/cities";
 import { toJsonLdGraph } from "@/lib/jsonld";
 import { JsonLdScript } from "@/components/JsonLdScript";
@@ -1143,34 +1143,11 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     description,
     alternates: {
       canonical: `/cities/${city.slug}`,
+      // Conteúdo EN-only — self-referencial x-default+en (ver nota em
+      // pricing/page.tsx). Declarar 27 langs → a MESMA URL mentia pro Google.
       languages: {
         "x-default": `/cities/${city.slug}`,
         en: `/cities/${city.slug}`,
-        "pt-BR": `/cities/${city.slug}`,
-        "es-ES": `/cities/${city.slug}`,
-        "fr-FR": `/cities/${city.slug}`,
-        "de-DE": `/cities/${city.slug}`,
-        "ja-JP": `/cities/${city.slug}`,
-        "it-IT": `/cities/${city.slug}`,
-        "ru-RU": `/cities/${city.slug}`,
-        "nl-NL": `/cities/${city.slug}`,
-        "ko-KR": `/cities/${city.slug}`,
-        ar: `/cities/${city.slug}`,
-        "zh-Hans": `/cities/${city.slug}`,
-        "hi-IN": `/cities/${city.slug}`,
-        "tr-TR": `/cities/${city.slug}`,
-        "pl-PL": `/cities/${city.slug}`,
-        "sv-SE": `/cities/${city.slug}`,
-        "da-DK": `/cities/${city.slug}`,
-        "nb-NO": `/cities/${city.slug}`,
-        "fi-FI": `/cities/${city.slug}`,
-        "he-IL": `/cities/${city.slug}`,
-        "uk-UA": `/cities/${city.slug}`,
-        "cs-CZ": `/cities/${city.slug}`,
-        "sk-SK": `/cities/${city.slug}`,
-        "th-TH": `/cities/${city.slug}`,
-        "vi-VN": `/cities/${city.slug}`,
-        "id-ID": `/cities/${city.slug}`,
       },
     },
     robots: meta.robots,
@@ -1181,8 +1158,9 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       locale: ogLocale(lang),
       type: "article",
       url: `${url}/cities/${city.slug}`,
+      images: ogFallbackImages(title),
     },
-    twitter: { card: "summary_large_image", site: "@viralefy", creator: "@viralefy" },
+    twitter: { card: "summary_large_image", site: "@viralefy", creator: "@viralefy", images: [OG_FALLBACK_IMAGE] },
   };
 }
 

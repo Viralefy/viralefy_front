@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Footer } from "@/components/Footer";
-import { indexableMeta } from "@/lib/seo-meta";
+import { indexableMeta, ogFallbackImages, OG_FALLBACK_IMAGE } from "@/lib/seo-meta";
 import { COMPETITORS } from "@/lib/competitors";
 import { withGlobalGraph } from "@/lib/jsonld";
 import { JsonLdScript } from "@/components/JsonLdScript";
@@ -130,8 +130,9 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       url: `${siteUrl()}${canonical}`,
       locale: localeOg,
       type: "website",
+      images: ogFallbackImages(t.metaTitle),
     },
-    twitter: { card: "summary_large_image", site: "@viralefy", creator: "@viralefy" },
+    twitter: { card: "summary_large_image", site: "@viralefy", creator: "@viralefy", images: [OG_FALLBACK_IMAGE] },
   };
 }
 

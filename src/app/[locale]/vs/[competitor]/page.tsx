@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Footer } from "@/components/Footer";
-import { indexableMeta, indexableDates } from "@/lib/seo-meta";
+import { indexableMeta, indexableDates, ogFallbackImages, OG_FALLBACK_IMAGE } from "@/lib/seo-meta";
 import { COMPETITORS, getCompetitor, type Competitor } from "@/lib/competitors";
-import { toJsonLdGraph } from "@/lib/jsonld";
+import { withGlobalGraph } from "@/lib/jsonld";
 import { JsonLdScript } from "@/components/JsonLdScript";
 // LangCode não importado: Footer aceita o subset "pt"|"en" como compatível.
 
@@ -1251,35 +1251,11 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     description,
     alternates: {
       canonical,
-      // BUG-75: adiciona alternate pt-BR pra Brasil/Portugal.
+      // Conteúdo EN-only — self-referencial x-default+en (ver nota em
+      // pricing/page.tsx). Declarar 27 langs → a MESMA URL mentia pro Google.
       languages: {
         "x-default": canonical,
         en: canonical,
-        "pt-BR": canonical,
-        "es-ES": canonical,
-        "fr-FR": canonical,
-        "de-DE": canonical,
-        "ja-JP": canonical,
-        "it-IT": canonical,
-        "ru-RU": canonical,
-        "nl-NL": canonical,
-        "ko-KR": canonical,
-        ar: canonical,
-        "zh-Hans": canonical,
-        "hi-IN": canonical,
-        "tr-TR": canonical,
-        "pl-PL": canonical,
-        "sv-SE": canonical,
-        "da-DK": canonical,
-        "nb-NO": canonical,
-        "fi-FI": canonical,
-        "he-IL": canonical,
-        "uk-UA": canonical,
-        "cs-CZ": canonical,
-        "sk-SK": canonical,
-        "th-TH": canonical,
-        "vi-VN": canonical,
-        "id-ID": canonical,
       },
     },
     robots: meta.robots,
@@ -1290,8 +1266,9 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
       url: `${siteUrl()}${canonical}`,
       locale: ogLocale(lang),
       type: "article",
+      images: ogFallbackImages(title),
     },
-    twitter: { card: "summary_large_image", site: "@viralefy", creator: "@viralefy" },
+    twitter: { card: "summary_large_image", site: "@viralefy", creator: "@viralefy", images: [OG_FALLBACK_IMAGE] },
   };
 }
 
@@ -1394,29 +1371,36 @@ export default async function VsCompetitorPage({ params }: { params: Promise<Par
   const buildDate = new Date().toISOString().slice(0, 10);
 
   // BUG-191: consolida BreadcrumbList + Article em UM @graph.
-  const jsonld = toJsonLdGraph([
-    {
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        { "@type": "ListItem", position: 1, name: tt.breadcrumbHome, item: url },
-        { "@type": "ListItem", position: 2, name: tt.breadcrumbComparisons, item: `${url}/vs` },
-        { "@type": "ListItem", position: 3, name: `Viralefy vs ${c.name}`, item: pageUrl },
-      ],
-    },
-    {
-      "@type": "Article",
-      "@id": `${pageUrl}#article`,
-      headline: `Viralefy vs ${c.name}`,
-      description: tt.schemaArticleDesc(c.name),
-      mainEntityOfPage: pageUrl,
-      inLanguage: schemaLang(lang),
-      datePublished: dates.datePublished,
-      dateModified: dates.dateModified,
-      author: { "@type": "Organization", name: "Viralefy", url },
-      publisher: { "@type": "Organization", name: "Viralefy", url },
-      about: { "@type": "Service", name: c.name, description: c.tagline },
-    },
-  ]);
+  // Track: withGlobalGraph prepende Org + WebSite canônicos, então author/
+  // publisher referenciam `${url}/#organization` por @id (entidade única no
+  // grafo) em vez de um Organization inline anônimo duplicado — mesmo padrão
+  // de help/case-studies.
+  const jsonld = withGlobalGraph(
+    [
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: tt.breadcrumbHome, item: url },
+          { "@type": "ListItem", position: 2, name: tt.breadcrumbComparisons, item: `${url}/vs` },
+          { "@type": "ListItem", position: 3, name: `Viralefy vs ${c.name}`, item: pageUrl },
+        ],
+      },
+      {
+        "@type": "Article",
+        "@id": `${pageUrl}#article`,
+        headline: `Viralefy vs ${c.name}`,
+        description: tt.schemaArticleDesc(c.name),
+        mainEntityOfPage: pageUrl,
+        inLanguage: schemaLang(lang),
+        datePublished: dates.datePublished,
+        dateModified: dates.dateModified,
+        author: { "@id": `${url}/#organization` },
+        publisher: { "@id": `${url}/#organization` },
+        about: { "@type": "Service", name: c.name, description: c.tagline },
+      },
+    ],
+    { siteUrl: url, inLanguage: schemaLang(lang) },
+  );
 
   return (
     <>

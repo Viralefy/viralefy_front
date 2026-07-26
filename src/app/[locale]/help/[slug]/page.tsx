@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Footer } from "@/components/Footer";
-import { indexableMeta } from "@/lib/seo-meta";
+import { indexableMeta, ogFallbackImages, OG_FALLBACK_IMAGE } from "@/lib/seo-meta";
 import { HELP_TOPICS, helpAllSlugs, helpTopicBySlug } from "@/lib/help";
-import { withGlobalGraph } from "@/lib/jsonld";
+import { buildHowToNode, withGlobalGraph } from "@/lib/jsonld";
 import { JsonLdScript } from "@/components/JsonLdScript";
 
 // Help center detail. EN-only. generateStaticParams + per-slug canonical.
@@ -48,8 +48,9 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
       locale: "en_US",
       type: "article",
       siteName: "Viralefy",
+      images: ogFallbackImages(topic.title),
     },
-    twitter: { card: "summary_large_image", site: "@viralefy", creator: "@viralefy" },
+    twitter: { card: "summary_large_image", site: "@viralefy", creator: "@viralefy", images: [OG_FALLBACK_IMAGE] },
   };
 }
 
@@ -63,8 +64,13 @@ export default async function HelpTopicPage({ params }: { params: Promise<Params
   const datePublished = "2026-01-01";
   const dateModified = topic.updatedAt;
 
-  // FAQPage só se cada section parecer Q&A (heading curto + body substancial).
-  const looksFaqLike = topic.sections.every((s) => s.heading.length <= 90 && s.body.length >= 80);
+  // Structured data secundário do tópico:
+  //   - procedural (passos sequenciais) → HowTo com HowToStep ordenados.
+  //   - senão, se cada section parece Q&A (heading curto + body substancial)
+  //     → FAQPage.
+  // Um tópico não emite os dois — evita marcar o mesmo conteúdo em dois
+  // formatos conflitantes.
+  const looksFaqLike = !topic.procedural && topic.sections.every((s) => s.heading.length <= 90 && s.body.length >= 80);
 
   const related = topic.relatedSlugs
     .map((s) => HELP_TOPICS.find((t) => t.slug === s))
@@ -95,7 +101,19 @@ export default async function HelpTopicPage({ params }: { params: Promise<Params
     },
   ];
 
-  if (looksFaqLike) {
+  if (topic.procedural) {
+    // HowTo: as seções são passos ordenados da tarefa. Deep-link por passo
+    // (#step-N) casa com os `id` renderizados abaixo.
+    nodes.push(
+      buildHowToNode({
+        name: topic.title,
+        description: topic.intro,
+        url: pageUrl,
+        inLanguage: "en",
+        steps: topic.sections,
+      }),
+    );
+  } else if (looksFaqLike) {
     nodes.push({
       "@type": "FAQPage",
       mainEntity: topic.sections.map((s) => ({
@@ -136,8 +154,12 @@ export default async function HelpTopicPage({ params }: { params: Promise<Params
           {topic.intro}
         </p>
 
-        {topic.sections.map((s) => (
-          <section key={s.heading} style={{ marginTop: "1.75rem" }}>
+        {topic.sections.map((s, i) => (
+          <section
+            key={s.heading}
+            id={topic.procedural ? `step-${i + 1}` : undefined}
+            style={{ marginTop: "1.75rem", scrollMarginTop: "5rem" }}
+          >
             <h2 style={{ fontSize: "1.15rem", marginBottom: "0.5rem" }}>{s.heading}</h2>
             <p style={{ color: "var(--text)", lineHeight: 1.6, margin: 0 }}>{s.body}</p>
           </section>

@@ -11,7 +11,7 @@ import { TrustSignals } from "@/components/TrustSignals";
 import { LiveCounter } from "@/components/LiveCounter";
 import { Flag } from "@/components/Flag";
 import { langOfCountry, tr } from "@/i18n/languages";
-import { CATEGORY_CODES, categoryLabel, categorySlug } from "@/i18n/categories";
+import { CATEGORY_CODES, categoryLabel, categorySlug, copyFor } from "@/i18n/categories";
 import { countryRootAlternates } from "@/lib/hreflang";
 import { indexableMeta } from "@/lib/seo-meta";
 
@@ -101,7 +101,11 @@ export default async function CountryPage({ params }: { params: Promise<Params> 
   // produto-âncora pro Service/AggregateOffer. Antes filtrava por "seguidores"
   // que não existia mais (split em seguidores_instagram/_tiktok).
   const anchorPlans = plans.filter((p) => p.category === "seguidores_instagram");
-  const jsonld = buildCountryJsonLd(c, anchorPlans, siteUrl());
+  // FAQ da categoria-âncora (seguidores Instagram), já localizado. Emitido como
+  // FAQPage no JSON-LD E renderizado visível abaixo — rich result de FAQ na
+  // landing de país + blocos citáveis pela IA, sem cópia nova.
+  const anchorFaq = copyFor("seguidores_instagram", lang).faq();
+  const jsonld = buildCountryJsonLd(c, anchorPlans, siteUrl(), { faq: anchorFaq });
 
   const sameRegion = countriesByRegion(c.region).filter((o) => o.code !== c.code);
   const otherRegion = countriesByRegion(c.region === "americas" ? "sepa" : "americas");
@@ -154,6 +158,21 @@ export default async function CountryPage({ params }: { params: Promise<Params> 
               {c.labels.backToStore}
             </Link>
           </p>
+
+          {/* FAQ visível — mesmo conteúdo do FAQPage JSON-LD (categoria-âncora).
+              Fica antes da lista de mercados: dá resposta direta às dúvidas de
+              compra e alimenta o rich result de FAQ + citação por IA. */}
+          {anchorFaq.length > 0 && (
+            <section aria-labelledby="faq-heading" style={{ marginTop: "3rem", maxWidth: 760, marginInline: "auto" }}>
+              <h2 id="faq-heading" style={{ marginBottom: "1rem", fontSize: "1.25rem" }}>{t.category.faq}</h2>
+              {anchorFaq.map((q, i) => (
+                <details key={i} style={{ borderBottom: "1px solid var(--border)", padding: "0.75rem 0" }}>
+                  <summary style={{ cursor: "pointer", fontWeight: 600 }}>{q.q}</summary>
+                  <p style={{ color: "var(--muted)", marginTop: "0.5rem" }}>{q.a}</p>
+                </details>
+              ))}
+            </section>
+          )}
 
           <section aria-labelledby="markets-heading" style={{ marginTop: "3rem", borderTop: "1px solid var(--border)", paddingTop: "1.5rem" }}>
             <h2 id="markets-heading" style={{ fontSize: "1rem", marginBottom: "0.75rem" }}>

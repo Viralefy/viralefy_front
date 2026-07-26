@@ -1,5 +1,6 @@
 import type { Country } from "@/i18n/countries";
 import type { AggregateRating, Plan } from "./api";
+import { SITE_CONTENT_VERSION, SITE_LAUNCH_DATE } from "./seo-meta";
 
 // safeJsonStringify — escapa caracteres que permitem breakout do contexto
 // <script type="application/ld+json"> quando o JSON é injetado via
@@ -229,6 +230,82 @@ export function withGlobalGraph(
   return toJsonLdGraph([org, website, ...pageNodes]);
 }
 
+// buildFaqPageNode — constrói UM nó FAQPage a partir de pares {q,a} já
+// localizados (i18n/categories.ts `copy.faq()`).
+//
+// Onde: reusado por category (que antes inlinava o shape), country root e
+// product-detail (slug), pra que as 3 superfícies de maior valor emitam o
+// MESMO FAQPage — rich result de FAQ no Google + blocos pergunta→resposta
+// auto-contidos que a IA recorta e cita (GEO/AIO §63). O texto do FAQ SEMPRE
+// bate com o `<details>` visível na página (nunca marcar o que não se vê).
+// Devolve null quando não há perguntas — o caller omite o nó do @graph.
+export function buildFaqPageNode(
+  faq: ReadonlyArray<{ q: string; a: string }>,
+): object | null {
+  if (!faq || faq.length === 0) return null;
+  return {
+    "@type": "FAQPage",
+    mainEntity: faq.map((item) => ({
+      "@type": "Question",
+      name: item.q,
+      acceptedAnswer: { "@type": "Answer", text: item.a },
+    })),
+  };
+}
+
+// buildHowToNode — constrói um nó HowTo a partir de passos ordenados.
+//
+// Onde: usado nas páginas de ajuda GENUINAMENTE procedurais (how-to-buy,
+// refill, refund, choose-the-right-plan). HowTo dá à IA a sequência explícita
+// de ações — forte pra citação generativa (GEO/AIO §64) e structured data
+// válido — enquanto os tópicos em formato Q&A continuam como FAQPage. Cada
+// seção do tópico vira um HowToStep com âncora deep-link (`#step-N`).
+export function buildHowToNode(opts: {
+  name: string;
+  description: string;
+  url: string;
+  inLanguage: string;
+  steps: ReadonlyArray<{ heading: string; body: string }>;
+}): object {
+  return {
+    "@type": "HowTo",
+    name: opts.name,
+    description: opts.description,
+    inLanguage: opts.inLanguage,
+    step: opts.steps.map((s, i) => ({
+      "@type": "HowToStep",
+      position: i + 1,
+      name: s.heading,
+      text: s.body,
+      url: `${opts.url}#step-${i + 1}`,
+    })),
+  };
+}
+
+// buildReviewNodes — constrói nós Review individuais a partir das reviews
+// públicas reais (backend /v1/plans/:id/reviews). Onde: product-detail (slug),
+// pra reforçar o nó Product com reviews citáveis além do aggregateRating.
+// NÃO fabrica — só reviews aprovadas de orders pagas. Trunca em `max` pra não
+// inflar o JSON-LD. Devolve [] quando não há reviews.
+export function buildReviewNodes(
+  reviews: ReadonlyArray<{ rating: number; title: string; body: string; author_name: string; created_at: string }>,
+  max = 5,
+): object[] {
+  return reviews.slice(0, max).map((r) => ({
+    "@type": "Review",
+    reviewRating: {
+      "@type": "Rating",
+      ratingValue: Math.max(1, Math.min(5, r.rating)),
+      bestRating: 5,
+      worstRating: 1,
+    },
+    author: { "@type": "Person", name: r.author_name },
+    datePublished: r.created_at,
+    ...(r.title ? { name: r.title } : {}),
+    ...(r.body ? { reviewBody: r.body } : {}),
+  }));
+}
+
 // BUG-192 (QA 2026-06-14): AggregateOffer.lowPrice tem que ser o MÍNIMO real
 // dos tiers, highPrice o máximo. Antes cada page replicava a fórmula manual
 // e algumas variantes (slug page) não filtravam preços não-numéricos
@@ -378,7 +455,12 @@ function categorySlugEn(cat: string): string {
   return map[cat] ?? cat;
 }
 
-export function buildCountryJsonLd(country: Country, plans: Plan[], siteUrl: string) {
+export function buildCountryJsonLd(
+  country: Country,
+  plans: Plan[],
+  siteUrl: string,
+  opts: { faq?: ReadonlyArray<{ q: string; a: string }> } = {},
+) {
   const pageUrl = `${siteUrl}/${country.code}`;
   const logoUrl = `${siteUrl}/logo.png`;
 
@@ -457,9 +539,12 @@ export function buildCountryJsonLd(country: Country, plans: Plan[], siteUrl: str
     isPartOf: { "@id": `${siteUrl}/#website` },
     about: { "@id": `${siteUrl}/#organization` },
     // Datas explícitas (antes Ahrefs reportava "Publicado/Modificado Ausente").
-    // datePublished = launch HML; dateModified = build atual (force-dynamic).
-    datePublished: "2026-01-01T00:00:00Z",
-    dateModified: new Date().toISOString(),
+    // datePublished = launch HML; dateModified = versão do conteúdo editorial
+    // (constante estável em seo-meta.ts). ANTES era `new Date()`, que sob ISR
+    // (revalidate=1800, não mais force-dynamic) avançava a cada regeneração —
+    // frescor falso que o Google desconta. Fonte única com seo-meta.
+    datePublished: SITE_LAUNCH_DATE,
+    dateModified: SITE_CONTENT_VERSION,
   };
 
   const breadcrumb = {
@@ -484,5 +569,11 @@ export function buildCountryJsonLd(country: Country, plans: Plan[], siteUrl: str
     offers: aggregateOffer ?? undefined,
   };
 
-  return toJsonLdGraph([organization, website, webpage, breadcrumb, service]);
+  // FAQPage opcional: quando a page passa o FAQ da categoria-âncora (seguidores
+  // Instagram), o mesmo bloco vira rich result de FAQ na landing de país e dá
+  // à IA perguntas→respostas auto-contidas. O texto bate com o `<details>`
+  // visível renderizado pela page.
+  const faq = opts.faq ? buildFaqPageNode(opts.faq) : null;
+
+  return toJsonLdGraph([organization, website, webpage, breadcrumb, service, faq]);
 }

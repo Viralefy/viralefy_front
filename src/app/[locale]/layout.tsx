@@ -74,6 +74,12 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: SITE_URL,
+    // Autodiscovery do RSS de guias/case studies (AIO §64). Aparece nas pages
+    // que herdam os alternates do layout (home + hubs que não sobrescrevem);
+    // também linkado no /llms.txt.
+    types: {
+      "application/rss+xml": "/feed.xml",
+    },
   },
   category: "social media marketing",
   keywords: [

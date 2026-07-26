@@ -16,7 +16,17 @@ import { CITIES } from "@/lib/cities";
 import { COMPETITORS } from "@/lib/competitors";
 import { HELP_TOPICS } from "@/lib/help";
 import { CASE_STUDIES } from "@/lib/case-studies";
+import { SITE_CONTENT_VERSION } from "@/lib/seo-meta";
 import type { Plan } from "./api";
+
+// lastmod das páginas de catálogo/editorial estáticas. É a versão do conteúdo
+// (constante estável em seo-meta.ts), NÃO `new Date()`: o catálogo (planos +
+// cópia i18n) é editorial e só muda no deploy que altera a cópia. Um lastmod
+// ESTÁVEL é o que faz Google/Bing confiarem no sinal e recrawlarem o que de
+// fato mudou — um lastmod que avança a cada regeneração ISR treina o crawler a
+// ignorá-lo. Páginas com data real por entidade (help.updatedAt,
+// caseStudy.updatedAt) usam a própria data.
+const CONTENT_LASTMOD = SITE_CONTENT_VERSION;
 
 export type SiteUrl = {
   url: string;
@@ -50,15 +60,15 @@ export async function allSiteUrls(): Promise<SiteUrl[]> {
   const out: SiteUrl[] = [];
 
   // Home global = entrada do bloco `en`.
-  out.push({ url: base, changeFrequency: "weekly", priority: 1.0, lang: "en" });
+  out.push({ url: base, changeFrequency: "weekly", priority: 1.0, lang: "en", lastModified: CONTENT_LASTMOD });
 
   for (const c of COUNTRIES) {
     const lang = langOfCountry(c.code);
-    out.push({ url: `${base}/${c.code}`, changeFrequency: "weekly", priority: 0.9, lang });
+    out.push({ url: `${base}/${c.code}`, changeFrequency: "weekly", priority: 0.9, lang, lastModified: CONTENT_LASTMOD });
 
     for (const cat of CATEGORY_CODES) {
       const slug = categorySlug(cat, lang);
-      out.push({ url: `${base}/${c.code}/${slug}`, changeFrequency: "weekly", priority: 0.8, lang });
+      out.push({ url: `${base}/${c.code}/${slug}`, changeFrequency: "weekly", priority: 0.8, lang, lastModified: CONTENT_LASTMOD });
 
       const catPlans = plans.filter((p) => p.category === cat);
       // Categorias de serviço (servicos, recuperacao_perfil) têm múltiplos
@@ -74,6 +84,7 @@ export async function allSiteUrls(): Promise<SiteUrl[]> {
           changeFrequency: "weekly",
           priority: 0.7,
           lang,
+          lastModified: CONTENT_LASTMOD,
         });
       }
     }
@@ -82,28 +93,32 @@ export async function allSiteUrls(): Promise<SiteUrl[]> {
   // Tier 4 SEO/Growth — landings standalone EN. Caem no bucket "en".
   // /pricing, /cities + 50 cidades, /vs + N competidores, /help + 12 tópicos,
   // /case-studies + 6 estudos. Todas no bucket "en" porque copy é EN-only.
-  out.push({ url: `${base}/pricing`, changeFrequency: "weekly", priority: 0.7, lang: "en" });
+  out.push({ url: `${base}/pricing`, changeFrequency: "weekly", priority: 0.7, lang: "en", lastModified: CONTENT_LASTMOD });
+  // /status é a única sem lastmod: é force-dynamic e muda a toda hora — um
+  // lastmod estático mentiria e um dinâmico churna. Omitir é o honesto.
   out.push({ url: `${base}/status`, changeFrequency: "hourly", priority: 0.4, lang: "en" });
-  out.push({ url: `${base}/legal/cookie-preferences`, changeFrequency: "yearly", priority: 0.3, lang: "en" });
+  out.push({ url: `${base}/legal/cookie-preferences`, changeFrequency: "yearly", priority: 0.3, lang: "en", lastModified: CONTENT_LASTMOD });
 
-  out.push({ url: `${base}/cities`, changeFrequency: "weekly", priority: 0.7, lang: "en" });
+  out.push({ url: `${base}/cities`, changeFrequency: "weekly", priority: 0.7, lang: "en", lastModified: CONTENT_LASTMOD });
   for (const c of CITIES) {
-    out.push({ url: `${base}/cities/${c.slug}`, changeFrequency: "monthly", priority: 0.6, lang: "en" });
+    out.push({ url: `${base}/cities/${c.slug}`, changeFrequency: "monthly", priority: 0.6, lang: "en", lastModified: CONTENT_LASTMOD });
   }
 
-  out.push({ url: `${base}/vs`, changeFrequency: "weekly", priority: 0.6, lang: "en" });
+  out.push({ url: `${base}/vs`, changeFrequency: "weekly", priority: 0.6, lang: "en", lastModified: CONTENT_LASTMOD });
   for (const c of COMPETITORS) {
-    out.push({ url: `${base}/vs/${c.slug}`, changeFrequency: "monthly", priority: 0.5, lang: "en" });
+    out.push({ url: `${base}/vs/${c.slug}`, changeFrequency: "monthly", priority: 0.5, lang: "en", lastModified: CONTENT_LASTMOD });
   }
 
-  out.push({ url: `${base}/help`, changeFrequency: "weekly", priority: 0.7, lang: "en" });
+  out.push({ url: `${base}/help`, changeFrequency: "weekly", priority: 0.7, lang: "en", lastModified: CONTENT_LASTMOD });
   for (const t of HELP_TOPICS) {
-    out.push({ url: `${base}/help/${t.slug}`, changeFrequency: "monthly", priority: 0.6, lang: "en" });
+    // Data real por tópico (help.updatedAt, ex.: "2026-06-05") → lastmod fiel.
+    out.push({ url: `${base}/help/${t.slug}`, changeFrequency: "monthly", priority: 0.6, lang: "en", lastModified: `${t.updatedAt}T00:00:00Z` });
   }
 
-  out.push({ url: `${base}/case-studies`, changeFrequency: "monthly", priority: 0.6, lang: "en" });
+  out.push({ url: `${base}/case-studies`, changeFrequency: "monthly", priority: 0.6, lang: "en", lastModified: CONTENT_LASTMOD });
   for (const cs of CASE_STUDIES) {
-    out.push({ url: `${base}/case-studies/${cs.slug}`, changeFrequency: "monthly", priority: 0.5, lang: "en" });
+    // Data real por estudo (case-study.updatedAt, já ISO datetime).
+    out.push({ url: `${base}/case-studies/${cs.slug}`, changeFrequency: "monthly", priority: 0.5, lang: "en", lastModified: cs.updatedAt });
   }
 
   // Legais — uma URL por idioma. Caem no bucket "legal" pra não inflar nenhum lang.
@@ -114,6 +129,7 @@ export async function allSiteUrls(): Promise<SiteUrl[]> {
         changeFrequency: "monthly",
         priority: 0.3,
         lang: "legal",
+        lastModified: CONTENT_LASTMOD,
       });
     }
   }

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Footer } from "@/components/Footer";
-import { indexableMeta } from "@/lib/seo-meta";
+import { indexableMeta, ogFallbackImages, OG_FALLBACK_IMAGE } from "@/lib/seo-meta";
 import { HELP_CATEGORIES, HELP_TOPICS, helpTopicsByCategory } from "@/lib/help";
 import { withGlobalGraph } from "@/lib/jsonld";
 import { JsonLdScript } from "@/components/JsonLdScript";
@@ -28,6 +28,8 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: {
       canonical: "/help",
       languages: { "x-default": "/help", en: "/help" },
+      // Autodiscovery do RSS — o help center é conteúdo serial coberto pelo feed.
+      types: { "application/rss+xml": "/feed.xml" },
     },
     robots: meta.robots,
     other: meta.other,
@@ -38,8 +40,9 @@ export async function generateMetadata(): Promise<Metadata> {
       locale: "en_US",
       type: "website",
       siteName: "Viralefy",
+      images: ogFallbackImages(title),
     },
-    twitter: { card: "summary_large_image", site: "@viralefy", creator: "@viralefy" },
+    twitter: { card: "summary_large_image", site: "@viralefy", creator: "@viralefy", images: [OG_FALLBACK_IMAGE] },
   };
 }
 

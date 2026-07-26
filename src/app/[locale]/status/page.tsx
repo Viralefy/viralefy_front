@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Footer } from "@/components/Footer";
-import { indexableMeta } from "@/lib/seo-meta";
+import { indexableMeta, ogFallbackImages, OG_FALLBACK_IMAGE } from "@/lib/seo-meta";
 import { withGlobalGraph } from "@/lib/jsonld";
 import { JsonLdScript } from "@/components/JsonLdScript";
 
@@ -40,7 +40,9 @@ export async function generateMetadata(): Promise<Metadata> {
       title, description, type: "website",
       url: `${siteUrl()}${canonical}`, locale: "en_US",
       siteName: "Viralefy",
+      images: ogFallbackImages(title),
     },
+    twitter: { card: "summary_large_image", site: "@viralefy", creator: "@viralefy", images: [OG_FALLBACK_IMAGE] },
   };
 }
 

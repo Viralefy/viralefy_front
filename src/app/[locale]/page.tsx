@@ -43,7 +43,10 @@ export const metadata: Metadata = {
   // antes a home declarava hreflang pros 130 country roots, mas eles têm
   // conteúdo diferente (localização) e Ahrefs flagava como hreflang
   // inválido + reciprocidade quebrada (Site Audit 2026-06-05).
-  alternates: homeAlternates(),
+  // types: autodiscovery do RSS. A home é o ponto canônico onde readers/
+  // crawlers procuram o feed; como ela sobrescreve os alternates do layout
+  // (que substitui por inteiro no Next), reafirmamos o link aqui.
+  alternates: { ...homeAlternates(), types: { "application/rss+xml": "/feed.xml" } },
   robots: seoMeta.robots,
   other: seoMeta.other,
   openGraph: {

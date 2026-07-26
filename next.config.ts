@@ -1,6 +1,20 @@
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
 
+// Guard de produção: NEXT_PUBLIC_SITE_URL alimenta metadataBase, canonicals,
+// OG, sitemap, robots, llms.txt e feed. Se faltar num BUILD de produção, todos
+// eles caem em `http://localhost:3000` silenciosamente — canonicals e sitemap
+// quebrados no ar, um desastre de SEO difícil de notar. Falhar o build cedo é
+// melhor que descobrir em produção. `next dev` (NODE_ENV=development) usa o
+// fallback localhost e não é afetado; o CI e o prod já definem a env.
+if (process.env.NODE_ENV === "production" && !process.env.NEXT_PUBLIC_SITE_URL) {
+  throw new Error(
+    "NEXT_PUBLIC_SITE_URL é obrigatório no build de produção — metadataBase, " +
+      "canonicals, OG, sitemap, robots e feed dependem dele. Defina-o no " +
+      "ambiente de build/CI antes de `next build`.",
+  );
+}
+
 // Sentry só entra no build (e no bundle client) quando há como reportar: token
 // de upload OU DSN. Em HML/POC ambos são vazios, então `withSentryConfig` NÃO é
 // aplicado — o SDK `@sentry/nextjs` fica FORA do bundle client (era ~JS morto

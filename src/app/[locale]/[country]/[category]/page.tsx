@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Plan } from "@/lib/api";
-import { buildOfferEnhancements, buildAggregateOffer, withGlobalGraph } from "@/lib/jsonld";
+import { buildOfferEnhancements, buildAggregateOffer, buildFaqPageNode, withGlobalGraph } from "@/lib/jsonld";
 import { JsonLdScript } from "@/components/JsonLdScript";
 import { categoryAlternates } from "@/lib/hreflang";
 import { indexableMeta } from "@/lib/seo-meta";
@@ -129,6 +129,24 @@ export default async function CategoryPage({ params }: { params: Promise<Params>
   // "views". Mantém o card legível sem duplicar "instagram" / "tiktok".
   const unitLabel = categoryUnit(cat, lang);
 
+  // Links de plano em HTML SERVER-SIDE (dedup por URL). O grid de cards
+  // (CategoryCardGrid) é client + `Suspense fallback={null}` → seus <a> NÃO
+  // saem no HTML servido, deixando o tier de planos (o mais profundo) sem link
+  // interno rastreável. Esta lista garante que cada plano seja alcançável por
+  // <a> no HTML estático (descoberta pelo crawler + fluxo de PageRank). Dedup
+  // por href espelha o sitemap (servicos têm qty=1 colidindo em `1-<slug>`).
+  const planLinks = (() => {
+    const seen = new Set<string>();
+    const out: { href: string; label: string }[] = [];
+    for (const p of sortedPlans) {
+      const href = `/${c.code}/${catSlug}/${p.followers_qty}-${catSlug}`;
+      if (seen.has(href)) continue;
+      seen.add(href);
+      out.push({ href, label: `${p.followers_qty.toLocaleString()} ${unitLabel}` });
+    }
+    return out;
+  })();
+
   // Offers para AggregateOffer (e cada plano vira ProductGroup ofertado).
   // Schema.org exige priceCurrency em ISO 4217; usamos USD (não USDT, que
   // não é fiat). USD é o canônico interno (plan.prices["USD"]).
@@ -177,14 +195,7 @@ export default async function CategoryPage({ params }: { params: Promise<Params>
         // e o BreadcrumbList já carregam o sinal de idioma.
         offers: aggregateOffer ?? undefined,
       },
-      {
-        "@type": "FAQPage",
-        mainEntity: copy.faq().map((q) => ({
-          "@type": "Question",
-          name: q.q,
-          acceptedAnswer: { "@type": "Answer", text: q.a },
-        })),
-      },
+      buildFaqPageNode(copy.faq()),
     ],
     { siteUrl: url, inLanguage: c.htmlLang },
   );
@@ -265,6 +276,26 @@ export default async function CategoryPage({ params }: { params: Promise<Params>
                   </section>
                 )}
             </>
+          )}
+
+          {/* Lista de planos rastreável (server HTML) — ver planLinks acima.
+              Dá ao crawler os <a> pra cada página de plano que o grid client
+              não expõe no HTML servido. Também é um atalho útil pro usuário. */}
+          {planLinks.length > 0 && (
+            <nav aria-labelledby="all-plans-heading" style={{ marginTop: "2.5rem", maxWidth: 760, marginInline: "auto" }}>
+              <h2 id="all-plans-heading" style={{ fontSize: "1rem", marginBottom: "0.75rem", color: "var(--muted)" }}>
+                {t.category.chooseQty}
+              </h2>
+              <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+                {planLinks.map((p) => (
+                  <li key={p.href}>
+                    <Link href={p.href} className="btn btn-outline" style={{ padding: "0.35rem 0.75rem", fontSize: "0.85rem" }}>
+                      {p.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
           )}
 
           {/* Cópia longa — parágrafos 2..N */}

@@ -5,7 +5,7 @@ import { Footer } from "@/components/Footer";
 // `headers()` foi REMOVIDO: lê-lo aqui tornava a página dinâmica e anulava o
 // `revalidate` (a home inteira era SSR por request). O idioma agora vem de
 // `params.locale` (o segmento de rota), que é estático/ISR. Ver ADR.
-import { indexableMeta } from "@/lib/seo-meta";
+import { indexableMeta, ogFallbackImages, OG_FALLBACK_IMAGE } from "@/lib/seo-meta";
 import { toJsonLdGraph } from "@/lib/jsonld";
 import { JsonLdScript } from "@/components/JsonLdScript";
 // LangCode importado abaixo apenas pra anotar `lang` recebido pelo Footer.
@@ -820,35 +820,13 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     other: meta.other,
     alternates: {
       canonical,
-      // x-default mantém EN como padrão global; pt-BR adicionado pra Brasil/Portugal.
+      // Conteúdo EN-only: declarar 27 langs → a MESMA URL mente pro Google
+      // (esta URL não serve de-DE/fr-FR/etc.). Self-referencial x-default+en é
+      // o honesto e consistente com os hubs (/cities, /vs, /help). Quando
+      // houver variantes localizadas de verdade, ligar por URL real.
       languages: {
         "x-default": canonical,
         en: canonical,
-        "pt-BR": canonical,
-        "es-ES": canonical,
-        "fr-FR": canonical,
-        "de-DE": canonical,
-        "ja-JP": canonical,
-        "it-IT": canonical,
-        "ru-RU": canonical,
-        "nl-NL": canonical,
-        "ko-KR": canonical,
-        ar: canonical,
-        "zh-Hans": canonical,
-        "hi-IN": canonical,
-        "tr-TR": canonical,
-        "pl-PL": canonical,
-        "sv-SE": canonical,
-        "da-DK": canonical,
-        "nb-NO": canonical,
-        "fi-FI": canonical,
-        "he-IL": canonical,
-        "uk-UA": canonical,
-        "cs-CZ": canonical,
-        "sk-SK": canonical,
-        "th-TH": canonical,
-        "vi-VN": canonical,
-        "id-ID": canonical,
       },
     },
     openGraph: {
@@ -857,6 +835,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       url: `${url}${canonical}`,
       locale: ogLocale(lang),
       type: "website",
+      images: ogFallbackImages(t.metaTitle),
     },
     twitter: {
       card: "summary_large_image",
@@ -864,6 +843,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       creator: "@viralefy",
       title: t.metaTitle,
       description: t.metaDescription,
+      images: [OG_FALLBACK_IMAGE],
     },
   };
 }
